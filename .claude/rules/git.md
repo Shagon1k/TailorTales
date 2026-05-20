@@ -6,19 +6,19 @@
 - One logical concern per branch — keep PRs reviewable.
 
 ## Branch Naming
-Format: `CC-<type>-<short-kebab-descriptor>`
+Format: `TT-<type>-<short-kebab-descriptor>`
 
 - `<type>` matches commit types (see below): `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `build`, `ci`, `style`.
 - `<descriptor>` — short, kebab-case, describes the change.
-- Meta branches (rare): `CC-<name>` acceptable when no clear type applies (e.g. `CC-init` for initial repo setup).
+- Meta branches (rare): `TT-<name>` acceptable when no clear type applies (e.g. `TT-init` for initial repo setup).
 - Phase tracking → use **GitHub Milestones** (e.g. `Phase 1 — Auth`), NOT phase-named branches.
 
 ### Examples
-- `CC-feat-google-oauth`
-- `CC-feat-user-entity`
-- `CC-fix-session-cookie-expiry`
-- `CC-chore-bump-prisma`
-- `CC-docs-roadmap-phase-4-detail`
+- `TT-feat-google-oauth`
+- `TT-feat-user-entity`
+- `TT-fix-session-cookie-expiry`
+- `TT-chore-bump-prisma`
+- `TT-docs-roadmap-phase-4-detail`
 
 ## Commit Messages — Conventional Commits
 

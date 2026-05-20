@@ -1,6 +1,6 @@
-# docs/
+# _docs/
 
-Per-phase documentation for CurioCraft. Each phase from [ROADMAP.md](../ROADMAP.md) produces one file here, named `phase-N-<name>.md`.
+Per-phase documentation for TailorTales. Each phase from [ROADMAP.md](../ROADMAP.md) produces one file here, named `phase-N-<name>.md`.
 
 ## Rules
 - One file per phase, written when the phase is completed.

@@ -1,4 +1,4 @@
-# CurioCraft — Roadmap
+# TailorTales — Roadmap
 
 > Single source of truth for project scope, decisions, and progress.
 > Update this file whenever scope changes, a decision is made, or a phase completes.
@@ -7,7 +7,7 @@
 
 ## 1. Project Overview
 
-**CurioCraft** is a SaaS service that generates short (5–20 page), customized PDF books and comics for children. Target audience: parents who want to create personalized educational content that answers their child's "Why?" / "How?" questions in an age-appropriate, engaging way.
+**TailorTales** is a SaaS service that generates short (5–20 page), customized PDF books and comics for children. Target audience: parents who want to create personalized educational content that answers their child's "Why?" / "How?" questions in an age-appropriate, engaging way.
 
 ### Output formats
 - **Book** — text + 1 illustration per page (or per spread).
@@ -111,7 +111,7 @@
 ## 6. Process & Documentation Rules
 
 - **ROADMAP.md is the single source of truth.** Update it on every scope change or decision.
-- **Per-phase docs (mandatory):** every completed phase MUST produce `docs/phase-N-<name>.md` following `docs/TEMPLATE.md`. Each doc must include:
+- **Per-phase docs (mandatory):** every completed phase MUST produce `_docs/phase-N-<name>.md` following `_docs/TEMPLATE.md`. Each doc must include:
   - **Summary** — one-paragraph overview of what was added
   - **What was added** — entities, modules, endpoints, pages, jobs, etc.
   - **Resulting structure** — directory tree of new/changed files
@@ -121,7 +121,7 @@
   - **Database migrations** — list of migrations and what they change
   - **Gotchas / known limitations** — anything a future developer needs to know
 - **Rules revision:** after each phase, review and propose updates to `CLAUDE.md` and `.claude/rules/*.md` based on what was learned. **Each revision requires developer approval before commit.**
-- **Phase completion gate:** a phase is NOT complete until acceptance checks pass AND its `docs/phase-N-*.md` is written. No half-finished phases in `main`.
+- **Phase completion gate:** a phase is NOT complete until acceptance checks pass AND its `_docs/phase-N-*.md` is written. No half-finished phases in `main`.
 
 ---
 
@@ -160,7 +160,7 @@
 - Commit with invalid message is rejected by commitlint; valid Conventional Commit is accepted
 - CI green on a no-op PR
 
-**Deliverables:** `docs/phase-0-infrastructure.md`
+**Deliverables:** `_docs/phase-0-infrastructure.md`
 
 ---
 
@@ -190,7 +190,7 @@
 - Admin role can be assigned via seed script
 - Tests pass
 
-**Deliverables:** `docs/phase-1-auth.md`
+**Deliverables:** `_docs/phase-1-auth.md`
 
 ---
 
@@ -214,7 +214,7 @@
 - Validation blocks invalid input
 - Tests pass
 
-**Deliverables:** `docs/phase-2-children.md`
+**Deliverables:** `_docs/phase-2-children.md`
 
 ---
 
@@ -244,7 +244,7 @@
 - Stories scoped per user
 - Tests pass
 
-**Deliverables:** `docs/phase-3-stories.md`
+**Deliverables:** `_docs/phase-3-stories.md`
 
 ---
 
@@ -279,7 +279,7 @@
 - Free tier PDFs are watermarked
 - Tests pass
 
-**Deliverables:** `docs/phase-4-generation.md`
+**Deliverables:** `_docs/phase-4-generation.md`
 
 ---
 
@@ -302,7 +302,7 @@
 - PDF updates correctly
 - Tests pass
 
-**Deliverables:** `docs/phase-5-regeneration.md`
+**Deliverables:** `_docs/phase-5-regeneration.md`
 
 ---
 
@@ -328,7 +328,7 @@
 - Free-tier PDFs expire per retention policy
 - Tests pass
 
-**Deliverables:** `docs/phase-6-subscriptions.md`
+**Deliverables:** `_docs/phase-6-subscriptions.md`
 
 ---
 
@@ -351,7 +351,7 @@
 - Notifications can be marked as read
 - Tests pass
 
-**Deliverables:** `docs/phase-7-notifications.md`
+**Deliverables:** `_docs/phase-7-notifications.md`
 
 ---
 
@@ -371,7 +371,7 @@
 - Admin can view all ratings
 - Tests pass
 
-**Deliverables:** `docs/phase-8-ratings.md`
+**Deliverables:** `_docs/phase-8-ratings.md`
 
 ---
 
@@ -393,7 +393,7 @@
 - Non-admins blocked from admin routes
 - Tests pass
 
-**Deliverables:** `docs/phase-9-admin.md`
+**Deliverables:** `_docs/phase-9-admin.md`
 
 ---
 
@@ -414,7 +414,7 @@
 - Generated stories respect language param
 - Tests pass
 
-**Deliverables:** `docs/phase-10-localization.md`
+**Deliverables:** `_docs/phase-10-localization.md`
 
 ---
 
@@ -439,7 +439,7 @@
 - End-to-end flow works (login → generate → download)
 - Backups configured
 
-**Deliverables:** `docs/phase-11-deploy.md`
+**Deliverables:** `_docs/phase-11-deploy.md`
 
 ---
 

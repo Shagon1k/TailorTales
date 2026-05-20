@@ -1,11 +1,11 @@
-# Contributing to CurioCraft
+# Contributing to TailorTales
 
 ## Workflow
 
-1. **Branch off `main`** with a name like `CC-<type>-<short-descriptor>`:
-   - `CC-feat-google-oauth`
-   - `CC-fix-session-cookie-expiry`
-   - `CC-chore-bump-prisma`
+1. **Branch off `main`** with a name like `TT-<type>-<short-descriptor>`:
+   - `TT-feat-google-oauth`
+   - `TT-fix-session-cookie-expiry`
+   - `TT-chore-bump-prisma`
 2. **Make focused commits** following [Conventional Commits](.claude/rules/git.md#commit-messages--conventional-commits).
 3. **Open a PR** with title in Conventional Commits format.
 4. **Link the GitHub Milestone** for the ROADMAP phase (e.g. `Phase 1 — Auth`).
@@ -46,8 +46,8 @@ After install, every `git commit` runs commitlint on the message. If it fails, t
 
 ## Phase Workflow
 
-CurioCraft is built in numbered phases (see [ROADMAP.md](ROADMAP.md)). Per phase:
+TailorTales is built in numbered phases (see [ROADMAP.md](ROADMAP.md)). Per phase:
 - Track work via a GitHub Milestone named `Phase N — <name>`.
 - All PRs related to a phase carry that milestone.
-- Phase is complete when: all milestone PRs merged, acceptance checks pass, and `docs/phase-N-<name>.md` is written (see [`docs/TEMPLATE.md`](docs/TEMPLATE.md)).
+- Phase is complete when: all milestone PRs merged, acceptance checks pass, and `_docs/phase-N-<name>.md` is written (see [`_docs/TEMPLATE.md`](_docs/TEMPLATE.md)).
 - After each phase, propose updates to `CLAUDE.md` and `.claude/rules/*` — apply only after developer approval.
