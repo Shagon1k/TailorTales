@@ -1,1 +1,1 @@
-# CurioCraft
+# TailorTales
