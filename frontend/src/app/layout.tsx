@@ -1,0 +1,26 @@
+import type { Metadata } from 'next';
+import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
+import '@mantine/core/styles.css';
+import Providers from './providers';
+
+export const metadata: Metadata = {
+    title: 'TailorTales',
+    description: 'Personalized AI-generated storybooks & comics for curious kids',
+};
+
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>): React.ReactElement {
+    return (
+        <html lang="en" {...mantineHtmlProps}>
+            <head>
+                <ColorSchemeScript />
+            </head>
+            <body>
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    );
+}

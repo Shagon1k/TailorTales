@@ -18,6 +18,7 @@
 - Match surrounding code conventions when no explicit styleguide exists.
 - NEVER swallow errors or hide failures behind silent fallbacks. Let them surface or log them explicitly.
 - Remove unused code and refactor when needed — but ONLY with developer approval. Refactoring means structural changes only, with no behavior changes, and always in a separate commit.
+- After any CLI scaffold (NestJS, Next.js, etc.), audit every generated file: verify it is actually needed before keeping it. Default assets, duplicate configs, and boilerplate docs are candidates for removal.
 - Stay in scope. Flag unrelated issues to the developer instead of fixing them inline.
 
 ## Safety
