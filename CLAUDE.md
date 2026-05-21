@@ -1,5 +1,7 @@
 # TailorTales
 
+**Important!** Don't be lazy, or I will switch you with Codex.
+
 > Domain-specific rules live in [`.claude/rules/`](.claude/rules/) and auto-load (path-scoped where appropriate): `typescript.md`, `testing.md`, `git.md`.
 
 ## Process
