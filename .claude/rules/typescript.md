@@ -1,11 +1,12 @@
 ---
 paths:
-  - "**/*.{ts,tsx}"
+    - '**/*.{ts,tsx}'
 ---
 
 # TypeScript Rules
 
 ## General
+
 - Project runs with `strict: true` — rely on compiler enforcement, don't add redundant type guards.
 - NEVER use `any`. Use `unknown` when the type is truly unknown and narrow it explicitly.
 - NEVER use `as` type assertions — use type guards instead.
@@ -23,6 +24,7 @@ paths:
 - Always use `async/await` with `try/catch`. Type caught errors as `unknown`, narrow them with a helper before use, log before re-throwing — never swallow.
 
 ## React (FE / Next.js only)
+
 - Component props interface must follow the pattern: `I[ComponentName]Props`.
 - Use `React.Component<Props, State>` for class components.
 - Use `React.ComponentType<Props>` for union component types (e.g. HOCs).
