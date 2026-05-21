@@ -3,9 +3,9 @@
 ## Workflow
 
 1. **Branch off `main`** with a name like `TT-<type>-<short-descriptor>`:
-   - `TT-feat-google-oauth`
-   - `TT-fix-session-cookie-expiry`
-   - `TT-chore-bump-prisma`
+    - `TT-feat-google-oauth`
+    - `TT-fix-session-cookie-expiry`
+    - `TT-chore-bump-prisma`
 2. **Make focused commits** following [Conventional Commits](.claude/rules/git.md#commit-messages--conventional-commits).
 3. **Open a PR** with title in Conventional Commits format.
 4. **Link the GitHub Milestone** for the ROADMAP phase (e.g. `Phase 1 — Auth`).
@@ -23,6 +23,7 @@
 - **Scope (optional):** narrows context — `feat(auth):`, `fix(backend):`
 
 Examples:
+
 ```
 feat(auth): add Google OAuth callback handler
 fix(frontend): correct session cookie expiry
@@ -47,6 +48,7 @@ After install, every `git commit` runs commitlint on the message. If it fails, t
 ## Phase Workflow
 
 TailorTales is built in numbered phases (see [ROADMAP.md](ROADMAP.md)). Per phase:
+
 - Track work via a GitHub Milestone named `Phase N — <name>`.
 - All PRs related to a phase carry that milestone.
 - Phase is complete when: all milestone PRs merged, acceptance checks pass, and `_docs/phase-N-<name>.md` is written (see [`_docs/TEMPLATE.md`](_docs/TEMPLATE.md)).

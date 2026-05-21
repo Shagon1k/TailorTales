@@ -1,0 +1,11 @@
+.tag {
+    display: inline-block;
+    padding: rem(4px) rem(10px);
+    border-radius: rem(20px);
+    font-size: rem(12px);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background-color: var(--mantine-color-blue-1);
+    color: var(--mantine-color-blue-7);
+}

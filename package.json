@@ -1,0 +1,48 @@
+{
+    "name": "tailortales",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "description": "Personalized AI-generated storybooks & comics for curious kids",
+    "packageManager": "pnpm@10.33.2",
+    "engines": {
+        "node": ">=24.15.0",
+        "pnpm": ">=10"
+    },
+    "scripts": {
+        "prepare": "husky",
+        "dev": "pnpm --parallel --filter \"./backend\" --filter \"./frontend\" dev",
+        "build": "pnpm --filter \"./backend\" build && pnpm --filter \"./frontend\" build",
+        "lint": "pnpm --filter \"./backend\" --filter \"./frontend\" lint",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "type-check": "pnpm --filter \"./backend\" --filter \"./frontend\" type-check",
+        "check": "pnpm lint && pnpm format:check",
+        "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@nestjs/core",
+            "@prisma/engines",
+            "prisma"
+        ],
+        "ignoredBuiltDependencies": [
+            "sharp",
+            "unrs-resolver"
+        ]
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^21.0.1",
+        "@commitlint/config-conventional": "^21.0.1",
+        "@eslint-react/eslint-plugin": "^5.8.3",
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.4.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "globals": "^17.6.0",
+        "husky": "^9.1.7",
+        "prettier": "^3.8.3",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.59.4"
+    }
+}
