@@ -16,6 +16,7 @@
         "lint": "pnpm --filter \"./backend\" --filter \"./frontend\" lint",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
+        "type-check": "pnpm --filter \"./backend\" --filter \"./frontend\" type-check",
         "check": "pnpm lint && pnpm format:check",
         "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test"
     },
