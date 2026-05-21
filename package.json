@@ -16,6 +16,7 @@
         "lint": "pnpm --filter \"./backend\" --filter \"./frontend\" lint",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
+        "check": "pnpm lint && pnpm format:check",
         "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test"
     },
     "pnpm": {
@@ -35,6 +36,7 @@
         "@eslint-react/eslint-plugin": "^5.8.3",
         "@eslint/js": "^10.0.1",
         "eslint": "^10.4.0",
+        "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-react-hooks": "^7.1.1",
         "globals": "^17.6.0",
         "husky": "^9.1.7",

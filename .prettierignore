@@ -5,3 +5,5 @@ build
 out
 coverage
 pnpm-lock.yaml
+.claude
+**/next-env.d.ts
