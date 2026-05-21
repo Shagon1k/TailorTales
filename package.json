@@ -20,7 +20,9 @@
     },
     "pnpm": {
         "onlyBuiltDependencies": [
-            "@nestjs/core"
+            "@nestjs/core",
+            "@prisma/engines",
+            "prisma"
         ],
         "ignoredBuiltDependencies": [
             "sharp",

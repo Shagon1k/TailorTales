@@ -15,6 +15,7 @@ out/
 .env.*.local
 
 # Prisma
+backend/generated/
 backend/prisma/migrations/dev.db
 
 # Logs
