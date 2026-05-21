@@ -2,6 +2,7 @@
   "name": "tailortales",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "description": "Personalized AI-generated storybooks & comics for curious kids",
   "packageManager": "pnpm@10.33.2",
   "engines": {
@@ -9,9 +10,15 @@
     "pnpm": ">=10"
   },
   "scripts": {
+    "prepare": "husky",
     "dev": "pnpm --parallel --filter \"./backend\" --filter \"./frontend\" dev",
     "build": "pnpm --filter \"./backend\" build && pnpm --filter \"./frontend\" build",
     "lint": "pnpm --filter \"./backend\" --filter \"./frontend\" lint",
     "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "husky": "^9.1.7"
   }
 }
