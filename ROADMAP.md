@@ -142,20 +142,20 @@
 
 **Sub-tasks:**
 
-- [ ] Initialize monorepo: root `package.json`, `pnpm-workspace.yaml`
-- [ ] Create `backend/` (Nest.js scaffold), `frontend/` (Next.js scaffold)
-- [ ] Root scripts for `dev`, `build`, `lint`, `test` orchestrating both apps
-- [ ] `docker-compose.yml`: PostgreSQL, Redis, MinIO services with persistent volumes
-- [ ] `.env.example` files at root and per-app
-- [ ] `backend/Dockerfile` (multi-stage Node build, production-ready for dokploy)
-- [ ] `frontend/Dockerfile` (multi-stage Next build, production-ready for dokploy)
-- [ ] Prisma init in `backend/`, connect to PostgreSQL
-- [ ] Shared ESLint + Prettier config at root
-- [ ] Vitest setup in both `backend/` and `frontend/`
-- [ ] **Husky + commitlint** — pre-commit hook enforces Conventional Commits per [`.claude/rules/git.md`](.claude/rules/git.md). `prepare` script installs hooks on `pnpm install`.
-- [ ] Basic health-check endpoint in Nest (`GET /health`)
-- [ ] Basic landing page in Next
-- [ ] GitHub Actions workflow: install + lint + type-check + test on PR
+- [x] Initialize monorepo: root `package.json`, `pnpm-workspace.yaml`
+- [x] Create `backend/` (Nest.js scaffold), `frontend/` (Next.js scaffold)
+- [x] Root scripts for `dev`, `build`, `lint`, `test` orchestrating both apps
+- [x] `docker-compose.yml`: PostgreSQL, Redis, MinIO services with persistent volumes
+- [x] `.env.example` files at root and per-app
+- [x] `backend/Dockerfile` (multi-stage Node build, production-ready for dokploy)
+- [x] `frontend/Dockerfile` (multi-stage Next build, production-ready for dokploy)
+- [x] Prisma init in `backend/`, connect to PostgreSQL
+- [x] Shared ESLint + Prettier config at root
+- [x] Vitest setup in both `backend/` and `frontend/`
+- [x] **Husky + commitlint** — pre-commit hook enforces Conventional Commits per [`.claude/rules/git.md`](.claude/rules/git.md). `prepare` script installs hooks on `pnpm install`.
+- [x] Basic health-check endpoint in Nest (`GET /health`)
+- [x] Basic landing page in Next
+- [x] GitHub Actions workflow: install + lint + type-check + test on PR
 
 **Acceptance Check:**
 
