@@ -18,6 +18,11 @@
         "format:check": "prettier --check .",
         "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test"
     },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@nestjs/core"
+        ]
+    },
     "devDependencies": {
         "@commitlint/cli": "^21.0.1",
         "@commitlint/config-conventional": "^21.0.1",

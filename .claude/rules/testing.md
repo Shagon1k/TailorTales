@@ -39,7 +39,8 @@ paths:
 
 - Use `beforeEach`/`beforeAll` for setup, `afterEach`/`afterAll` for cleanup — not interchangeably.
 - Use `vi.fn()`, `vi.mock()`, `vi.spyOn()` — never Jest equivalents.
-- Import test utilities from `vitest`: `{ describe, it, expect, vi, beforeEach, afterEach }`.
+- Vitest globals are enabled (`globals: true`) — do NOT import `describe`, `it`, `expect`, `vi`,
+  `beforeEach`, `afterEach`, etc. They are available without imports.
 - Don't mock what you don't own — wrap third-party libraries first, then mock the wrapper.
 
 ---
