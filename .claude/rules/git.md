@@ -50,7 +50,7 @@ Use to clarify the area: `feat(auth):`, `fix(backend):`, `docs(roadmap):`, `chor
 ### Body (optional)
 - Blank line between subject and body.
 - Explain *why*, not *what* (the diff shows what).
-- Wrap at ~80 chars.
+- Wrap at 100 chars (enforced by commitlint).
 
 ### Examples
 ```
