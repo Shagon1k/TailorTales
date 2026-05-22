@@ -38,7 +38,15 @@ describe('AuthGuard', () => {
     });
 
     it('should render children when the user is authenticated', () => {
-        const user = { id: 'user-123', name: 'Alice' };
+        const user: import('@/types/user.types').IUser = {
+            id: 'user-123',
+            email: 'alice@example.com',
+            name: 'Alice',
+            avatarUrl: null,
+            role: 'USER',
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+        };
         mockUseCurrentUser.mockReturnValue(makeContext({ user }));
 
         render(
