@@ -33,7 +33,9 @@ describe('JwtAuthGuard', () => {
             // super.canActivate requires a real HTTP context — here we only verify
             // the guard does NOT short-circuit and actually calls the parent.
             const superActivate = vi.spyOn(
-                Object.getPrototypeOf(Object.getPrototypeOf(guard)) as { canActivate: () => unknown },
+                Object.getPrototypeOf(Object.getPrototypeOf(guard)) as {
+                    canActivate: () => unknown;
+                },
                 'canActivate',
             );
             superActivate.mockReturnValue(true);

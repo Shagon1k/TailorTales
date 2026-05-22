@@ -23,9 +23,7 @@ describe('UserController', () => {
 
         const module = await Test.createTestingModule({
             controllers: [UserController],
-            providers: [
-                { provide: UserService, useValue: { updateName } },
-            ],
+            providers: [{ provide: UserService, useValue: { updateName } }],
         }).compile();
 
         controller = module.get(UserController);

@@ -11,10 +11,7 @@ describe('AuthService', () => {
         jwtSign = vi.fn().mockReturnValue('signed.token');
 
         const module = await Test.createTestingModule({
-            providers: [
-                AuthService,
-                { provide: JwtService, useValue: { sign: jwtSign } },
-            ],
+            providers: [AuthService, { provide: JwtService, useValue: { sign: jwtSign } }],
         }).compile();
 
         service = module.get(AuthService);

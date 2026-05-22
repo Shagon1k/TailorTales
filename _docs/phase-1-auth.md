@@ -12,25 +12,25 @@ Phase 1 delivers full Google OAuth sign-in with JWT-backed httpOnly cookies. Use
 - **Entities:** `User` (`id`, `googleId`, `email`, `name`, `avatarUrl`, `role`, `createdAt`, `updatedAt`)
 - **Backend modules:** `AuthModule` (Google OAuth + JWT), `UserModule` (`GET /me`, `PATCH /me`)
 - **Endpoints:**
-  - `GET /auth/google` — initiates Google OAuth redirect
-  - `GET /auth/google/callback` — OAuth callback; issues JWT, sets `access_token` httpOnly cookie, redirects to frontend
-  - `POST /auth/logout` — clears the cookie
-  - `GET /me` — returns the authenticated user
-  - `PATCH /me` — updates the user's name
+    - `GET /auth/google` — initiates Google OAuth redirect
+    - `GET /auth/google/callback` — OAuth callback; issues JWT, sets `access_token` httpOnly cookie, redirects to frontend
+    - `POST /auth/logout` — clears the cookie
+    - `GET /me` — returns the authenticated user
+    - `PATCH /me` — updates the user's name
 - **Auth infrastructure:** global `JwtAuthGuard`, `@Public()` decorator to opt out, `@CurrentUser()` param decorator
 - **Admin script:** `pnpm seed:admin <email>` — promotes a registered user to `ADMIN`
 - **Frontend pages / components:**
-  - `/login` — login page with "Sign in with Google" link
-  - `/profile` (protected) — displays user info, inline name edit, sign out button
-  - `AuthGuard` component — redirects to `/login` when no user is present
-  - `(auth-guard)` route group — applies `AuthGuard` to all protected routes
+    - `/login` — login page with "Sign in with Google" link
+    - `/profile` (protected) — displays user info, inline name edit, sign out button
+    - `AuthGuard` component — redirects to `/login` when no user is present
+    - `(auth-guard)` route group — applies `AuthGuard` to all protected routes
 - **Frontend context / API layer:**
-  - `UserProvider` — seeded from `initialUser` (RSC), exposes `user`, `isLoading`, `refetch`
-  - `api/user.ts` — client-side user API (`getMe`, `updateMe`)
-  - `api/auth.ts` — client-side auth API (`logout`)
-  - `api/user.server.ts` — server-only helper (`getServerUser`); guarded by `server-only` package
-  - `lib/api.ts` — client `apiFetch` utility (credentials: include, JSON content-type)
-  - `lib/api.server.ts` — server `apiFetchServer` utility; reads `access_token` cookie and forwards it
+    - `UserProvider` — seeded from `initialUser` (RSC), exposes `user`, `isLoading`, `refetch`
+    - `api/user.ts` — client-side user API (`getMe`, `updateMe`)
+    - `api/auth.ts` — client-side auth API (`logout`)
+    - `api/user.server.ts` — server-only helper (`getServerUser`); guarded by `server-only` package
+    - `lib/api.ts` — client `apiFetch` utility (credentials: include, JSON content-type)
+    - `lib/api.server.ts` — server `apiFetchServer` utility; reads `access_token` cookie and forwards it
 
 ## Auth Flow
 
@@ -60,6 +60,7 @@ Browser            Frontend             Backend               Google
 ```
 
 **Key details:**
+
 - `GoogleStrategy` requests the `email` and `profile` scopes.
 - On first login `findOrCreate` inserts a new `User` row; on subsequent logins it returns the existing record.
 - The JWT is stored in an `HttpOnly`, `SameSite: lax` cookie (`access_token`). JavaScript cannot read it.
@@ -233,23 +234,23 @@ pnpm dev
 
 ### Backend (`backend/.env`)
 
-| Variable              | Example                                         | Required | Description                                        |
-| --------------------- | ----------------------------------------------- | -------- | -------------------------------------------------- |
-| `DATABASE_URL`        | `postgresql://user:pass@localhost:5432/tailortales` | yes   | Postgres connection string                         |
-| `GOOGLE_CLIENT_ID`    | `123456.apps.googleusercontent.com`             | yes          | Google OAuth client ID                             |
-| `GOOGLE_CLIENT_SECRET`| `GOCSPX-…`                                      | yes          | Google OAuth client secret                         |
-| `BACKEND_URL`         | `http://localhost:3001`                         | yes          | Used to build the OAuth callback URL (`BACKEND_URL/auth/google/callback`). Must match the authorized redirect URI in GCP. |
-| `JWT_SECRET`          | `change-me-in-production`                       | yes          | Secret used to sign JWTs                           |
-| `JWT_EXPIRY_DAYS`     | `7`                                             | no (def: `7`)| Access token lifetime in days                      |
-| `FRONTEND_URL`        | `http://localhost:3000`                         | yes          | Used for CORS origin and post-login redirect       |
-| `NODE_ENV`            | `production`                                    | no (def: `development`) | Controls the cookie `secure` flag — set to `production` in prod so the cookie is HTTPS-only |
-| `PORT`                | `3001`                                          | no (def: `3001`) | Port the NestJS server listens on             |
+| Variable               | Example                                             | Required                | Description                                                                                                               |
+| ---------------------- | --------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`         | `postgresql://user:pass@localhost:5432/tailortales` | yes                     | Postgres connection string                                                                                                |
+| `GOOGLE_CLIENT_ID`     | `123456.apps.googleusercontent.com`                 | yes                     | Google OAuth client ID                                                                                                    |
+| `GOOGLE_CLIENT_SECRET` | `GOCSPX-…`                                          | yes                     | Google OAuth client secret                                                                                                |
+| `BACKEND_URL`          | `http://localhost:3001`                             | yes                     | Used to build the OAuth callback URL (`BACKEND_URL/auth/google/callback`). Must match the authorized redirect URI in GCP. |
+| `JWT_SECRET`           | `change-me-in-production`                           | yes                     | Secret used to sign JWTs                                                                                                  |
+| `JWT_EXPIRY_DAYS`      | `7`                                                 | no (def: `7`)           | Access token lifetime in days                                                                                             |
+| `FRONTEND_URL`         | `http://localhost:3000`                             | yes                     | Used for CORS origin and post-login redirect                                                                              |
+| `NODE_ENV`             | `production`                                        | no (def: `development`) | Controls the cookie `secure` flag — set to `production` in prod so the cookie is HTTPS-only                               |
+| `PORT`                 | `3001`                                              | no (def: `3001`)        | Port the NestJS server listens on                                                                                         |
 
 ### Frontend (`frontend/.env`)
 
-| Variable                    | Example                       | Required | Description                              |
-| --------------------------- | ----------------------------- | -------- | ---------------------------------------- |
-| `NEXT_PUBLIC_BACKEND_URL`   | `http://localhost:3001`       | yes      | Backend base URL; used client- and server-side |
+| Variable                  | Example                 | Required | Description                                    |
+| ------------------------- | ----------------------- | -------- | ---------------------------------------------- |
+| `NEXT_PUBLIC_BACKEND_URL` | `http://localhost:3001` | yes      | Backend base URL; used client- and server-side |
 
 ## External Services
 
@@ -270,16 +271,16 @@ pnpm dev
 
 ## Tests
 
-| Suite | File | Tests |
-| ----- | ---- | ------ |
-| AuthService | `backend/src/auth/__tests__/auth.service.spec.ts` | `issueToken` signs JWT with `sub` |
-| JwtStrategy | `backend/src/auth/__tests__/jwt.strategy.spec.ts` | `validate` returns user or throws 401 |
-| JwtAuthGuard | `backend/src/auth/__tests__/jwt-auth.guard.spec.ts` | `@Public()` bypass; defers to Passport for protected routes |
-| AuthController | `backend/src/auth/__tests__/auth.controller.spec.ts` | `logout` clears cookie; `googleCallback` issues token + redirects |
-| UserService | `backend/src/user/__tests__/user.service.spec.ts` | `findById`, `findOrCreate` (new + existing), `updateName` |
-| UserController | `backend/src/user/__tests__/user.controller.spec.ts` | `getMe` returns user; `updateMe` delegates to service |
-| LoginPage | `frontend/src/app/login/page.spec.tsx` | Google OAuth link renders and points to `/auth/google` |
-| AuthGuard | `frontend/src/components/AuthGuard/AuthGuard.spec.tsx` | Redirects to `/login` when no user; renders children when authenticated |
+| Suite          | File                                                   | Tests                                                                   |
+| -------------- | ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| AuthService    | `backend/src/auth/__tests__/auth.service.spec.ts`      | `issueToken` signs JWT with `sub`                                       |
+| JwtStrategy    | `backend/src/auth/__tests__/jwt.strategy.spec.ts`      | `validate` returns user or throws 401                                   |
+| JwtAuthGuard   | `backend/src/auth/__tests__/jwt-auth.guard.spec.ts`    | `@Public()` bypass; defers to Passport for protected routes             |
+| AuthController | `backend/src/auth/__tests__/auth.controller.spec.ts`   | `logout` clears cookie; `googleCallback` issues token + redirects       |
+| UserService    | `backend/src/user/__tests__/user.service.spec.ts`      | `findById`, `findOrCreate` (new + existing), `updateName`               |
+| UserController | `backend/src/user/__tests__/user.controller.spec.ts`   | `getMe` returns user; `updateMe` delegates to service                   |
+| LoginPage      | `frontend/src/app/login/page.spec.tsx`                 | Google OAuth link renders and points to `/auth/google`                  |
+| AuthGuard      | `frontend/src/components/AuthGuard/AuthGuard.spec.tsx` | Redirects to `/login` when no user; renders children when authenticated |
 
 Run all tests: `pnpm test` (from the monorepo root runs both backend and frontend).
 

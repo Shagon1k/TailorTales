@@ -134,9 +134,9 @@
 > Items explicitly deferred during development. Each entry records **what**, **why it was deferred**, and **when to revisit**.
 > New items require developer approval before being added.
 
-| #   | Item | Deferred reason | Revisit at |
-| --- | ---- | --------------- | ---------- |
-| —   | *(no open items)* | | |
+| #   | Item              | Deferred reason | Revisit at |
+| --- | ----------------- | --------------- | ---------- |
+| —   | _(no open items)_ |                 |            |
 
 ---
 
