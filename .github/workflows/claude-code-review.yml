@@ -1,8 +1,7 @@
 name: Claude Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
+  workflow_dispatch: # disabled: re-enable by adding pull_request trigger back
 
 jobs:
   claude-review:
