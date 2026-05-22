@@ -37,3 +37,4 @@
 - Every completed phase MUST ship with a doc at `_docs/phase-N-<name>.md` covering: what was added, resulting structure, working commands, configuration/env vars, gotchas. Follow `_docs/TEMPLATE.md`.
 - After each phase: propose updates to `CLAUDE.md` and `.claude/rules/*` based on what was learned. Apply only after developer approval.
 - A phase is NOT complete until its doc is written and acceptance checks pass.
+- When deferring a decision or tech debt item, propose adding it to `ROADMAP.md` section "Deferred Decisions & Tech Debt" — ALWAYS ask the developer before adding.

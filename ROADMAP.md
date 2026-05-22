@@ -129,7 +129,18 @@
 
 ---
 
-## 7. Phase Plan
+## 7. Deferred Decisions & Tech Debt
+
+> Items explicitly deferred during development. Each entry records **what**, **why it was deferred**, and **when to revisit**.
+> New items require developer approval before being added.
+
+| #   | Item                                                                                                             | Deferred reason                                                                                                               | Revisit at                                              |
+| --- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1   | Server-side auth in Next.js (middleware / Server Components reading JWT cookie, calling `GET /me` before render) | Client-side auth is simpler for MVP; SSR auth requires Next.js server → NestJS reachability and server-side redirect handling | Phase 4+ or when performance/SEO requirements demand it |
+
+---
+
+## 8. Phase Plan
 
 > Each phase below lists: **Goals → Sub-tasks → Acceptance Check → Deliverables**.
 > Use the checkboxes for progress tracking.
@@ -471,7 +482,7 @@
 
 ---
 
-## 8. Post-MVP Backlog (v2+)
+## 10. Post-MVP Backlog (v2+)
 
 - Photo personalization (switch image provider to Flux or SD with IP-Adapter)
 - Referral program (link-based, free book/pages reward)
@@ -486,7 +497,7 @@
 
 ---
 
-## 9. Progress Tracking
+## 11. Progress Tracking
 
 | Phase                   | Status         | Notes |
 | ----------------------- | -------------- | ----- |
