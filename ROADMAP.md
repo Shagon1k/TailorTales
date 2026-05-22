@@ -219,14 +219,14 @@
 
 **Sub-tasks:**
 
-- [ ] Prisma `Child` model: `id`, `userId`, `name`, `birthdate`, `gender`, `interests (string[])`, `avatarUrl?` (reserved for v2), `createdAt`, `updatedAt`
-- [ ] Prisma migration
-- [ ] Children module: CRUD endpoints scoped to current user (`/children`)
-- [ ] Authorization: user can only access own children
-- [ ] DTO validation (name length, birthdate range, etc.)
-- [ ] Frontend: children dashboard (list)
-- [ ] Frontend: add/edit/delete child forms (Mantine)
-- [ ] Tests: ownership scoping, validation, full CRUD
+- [x] Prisma `Child` model: `id`, `userId`, `name`, `birthdate`, `gender`, `interests (string[])`, `avatarUrl?` (reserved for v2), `createdAt`, `updatedAt`
+- [x] Prisma migration
+- [x] Children module: CRUD endpoints scoped to current user (`/children`)
+- [x] Authorization: user can only access own children
+- [x] DTO validation (name length, birthdate range, etc.)
+- [x] Frontend: children dashboard (list)
+- [x] Frontend: add/edit/delete child forms (Mantine)
+- [x] Tests: ownership scoping, validation, full CRUD
 
 **Acceptance Check:**
 
@@ -503,7 +503,7 @@
 | ----------------------- | -------------- | ----- |
 | 0 — Infrastructure      | ✅ Done        |       |
 | 1 — Auth                | ✅ Done        |       |
-| 2 — Children            | ⬜ Not started |       |
+| 2 — Children            | ✅ Done        |       |
 | 3 — Stories & Templates | ⬜ Not started |       |
 | 4 — Generation Pipeline | ⬜ Not started |       |
 | 5 — Regeneration        | ⬜ Not started |       |
