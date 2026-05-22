@@ -134,9 +134,9 @@
 > Items explicitly deferred during development. Each entry records **what**, **why it was deferred**, and **when to revisit**.
 > New items require developer approval before being added.
 
-| #   | Item                                                                                                             | Deferred reason                                                                                                               | Revisit at                                              |
-| --- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 1   | Server-side auth in Next.js (middleware / Server Components reading JWT cookie, calling `GET /me` before render) | Client-side auth is simpler for MVP; SSR auth requires Next.js server → NestJS reachability and server-side redirect handling | Phase 4+ or when performance/SEO requirements demand it |
+| #   | Item | Deferred reason | Revisit at |
+| --- | ---- | --------------- | ---------- |
+| —   | *(no open items)* | | |
 
 ---
 
@@ -187,19 +187,19 @@
 
 **Sub-tasks:**
 
-- [ ] Prisma `User` model: `id`, `email`, `googleId`, `name`, `avatarUrl`, `role (USER | ADMIN)`, `createdAt`, `updatedAt`
-- [ ] Prisma migration
-- [ ] Nest Auth module: Google OAuth strategy (Passport), callback handler, JWT issuance
-- [ ] Session via httpOnly cookies
-- [ ] Auth guard + `@CurrentUser()` decorator
-- [ ] Endpoints: `GET /auth/google`, `GET /auth/google/callback`, `POST /auth/logout`, `GET /me`, `PATCH /me`
-- [ ] Admin seed script (`pnpm seed:admin <email>`)
-- [ ] Frontend: login page with "Sign in with Google" button
-- [ ] Frontend: OAuth callback handling, session context via React Query
-- [ ] Frontend: protected route wrapper, redirect to login if unauthenticated
-- [ ] Frontend: profile page (view + edit name)
-- [ ] Backend tests: auth flow, guards, user CRUD
-- [ ] Frontend tests: login button renders, protected route redirects
+- [x] Prisma `User` model: `id`, `email`, `googleId`, `name`, `avatarUrl`, `role (USER | ADMIN)`, `createdAt`, `updatedAt`
+- [x] Prisma migration
+- [x] Nest Auth module: Google OAuth strategy (Passport), callback handler, JWT issuance
+- [x] Session via httpOnly cookies
+- [x] Auth guard + `@CurrentUser()` decorator
+- [x] Endpoints: `GET /auth/google`, `GET /auth/google/callback`, `POST /auth/logout`, `GET /me`, `PATCH /me`
+- [x] Admin seed script (`pnpm seed:admin <email>`)
+- [x] Frontend: login page with "Sign in with Google" button
+- [x] Frontend: session context seeded from RSC (root layout fetches user server-side; no React Query needed at this phase)
+- [x] Frontend: protected route wrapper, redirect to login if unauthenticated
+- [x] Frontend: profile page (view + edit name)
+- [x] Backend tests: auth flow, guards, user CRUD
+- [x] Frontend tests: login button renders, protected route redirects
 
 **Acceptance Check:**
 
@@ -501,8 +501,8 @@
 
 | Phase                   | Status         | Notes |
 | ----------------------- | -------------- | ----- |
-| 0 — Infrastructure      | ⬜ Not started |       |
-| 1 — Auth                | ⬜ Not started |       |
+| 0 — Infrastructure      | ✅ Done        |       |
+| 1 — Auth                | ✅ Done        |       |
 | 2 — Children            | ⬜ Not started |       |
 | 3 — Stories & Templates | ⬜ Not started |       |
 | 4 — Generation Pipeline | ⬜ Not started |       |
