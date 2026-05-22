@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
 import { type User } from '../generated/prisma/client.js';
 import { AuthService } from './auth.service.js';
+import { Public } from './decorators/public.decorator.js';
 
 const COOKIE_NAME = 'access_token';
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -15,12 +16,14 @@ export class AuthController {
         private readonly configService: ConfigService,
     ) {}
 
+    @Public()
     @Get('google')
     @UseGuards(AuthGuard('google'))
     googleLogin(): void {
         // Passport redirects to Google — no body needed
     }
 
+    @Public()
     @Get('google/callback')
     @UseGuards(AuthGuard('google'))
     googleCallback(@Req() req: Request, @Res() res: Response): void {
