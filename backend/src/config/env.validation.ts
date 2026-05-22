@@ -20,6 +20,13 @@ class EnvironmentVariables {
     @IsString()
     JWT_SECRET!: string;
 
+    @IsInt()
+    @Min(1)
+    JWT_EXPIRY_DAYS: number = 7;
+
+    @IsString()
+    BACKEND_URL!: string;
+
     @IsString()
     FRONTEND_URL!: string;
 
