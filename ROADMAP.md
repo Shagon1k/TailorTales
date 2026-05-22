@@ -136,7 +136,7 @@
 
 | #   | Item              | Deferred reason | Revisit at |
 | --- | ----------------- | --------------- | ---------- |
-| —   | _(no open items)_ |                 |            |
+| 1   | Refresh tokens + server-side logout | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP. | Post-MVP |
 
 ---
 
