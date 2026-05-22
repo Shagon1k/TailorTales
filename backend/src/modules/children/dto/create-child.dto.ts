@@ -12,7 +12,7 @@ import {
     ValidatorConstraint,
     ValidatorConstraintInterface,
 } from 'class-validator';
-import { Gender } from '../../generated/prisma/client.js';
+import { Gender } from '../../../generated/prisma/client.js';
 import {
     CHILD_INTEREST_MAX_LENGTH,
     CHILD_INTERESTS_MAX_COUNT,

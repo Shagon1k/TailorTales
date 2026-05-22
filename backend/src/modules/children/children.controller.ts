@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
-import { type Child, type User } from '../generated/prisma/client.js';
+import { type Child, type User } from '../../generated/prisma/client.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { ChildrenService } from './children.service.js';
 import { CreateChildDto } from './dto/create-child.dto.js';

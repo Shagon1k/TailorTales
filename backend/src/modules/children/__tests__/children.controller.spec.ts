@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import type { Child, User } from '../../generated/prisma/client.js';
+import type { Child, User } from '../../../generated/prisma/client.js';
 import { ChildrenController } from '../children.controller.js';
 import { ChildrenService } from '../children.service.js';
 

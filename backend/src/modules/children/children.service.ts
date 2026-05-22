@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { type Child } from '../generated/prisma/client.js';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { type Child } from '../../generated/prisma/client.js';
+import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreateChildDto } from './dto/create-child.dto.js';
 import { UpdateChildDto } from './dto/update-child.dto.js';
 

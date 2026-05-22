@@ -2,7 +2,7 @@ import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { type User } from '../generated/prisma/client.js';
+import { type User } from '../../generated/prisma/client.js';
 import { AuthService } from './auth.service.js';
 import { Public } from './decorators/public.decorator.js';
 

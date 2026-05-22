@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import type { User } from '../../generated/prisma/client.js';
+import type { User } from '../../../generated/prisma/client.js';
 import { AuthController } from '../auth.controller.js';
 import { AuthService } from '../auth.service.js';
 

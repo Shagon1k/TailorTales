@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import type { Child } from '../../generated/prisma/client.js';
-import { PrismaService } from '../../prisma/prisma.service.js';
+import type { Child } from '../../../generated/prisma/client.js';
+import { PrismaService } from '../../../prisma/prisma.service.js';
 import { ChildrenService } from '../children.service.js';
 import type { CreateChildDto } from '../dto/create-child.dto.js';
 import type { UpdateChildDto } from '../dto/update-child.dto.js';
