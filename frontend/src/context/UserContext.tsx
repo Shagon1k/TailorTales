@@ -1,14 +1,15 @@
 'use client';
 
-import { createContext, use, useCallback, useState } from 'react';
-import { ApiError } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { createContext, use } from 'react';
 import { userApi } from '@/api/user';
+import { USER_QUERY_KEY } from '@/hooks/user';
 import type { IUser } from '@/types/user.types';
 
 export interface IUserContext {
     user: IUser | null;
     isLoading: boolean;
-    refetch: () => Promise<void>;
+    refetch: () => Promise<unknown>;
 }
 
 const UserContext = createContext<IUserContext | null>(null);
@@ -19,27 +20,16 @@ interface IUserProviderProps {
 }
 
 export function UserProvider({ children, initialUser }: IUserProviderProps): React.ReactElement {
-    // Seeded from the server — no useEffect or client fetch needed on initial render
-    const [user, setUser] = useState<IUser | null>(initialUser);
-    // isLoading is only true during an explicit refetch (e.g. after profile update)
-    const [isLoading, setIsLoading] = useState(false);
-
-    const refetch = useCallback(async (): Promise<void> => {
-        setIsLoading(true);
-        try {
-            const data = await userApi.getMe();
-            setUser(data);
-        } catch (err: unknown) {
-            if (err instanceof ApiError && err.status === 401) {
-                setUser(null);
-            } else {
-                console.error('Failed to fetch current user', err);
-                setUser(null);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+    const {
+        data: user = null,
+        isLoading,
+        refetch,
+    } = useQuery({
+        queryKey: USER_QUERY_KEY,
+        queryFn: userApi.getMe,
+        initialData: initialUser ?? undefined,
+        retry: false,
+    });
 
     return <UserContext value={{ user, isLoading, refetch }}>{children}</UserContext>;
 }
