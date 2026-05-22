@@ -30,6 +30,7 @@
 
 - Follow [`.claude/rules/git.md`](.claude/rules/git.md): GitHub Flow, `TT-<type>-<descriptor>` branches, Conventional Commits, squash merge.
 - One logical change per commit. Refactors require approval and go in a separate commit with no behavior change.
+- NEVER commit without explicit developer approval — describe the change and wait for a clear "yes" before running git commit.
 
 ## Documentation
 
