@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
-import type { User } from '../../generated/prisma/client.js';
-import { PrismaService } from '../../prisma/prisma.service.js';
+import type { User } from '../../../generated/prisma/client.js';
+import { PrismaService } from '../../../prisma/prisma.service.js';
 import { UserService } from '../user.service.js';
 
 const MOCK_USER: User = {

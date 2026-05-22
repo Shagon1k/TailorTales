@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import type { User } from '../../generated/prisma/client.js';
+import type { User } from '../../../generated/prisma/client.js';
 import { UserController } from '../user.controller.js';
 import { UserService } from '../user.service.js';
 

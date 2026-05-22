@@ -1,0 +1,4 @@
+export const CHILD_NAME_MAX_LENGTH = 50;
+export const CHILD_MAX_AGE_YEARS = 18;
+export const CHILD_INTERESTS_MAX_COUNT = 20;
+export const CHILD_INTEREST_MAX_LENGTH = 50;

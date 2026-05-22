@@ -4,33 +4,23 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar, Button, Container, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { authApi } from '@/api/auth';
-import { userApi } from '@/api/user';
 import { useCurrentUser } from '@/context/UserContext';
+import { useUpdateUser } from '@/hooks/user';
 
 export default function ProfilePage(): React.ReactElement {
-    const { user, refetch } = useCurrentUser();
+    const { user } = useCurrentUser();
     const router = useRouter();
+    const { mutate: updateUser, isPending: isSaving } = useUpdateUser();
 
-    // null = not editing; string = active edit value
     const [editedName, setEditedName] = useState<string | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
 
     function startEditing(): void {
         setEditedName(user?.name ?? '');
     }
 
-    async function handleSave(): Promise<void> {
+    function handleSave(): void {
         if (editedName === null) return;
-        setIsSaving(true);
-        try {
-            await userApi.updateMe(editedName);
-            await refetch();
-            setEditedName(null);
-        } catch (err: unknown) {
-            console.error('Failed to update name', err);
-        } finally {
-            setIsSaving(false);
-        }
+        updateUser(editedName, { onSuccess: () => setEditedName(null) });
     }
 
     async function handleLogout(): Promise<void> {

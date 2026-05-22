@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import type { User } from '../../generated/prisma/client.js';
+import type { User } from '../../../generated/prisma/client.js';
 import { AuthService } from '../auth.service.js';
 
 describe('AuthService', () => {

@@ -18,6 +18,9 @@ export default tseslint.config(
     {
         files: ['**/*.{ts,tsx}'],
         extends: [tseslint.configs.recommended],
+        rules: {
+            'no-duplicate-imports': 'error',
+        },
     },
 
     // Backend — Node.js environment, type-aware rules (enabled after tsconfig is in place)
