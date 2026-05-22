@@ -10,6 +10,7 @@
 - Ask when unclear — group all questions in one message, don't ask one-by-one.
 - For changes touching >5 files or ~100+ LOC: outline the plan -> get approval -> then deliver incrementally.
 - Verify before declaring done — run it, test it, or walk a checklist. Don't ship unverified changes.
+- When a conversation produces a reusable pattern or architectural decision, propose adding it to the relevant CLAUDE.md or .claude/rules/\*.md. Wait for approval before applying.
 
 ## Code
 
