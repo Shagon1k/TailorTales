@@ -97,7 +97,9 @@ describe('ChildrenService', () => {
         it('should throw NotFoundException when child belongs to a different user', async () => {
             childFindFirst.mockResolvedValue(null);
 
-            await expect(service.findOne('child-1', 'other-user')).rejects.toThrow(NotFoundException);
+            await expect(service.findOne('child-1', 'other-user')).rejects.toThrow(
+                NotFoundException,
+            );
         });
     });
 
@@ -177,7 +179,9 @@ describe('ChildrenService', () => {
         it('should throw NotFoundException when child belongs to a different user', async () => {
             childFindFirst.mockResolvedValue(null);
 
-            await expect(service.remove('child-1', 'other-user')).rejects.toThrow(NotFoundException);
+            await expect(service.remove('child-1', 'other-user')).rejects.toThrow(
+                NotFoundException,
+            );
             expect(childDelete).not.toHaveBeenCalled();
         });
     });

@@ -22,6 +22,5 @@ export const childrenApi = {
     update: (id: string, payload: IUpdateChildPayload): Promise<IChild> =>
         apiFetch<IChild>(`/children/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
 
-    remove: (id: string): Promise<void> =>
-        apiFetch<void>(`/children/${id}`, { method: 'DELETE' }),
+    remove: (id: string): Promise<void> => apiFetch<void>(`/children/${id}`, { method: 'DELETE' }),
 };

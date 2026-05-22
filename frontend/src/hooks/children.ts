@@ -8,7 +8,9 @@ export function useChildren(): ReturnType<typeof useQuery<IChild[]>> {
     return useQuery({ queryKey: CHILDREN_QUERY_KEY, queryFn: childrenApi.getAll });
 }
 
-export function useCreateChild(): ReturnType<typeof useMutation<IChild, Error, ICreateChildPayload>> {
+export function useCreateChild(): ReturnType<
+    typeof useMutation<IChild, Error, ICreateChildPayload>
+> {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: childrenApi.create,
