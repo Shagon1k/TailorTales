@@ -24,6 +24,7 @@
         "onlyBuiltDependencies": [
             "@nestjs/core",
             "@prisma/engines",
+            "esbuild",
             "prisma"
         ],
         "ignoredBuiltDependencies": [
