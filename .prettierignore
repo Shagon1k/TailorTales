@@ -6,4 +6,5 @@ out
 coverage
 pnpm-lock.yaml
 .claude
+.github
 **/next-env.d.ts
