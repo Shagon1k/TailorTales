@@ -5,7 +5,7 @@ import { ApiError } from '@/lib/api';
 import { userApi } from '@/api/user';
 import type { IUser } from '@/types/user.types';
 
-interface IUserContext {
+export interface IUserContext {
     user: IUser | null;
     isLoading: boolean;
     refetch: () => Promise<void>;
