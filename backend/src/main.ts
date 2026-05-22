@@ -2,12 +2,18 @@ import 'reflect-metadata';
 import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module.js';
 
 const PORT = process.env.PORT ?? 3001;
 
 async function bootstrap(): Promise<void> {
     const app = await NestFactory.create(AppModule);
+    const configService = app.get(ConfigService);
+    app.enableCors({
+        origin: configService.getOrThrow<string>('FRONTEND_URL'),
+        credentials: true,
+    });
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.listen(PORT);
