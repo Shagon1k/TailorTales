@@ -1,6 +1,10 @@
 'use client';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+import { useState } from 'react';
 import { UserProvider } from '@/context/UserContext';
 import type { IUser } from '@/types/user.types';
 
@@ -10,9 +14,16 @@ interface IProvidersProps {
 }
 
 export default function Providers({ children, initialUser }: IProvidersProps): React.ReactElement {
+    const [queryClient] = useState(() => new QueryClient());
+
     return (
-        <MantineProvider>
-            <UserProvider initialUser={initialUser}>{children}</UserProvider>
-        </MantineProvider>
+        <QueryClientProvider client={queryClient}>
+            <MantineProvider>
+                <ModalsProvider>
+                    <UserProvider initialUser={initialUser}>{children}</UserProvider>
+                </ModalsProvider>
+            </MantineProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
     );
 }

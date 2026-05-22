@@ -14,13 +14,17 @@
     },
     "dependencies": {
         "@mantine/core": "^9.2.1",
+        "@mantine/form": "^9.2.1",
         "@mantine/hooks": "^9.2.1",
+        "@mantine/modals": "^9.2.1",
+        "@tanstack/react-query": "^5.100.11",
         "next": "16.2.6",
         "react": "19.2.4",
         "react-dom": "19.2.4",
         "server-only": "^0.0.1"
     },
     "devDependencies": {
+        "@tanstack/react-query-devtools": "^5.100.11",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
         "@testing-library/user-event": "^14.6.1",
