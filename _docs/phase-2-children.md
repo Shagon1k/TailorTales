@@ -137,10 +137,12 @@ None introduced in this phase.
 ## Tests
 
 **Backend** (`backend/src/modules/children/__tests__/`):
+
 - `children.service.spec.ts` — unit tests for all service methods: `findAllByUser`, `findOne` (found / not-found / wrong-owner), `create` (with/without interests), `update` (success / wrong-owner), `remove` (success / wrong-owner)
 - `children.controller.spec.ts` — wiring tests verifying each endpoint calls the correct service method with correct arguments
 
 **Frontend** (`frontend/src/components/*/`):
+
 - `ChildCard.component.spec.tsx` — 8 tests: name render, age computation, gender label (Boy/Girl), interests badges, empty interests, edit/delete callbacks
 - `ChildForm.component.spec.tsx` — 5 tests: all fields render, `initialValues` population, name validation error, valid submit calls `onSubmit`, cancel calls `onCancel`
 

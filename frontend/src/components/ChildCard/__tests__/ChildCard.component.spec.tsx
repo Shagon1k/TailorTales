@@ -23,7 +23,11 @@ function renderCard(
 ): ReturnType<typeof render> {
     return render(
         <MantineProvider>
-            <ChildCard child={{ ...MOCK_CHILD, ...overrides }} onEdit={onEdit} onDelete={onDelete} />
+            <ChildCard
+                child={{ ...MOCK_CHILD, ...overrides }}
+                onEdit={onEdit}
+                onDelete={onDelete}
+            />
         </MantineProvider>,
     );
 }
