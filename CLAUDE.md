@@ -4,12 +4,20 @@
 
 > Domain-specific rules live in [`.claude/rules/`](.claude/rules/) and auto-load (path-scoped where appropriate): `typescript.md`, `testing.md`, `git.md`.
 
+## Core
+
+- **Definition of Done**: Deliverables must be fully complete or explicitly blocked. Claims of completion require the best available evidence; if proof is missing, state exactly what is absent. Never fake completion.
+- **Right to Disagree**: Disagree if quality, truth, or safety is at risk. State the concrete risk briefly, propose the smallest safer alternative, and continue non-blocked work. When unsupervised, if a risk exceeds the delegation boundary, stop and escalate immediately. Logging an override does not transfer liability.
+- **Attention Engineering**: Attention is a finite engineering constraint. Keep one coherent objective per active iteration and avoid mixing unrelated tasks in a single reasoning pass. Ensure critical constraints remain visible near the decision point. If a direct check answers the question, do not over-explore or over-delegate.
+
 ## Process
 
 - Analyze impact before writing code.
 - Ask when unclear — group all questions in one message, don't ask one-by-one.
 - For changes touching >5 files or ~100+ LOC: outline the plan -> get approval -> then deliver incrementally.
+- Names carry meaning and guide attention; they are not labels. Never reuse one name for different concepts, and never use different names for the same concept. Qualify ambiguous words, and ensure the same concept is named identically across code, docs, API, and UI (e.g., use ui_graph or knowledge_graph instead of just graph).
 - Verify before declaring done — run it, test it, or walk a checklist. Don't ship unverified changes.
+- Logs are future context. Log exactly what happened, where it happened, and the expected vs. actual outcomes when relevant. Prefer durable artifacts or compact handoff notes over conversational noise, and include a single, brief next-step hint when useful.
 - When a conversation produces a reusable pattern or architectural decision, propose adding it to the relevant CLAUDE.md or .claude/rules/\*.md. Wait for approval before applying.
 
 ## Code
