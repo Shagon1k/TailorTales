@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@mantine/core';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
-import HeaderUserChip from './HeaderUserChip';
+import HeaderUserChip from './components/HeaderUserChip/HeaderUserChip';
+import NotificationBell from './components/NotificationBell/NotificationBell';
 import styles from './Header.module.scss';
 
 interface IHeaderProps {
@@ -29,9 +30,7 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                             <Link href="/account/workshop" className={styles.header__link}>Workshop</Link>
                             <Link href="/account/children" className={styles.header__link}>Children</Link>
                             <span className={styles['header__nav-divider']} aria-hidden="true" />
-                            <button type="button" className={styles['header__icon-btn']} aria-label="Notifications">
-                                <span className={styles['header__icon-placeholder']} aria-hidden="true" />
-                            </button>
+                            <NotificationBell />
                             <HeaderUserChip />
                         </>
                     )}

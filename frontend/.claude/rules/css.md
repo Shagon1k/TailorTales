@@ -190,6 +190,28 @@ Start co-located. Move up only when a second consumer needs it:
 - Multiple route groups → `src/components/shared/`
 - No domain knowledge → `src/components/ui/`
 
+### Sub-component rule
+
+When a component owns private sub-components (used only by that parent), place them in a `components/` subfolder. Each sub-component gets its own named directory with all its files inside:
+
+```
+ParentComponent/
+  ParentComponent.tsx
+  ParentComponent.module.scss
+  __tests__/
+    ParentComponent.component.spec.tsx
+  components/
+    SubComponent/
+      SubComponent.tsx
+      SubComponent.module.scss
+      __tests__/
+        SubComponent.component.spec.tsx
+```
+
+Example: `Header/components/NotificationBell/`, `Header/components/HeaderUserChip/`.
+
+This applies at every level — route components, shared components, and ui atoms alike. Never place sub-component files flat in the parent directory.
+
 ---
 
 ## What never to do

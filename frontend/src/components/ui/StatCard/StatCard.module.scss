@@ -1,0 +1,36 @@
+@use 'styles/typography' as *;
+
+.stat-card {
+    // Dark card shell — mirrors Card m-dark exactly, with the correct padding + radius from Figma
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-8);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-md);
+
+    &__label {
+        @include t-caps-xs;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    &__value {
+        @include t-heading-4xl;
+        color: var(--text-primary);
+        white-space: nowrap;
+    }
+
+    &__info {
+        @include t-body-sm;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    // ── Tone modifiers — info line color only ────────────────────────────
+    // These soft tints are data-viz specific; no semantic token exists for them.
+    &.m-positive .stat-card__info { color: #b6d8a8; }
+    &.m-negative .stat-card__info { color: #f0a3a8; }
+}
