@@ -16,67 +16,71 @@
 
 ### Customization inputs (per generation)
 
-- **Required:** child question, child age, output format (book/comic), length (short 1–5 pages / medium 5–10 / long 10–20).
-- **Optional:** child interests/hobbies, art style preference, language (EN/RU).
+- **Required:** child question, child age, output format (book/comic), length (5/8/12/16/20 pages), art style, language.
+- **Optional:** child interests/hobbies.
 - **Future (v2):** child photo, parent photo for character likeness.
 
 ---
 
 ## 2. Stack & Architecture Decisions
 
-| Area                  | Decision                                                                                   |
-| --------------------- | ------------------------------------------------------------------------------------------ |
-| Repo layout           | Monorepo: `frontend/` + `backend/`, **pnpm workspaces** (no Turborepo for now)             |
-| Backend               | Nest.js (TypeScript), REST API with OpenAPI auto-generation                                |
-| Frontend              | Next.js (React, TypeScript), CSS Modules, **Mantine** UI library                           |
-| State management (FE) | React Query (server state) + Zustand (UI state)                                            |
-| Database              | PostgreSQL via **Prisma** ORM                                                              |
-| Queue                 | **BullMQ** (Redis-backed)                                                                  |
-| Object storage        | **MinIO** for dev/local, **AWS S3** for production                                         |
-| LLM (text)            | **OpenRouter** — `claude-haiku-4-5` for prod, `gpt-4o-mini` for dev (configurable via env) |
-| Image generation      | **DALL-E 3** via OpenAI API                                                                |
-| PDF generation        | **Puppeteer** (HTML → PDF)                                                                 |
-| Auth                  | **Google OAuth only** at MVP                                                               |
-| Payments              | **Paddle**                                                                                 |
-| Real-time progress    | **SSE** (Server-Sent Events)                                                               |
-| Email                 | TBD (Resend / Postmark / SES) — decide in Phase 7                                          |
-| Notifications         | Email + in-app                                                                             |
-| Testing               | Vitest + React Testing Library                                                             |
-| Containerization      | Docker + docker-compose for dev; Dockerfiles deployed via **dokploy**                      |
-| CI/CD                 | GitHub Actions (lint + type-check + test) — minimal at start                               |
-| Observability         | Pino logs only at MVP (no Sentry/OTel for now)                                             |
-| Compliance            | GDPR (EU-only target audience at MVP)                                                      |
+| Area | Decision |
+| ---- | -------- |
+| Repo layout | Monorepo: `frontend/` + `backend/`, **pnpm workspaces** (no Turborepo for now) |
+| Backend | Nest.js (TypeScript), REST API with OpenAPI auto-generation |
+| Frontend | Next.js (React, TypeScript), CSS Modules, **Mantine** UI library |
+| State management (FE) | React Query (server state) + Zustand (UI state) |
+| Database | PostgreSQL via **Prisma** ORM |
+| Queue | **BullMQ** (Redis-backed) |
+| Object storage | **MinIO** for dev/local, **AWS S3** for production |
+| LLM (text) | **OpenRouter** — `claude-haiku-4-5` for prod, `gpt-4o-mini` for dev (configurable via env) |
+| Image generation | **DALL-E 3** via OpenAI API |
+| PDF generation | **Puppeteer** (HTML → PDF) |
+| Auth | **Google OAuth only** at MVP |
+| Payments | **Paddle** |
+| Email | **Resend** (decided in Phase 5 — story completion notification) |
+| Real-time progress | **SSE** (Server-Sent Events) |
+| Notifications | Email + in-app (bell + toast) |
+| Testing | Vitest + React Testing Library |
+| Containerization | Docker + docker-compose for dev; Dockerfiles deployed via **dokploy** |
+| CI/CD | GitHub Actions (lint + type-check + test) — minimal at start |
+| Observability | Pino logs only at MVP (no Sentry/OTel for now) |
+| Compliance | GDPR (EU-only target audience at MVP) |
 
 ---
 
 ## 3. Domain Model (high level)
 
-| Entity           | Notes                                                                                                          |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| **User**         | Google OAuth identity, role (USER / ADMIN).                                                                    |
-| **Child**        | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input). |
-| **Story**        | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child.         |
-| **Page**         | Belongs to Story, ordered, contains text + illustration URL(s).                                                |
-| **Template**     | Pre-defined Story blueprint created by Admin. Users instantiate Stories from Templates with customization.     |
-| **Subscription** | Paddle-backed, plan + quotas (pages/month, regenerations/month).                                               |
-| **Rating**       | Belongs to Story, score + comment.                                                                             |
-| **Job**          | Tracks generation pipeline state and progress for SSE.                                                         |
-| **Notification** | In-app notifications per User.                                                                                 |
+| Entity | Notes |
+| ------ | ----- |
+| **User** | Google OAuth identity, role (USER / ADMIN). |
+| **Child** | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input). |
+| **ArtStyle** | Admin-managed. Fields: id, name, slug, thumbnailUrl, promptPrefix, isActive, order. Seeded with 8 styles. |
+| **Story** | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child. Includes `isPublic boolean (default false)` — set via opt-in in rating flow. |
+| **Page** | Belongs to Story, ordered, contains text + illustration URL(s) + chapter title. |
+| **Template** | Pre-defined Story blueprint created by Admin. Users instantiate Stories from Templates with customization. |
+| **Plan** | Subscription tier definition. Fields: id, name, paddleProductId, priceMonthly, pagesPerMonth, regenerationsPerMonth, childrenLimit, retentionDays, watermark. |
+| **Subscription** | Paddle-backed. Fields: id, userId, planId, paddleSubscriptionId, status, currentPeriodEnd, pagesUsed, regenerationsUsed. |
+| **Rating** | Belongs to Story + User. Fields: score (1–5), comment (optional). One per user per story (upsert). |
+| **Job** | Tracks generation pipeline state and progress for SSE. |
+| **Notification** | In-app notification per User. Fields: id, userId, type, payload (JSON), readAt?, createdAt. |
 
-**Unified naming:** `Story` (covers both book and comic).
+**Unified naming:** `Story` covers both book and comic.
 
 ---
 
 ## 4. Business Rules & Policies
 
-- **Pricing model:** "page credits." 1 book page = 1 credit, 1 comic page = 2–3 credits (comic costs more due to multi-illustration pages).
-- **Generation:** fully automated end-to-end. User submits customization, receives final PDF.
-- **Regeneration:** user can regenerate specific pages (text and/or illustration) with limits per subscription tier.
+- **Pricing model:** page credits. 1 book page = 1 credit. 1 comic page = 2 credits.
+- **Generation:** fully automated end-to-end. User submits customization → receives final PDF.
+- **Concurrent generation:** 1 active generation job per user at MVP.
+- **Regeneration:** user can regenerate specific pages (text / illustration / both) with an optional prompt. Limited per subscription tier.
 - **Free tier:** PDFs are watermarked. Retention policies differ per tier (free PDFs may expire).
 - **Content safety:** strict — text and image moderation pre-delivery. Child-friendly only.
 - **Age-adaptive content:** LLM adapts vocabulary and complexity based on child's age.
-- **Localization:** UI + content in EN and RU.
+- **Localization:** UI + generated content in EN and RU.
 - **Subscriptions only for registered users.**
+- **Public stories:** opt-in only. Parent explicitly agrees when rating a story. Appears on landing page.
 - **Admin:** seeded via DB or admin-only invite flow. Has a dedicated admin panel.
 
 ---
@@ -86,35 +90,62 @@
 ### IN
 
 - ✅ Google OAuth, USER + ADMIN roles
-- ✅ Multiple children per user
+- ✅ Multiple children per user (capped by plan's `childrenLimit`)
 - ✅ Stories: book + comic, single entity with `type`
 - ✅ Templates (admin-created, user-customized)
 - ✅ Generation pipeline (text via OpenRouter, images via DALL-E)
-- ✅ Customization: question, age, format, length, interests, art style, language
-- ✅ Limited page regeneration per tier
-- ✅ Paddle subscriptions (page credits model)
-- ✅ Ratings + feedback (score + comment)
-- ✅ Email + in-app notifications
-- ✅ Admin panel (users, stories review, templates, basic stats)
+- ✅ Customization: question, age, format, length, art style (from DB), language
+- ✅ 6 static question suggestion chips in workshop form ("the jar")
+- ✅ 1 concurrent generation per user; workshop nav routes to generation page if job active
+- ✅ Real-time generation progress via SSE (per-page completion events)
+- ✅ Limited page regeneration per tier (with optional user prompt)
+- ✅ Paddle subscriptions (page credits model, 3 tiers)
+- ✅ Ratings (score + comment) + opt-in public sharing (`Story.isPublic`)
+- ✅ Toast (transient) + bell (persistent inbox) notifications
+- ✅ Email notifications (story completed, story failed, subscription events) via Resend
+- ✅ Admin panel (users, stories review, templates, art styles, ratings, basic stats)
 - ✅ Content moderation (text + image)
 - ✅ Watermark on free tier
 - ✅ EN + RU localization
-- ✅ Schema reserved for photo input (avatarUrl on Child, etc.) — extendable later
+- ✅ `/account` settings page (Profile, Children, Subscription, Notifications, Language, Privacy & data)
+- ✅ Delete account (GDPR)
+- ✅ Schema reserved for photo input (avatarUrl on Child) — extendable later
 
 ### OUT (Post-MVP / v2)
 
+- ❌ Magic email link auth
 - ❌ Photo input (requires switching image provider to Flux/SD with reference-image support)
-- ❌ Referral program (link-based, free book/pages reward)
-- ❌ Public story sharing / gallery
+- ❌ Referral program
+- ❌ Public story sharing gallery (beyond opt-in landing page display)
 - ❌ Advanced analytics & observability (Sentry, OTel)
-- ❌ More auth providers (email/password, Apple, etc.)
+- ❌ Email/password auth, Apple OAuth, etc.
+- ❌ Export library (ZIP of all user PDFs)
+- ❌ "From the Wonder Jar" AI-personalized question suggestions (requires story history analysis)
 - ❌ Mobile apps
+- ❌ More languages (French, Estonian, etc.)
 
 ---
 
-## 6. Process & Documentation Rules
+## 6. Navigation Decisions
+
+### Public header (unauthenticated)
+
+`[Logo] TailorTales` · How it works · Pricing · `Sign in` · **Begin a tale →** (CTA button)
+
+### Private header (authenticated)
+
+`[Logo] TailorTales` · **Library** · **Workshop** · `[🔔]` · `[Avatar] Name / Plan`
+
+### Footer (both states)
+
+Privacy · Contact _(both static pages)_
+
+---
+
+## 7. Process & Documentation Rules
 
 - **ROADMAP.md is the single source of truth.** Update it on every scope change or decision.
+- **DESIGN.md** documents all UI/UX decisions from design screen reviews. Update after each design review session.
 - **Per-phase docs (mandatory):** every completed phase MUST produce `_docs/phase-N-<name>.md` following `_docs/TEMPLATE.md`. Each doc must include:
     - **Summary** — one-paragraph overview of what was added
     - **What was added** — entities, modules, endpoints, pages, jobs, etc.
@@ -129,25 +160,27 @@
 
 ---
 
-## 7. Deferred Decisions & Tech Debt
+## 8. Deferred Decisions & Tech Debt
 
 > Items explicitly deferred during development. Each entry records **what**, **why it was deferred**, and **when to revisit**.
 > New items require developer approval before being added.
 
-| #   | Item                                | Deferred reason                                                                                                                                                                                                                                                                        | Revisit at |
-| --- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| 1   | Refresh tokens + server-side logout | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP. | Post-MVP   |
+| # | Item | Deferred reason | Revisit at |
+| - | ---- | --------------- | ---------- |
+| 1 | Refresh tokens + server-side logout | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP. | Post-MVP |
+| 2 | Magic email link auth | Requires email provider (already decided: Resend in Phase 5). Added as Post-MVP auth option alongside Apple OAuth. | Post-MVP |
+| 3 | Exact comic credit rate | Design confirms 2 credits/page. Final business confirmation during Phase 8 (Subscriptions) Paddle setup. | Phase 8 |
 
 ---
 
-## 8. Phase Plan
+## 9. Phase Plan
 
 > Each phase below lists: **Goals → Sub-tasks → Acceptance Check → Deliverables**.
 > Use the checkboxes for progress tracking.
 
 ---
 
-### Phase 0 — Infrastructure & Foundation
+### Phase 0 — Infrastructure & Foundation ✅
 
 **Goal:** working dev environment, empty FE + BE skeletons, Docker-ready.
 
@@ -181,7 +214,7 @@
 
 ---
 
-### Phase 1 — Users & Authentication
+### Phase 1 — Users & Authentication ✅
 
 **Goal:** users can sign in with Google, sessions work, admin role exists.
 
@@ -213,7 +246,7 @@
 
 ---
 
-### Phase 2 — Children Management
+### Phase 2 — Children Management ✅
 
 **Goal:** parents can manage multiple child profiles.
 
@@ -239,41 +272,173 @@
 
 ---
 
-### Phase 3 — Story Entity & Templates
+### Phase 3 — Design System & Base Layout
 
-**Goal:** data model for stories + templates, draft creation, no generation yet.
+**Goal:** establish the visual foundation — design tokens, Mantine theme, atom library, route-group layouts, static pages, account shell, and the `ArtStyle` entity — so all subsequent phases build on a consistent base.
+
+> All TypeScript follows `.claude/rules/typescript.md` (e.g. `IComponentNameProps`, explicit return types, no `React.FC`).
+> All CSS follows `frontend/.claude/rules/css.md` (tokens → Mantine theme → CSS Modules; semantic tokens only; `m-` modifiers).
+> The "promotion rule" governs component location: start co-located, lift only when a second consumer needs the component.
 
 **Sub-tasks:**
 
-- [ ] Prisma `Story` model: `id`, `userId`, `childId`, `type (BOOK | COMIC)`, `status (DRAFT | QUEUED | GENERATING | COMPLETED | FAILED)`, `templateId?`, `customization (JSON)`, `language`, `pdfUrl?`, `createdAt`, `updatedAt`
-- [ ] Prisma `Page` model: `id`, `storyId`, `order`, `text`, `illustrations (JSON — array of { url, position })`, `layout?`
+**Dependencies (requires developer approval)**
+- [ ] Add `@mantine/notifications@^9.2.1` to `frontend/package.json` — required for Toast atom; same major version as existing Mantine packages
+
+**CSS architecture setup**
+- [ ] Migrate existing `src/app/globals.css` → `src/styles/globals.css`; update root layout import
+- [ ] `src/styles/tokens.css` — CSS custom properties: all primitives, semantic aliases, spacing, radii, shadows, gradients, motion tokens (`--duration-base`, `--ease-out`, `--focus-ring-color`, `--hit-min: 44px`)
+- [ ] `src/styles/globals.css` — imports `tokens.css`; global reset (existing); `prefers-reduced-motion` collapse rule; `:focus-visible` ring via `--focus-ring-color`
+- [ ] `src/theme/mantine.ts` — `createTheme()`: color scale from tokens, font families (Newsreader, Plus Jakarta Sans, Caveat, Geist Mono), border-radius scale, shadows, focus ring from `--focus-ring-color`
+- [ ] Wire theme into `src/app/providers.tsx` — `<MantineProvider theme={theme}>` (currently uses default theme)
+- [ ] Verify CSS cascade order: Mantine's `@mantine/core/styles.css` < `tokens.css` < CSS Module overrides via `classNames` (manual visual check on Button + Input)
+
+**Route restructure (foundation for co-location)**
+- [ ] Rename `src/app/(auth-guard)/` → `src/app/(private)/` (matches `(public)` paired group; symmetry + intent-based naming)
+- [ ] Create `src/app/(public)/` route group with `layout.tsx` (imports `Header` + `Footer` from `shared/`)
+- [ ] Create `src/app/(private)/layout.tsx` (imports `Header` + `Footer` from `shared/`, wraps children with `AuthGuard`)
+- [ ] Create `src/app/(private)/account/layout.tsx` (sidebar shell — `_components/AccountSidebar/`)
+- [ ] `/login` stays at `src/app/login/page.tsx` (outside groups — no chrome, full-bleed split layout)
+- [ ] Migrate existing routes: move `(auth-guard)/profile/` → `(private)/account/profile/`, `(auth-guard)/children/` → `(private)/account/children/`
+
+**Existing component migrations**
+- [ ] `src/components/Tag/` → `src/components/ui/Badge/` (rename + update imports — corresponds to Mantine `Badge` plan)
+- [ ] `src/components/AuthGuard/` → `src/app/(private)/_components/AuthGuard/` (only consumer is the private layout)
+- [ ] `src/components/ChildCard/` → `src/app/(private)/account/children/_components/ChildCard/`
+- [ ] `src/components/ChildForm/` → `src/app/(private)/account/children/_components/ChildForm/`
+- [ ] After all migrations: `src/components/` contains only `ui/` and `shared/`
+
+**Shared structural components** (`src/components/shared/`)
+- [ ] `Header` — adapts nav links based on auth state (auth from `UserContext`); public: How it works · Pricing · Sign in · "Begin a tale →" CTA; private: Library · Workshop · `NotificationBell` · Avatar + plan name
+- [ ] `Footer` — BrandMark + tagline + "Privacy · Contact" links; identical across public and private layouts
+
+**Mantine-based atoms** (`src/components/ui/`) — override visually via `classNames` + CSS Module:
+- [ ] `Button` — variants: `m-primary` (fox bevel gradient), `m-secondary` (outlined), `m-quiet` (text-only), `m-on-card` (cream on dark card); all hit-target compliant (44px)
+- [ ] `Card` (`Paper` base) — variants: `m-gradient` (warm cream, `--gradient-page`), `m-dark` (twilight, `--gradient-card-twilight`)
+- [ ] `Badge` — variants: `m-filled`, `m-warm` (ember), `m-gold`
+- [ ] `Rating` — star rating 1–5; uses `--accent-gold`
+- [ ] `Divider` — variants: `m-dashed`, `m-needle`
+- [ ] `Progress` — fill via `--gradient-progress` (ember → fox → gold)
+- [ ] `Avatar` — circular; fox bevel gradient border (`--gradient-fox-bevel`); 44px min
+- [ ] `Modal` — wraps Mantine Modal; dark overlay, `--bg-elevated` surface, focus trap
+- [ ] `Link` (`Anchor` base) — variants: `m-quiet`, `m-on-card`
+- [ ] `Toast` (`Notification` + `@mantine/notifications`) — variants: `m-success`, `m-error`, `m-warning`, `m-info`; auto-dismiss; glyph per variant; `notifications.show()` helper wrapper
+
+**Form atoms** (`src/components/ui/`) — Mantine base, `classNames` slot override:
+- [ ] `Input` (`TextInput`) — label, input, helper, error slots; `aria-describedby` wired
+- [ ] `Textarea` (`Textarea`) — same slot pattern
+- [ ] `Select` (`Select`) — same slot pattern
+- [ ] `TagsInput` (`TagsInput`) — same slot pattern
+
+**Custom CSS Module atoms** (`src/components/ui/`) — no Mantine base:
+- [ ] `CapsLabel` — `font: var(--font-mono)`, 11px, all-caps; variants: `m-on-card`, `m-gold`
+- [ ] `BrandMark` — SVG logo + wordmark lockup; consumer passes `href` so it stays domain-free
+- [ ] `StatCard` — stat value + label + delta; variants: `m-positive`, `m-negative`
+- [ ] `NotificationBell` — icon + unread count badge; visual shell at Phase 3 (no data wiring); full dropdown UI wires in Phase 9
+- [ ] `SuggestionChip` — pill-shaped tappable chip for workshop question suggestions
+
+**Static pages** (placed inside route groups — chrome comes from group's `layout.tsx`)
+- [ ] `src/app/(public)/page.tsx` — landing: hero, Three lanterns explainer (3-step cards), public stories grid (empty — wired in Phase 10), bottom CTA strip
+- [ ] `src/app/login/page.tsx` (existing — restyle): split layout (illustration left, auth card right); "Continue with Google" primary button; legal note
+- [ ] `src/app/(public)/how-it-works/page.tsx` — placeholder content
+- [ ] `src/app/(public)/pricing/page.tsx` — plan cards (Free Chapter, Story Hour, Family Workshop) + feature comparison table + FAQ section; monthly/yearly toggle; static/hardcoded data (wired to Paddle in Phase 8)
+- [ ] `src/app/(public)/privacy/page.tsx` — static
+- [ ] `src/app/(public)/contact/page.tsx` — static
+
+**Account shell** (sub-pages placeholder until their respective phases)
+- [ ] `src/app/(private)/account/_components/AccountSidebar/` — sidebar nav with all sections (Profile [Phase 1 — existing], Children [Phase 2 — existing], Subscription [Phase 8], Notifications [Phase 9], Language [Phase 12], Privacy & data [Phase 8], Sign out [existing], Delete account [Phase 8])
+- [ ] `src/app/(private)/account/page.tsx` — redirects to `/account/profile` (or shows overview)
+- [ ] `src/app/(private)/account/subscription/page.tsx` — placeholder
+- [ ] `src/app/(private)/account/notifications/page.tsx` — placeholder
+- [ ] `src/app/(private)/account/language/page.tsx` — placeholder
+- [ ] `src/app/(private)/account/privacy/page.tsx` — placeholder
+
+**Backend — ArtStyle entity**
+- [ ] Prisma `ArtStyle` model: `id`, `name`, `slug`, `thumbnailUrl`, `promptPrefix`, `isActive`, `order`, `createdAt`
+- [ ] Prisma migration for `ArtStyle`
+- [ ] Seed script: 8 art styles (Storybook, Watercolour, Crayon, Ink line, Felt-pen, Cut-paper, Soft 3D, Comic ink) with placeholder thumbnail URLs
+
+**Tests**
+
+Baseline rule: every atom ships with at least — render test, one test per variant, disabled / loading / error state where applicable. Layouts ship with nav link rendering test.
+
+- [ ] All atoms in `src/components/ui/` — apply the baseline above
+- [ ] `Header` — renders public links when unauthenticated, private links when authenticated, `NotificationBell` visible only when authenticated
+- [ ] `Footer` — renders Privacy + Contact links
+- [ ] `(public)/layout.tsx` and `(private)/layout.tsx` — render header + footer + children slot
+- [ ] `AccountSidebar` — renders all sidebar items in correct order
+- [ ] Migrated components (`Badge`, `AuthGuard`, `ChildCard`, `ChildForm`) — existing tests pass after path change
+- [ ] ArtStyle seed: 8 rows with correct slugs
+
+**Acceptance Check:**
+
+- `pnpm dev` runs frontend with new theme applied; no Mantine default colors visible
+- Public routes (`/`, `/how-it-works`, `/pricing`, `/privacy`, `/contact`) render via `(public)` layout with Header + Footer
+- Private routes (`/account/*`) render via `(private)` layout with private Header + Footer
+- `/login` renders full-bleed split layout (no public/private chrome)
+- Account sidebar shows all sections — each non-wired section displays a placeholder
+- All 4 existing components migrated to new locations; their existing tests still pass
+- ArtStyle seed populates 8 styles
+- `pnpm test` passes; `pnpm type-check` passes; `pnpm lint` passes
+
+**Deliverables:** `_docs/phase-3-design-system.md`
+
+**Out of scope (explicit):** Mobile responsiveness — design system targets desktop at MVP; mobile breakpoints are post-MVP.
+
+---
+
+### Phase 4 — Story Entity & Templates
+
+**Goal:** data model for stories + templates, draft creation, workshop form, story reader (read-only), library grid. No generation yet.
+
+**Sub-tasks:**
+
+- [ ] Prisma `Story` model: `id`, `userId`, `childId`, `type (BOOK | COMIC)`, `status (DRAFT | QUEUED | GENERATING | COMPLETED | FAILED)`, `templateId?`, `customization (JSON)`, `artStyleId`, `language`, `isPublic (default false)`, `pdfUrl?`, `createdAt`, `updatedAt`
+- [ ] Prisma `Page` model: `id`, `storyId`, `order`, `chapterTitle?`, `text`, `illustrations (JSON — array of { url, position })`, `layout?`
 - [ ] Prisma `Template` model: `id`, `name`, `description`, `type`, `blueprint (JSON)`, `customizableFields (JSON)`, `coverImageUrl`, `createdById`, `createdAt`, `updatedAt`
 - [ ] Prisma migrations
 - [ ] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
 - [ ] Stories module: CRUD (draft create, list user's stories, get by id, delete)
 - [ ] Templates module: list (public to all users), CRUD (admin only)
-- [ ] Frontend: stories list page
-- [ ] Frontend: story detail page (read-only at this stage)
-- [ ] Frontend: template gallery
-- [ ] Frontend: "create story" wizard (collects customization, saves as DRAFT — no generation yet)
+- [ ] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
+    - Child reader selector (loads user's children)
+    - Question text input + 6 static suggestion chips
+    - Format selector (Book / Comic) with credit cost display
+    - Length selector (5 / 8 / 12 / 16 / 20 pp) with credit cost and remaining balance
+    - Art style grid (loaded from `ArtStyle` DB, thumbnails displayed)
+    - Language selector (EN active; RU active; others "coming soon")
+    - Sticky right panel: live summary (Reader, Format, Length, Style, Language, Credits X/Y) + "Light the lantern →" CTA + "Save as draft" link
+- [ ] Frontend: `/library` dashboard page (partial):
+    - Greeting + tonight's tale (one static suggestion)
+    - "Your readers" child cards with "+ New tale" quick action
+    - "Your library" tale grid with filter chips (All / For [Child] / Books / Comics)
+    - Stats bar stubbed (zeros until Phase 8 wires subscription data)
+    - "In the Workshop" strip placeholder (wired in Phase 5)
+- [ ] Frontend: `/library/[storyId]` story reader (read-only at this stage):
+    - Breadcrumb + page header (title, subtitle, Download PDF stub)
+    - Chapter list (left panel)
+    - Spread viewer with navigation (center)
+    - Details panel (right — created, reader, format, style, language, file size)
+    - Regeneration and rating panels rendered but inactive (wired in Phases 7 and 10)
 - [ ] Admin frontend: template CRUD UI
-- [ ] Tests: CRUD, scoping, admin-only template create
+- [ ] Tests: Story CRUD, scoping, draft lifecycle, template admin-only create, workshop form renders and submits
 
 **Acceptance Check:**
 
-- User can save a DRAFT story with customization
+- User can save a DRAFT story via the workshop form
+- Art styles load from DB in the form
 - Admin can CRUD templates
-- Templates are publicly listable, only admin can modify
-- Stories scoped per user
+- Stories scoped per user; templates publicly listable
+- Story reader renders chapter list and spread viewer
 - Tests pass
 
-**Deliverables:** `_docs/phase-3-stories.md`
+**Deliverables:** `_docs/phase-4-stories.md`
 
 ---
 
-### Phase 4 — Generation Pipeline (core feature)
+### Phase 5 — Generation Pipeline
 
-**Goal:** end-to-end generation from DRAFT to downloadable PDF.
+**Goal:** end-to-end generation from DRAFT to downloadable PDF with real-time progress.
 
 **Sub-tasks:**
 
@@ -282,145 +447,212 @@
 - [ ] Queue definitions: `outline`, `text`, `illustration`, `assembly`, `upload`
 - [ ] OpenRouter client (configurable model via `OPENROUTER_MODEL` env)
 - [ ] DALL-E client (with exponential backoff retry, max 3 attempts)
-- [ ] **Stage 1 — outline:** LLM generates page-by-page outline (page count from `length`, characters, theme)
-- [ ] **Stage 2 — text:** LLM writes content per page (parallelizable; age-adaptive prompt)
-- [ ] **Stage 3 — illustration:** DALL-E generates image(s) per page (parallelizable; consistent style prefix + character description)
-- [ ] **Stage 4 — moderation:** LLM-based text moderation; image moderation (TBD provider — at minimum OpenAI moderation API for text, image moderation flag from DALL-E)
-- [ ] **Stage 5 — assembly:** Puppeteer renders HTML pages → PDF
-- [ ] **Stage 6 — upload:** PDF uploaded to S3, signed URL stored on Story
-- [ ] Watermark applied for free-tier users at assembly stage
-- [ ] SSE endpoint: `GET /stories/:id/progress` streams job progress events
+- [ ] 1-concurrent-story enforcement: check for active job before enqueuing; return 409 if one exists
+- [ ] **Stage 1 — Outline:** LLM generates page-by-page outline + chapter titles (using child age, interests, question, art style prompt prefix)
+- [ ] **Stage 2 — Words:** LLM writes content per page (parallelizable; age-adaptive prompt)
+- [ ] **Stage 3 — Pictures:** DALL-E generates image(s) per page (parallelizable; consistent style prefix + character description)
+- [ ] **Stage 4 — Moderation:** LLM-based text moderation; image moderation via DALL-E safety flags (runs silently — not a named user-visible stage)
+- [ ] **Stage 5 — Binding:** Puppeteer renders HTML pages → PDF; watermark applied for free-tier users
+- [ ] **Stage 6 — Ready:** PDF uploaded to S3, signed URL stored on Story; Story status → COMPLETED
+- [ ] SSE endpoint: `GET /stories/:id/progress` — streams per-page completion events (not just %) + stage transitions
 - [ ] Retry policy: exponential backoff, 3 retries, transient errors only (4xx fails immediately)
 - [ ] Failure handling: mark Story FAILED, surface error to user
-- [ ] Frontend: "Generate" button triggers pipeline, real-time progress UI via SSE
-- [ ] Frontend: completed story page with PDF download
-- [ ] Tests: each stage independently (mocked LLM/DALL-E), full pipeline integration test
+- [ ] `/workshop` routing: if active job exists → redirect to `/workshop/[jobId]`; otherwise show form
+- [ ] Frontend: `/workshop/[jobId]` generation progress page:
+    - Fox mascot + progress bar ("page X of Y · [stage] · ~N min remaining")
+    - Pipeline stage row: Outline ✓ → Words ✓ → Pictures (active) → Binding → Ready
+    - "Pages so far" grid: thumbnails appear per SSE page-completion event; active page glows
+    - Workshop log (LIVE badge): timestamped, short human-friendly label per event
+    - "Close safely" banner (email + address displayed)
+- [ ] Frontend: "In the Workshop" strip on `/library` dashboard wired (shows active job)
+- [ ] Frontend: Download PDF button wired on story reader on COMPLETED stories
+- [ ] Email notification on story_completed (Resend) — also creates bell `Notification` record
+- [ ] Bell notification on story_failed — also creates bell `Notification` record
+- [ ] Resend client module (used here and expanded in Phase 9)
+- [ ] Tests: each pipeline stage independently (mocked LLM/DALL-E), SSE events, 1-concurrent enforcement, failure handling
 
 **Acceptance Check:**
 
-- User submits customization → sees real-time progress → downloads PDF
-- Generation works for both book and comic types
-- Failed stages retry transient errors and surface non-transient failures clearly
+- User submits workshop form → redirected to generation page → sees per-page real-time progress → story completes → PDF downloadable
+- Second generation attempt while one is active returns 409
+- Failed stories surface error to user
 - Free tier PDFs are watermarked
+- User receives email on completion
 - Tests pass
 
-**Deliverables:** `_docs/phase-4-generation.md`
+**Deliverables:** `_docs/phase-5-generation.md`
 
 ---
 
-### Phase 5 — Page Regeneration
+### Phase 6 — Mid-point Documentation
 
-**Goal:** users can regenerate specific pages within tier limits.
+**Goal:** consolidate what was built in Phases 1–5 into coherent, durable documentation for both developers and AI. The core happy path is complete at this point — good moment to document the system as a whole before adding complexity.
 
 **Sub-tasks:**
 
-- [ ] Endpoint: `POST /stories/:id/pages/:order/regenerate` with body `{ what: 'text' | 'illustration' | 'both' }`
-- [ ] Track regenerations per Story and per User per month
-- [ ] Enforce per-tier limits (read from Subscription, deferred to Phase 6 — until then use a placeholder/free tier limit)
-- [ ] Re-render PDF after page regeneration, replace S3 file
-- [ ] Frontend: regenerate buttons per page on story detail
-- [ ] Frontend: show remaining regenerations
-- [ ] Tests: regeneration flow, quota enforcement
+- [ ] Architecture overview doc: system design, data flow diagram, key decisions and their rationale (covers Phases 0–5)
+- [ ] API reference: all endpoints, request/response shapes, auth rules, error codes
+- [ ] Developer onboarding guide: prerequisites, env setup, local run (frontend + backend + workers), first contribution checklist
+- [ ] Review and improve all `_docs/phase-N-*.md` files (0–5): fill gaps, fix stale info, ensure commands still work
+- [ ] Sweep `CLAUDE.md` + all `.claude/rules/*.md`: incorporate patterns and lessons learned from Phases 1–5; propose updates for developer approval
+- [ ] Verify `DESIGN.md` and `ROADMAP.md` reflect actual built state (no drift)
 
 **Acceptance Check:**
 
-- User can regenerate a page (text only / illustration only / both)
-- Quota tracked and enforced
+- A new developer can clone the repo, follow the onboarding guide, and run the full stack locally without assistance
+- All `_docs/phase-0` through `_docs/phase-5` docs are accurate and complete
+- `CLAUDE.md` and rules files updated with any new conventions discovered
+- Architecture overview covers all major system components
+
+**Deliverables:** `_docs/phase-6-midpoint-docs.md`
+
+---
+
+### Phase 7 — Page Regeneration
+
+**Goal:** users can regenerate specific pages within tier limits, with an optional prompt.
+
+**Sub-tasks:**
+
+- [ ] Endpoint: `POST /stories/:id/pages/:order/regenerate` with body `{ what: 'text' | 'illustration' | 'both', prompt?: string }`
+- [ ] Track regenerations per User per month; enforce per-tier limits (read from Subscription; use free-tier placeholder limit until Phase 8)
+- [ ] Re-render PDF after page regeneration, replace S3 file
+- [ ] Frontend: wire regeneration in story reader right panel:
+    - "Regenerate words on this page" → opens modal (current page text as context + optional prompt field + submit)
+    - "Repaint the picture" → opens modal (illustration description as context + optional prompt field + submit)
+    - "N regenerations left this month" (stubbed count until Phase 8 wires subscription quota)
+- [ ] Tests: regeneration flow, optional prompt forwarded to LLM/DALL-E, quota enforcement (placeholder limit)
+
+**Acceptance Check:**
+
+- User can regenerate text / illustration / both for a page
+- Optional prompt is respected in regenerated output
+- Quota tracked and enforced (at least with free-tier placeholder)
 - PDF updates correctly
 - Tests pass
 
-**Deliverables:** `_docs/phase-5-regeneration.md`
+**Deliverables:** `_docs/phase-7-regeneration.md`
 
 ---
 
-### Phase 6 — Subscriptions (Paddle)
+### Phase 8 — Subscriptions (Paddle)
 
-**Goal:** users can subscribe and quotas are enforced.
+**Goal:** users can subscribe, quotas are enforced per plan, billing details visible in account settings, account deletion supported.
 
 **Sub-tasks:**
 
-- [ ] Prisma `Plan` model: `id`, `name`, `paddleProductId`, `priceMonthly`, `pagesPerMonth`, `regenerationsPerMonth`, `retentionDays`, `watermark (bool)`
+- [ ] Prisma `Plan` model: `id`, `name`, `paddleProductId`, `priceMonthly`, `pagesPerMonth`, `regenerationsPerMonth`, `childrenLimit`, `retentionDays`, `watermark (bool)`
 - [ ] Prisma `Subscription` model: `id`, `userId`, `planId`, `paddleSubscriptionId`, `status`, `currentPeriodEnd`, `pagesUsed`, `regenerationsUsed`
+- [ ] Prisma migrations
 - [ ] Paddle integration: checkout link generation, webhook handler (created, updated, canceled, payment_failed)
-- [ ] Quota service: before generation, validate pages + credits against subscription
-- [ ] Quota service: deduct page credits on generation completion (1 per book page, 2–3 per comic page — TBD exact rate)
-- [ ] Retention cleanup job (cron): delete PDFs past tier retention
-- [ ] Frontend: pricing page (plans listed)
-- [ ] Frontend: subscription management UI (current plan, change, cancel, billing portal link)
-- [ ] Frontend: usage display (pages used / remaining, regenerations remaining)
-- [ ] Tests: webhook handling, quota enforcement, retention cleanup
+- [ ] Quota service: validate pages + regenerations against subscription before allowing operations
+- [ ] Quota service: deduct page credits on generation completion (1 per book page, 2 per comic page)
+- [ ] Children limit enforcement: `childrenLimit` from Plan enforced in children endpoint (backfills Phase 2's uncapped endpoint)
+- [ ] `DELETE /me`: cancel active Paddle subscription (if any) then delete user + all owned data
+- [ ] Retention cleanup job (cron): delete PDFs past tier `retentionDays`
+- [ ] Frontend: `/account` → Subscription section wired:
+    - Current plan card (name, billing, description, next renewal, VAT breakdown)
+    - Usage bars: pages painted X/Y · regenerations X/Y · children profiles X/Y
+    - Payment details section (card "Change" → Paddle billing portal; billing email / address / Tax ID displayed from Paddle API)
+    - Past parcels list (invoice history from Paddle API)
+    - Upgrade / Cancel subscription actions
+- [ ] Frontend: `/account` → Privacy & data section: GDPR info + "Delete account" flow
+- [ ] Frontend: stats bar on `/library` dashboard wired (pages this month / left / regenerations / tales count)
+- [ ] Frontend: regeneration quota count wired in story reader (was stubbed in Phase 7)
+- [ ] Frontend: `/pricing` page wired to real Plan data (replaces Phase 3 static hardcoded data — ships in Phase 8)
+- [ ] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account deletion flow
 
 **Acceptance Check:**
 
 - User can subscribe via Paddle
-- Quotas enforced before generation
+- Quotas enforced before generation and regeneration
+- Children limit enforced per plan
+- Account deletion cancels subscription and removes all user data
 - Free-tier PDFs expire per retention policy
 - Tests pass
 
-**Deliverables:** `_docs/phase-6-subscriptions.md`
+**Deliverables:** `_docs/phase-8-subscriptions.md`
 
 ---
 
-### Phase 7 — Notifications (Email + In-App)
+### Phase 9 — Notifications
 
-**Goal:** users get notified on key events.
+**Goal:** full notification preferences UI, in-app bell wiring, subscription event emails.
+
+> Note: story_completed and story_failed notifications (email + bell record) already ship in Phase 5.
+> This phase adds: all remaining event types, user preferences, and the bell UI.
 
 **Sub-tasks:**
 
-- [ ] Decide email provider (Resend recommended — simple, generous free tier)
-- [ ] Email service module (templates for: story*completed, story_failed, subscription*\* events)
-- [ ] Prisma `Notification` model: `id`, `userId`, `type`, `payload (JSON)`, `readAt?`, `createdAt`
-- [ ] Notifications module: list, mark-as-read endpoints
-- [ ] Event-driven: emit notification + email on story completion, story failure, subscription events
-- [ ] Frontend: notification bell + dropdown, mark-as-read
-- [ ] Frontend: SSE or polling for new notifications (SSE preferred — already in stack)
-- [ ] Tests: notification creation, email sending (mocked), mark-as-read
+- [ ] Prisma `Notification` model: `id`, `userId`, `type`, `payload (JSON)`, `readAt?`, `createdAt` (may already be created in Phase 5 — verify)
+- [ ] Notifications module: list (`GET /notifications`), mark-as-read (`PATCH /notifications/:id/read`), mark-all-read endpoints
+- [ ] Subscription event notifications (emit on Paddle webhook events): payment_failed (bell + email), subscription_canceled (bell + email), subscription_renewed (email only)
+- [ ] Resend email templates for all remaining event types
+- [ ] Frontend: private header — wire notification bell (was shell in Phase 3):
+    - Dropdown showing last 20 notifications
+    - Unread badge count
+    - Mark-as-read on open / individual mark-as-read
+    - "Mark all as read" action
+- [ ] Frontend: `/account` → Notifications section wired: per-event toggles (email vs in-app on/off)
+- [ ] User notification preferences stored on `User` or separate `NotificationPreference` model (decide at implementation)
+- [ ] Tests: notification creation, email sending (mocked), mark-as-read, preferences respected
 
 **Acceptance Check:**
 
-- User receives email + in-app notification on key events
-- Notifications can be marked as read
+- Bell shows unread count; dropdown lists recent notifications
+- Subscription events trigger correct email + bell combinations
+- User can toggle notification preferences per event type
 - Tests pass
 
-**Deliverables:** `_docs/phase-7-notifications.md`
+**Deliverables:** `_docs/phase-9-notifications.md`
 
 ---
 
-### Phase 8 — Ratings & Feedback
+### Phase 10 — Ratings & Public Sharing
 
-**Goal:** users can rate completed stories with a comment.
+**Goal:** users can rate completed stories; opt-in public stories appear on the landing page.
 
 **Sub-tasks:**
 
 - [ ] Prisma `Rating` model: `id`, `storyId`, `userId`, `score (1-5)`, `comment?`, `createdAt`
-- [ ] Endpoints: `POST /stories/:id/rating`, `GET /admin/ratings` (admin only)
-- [ ] One rating per user per story (upsert)
-- [ ] Frontend: rating UI on completed story page (stars + comment input)
-- [ ] Tests: rating CRUD, upsert behavior, admin-only listing
+- [ ] Endpoint: `POST /stories/:id/rating` (upsert — one per user per story); accepts `{ score, comment?, isPublic? }`
+- [ ] When `isPublic = true` in rating payload: set `Story.isPublic = true`
+- [ ] `GET /stories/public` — paginated list of public stories (for landing page "Tales lit this week")
+- [ ] `GET /admin/ratings` (admin only)
+- [ ] Frontend: wire rating panel in story reader right panel (was inactive in Phase 4):
+    - 1–5 star input
+    - Optional comment textarea
+    - "Share this story as an example for other families" opt-in toggle
+    - "Save rating" button
+- [ ] Frontend: `/` landing page — wire public stories grid (was empty in Phase 3)
+- [ ] Admin: manage `Story.isPublic` visibility (override/retract public status)
+- [ ] Tests: rating CRUD, upsert behavior, isPublic propagation, public story list, admin rating view
 
 **Acceptance Check:**
 
 - User can rate a completed story
-- Admin can view all ratings
+- Opting in makes the story appear on the landing page public grid
+- Admin can view all ratings and manage public visibility
 - Tests pass
 
-**Deliverables:** `_docs/phase-8-ratings.md`
+**Deliverables:** `_docs/phase-10-ratings.md`
 
 ---
 
-### Phase 9 — Admin Panel
+### Phase 11 — Admin Panel
 
-**Goal:** admin can manage users, review stories, manage templates, view stats.
+**Goal:** admin can manage users, review stories, manage templates and art styles, view stats.
 
 **Sub-tasks:**
 
 - [ ] Admin-only frontend route group with auth guard
 - [ ] User management: list, suspend, change role
-- [ ] Story moderation queue: list flagged stories, mark as reviewed, force-delete
-- [ ] Templates UI (already exists from Phase 3, polish here)
-- [ ] Ratings + feedback view
+- [ ] Story moderation queue: list flagged/reported stories, mark as reviewed, force-delete, toggle `isPublic`
+- [ ] Templates UI (polish Phase 4 implementation)
+- [ ] ArtStyle management UI: list, create, edit (name, slug, thumbnail, promptPrefix), activate/deactivate, reorder
+- [ ] Ratings + feedback view (list all ratings from Phase 9)
 - [ ] Stats dashboard: counts (users, stories, active subs), revenue from Paddle API
-- [ ] Tests: admin auth guard, admin endpoints
+- [ ] Tests: admin auth guard, all admin endpoints
 
 **Acceptance Check:**
 
@@ -428,22 +660,22 @@
 - Non-admins blocked from admin routes
 - Tests pass
 
-**Deliverables:** `_docs/phase-9-admin.md`
+**Deliverables:** `_docs/phase-11-admin.md`
 
 ---
 
-### Phase 10 — Localization (EN + RU)
+### Phase 12 — Localization (EN + RU)
 
 **Goal:** UI in EN/RU, generated content in EN/RU.
 
 **Sub-tasks:**
 
 - [ ] Frontend: `next-intl` setup, EN + RU translation files
-- [ ] Language switcher (persists to user profile if logged in, else cookie)
+- [ ] `/account` → Language section wired: EN / RU switcher (persists to `User.language` if logged in, else cookie)
 - [ ] Backend: localized error messages via Accept-Language header
-- [ ] Generation: `language` param drives LLM output language
+- [ ] Generation: `language` param drives LLM output language (already passed in `customization` JSON — ensure prompts are language-aware)
 - [ ] Translate all existing UI strings to RU
-- [ ] Tests: language switching, localized errors
+- [ ] Tests: language switching, localized errors, generated content in correct language
 
 **Acceptance Check:**
 
@@ -451,11 +683,37 @@
 - Generated stories respect language param
 - Tests pass
 
-**Deliverables:** `_docs/phase-10-localization.md`
+**Deliverables:** `_docs/phase-12-localization.md`
 
 ---
 
-### Phase 11 — Production Deploy
+### Phase 13 — Final Documentation
+
+**Goal:** bring all documentation to launch-ready quality. Everything is built; nothing is deployed yet. Last chance to capture what was actually built before the codebase is live and changing under load.
+
+**Sub-tasks:**
+
+- [ ] Ops runbook: deployment procedure, rollback steps, env variable reference (all vars across all services), health check endpoints
+- [ ] Monitoring & alerting guide: log structure (Pino), what to watch, how to diagnose common failures
+- [ ] Backup strategy doc: Postgres backup schedule + restore procedure, S3 versioning policy
+- [ ] Final sweep of all `_docs/phase-N-*.md` (0–12): verify accuracy, update any commands or configs that changed during later phases
+- [ ] Final sweep of `CLAUDE.md` + all `.claude/rules/*.md`: incorporate all patterns and lessons from Phases 6–12; propose updates for developer approval
+- [ ] Final review of `DESIGN.md`: confirm it matches what was actually built (no deferred items silently dropped)
+- [ ] Final review of `ROADMAP.md`: move completed items to ✅, update open questions, archive resolved deferred decisions
+- [ ] Update architecture overview doc (from Phase 6) to reflect full system including Phases 6–12 additions
+
+**Acceptance Check:**
+
+- Ops runbook covers full deployment from zero to live
+- All per-phase docs accurate and complete through Phase 12
+- `CLAUDE.md` and rules files reflect all conventions established across the full build
+- `ROADMAP.md` accurately reflects the shipped product
+
+**Deliverables:** `_docs/phase-13-final-docs.md`
+
+---
+
+### Phase 14 — Production Deploy
 
 **Goal:** app runs in production via dokploy.
 
@@ -467,9 +725,10 @@
 - [ ] Production Postgres + Redis provisioned
 - [ ] Paddle production credentials wired
 - [ ] OpenAI/OpenRouter production keys wired
+- [ ] Resend production credentials wired
 - [ ] Domain + HTTPS (handled by dokploy)
 - [ ] dokploy deployment pipeline configured
-- [ ] Smoke tests in production env (login, generate one story end-to-end)
+- [ ] Smoke tests in production env (login → generate one story → download)
 - [ ] Backup strategy for Postgres + S3 documented
 
 **Acceptance Check:**
@@ -478,7 +737,7 @@
 - End-to-end flow works (login → generate → download)
 - Backups configured
 
-**Deliverables:** `_docs/phase-11-deploy.md`
+**Deliverables:** `_docs/phase-14-deploy.md`
 
 ---
 
@@ -486,41 +745,60 @@
 
 - Photo personalization (switch image provider to Flux or SD with IP-Adapter)
 - Referral program (link-based, free book/pages reward)
-- Public sharing / story gallery
+- Full public sharing gallery (browse all public stories)
 - Sentry + OpenTelemetry observability
-- Email/password auth, Apple OAuth, etc.
+- Magic email link auth
+- Email/password auth, Apple OAuth
+- Export library (ZIP of all user PDFs)
+- "From the Wonder Jar" AI-personalized question suggestions (requires story history analysis)
+- "From page X" text excerpt preview during generation
+- "About this page" per-page generation context panel in story reader
 - Mobile apps
-- Public API for third-party integrations
-- More languages
 - Audio narration (TTS)
 - Print-on-demand integration
+- More languages (French, Estonian, Spanish, German)
+- Public API for third-party integrations
 
 ---
 
-## 11. Progress Tracking
+## 11. Ideas & Future Directions
 
-| Phase                   | Status         | Notes |
-| ----------------------- | -------------- | ----- |
-| 0 — Infrastructure      | ✅ Done        |       |
-| 1 — Auth                | ✅ Done        |       |
-| 2 — Children            | ✅ Done        |       |
-| 3 — Stories & Templates | ⬜ Not started |       |
-| 4 — Generation Pipeline | ⬜ Not started |       |
-| 5 — Regeneration        | ⬜ Not started |       |
-| 6 — Subscriptions       | ⬜ Not started |       |
-| 7 — Notifications       | ⬜ Not started |       |
-| 8 — Ratings             | ⬜ Not started |       |
-| 9 — Admin Panel         | ⬜ Not started |       |
-| 10 — Localization       | ⬜ Not started |       |
-| 11 — Production Deploy  | ⬜ Not started |       |
+> Not scheduled. No implementation commitment. Worth revisiting when MVP is stable.
+
+- **Workshop step-by-step wizard pagination** — currently a single scrollable form; a step-by-step flow (Reader → Question → Look → Review) could improve UX for new users at scale
+- **Family plan upsell card** — contextual upsell in the dashboard "Your readers" section, personalized based on usage patterns
+- **AI-flavored workshop log descriptions** — during generation, produce whimsical human-like prose for each log event instead of short labels (e.g. "The mountain breathed slowly into the story...")
+- **"Share with family"** — share a specific story link with other family members (grandparents, etc.)
+
+---
+
+## 12. Progress Tracking
+
+| Phase | Status | Notes |
+| ----- | ------ | ----- |
+| 0 — Infrastructure | ✅ Done | |
+| 1 — Auth | ✅ Done | |
+| 2 — Children | ✅ Done | |
+| 3 — Design System | ⬜ Not started | |
+| 4 — Stories & Templates | ⬜ Not started | |
+| 5 — Generation Pipeline | ⬜ Not started | |
+| 6 — Mid-point Documentation | ⬜ Not started | |
+| 7 — Regeneration | ⬜ Not started | |
+| 8 — Subscriptions | ⬜ Not started | |
+| 9 — Notifications | ⬜ Not started | |
+| 10 — Ratings & Public Sharing | ⬜ Not started | |
+| 11 — Admin Panel | ⬜ Not started | |
+| 12 — Localization | ⬜ Not started | |
+| 13 — Final Documentation | ⬜ Not started | |
+| 14 — Production Deploy | ⬜ Not started | |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval
 
 ---
 
-## 10. Open Questions / Deferred Decisions
+## 13. Open Questions
 
-- Image moderation provider — only OpenAI moderation for text covers text. Image moderation via DALL-E's own safety flags is the default; explicit image moderation provider TBD.
-- Email provider — confirm Resend in Phase 7.
-- Exact page-credit rate for comics (2 or 3 per page) — confirm in Phase 6.
-- Backup strategy specifics for Postgres + S3 — confirm in Phase 11.
+- Image moderation provider — DALL-E's own safety flags are the default; explicit image moderation provider TBD if coverage proves insufficient.
+- Backup strategy specifics for Postgres + S3 — confirm in Phase 14.
+- Notification preferences storage — `User` JSON field vs separate `NotificationPreference` model — decide in Phase 9.
+- Pricing page FAQ copy — 6 questions; content is copywriting, not code scope. Write before Phase 3 ships.
