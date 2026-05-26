@@ -88,15 +88,55 @@ Primitives (`--color-fox`, `--color-ember`, etc.) are reserved for brand-specifi
 
 ## Mantine override pattern
 
-Two tools, applied in this order:
+Three tools, applied in this order:
 
 **1. `createTheme()` — global defaults** (`src/theme/mantine.ts`)
 
 Override once for values that apply to every instance: color palette, font family, border-radius, shadows, focus ring.
 
-**2. `classNames` prop — per-component slot overrides**
+**2. Compound modifier classes — variant and size overrides in atom components**
 
-For Mantine components whose sub-elements (label, input, error, dropdown, etc.) need precise visual control:
+Mantine applies its own styles via single-class selectors (`[0,1,0]` specificity). A compound selector like `.button.m-primary` has specificity `[0,2,0]` and **always wins** regardless of CSS injection order.
+
+In the SCSS module, nest modifier rules inside the base class using `&`:
+
+```scss
+.button {
+    /* base styles */
+
+    &.m-primary {
+        background: var(--gradient-fox-bevel);
+        color: var(--text-on-card);
+        border: none;
+
+        &:not([data-disabled]):hover {
+            box-shadow: 0 6px 9px rgba(0, 0, 0, 0.35);
+        }
+    }
+
+    &.m-secondary {
+        background: transparent;
+        border: 1.5px solid var(--border-strong);
+    }
+}
+```
+
+Wire them up in the component via `classNames`:
+
+```tsx
+<MantineButton
+    variant="filled"
+    classNames={{
+        root: clsx(styles.button, styles[`m-${variant}`], styles[`m-${size}`]),
+    }}
+/>
+```
+
+**Atom components do not expose `className`, `classNames`, `style`, `styles`, or `vars` props.** Atoms are closed — all visual variation comes from semantic props (`variant`, `size`, etc.) that map to modifier classes internally.
+
+**3. `classNames` prop — sub-element slot overrides**
+
+For Mantine components whose internal slots (label, input, error, dropdown, etc.) need precise visual control:
 
 ```tsx
 <TextInput

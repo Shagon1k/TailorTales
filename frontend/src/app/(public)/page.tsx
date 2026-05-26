@@ -1,11 +1,11 @@
 import { Container, Title, Text, Button, Stack } from '@mantine/core';
-import Badge from '@/components/ui/Badge/Badge';
+import Tag from '@/components/ui/Tag/Tag';
 
 export default function HomePage(): React.ReactElement {
     return (
         <Container size="sm" py="xl">
             <Stack align="center" gap="lg">
-                <Badge>AI-powered</Badge>
+                <Tag>AI-powered</Tag>
                 <Title order={1}>TailorTales</Title>
                 <Text size="lg" c="dimmed" ta="center">
                     Personalized AI-generated storybooks &amp; comics for curious kids.

@@ -1,0 +1,24 @@
+.progress {
+    &.m-sm {
+        height: 4px;
+        border-radius: var(--radius-pill);
+        background: var(--border-subtle);
+    }
+
+    &.m-md {
+        height: 8px;
+        border-radius: var(--radius-pill);
+        background: var(--border-subtle);
+    }
+
+    &.m-lg {
+        height: 14px;
+        border-radius: var(--radius-pill);
+        background: var(--border-subtle);
+    }
+
+    .progress__section {
+        background: var(--gradient-progress);
+        box-shadow: 0 0 14px rgba(248, 110, 66, 0.5);
+    }
+}

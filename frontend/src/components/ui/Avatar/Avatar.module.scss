@@ -1,0 +1,11 @@
+.avatar {
+    border-radius: var(--radius-pill);
+
+    .avatar__placeholder {
+        background: var(--gradient-fox-bevel);
+        color: var(--text-inverse);
+        font-family: var(--font-sans);
+        font-weight: 600;
+        border: none;
+    }
+}

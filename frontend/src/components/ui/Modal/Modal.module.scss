@@ -1,0 +1,46 @@
+@use 'styles/typography' as *;
+
+.modal {
+    --mb-shadow: var(--shadow-lg);
+    --mb-padding: 0;
+
+    &.m-sm,
+    &.m-md,
+    &.m-lg {
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+    }
+
+    &.m-sm { padding: var(--space-8); }
+    &.m-md { padding: var(--space-10); }
+    &.m-lg { padding: var(--space-12); }
+
+    .modal__header {
+        padding: 0;
+        min-height: 0;
+        position: relative;
+        background: transparent;
+        margin-bottom: var(--space-4);
+    }
+
+    .modal__subheader {
+        @include t-caps-xs;
+        color: var(--text-on-card-3);
+    }
+
+    .modal__close {
+        color: var(--text-on-card-3);
+        width: 20px;
+        height: 20px;
+        min-width: 0;
+
+        &:hover {
+            background: transparent;
+            opacity: 0.7;
+        }
+    }
+
+    .modal__body {
+        padding: 0;
+    }
+}

@@ -55,8 +55,10 @@ paths:
 ### React Testing Library
 
 - Test user **behavior**, not implementation details — do not access internal state or methods.
+- **Never assert `className`, `classList`, or third-party internal class names** (e.g. `mantine-Avatar-placeholder`) — all are styling internals, not observable behavior. Test what the user sees (rendered text, semantic roles, ARIA attributes, DOM structure) and what the component does (disabled state, navigation href, aria-busy). Visual variant correctness belongs in visual regression tests, not unit tests.
+- **If there is no meaningful behavioral assertion, write no test** — a test that only verifies a component renders without crashing adds noise without coverage value. Only test observable outcomes.
 - Avoid snapshot testing — it produces false positives/negatives and slows down the suite.
-- Use `screen` to query elements — never `container`.
+- Use `screen` to query elements — avoid `container` (exception: querying non-semantic elements like `svg` that have no accessible role).
 - Element querying priority:
     - `get*` — default
     - `query*` — only to assert element is NOT present

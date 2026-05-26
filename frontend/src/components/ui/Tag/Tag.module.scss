@@ -1,0 +1,26 @@
+.tag {
+    font-family: var(--font-sans);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-caps);
+    text-transform: uppercase;
+    padding-inline: var(--space-3);
+    height: 24px;
+    border-radius: var(--radius-pill);
+    border: none;
+
+    &.m-filled {
+        background: var(--bg-elevated);
+        color: var(--text-secondary);
+    }
+
+    &.m-warm {
+        background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+        color: var(--text-accent);
+    }
+
+    &.m-gold {
+        background: color-mix(in srgb, var(--accent-gold) 15%, transparent);
+        color: var(--accent-gold);
+    }
+}

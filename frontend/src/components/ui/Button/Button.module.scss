@@ -1,0 +1,69 @@
+.button {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    letter-spacing: 0;
+    transition: box-shadow var(--duration-base) var(--ease-out),
+        opacity var(--duration-base) var(--ease-out);
+
+    &[data-disabled] {
+        opacity: var(--opacity-disabled);
+    }
+
+    // Sizes — compound selector [0,2,0] beats Mantine's single class [0,1,0]
+    &.m-default {
+        height: 44px;
+        padding-inline: var(--space-5);
+        border-radius: var(--radius-pill);
+        font-size: var(--fs-base);
+    }
+
+    &.m-lg {
+        height: 56px;
+        padding-inline: var(--space-5);
+        border-radius: var(--radius-pill);
+        font-size: var(--fs-md);
+    }
+
+    // Variants
+    &.m-primary {
+        background: var(--gradient-fox-bevel);
+        color: var(--text-on-card);
+        border: none;
+
+        &:not([data-disabled]):hover {
+            background: var(--gradient-fox-bevel);
+            box-shadow: 0 6px 9px rgba(0, 0, 0, 0.35);
+        }
+    }
+
+    &.m-secondary {
+        background: transparent;
+        color: var(--text-primary);
+        border: 1.5px solid var(--border-strong);
+
+        &:not([data-disabled]):hover {
+            background: var(--bg-elevated);
+        }
+    }
+
+    &.m-quiet {
+        background: transparent;
+        color: var(--text-secondary);
+        border: none;
+
+        &:not([data-disabled]):hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+    }
+
+    &.m-on-card {
+        background: transparent;
+        color: var(--text-on-card);
+        border: 1.5px solid var(--border-on-card);
+
+        &:not([data-disabled]):hover {
+            background: var(--bg-card-2);
+        }
+    }
+}

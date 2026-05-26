@@ -17,20 +17,6 @@
     }
 }
 
-.chip__avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-pill);
-    background: var(--gradient-fox-bevel);
-    color: var(--text-inverse);
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: var(--fs-sm);
-    flex-shrink: 0;
-}
 
 .chip__info {
     display: flex;
