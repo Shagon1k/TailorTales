@@ -8,11 +8,16 @@ paths:
 
 ## Architecture
 
-Three layers, strictly ordered:
+Four layers, strictly ordered:
 
-1. **`src/styles/tokens.css`** — CSS custom properties. Imported once in `src/styles/globals.css`. Never import again anywhere else.
-2. **`src/theme/mantine.ts`** — `createTheme()` wires Mantine's visual layer to our token values globally.
-3. **`src/components/ui/*/Component.module.css`** — one CSS Module per component, consuming semantic tokens via `var(--token-name)`.
+1. **`src/styles/_tokens.scss`** — CSS custom properties only. Used once via `globals.scss`. Never import directly anywhere else.
+2. **`src/styles/_typography.scss`** — Sass `@mixin` definitions (one per Figma text style). Use in component modules with `@use 'styles/typography' as *` then `@include t-body-base`. Never produces CSS output on its own.
+3. **`src/theme/mantine.ts`** — `createTheme()` wires Mantine's visual layer to our token values globally.
+4. **`src/components/ui/*/Component.module.scss`** — one SCSS Module per component, consuming semantic tokens via `var(--token-name)`.
+
+`src/styles/globals.scss` is the entry point: it `@use`s `_tokens.scss` (emitting all CSS custom properties), then defines the global reset, body defaults, focus ring, and scrollbar styles.
+
+All component stylesheets use `.module.scss`. Typography mixins are available anywhere via `@use 'styles/typography' as *` (no relative path needed — `src/` is in `sassOptions.includePaths`).
 
 ---
 
@@ -33,13 +38,17 @@ CSS Modules provides the scope — no block-name repetition needed in modifiers.
 | Base | `.componentName` | `.button` |
 | Modifier | `.m-modifierName` | `.m-primary`, `.m-sm` |
 | Internal element | `.componentName__element` | `.card__header` |
+| Internal element (multi-word) | `.componentName__element-name` | `.card__action-btn`, `.header__icon-btn` |
+
+Element names after `__` are always kebab-case — never underscores.
 
 ```css
-.button { }           /* base */
-.m-primary { }        /* variant modifier */
-.m-sm { }             /* size modifier */
-.card__header { }     /* internal element */
-.m-featured { }       /* modifier applied alongside an element */
+.button { }              /* base */
+.m-primary { }           /* variant modifier */
+.m-sm { }                /* size modifier */
+.card__header { }        /* internal element — single word */
+.card__action-btn { }    /* internal element — multi-word, kebab-case */
+.m-featured { }          /* modifier applied alongside an element */
 ```
 
 Apply modifiers with `clsx`:

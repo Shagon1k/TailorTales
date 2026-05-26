@@ -1,6 +1,6 @@
-@import './tokens.css';
+@use './tokens';
 
-/* ---- Global reset ---- */
+// ---- Global reset ----
 *,
 *::before,
 *::after {
@@ -21,13 +21,13 @@ body {
     font-family: var(--font-sans);
 }
 
-/* ---- Focus ring ---- */
+// ---- Focus ring ----
 :focus-visible {
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
 }
 
-/* ---- Scrollbar (webkit) ---- */
+// ---- Scrollbar (webkit) ----
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

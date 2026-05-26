@@ -1,0 +1,112 @@
+// ============================================================
+// TailorTales — Typography mixins  (source: Figma text styles)
+// Usage: @use 'styles/typography' as *; then @include t-body-base;
+// Override individual properties after @include as needed.
+// ============================================================
+
+@mixin t-display-6xl {
+    font-family: var(--font-serif);
+    font-size: var(--fs-6xl);
+    font-weight: 600;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-display);
+}
+
+@mixin t-display-5xl {
+    font-family: var(--font-serif);
+    font-size: var(--fs-5xl);
+    font-weight: 600;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-display);
+}
+
+@mixin t-display-4xl {
+    font-family: var(--font-serif);
+    font-size: var(--fs-4xl);
+    font-weight: 600;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-display);
+}
+
+@mixin t-heading-4xl {
+    font-family: var(--font-serif);
+    font-size: var(--fs-4xl);
+    font-weight: 600;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-display);
+}
+
+@mixin t-heading-3xl {
+    font-family: var(--font-serif);
+    font-size: var(--fs-3xl);
+    font-weight: 600;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-heading);
+}
+
+@mixin t-heading-3xl-italic {
+    font-family: var(--font-serif);
+    font-size: var(--fs-3xl);
+    font-weight: 600;
+    font-style: italic;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-heading);
+}
+
+@mixin t-heading-2xl {
+    font-family: var(--font-serif);
+    font-size: var(--fs-2xl);
+    font-weight: 600;
+    line-height: var(--lh-snug);
+}
+
+@mixin t-subhead-xl {
+    font-family: var(--font-sans);
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    line-height: var(--lh-snug);
+}
+
+@mixin t-lede-lg {
+    font-family: var(--font-serif);
+    font-size: var(--fs-lg);
+    font-weight: 400;
+    line-height: var(--lh-snug);
+}
+
+@mixin t-body-md {
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    font-weight: 400;
+    line-height: var(--lh-normal);
+}
+
+@mixin t-body-base {
+    font-family: var(--font-sans);
+    font-size: var(--fs-base);
+    font-weight: 400;
+    line-height: var(--lh-tight);
+}
+
+@mixin t-body-sm {
+    font-family: var(--font-sans);
+    font-size: var(--fs-sm);
+    font-weight: 400;
+    line-height: var(--lh-normal);
+}
+
+@mixin t-caps-xs {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-caps);
+    text-transform: uppercase;
+}
+
+@mixin t-script-xl {
+    font-family: var(--font-script);
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+}

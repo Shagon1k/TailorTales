@@ -1,0 +1,39 @@
+.brand {
+    --_circle: 36px;
+    --_text: var(--fs-xl);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: opacity var(--duration-base) var(--ease-out);
+
+    &:hover {
+        opacity: 0.85;
+    }
+}
+
+.m-sm {
+    --_circle: 24px;
+    --_text: var(--fs-base);
+}
+
+.m-lg {
+    --_circle: 56px;
+    --_text: var(--fs-2xl);
+}
+
+.brand__mark {
+    width: var(--_circle);
+    height: var(--_circle);
+    flex-shrink: 0;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-fox-bevel);
+}
+
+.brand__name {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--_text);
+    line-height: 1;
+}

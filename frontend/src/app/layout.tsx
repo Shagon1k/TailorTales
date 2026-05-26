@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Newsreader, Plus_Jakarta_Sans, Caveat, Geist_Mono } from 'next/font/google';
 import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
 import '@mantine/core/styles.css';
-import '../styles/globals.css';
+import '../styles/globals.scss';
 import { getServerUser } from '@/api/user.server';
 import Providers from './providers';
 
