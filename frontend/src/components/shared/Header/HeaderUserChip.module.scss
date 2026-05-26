@@ -1,0 +1,51 @@
+@use 'styles/typography' as *;
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    transition: background var(--duration-base) var(--ease-out);
+    min-height: var(--hit-min);
+
+    &:hover {
+        background: var(--bg-card);
+    }
+}
+
+.chip__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-fox-bevel);
+    color: var(--text-inverse);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    flex-shrink: 0;
+}
+
+.chip__info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.chip__name {
+    @include t-body-base;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.chip__plan {
+    @include t-caps-xs;
+    color: var(--text-muted);
+    line-height: 1;
+}

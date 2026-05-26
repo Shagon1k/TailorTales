@@ -62,10 +62,10 @@
     background: var(--border-subtle);
 }
 
-.header__avatar-placeholder {
+.header__nav-divider {
     display: block;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-pill);
+    width: 1px;
+    height: 20px;
     background: var(--border-subtle);
+    flex-shrink: 0;
 }
