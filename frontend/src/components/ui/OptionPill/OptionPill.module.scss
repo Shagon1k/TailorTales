@@ -1,0 +1,35 @@
+@use 'styles/typography' as *;
+
+.option-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-min);
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-strong);
+    background: transparent;
+    @include t-body-base;
+    color: var(--text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 100ms ease;
+
+    &:not([disabled]):not(.m-selected):hover {
+        border-color: var(--text-muted);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--focus-ring-color);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: var(--opacity-disabled);
+        cursor: not-allowed;
+    }
+
+    &.m-selected {
+        border: 1.5px solid var(--accent-primary);
+        font-weight: 600;
+    }
+}

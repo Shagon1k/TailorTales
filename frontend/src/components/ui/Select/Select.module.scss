@@ -1,0 +1,114 @@
+@use 'styles/typography' as *;
+
+.select {
+    // ── Field — shared layout ────────────────────────────────────────────
+    .select__field {
+        height: 44px;
+        padding: var(--space-3) var(--space-5);
+        border-radius: var(--radius-md);
+        background: transparent;
+        font-family: var(--font-sans);
+        font-size: var(--fs-md);
+        line-height: 1.2;
+        width: 100%;
+        cursor: pointer;
+        transition: border-color 100ms ease, box-shadow 100ms ease;
+
+        &:focus { outline: none; }
+
+        &:disabled {
+            opacity: var(--opacity-disabled);
+            cursor: not-allowed;
+        }
+    }
+
+    .select__chevron {
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+
+    .select__label {
+        @include t-body-sm;
+        font-weight: 500;
+        margin-bottom: var(--space-1);
+    }
+
+    .select__helper,
+    .select__error {
+        @include t-body-sm;
+        margin-top: var(--space-1);
+    }
+
+    .select__error { color: var(--accent-warm); }
+
+    // ── Twilight surface (dark background) ──────────────────────────────
+    &.m-twilight {
+        .select__field {
+            border: 1px solid var(--border-strong);
+            color: var(--text-primary);
+
+            &[data-expanded] {
+                border: 2px solid var(--focus-ring-color);
+                box-shadow: 0 0 0 3px rgba(248, 110, 66, 0.15);
+            }
+        }
+
+        .select__wrapper[data-error] .select__field {
+            border-color: var(--accent-warm);
+        }
+
+        .select__label { color: var(--text-secondary); }
+        .select__helper { color: var(--text-muted); }
+    }
+
+    // ── Cream surface (on cards / modals) ───────────────────────────────
+    &.m-cream {
+        .select__field {
+            border: 1px solid var(--border-on-card);
+            color: var(--text-on-card);
+
+            &[data-expanded] {
+                border: 2px solid var(--focus-ring-color);
+                box-shadow: 0 0 0 3px rgba(248, 110, 66, 0.15);
+            }
+        }
+
+        .select__wrapper[data-error] .select__field {
+            border-color: var(--accent-warm);
+        }
+
+        .select__label { color: var(--text-on-card-2); }
+        .select__helper { color: var(--text-on-card-3); }
+    }
+}
+
+// ── Dropdown — floating panel (portal-rendered, surface-independent) ────
+.select__dropdown {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-1) 0;
+    overflow: hidden;
+}
+
+// ── Option ──────────────────────────────────────────────────────────────
+.select__option {
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    color: var(--text-primary);
+    padding: var(--space-2) var(--space-5);
+    cursor: pointer;
+    transition: background 80ms ease;
+
+    &[data-combobox-selected] {
+        background: transparent;
+        color: var(--accent-primary);
+        font-weight: 500;
+    }
+
+    &[data-combobox-active],
+    &:hover {
+        background: rgba(248, 110, 66, 0.08);
+    }
+}
