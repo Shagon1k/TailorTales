@@ -22,7 +22,7 @@ export default function ChildCard({
     child,
     onEdit,
     onDelete,
-}: IChildCardProps): React.ReactElement {
+}: Readonly<IChildCardProps>): React.ReactElement {
     return (
         <Card shadow="sm" padding="md" radius="md" withBorder>
             <Stack gap="xs">

@@ -2,8 +2,8 @@
 
 import { Button, Container, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import ChildCard from '@/components/ChildCard/ChildCard';
-import ChildForm, { type IChildFormValues } from '@/components/ChildForm/ChildForm';
+import ChildCard from './_components/ChildCard/ChildCard';
+import ChildForm, { type IChildFormValues } from './_components/ChildForm/ChildForm';
 import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/hooks/children';
 import type { IChild } from '@/types/child.types';
 

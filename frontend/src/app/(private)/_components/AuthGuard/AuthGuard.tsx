@@ -8,7 +8,7 @@ interface IAuthGuardProps {
     children: React.ReactNode;
 }
 
-export default function AuthGuard({ children }: IAuthGuardProps): React.ReactElement | null {
+export default function AuthGuard({ children }: Readonly<IAuthGuardProps>): React.ReactElement | null {
     const { user } = useCurrentUser();
     const router = useRouter();
 

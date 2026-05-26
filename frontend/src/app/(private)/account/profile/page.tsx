@@ -39,7 +39,11 @@ export default function ProfilePage(): React.ReactElement {
                 <Title order={2}>{user?.name}</Title>
                 <Text c="dimmed">{user?.email}</Text>
 
-                {editedName !== null ? (
+                {editedName === null ? (
+                    <Button variant="subtle" onClick={startEditing}>
+                        Edit name
+                    </Button>
+                ) : (
                     <Stack w="100%" gap="sm">
                         <TextInput
                             label="Name"
@@ -60,10 +64,6 @@ export default function ProfilePage(): React.ReactElement {
                             </Button>
                         </Group>
                     </Stack>
-                ) : (
-                    <Button variant="subtle" onClick={startEditing}>
-                        Edit name
-                    </Button>
                 )}
 
                 <Button variant="subtle" color="red" onClick={handleLogout}>

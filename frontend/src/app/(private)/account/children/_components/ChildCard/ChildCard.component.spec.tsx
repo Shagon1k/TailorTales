@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
-import ChildCard from '../ChildCard';
+import ChildCard from './ChildCard';
 import type { IChild } from '@/types/child.types';
 
 const MOCK_CHILD: IChild = {

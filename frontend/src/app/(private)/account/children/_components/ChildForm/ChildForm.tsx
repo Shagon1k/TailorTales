@@ -35,7 +35,7 @@ export default function ChildForm({
     onSubmit,
     onCancel,
     isSubmitting = false,
-}: IChildFormProps): React.ReactElement {
+}: Readonly<IChildFormProps>): React.ReactElement {
     const form = useForm<IChildFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
         validate: {
@@ -43,11 +43,11 @@ export default function ChildForm({
             birthdate: (v) => {
                 if (!v) return 'Birthdate is required';
                 const date = new Date(v);
-                if (isNaN(date.getTime())) return 'Invalid date';
+                if (Number.isNaN(date.getTime())) return 'Invalid date';
                 if (date > new Date()) return 'Birthdate must be in the past';
                 return null;
             },
-            gender: (v) => (!v ? 'Gender is required' : null),
+            gender: (v) => (v ? null : 'Gender is required'),
         },
     });
 

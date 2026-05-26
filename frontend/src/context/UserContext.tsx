@@ -19,7 +19,7 @@ interface IUserProviderProps {
     initialUser: IUser | null;
 }
 
-export function UserProvider({ children, initialUser }: IUserProviderProps): React.ReactElement {
+export function UserProvider({ children, initialUser }: Readonly<IUserProviderProps>): React.ReactElement {
     const {
         data: user = null,
         isLoading,
