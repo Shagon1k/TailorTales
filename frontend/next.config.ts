@@ -1,9 +1,12 @@
 import type { NextConfig } from 'next';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
     sassOptions: {
-        includePaths: [path.join(__dirname, 'src')],
+        loadPaths: [path.join(configDir, 'src')],
     },
 };
 

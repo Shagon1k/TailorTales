@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@mantine/core';
+import ButtonLink from '@/components/ui/Button/ButtonLink';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
 import HeaderUserChip from './components/HeaderUserChip/HeaderUserChip';
 import NotificationBell from './components/NotificationBell/NotificationBell';
@@ -20,9 +20,9 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                             <Link href="/how-it-works" className={styles.header__link}>How it works</Link>
                             <Link href="/pricing" className={styles.header__link}>Pricing</Link>
                             <Link href="/sign-in" className={styles.header__link}>Sign in</Link>
-                            <Button component={Link} href="/sign-up" radius="xl" className={styles.header__cta}>
+                            <ButtonLink href="/sign-up">
                                 Begin a tale →
-                            </Button>
+                            </ButtonLink>
                         </>
                     ) : (
                         <>

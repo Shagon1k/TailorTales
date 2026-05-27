@@ -1,4 +1,8 @@
-import { Button as MantineButton, type ButtonProps as IMantineButtonProps } from '@mantine/core';
+import {
+    Button as MantineButton,
+    createPolymorphicComponent,
+    type ButtonProps as IMantineButtonProps,
+} from '@mantine/core';
 import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Button.module.scss';
@@ -11,12 +15,7 @@ export interface IButtonProps extends OmitStyling<IMantineButtonProps, 'variant'
     size?: TButtonSize;
 }
 
-export default function Button({
-    variant = 'primary',
-    size = 'default',
-    ...props
-}: Readonly<IButtonProps>): React.ReactElement {
-    return (
+const _Button = ({ variant = 'primary', size = 'default', ...props }: IButtonProps) => (
         <MantineButton
             variant="filled"
             classNames={{
@@ -25,4 +24,7 @@ export default function Button({
             {...props}
         />
     );
-}
+
+_Button.displayName = 'Button';
+
+export default createPolymorphicComponent<'button', IButtonProps>(_Button);
