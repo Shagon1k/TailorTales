@@ -1,0 +1,41 @@
+@use 'styles/typography' as *;
+
+.tales {
+    padding: var(--space-16) var(--space-6);
+}
+
+.tales__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.tales__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.tales__heading {
+    @include t-heading-3xl-italic;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.tales__browse {
+    text-decoration: none;
+    flex-shrink: 0;
+
+    &:hover span {
+        color: var(--text-secondary);
+    }
+}
+
+.tales__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+}

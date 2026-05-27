@@ -1,0 +1,45 @@
+@use 'styles/typography' as *;
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.name {
+    @include t-body-md;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.meta {
+    @include t-body-sm;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.interests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}

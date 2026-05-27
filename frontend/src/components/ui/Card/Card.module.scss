@@ -1,0 +1,50 @@
+.card {
+    position: relative;
+
+    // Variants — control background, shadow, border
+    &.m-default {
+        background: var(--bg-card);
+        box-shadow: var(--shadow-lg);
+        color: var(--text-on-card);
+    }
+
+    &.m-dark {
+        background: var(--bg-elevated);
+        box-shadow: var(--shadow-md);
+        color: var(--text-primary);
+        border: 1px solid var(--border-subtle);
+    }
+
+    &.m-gradient {
+        background: var(--gradient-card-twilight);
+        box-shadow: var(--shadow-lg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+    }
+
+    &.m-outlined {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+    }
+
+    // Sizes — control border-radius and padding
+    &.m-sm {
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
+    }
+
+    &.m-md {
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+    }
+
+    &.m-lg {
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+    }
+
+    &.m-hero {
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+    }
+}

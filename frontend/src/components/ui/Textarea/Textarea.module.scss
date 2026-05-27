@@ -1,0 +1,102 @@
+@use 'styles/typography' as *;
+
+.textarea {
+    // Shared layout — no colors, so surface variants own those cleanly
+    .textarea__field {
+        min-height: 120px;
+        padding: var(--space-3) var(--space-5);
+        border-radius: var(--radius-md);
+        background: transparent;
+        font-family: var(--font-sans);
+        font-size: var(--fs-md);
+        line-height: 1.5;
+        width: 100%;
+        resize: vertical;
+        transition:
+            border-color 100ms ease,
+            box-shadow 100ms ease;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:disabled {
+            opacity: var(--opacity-disabled);
+            cursor: not-allowed;
+            resize: none;
+        }
+    }
+
+    .textarea__label {
+        @include t-body-sm;
+        font-weight: 500;
+        margin-bottom: var(--space-1);
+    }
+
+    .textarea__helper,
+    .textarea__error {
+        @include t-body-sm;
+        margin-top: var(--space-1);
+    }
+
+    .textarea__error {
+        color: var(--accent-warm);
+    }
+
+    // ── Twilight surface (dark background) ──────────────────────────────
+    &.m-twilight {
+        .textarea__field {
+            border: 1px solid var(--border-strong);
+            color: var(--text-primary);
+
+            &::placeholder {
+                color: var(--text-muted);
+            }
+
+            &:focus {
+                border: 2px solid var(--focus-ring-color);
+                box-shadow: 0 0 0 3px rgba(248, 110, 66, 0.15);
+            }
+        }
+
+        // Mantine adds [data-error] to the wrapper when error prop is set
+        .textarea__wrapper[data-error] .textarea__field {
+            border-color: var(--accent-warm);
+        }
+
+        .textarea__label {
+            color: var(--text-secondary);
+        }
+        .textarea__helper {
+            color: var(--text-muted);
+        }
+    }
+
+    // ── Cream surface (on cards / modals) ───────────────────────────────
+    &.m-cream {
+        .textarea__field {
+            border: 1px solid var(--border-on-card);
+            color: var(--text-on-card);
+
+            &::placeholder {
+                color: var(--text-on-card-3);
+            }
+
+            &:focus {
+                border: 2px solid var(--focus-ring-color);
+                box-shadow: 0 0 0 3px rgba(248, 110, 66, 0.15);
+            }
+        }
+
+        .textarea__wrapper[data-error] .textarea__field {
+            border-color: var(--accent-warm);
+        }
+
+        .textarea__label {
+            color: var(--text-on-card-2);
+        }
+        .textarea__helper {
+            color: var(--text-on-card-3);
+        }
+    }
+}

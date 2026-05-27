@@ -8,16 +8,16 @@
 
 ## Screens Reviewed
 
-| # | Screen | Auth state |
-| - | ------ | ---------- |
-| 1 | Workshop — story creation form | Authenticated |
-| 2 | Library / Dashboard | Authenticated |
-| 3 | Login | Public |
-| 4 | Pricing | Public |
-| 5 | Landing | Public |
-| 6 | Account / Settings — Subscription tab | Authenticated |
-| 7 | Story Reader | Authenticated |
-| 8 | Generation progress | Authenticated |
+| #   | Screen                                | Auth state    |
+| --- | ------------------------------------- | ------------- |
+| 1   | Workshop — story creation form        | Authenticated |
+| 2   | Library / Dashboard                   | Authenticated |
+| 3   | Login                                 | Public        |
+| 4   | Pricing                               | Public        |
+| 5   | Landing                               | Public        |
+| 6   | Account / Settings — Subscription tab | Authenticated |
+| 7   | Story Reader                          | Authenticated |
+| 8   | Generation progress                   | Authenticated |
 
 ---
 
@@ -88,15 +88,15 @@ For schools, Gift a tale, Safety, Sign in (footer), Pricing (footer).
 
 Sections, top → bottom:
 
-| # | Section | Notes |
-| - | ------- | ----- |
-| 1 | Greeting | "Good [evening], [Name]." + personalized subtitle (tale count recap) |
-| 2 | Stats bar | Pages this month / pages left / regenerations used / tales in library — **wired in Phase 8** |
-| 3 | "Tonight's Tale" card | One pre-seeded question featured as a prompt; "Begin tale →" / "Pick another" (static pre-seeded list) |
-| 4 | "Your readers" | Child cards (avatar, name·age, interests, "+ New tale" CTA, tale count) + "Add child" card + "Manage children →" link |
-| 5 | "In the Workshop" strip | Visible only when a generation job is active: title, progress bar, page count, ~time remaining, "Open workshop →" — **wired in Phase 5** |
-| 6 | "Your library" | Tale grid; filter chips: All / For [Child] / Books / Comics |
-| Post-MVP | "From the Wonder Jar" | AI-personalized question suggestions (requires analysis of user's story history) |
+| #        | Section                 | Notes                                                                                                                                    |
+| -------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | Greeting                | "Good [evening], [Name]." + personalized subtitle (tale count recap)                                                                     |
+| 2        | Stats bar               | Pages this month / pages left / regenerations used / tales in library — **wired in Phase 8**                                             |
+| 3        | "Tonight's Tale" card   | One pre-seeded question featured as a prompt; "Begin tale →" / "Pick another" (static pre-seeded list)                                   |
+| 4        | "Your readers"          | Child cards (avatar, name·age, interests, "+ New tale" CTA, tale count) + "Add child" card + "Manage children →" link                    |
+| 5        | "In the Workshop" strip | Visible only when a generation job is active: title, progress bar, page count, ~time remaining, "Open workshop →" — **wired in Phase 5** |
+| 6        | "Your library"          | Tale grid; filter chips: All / For [Child] / Books / Comics                                                                              |
+| Post-MVP | "From the Wonder Jar"   | AI-personalized question suggestions (requires analysis of user's story history)                                                         |
 
 #### `/workshop` — Story Creation Form
 
@@ -104,14 +104,14 @@ Sections, top → bottom:
 
 Single scrollable form (no step-by-step page transitions):
 
-| # | Section | Details |
-| - | ------- | ------- |
-| 1 | Reader selector | Child avatar, name·age, interests summary; "Change reader →" link |
-| 2 | Question | Free-text input + 6 static suggestion chips ("pluck from the jar") |
-| 3 | Format | Book (1 cr/page) vs Comic (2 cr/page) |
-| 4 | Length | Short 5pp / Medium 8pp / Long 12pp / Big 16pp / Bedtime saga 20pp; shows credit cost vs remaining |
-| 5 | Art style | Grid of 8 thumbnails loaded from `ArtStyle` DB; styles: Storybook · Watercolour · Crayon · Ink line · Felt-pen · Cut-paper · Soft 3D · Comic ink |
-| 6 | Language | English / Русский (others: "coming soon") |
+| #   | Section         | Details                                                                                                                                          |
+| --- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Reader selector | Child avatar, name·age, interests summary; "Change reader →" link                                                                                |
+| 2   | Question        | Free-text input + 6 static suggestion chips ("pluck from the jar")                                                                               |
+| 3   | Format          | Book (1 cr/page) vs Comic (2 cr/page)                                                                                                            |
+| 4   | Length          | Short 5pp / Medium 8pp / Long 12pp / Big 16pp / Bedtime saga 20pp; shows credit cost vs remaining                                                |
+| 5   | Art style       | Grid of 8 thumbnails loaded from `ArtStyle` DB; styles: Storybook · Watercolour · Crayon · Ink line · Felt-pen · Cut-paper · Soft 3D · Comic ink |
+| 6   | Language        | English / Русский (others: "coming soon")                                                                                                        |
 
 Sticky right panel ("Your tale so far"):
 
@@ -136,18 +136,20 @@ Breadcrumb: Library / For [Child] / Tale [N]
 
 3-column layout:
 
-| Column | Content |
-| ------ | ------- |
-| Left | Chapter list — numbered, LLM-generated chapter titles |
+| Column | Content                                                                                                |
+| ------ | ------------------------------------------------------------------------------------------------------ |
+| Left   | Chapter list — numbered, LLM-generated chapter titles                                                  |
 | Center | Spread viewer — text page + illustration page; "← Previous spread" / "spread X of Y" / "Next spread →" |
-| Right | Action panels (top → bottom): Regeneration, Rating, Details |
+| Right  | Action panels (top → bottom): Regeneration, Rating, Details                                            |
 
-**Right panel — Regeneration** *(wired in Phase 7)*:
+**Right panel — Regeneration** _(wired in Phase 7)_:
+
 - "Regenerate words on this page" → opens modal (optional prompt field + submit)
 - "Repaint the picture" → opens modal (optional prompt field + submit)
 - "N regenerations left this month"
 
-**Right panel — Rating** *(wired in Phase 10)*:
+**Right panel — Rating** _(wired in Phase 10)_:
+
 - "Rate this tale" — 1–5 stars + optional comment textarea
 - "Share as example" opt-in toggle → sets `Story.isPublic = true`
 - "Save rating" button
@@ -163,17 +165,17 @@ Removed: "Share with family" button
 
 Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Design System**.
 
-| Sidebar item | Wired in | Notes |
-| ------------ | -------- | ----- |
-| Profile | Phase 1 (existing) | Name, avatar from Google |
-| Children | Phase 2 (existing) | Links to child management |
-| Subscription | Phase 8 | Plan card, usage bars, payment, invoices |
-| Notifications | Phase 9 | Per-event preferences (email vs in-app toggles) |
-| Language | Phase 12 | EN / RU switcher |
-| Privacy & data | Phase 8 | GDPR info + delete account trigger |
-| Export library | Post-MVP | ZIP of all user PDFs |
-| Sign out | Phase 1 (existing) | |
-| Delete account | Phase 8 | Subscription must be cancelled first |
+| Sidebar item   | Wired in           | Notes                                           |
+| -------------- | ------------------ | ----------------------------------------------- |
+| Profile        | Phase 1 (existing) | Name, avatar from Google                        |
+| Children       | Phase 2 (existing) | Links to child management                       |
+| Subscription   | Phase 8            | Plan card, usage bars, payment, invoices        |
+| Notifications  | Phase 9            | Per-event preferences (email vs in-app toggles) |
+| Language       | Phase 12           | EN / RU switcher                                |
+| Privacy & data | Phase 8            | GDPR info + delete account trigger              |
+| Export library | Post-MVP           | ZIP of all user PDFs                            |
+| Sign out       | Phase 1 (existing) |                                                 |
+| Delete account | Phase 8            | Subscription must be cancelled first            |
 
 **Subscription sub-section details:**
 
@@ -189,75 +191,75 @@ Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Desi
 
 ### Auth
 
-| Decision | Value |
-| -------- | ----- |
-| MVP auth | Google OAuth only |
-| Magic email link | Post-MVP |
-| Password / Apple auth | Post-MVP (v2+) |
+| Decision              | Value             |
+| --------------------- | ----------------- |
+| MVP auth              | Google OAuth only |
+| Magic email link      | Post-MVP          |
+| Password / Apple auth | Post-MVP (v2+)    |
 
 ### Story Creation
 
-| Decision | Value |
-| -------- | ----- |
-| Form structure | Single scrollable form — no wizard pagination |
-| Concurrent generation limit | 1 active job per user at MVP |
-| Comic credit rate | 2 credits / page (confirmed) |
-| Art styles | 8 styles, admin-seeded in DB (`ArtStyle` entity) |
-| Question suggestion chips | 6 static pre-seeded strings — no AI, no DB |
-| Save as draft | Supported |
+| Decision                    | Value                                            |
+| --------------------------- | ------------------------------------------------ |
+| Form structure              | Single scrollable form — no wizard pagination    |
+| Concurrent generation limit | 1 active job per user at MVP                     |
+| Comic credit rate           | 2 credits / page (confirmed)                     |
+| Art styles                  | 8 styles, admin-seeded in DB (`ArtStyle` entity) |
+| Question suggestion chips   | 6 static pre-seeded strings — no AI, no DB       |
+| Save as draft               | Supported                                        |
 
 ### Generation Pipeline
 
-| Decision | Value |
-| -------- | ----- |
-| Stage names | Outline → Words → Pictures → Binding → Ready |
-| Progress delivery | SSE; per-page completion events (not just %) |
-| Workshop log | Real pipeline events with short human-friendly labels |
-| Email on completion | Ships with Phase 5 (not Phase 9) |
-| Email provider | Resend (decided in Phase 5, not deferred to Phase 9) |
+| Decision            | Value                                                 |
+| ------------------- | ----------------------------------------------------- |
+| Stage names         | Outline → Words → Pictures → Binding → Ready          |
+| Progress delivery   | SSE; per-page completion events (not just %)          |
+| Workshop log        | Real pipeline events with short human-friendly labels |
+| Email on completion | Ships with Phase 5 (not Phase 9)                      |
+| Email provider      | Resend (decided in Phase 5, not deferred to Phase 9)  |
 
 ### Ratings & Public Sharing
 
-| Decision | Value |
-| -------- | ----- |
-| Rating location | Story reader page (right panel) |
-| Rating model | 1–5 stars + optional comment |
-| Public sharing | Opt-in toggle in rating flow → `Story.isPublic = true` |
-| Public stories | Appear on landing page "Tales lit this week" |
-| "Share with family" | Removed from MVP scope |
+| Decision            | Value                                                  |
+| ------------------- | ------------------------------------------------------ |
+| Rating location     | Story reader page (right panel)                        |
+| Rating model        | 1–5 stars + optional comment                           |
+| Public sharing      | Opt-in toggle in rating flow → `Story.isPublic = true` |
+| Public stories      | Appear on landing page "Tales lit this week"           |
+| "Share with family" | Removed from MVP scope                                 |
 
 ### Notifications
 
-| Decision | Value |
-| -------- | ----- |
-| Toast | Transient; fires when user is on-site |
-| Bell | Persistent inbox; accumulates across sessions |
-| Dual-channel rule | Same event → toast + bell when user is active |
-| Bell shell | Design System phase (visual only, no wiring) |
-| Story events wired | Phase 5 |
-| Subscription events wired | Phase 9 |
+| Decision                  | Value                                         |
+| ------------------------- | --------------------------------------------- |
+| Toast                     | Transient; fires when user is on-site         |
+| Bell                      | Persistent inbox; accumulates across sessions |
+| Dual-channel rule         | Same event → toast + bell when user is active |
+| Bell shell                | Design System phase (visual only, no wiring)  |
+| Story events wired        | Phase 5                                       |
+| Subscription events wired | Phase 9                                       |
 
 ### Subscriptions & Billing
 
-| Decision | Value |
-| -------- | ----- |
-| Payment provider | Paddle |
-| Billing data | Not stored by us — displayed from Paddle API |
-| VAT | Displayed from Paddle invoice data |
-| `childrenLimit` on Plan | Yes — enforced at Phase 8 |
-| Delete account | Phase 8; requires subscription cancellation first |
+| Decision                | Value                                             |
+| ----------------------- | ------------------------------------------------- |
+| Payment provider        | Paddle                                            |
+| Billing data            | Not stored by us — displayed from Paddle API      |
+| VAT                     | Displayed from Paddle invoice data                |
+| `childrenLimit` on Plan | Yes — enforced at Phase 8                         |
+| Delete account          | Phase 8; requires subscription cancellation first |
 
 ---
 
 ## Notification Event Types
 
-| Event | Toast | Bell | Email | Phase |
-| ----- | ----- | ---- | ----- | ----- |
-| story_completed | ✅ | ✅ | ✅ | 5 |
-| story_failed | ✅ | ✅ | — | 5 |
-| payment_failed | — | ✅ | ✅ | 9 |
-| subscription_canceled | — | ✅ | ✅ | 9 |
-| subscription_renewed | — | — | ✅ | 9 |
+| Event                 | Toast | Bell | Email | Phase |
+| --------------------- | ----- | ---- | ----- | ----- |
+| story_completed       | ✅    | ✅   | ✅    | 5     |
+| story_failed          | ✅    | ✅   | —     | 5     |
+| payment_failed        | —     | ✅   | ✅    | 9     |
+| subscription_canceled | —     | ✅   | ✅    | 9     |
+| subscription_renewed  | —     | —    | ✅    | 9     |
 
 Post-MVP: credits_low, marketing, story_expiry_warning (free tier retention)
 
@@ -267,11 +269,11 @@ Post-MVP: credits_low, marketing, story_expiry_warning (free tier retention)
 
 Three layers, strictly ordered:
 
-| Layer | File | Role |
-| ----- | ---- | ---- |
-| 1. Tokens | `src/styles/tokens.css` | CSS custom properties — primitives + semantic aliases. Imported once in `globals.css`. Never re-imported. |
-| 2. Mantine theme | `src/theme/mantine.ts` | `createTheme()` wires Mantine's visual layer to token values globally. |
-| 3. CSS Modules | `ComponentName.module.css` | One module per component. Consumes semantic tokens via `var(--token)`. Base class is the component name; modifiers use `m-` prefix (e.g. `.m-primary`). CSS Modules provides scope. |
+| Layer            | File                       | Role                                                                                                                                                                                |
+| ---------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Tokens        | `src/styles/tokens.css`    | CSS custom properties — primitives + semantic aliases. Imported once in `globals.css`. Never re-imported.                                                                           |
+| 2. Mantine theme | `src/theme/mantine.ts`     | `createTheme()` wires Mantine's visual layer to token values globally.                                                                                                              |
+| 3. CSS Modules   | `ComponentName.module.css` | One module per component. Consumes semantic tokens via `var(--token)`. Base class is the component name; modifiers use `m-` prefix (e.g. `.m-primary`). CSS Modules provides scope. |
 
 Components consume **semantic tokens only** (`--text-primary`, `--accent-primary`). Primitive tokens (`--color-fox`) are reserved for brand assets (logo, illustrations).
 
@@ -287,68 +289,68 @@ See `frontend/.claude/rules/css.md` for full conventions (including the promotio
 
 Override visually via `classNames` prop + CSS Module. Behavior stays in Mantine.
 
-| Component | Mantine base | CSS Module class | Variants |
-| --------- | ------------ | ---------------- | -------- |
-| `Button` | `Button` | `.button` | `m-primary / m-secondary / m-quiet / m-on-card` |
-| `Card` | `Paper` | `.card` | `m-gradient / m-dark` |
-| `Badge` | `Badge` | `.badge` | `m-filled / m-warm / m-gold` |
-| `Rating` | `Rating` | `.rating` | — |
-| `Divider` | `Divider` | `.divider` | `m-dashed / m-needle` |
-| `Progress` | `Progress` | `.progress` | — |
-| `Avatar` | `Avatar` | `.avatar` | — |
-| `Modal` | `Modal` | `.modal` | — |
-| `Link` | `Anchor` | `.link` | `m-quiet / m-on-card` |
-| `Toast` | `Notification` + `@mantine/notifications` | `.toast` | `m-success / m-error / m-warning / m-info` |
+| Component  | Mantine base                              | CSS Module class | Variants                                        |
+| ---------- | ----------------------------------------- | ---------------- | ----------------------------------------------- |
+| `Button`   | `Button`                                  | `.button`        | `m-primary / m-secondary / m-quiet / m-on-card` |
+| `Card`     | `Paper`                                   | `.card`          | `m-gradient / m-dark`                           |
+| `Badge`    | `Badge`                                   | `.badge`         | `m-filled / m-warm / m-gold`                    |
+| `Rating`   | `Rating`                                  | `.rating`        | —                                               |
+| `Divider`  | `Divider`                                 | `.divider`       | `m-dashed / m-needle`                           |
+| `Progress` | `Progress`                                | `.progress`      | —                                               |
+| `Avatar`   | `Avatar`                                  | `.avatar`        | —                                               |
+| `Modal`    | `Modal`                                   | `.modal`         | —                                               |
+| `Link`     | `Anchor`                                  | `.link`          | `m-quiet / m-on-card`                           |
+| `Toast`    | `Notification` + `@mantine/notifications` | `.toast`         | `m-success / m-error / m-warning / m-info`      |
 
 ### Form atoms (`src/components/ui/`)
 
 Override via `classNames` slot map.
 
-| Component | Mantine base | CSS Module classes |
-| --------- | ------------ | ------------------ |
-| `Input` | `TextInput` | `.label / .input / .helper` (`m-error`) |
-| `Textarea` | `Textarea` | `.label / .textarea / .helper` |
-| `Select` | `Select` | `.label / .input / .helper` |
-| `TagsInput` | `TagsInput` | `.label / .input` |
+| Component   | Mantine base | CSS Module classes                      |
+| ----------- | ------------ | --------------------------------------- |
+| `Input`     | `TextInput`  | `.label / .input / .helper` (`m-error`) |
+| `Textarea`  | `Textarea`   | `.label / .textarea / .helper`          |
+| `Select`    | `Select`     | `.label / .input / .helper`             |
+| `TagsInput` | `TagsInput`  | `.label / .input`                       |
 
 ### Custom CSS Module atoms (`src/components/ui/`)
 
 No Mantine base — built entirely from tokens.
 
-| Component | CSS Module class | Notes |
-| --------- | ---------------- | ----- |
-| `CapsLabel` | `.caps` | `m-on-card / m-gold`; `font: var(--font-mono)`, all-caps, 11px |
-| `BrandMark` | `.brand` | Logo lockup — SVG + wordmark |
-| `StatCard` | `.stat` | `m-positive / m-negative` |
-| `NotificationBell` | custom | Visual shell only at Phase 3; wired in Phase 5 |
-| `SuggestionChip` | custom | Workshop question chips |
+| Component          | CSS Module class | Notes                                                          |
+| ------------------ | ---------------- | -------------------------------------------------------------- |
+| `CapsLabel`        | `.caps`          | `m-on-card / m-gold`; `font: var(--font-mono)`, all-caps, 11px |
+| `BrandMark`        | `.brand`         | Logo lockup — SVG + wordmark                                   |
+| `StatCard`         | `.stat`          | `m-positive / m-negative`                                      |
+| `NotificationBell` | custom           | Visual shell only at Phase 3; wired in Phase 5                 |
+| `SuggestionChip`   | custom           | Workshop question chips                                        |
 
 ### Shared structural (`src/components/shared/`)
 
 Used across multiple route groups. No Mantine base.
 
-| Component | Notes |
-| --------- | ----- |
-| `Header` | Adapts nav links based on auth state (public vs private) |
-| `Footer` | Identical across all layouts |
+| Component | Notes                                                    |
+| --------- | -------------------------------------------------------- |
+| `Header`  | Adapts nav links based on auth state (public vs private) |
+| `Footer`  | Identical across all layouts                             |
 
 ### Feature molecules (co-located)
 
 Composed from atoms. Location determined by the promotion rule in `css.md` — start in `_components/` next to the route, lift when a second consumer needs it.
 
-| Component | Route |
-| --------- | ----- |
-| `ChildCard` | `(private)/library/` |
-| `TaleCard` | `(private)/library/`, `(public)/` |
-| `SuggestionChipGroup` | `(private)/workshop/` |
-| `PipelineStageIndicator` | `(private)/workshop/[jobId]/` |
-| `PagesThumbnailGrid` | `(private)/workshop/[jobId]/` |
-| `WorkshopLogEntry` | `(private)/workshop/[jobId]/` |
-| `ChapterListItem` | `(private)/library/[storyId]/` |
-| `PageSpread` | `(private)/library/[storyId]/` |
-| `PlanCard` | `(public)/pricing/`, `(private)/account/` |
-| `UsageBar` | `(private)/account/` |
-| `InvoiceRow` | `(private)/account/` |
+| Component                | Route                                     |
+| ------------------------ | ----------------------------------------- |
+| `ChildCard`              | `(private)/library/`                      |
+| `TaleCard`               | `(private)/library/`, `(public)/`         |
+| `SuggestionChipGroup`    | `(private)/workshop/`                     |
+| `PipelineStageIndicator` | `(private)/workshop/[jobId]/`             |
+| `PagesThumbnailGrid`     | `(private)/workshop/[jobId]/`             |
+| `WorkshopLogEntry`       | `(private)/workshop/[jobId]/`             |
+| `ChapterListItem`        | `(private)/library/[storyId]/`            |
+| `PageSpread`             | `(private)/library/[storyId]/`            |
+| `PlanCard`               | `(public)/pricing/`, `(private)/account/` |
+| `UsageBar`               | `(private)/account/`                      |
+| `InvoiceRow`             | `(private)/account/`                      |
 
 ---
 

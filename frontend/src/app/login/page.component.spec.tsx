@@ -21,17 +21,29 @@ function renderLoginPage(): ReturnType<typeof render> {
 }
 
 describe('LoginPage', () => {
-    it('should render the Sign in with Google button', () => {
+    beforeEach(() => {
+        mockRouterReplace.mockClear();
+    });
+
+    it('should render the Continue with Google button', () => {
         renderLoginPage();
 
-        expect(screen.getByRole('link', { name: /sign in with google/i })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /continue with google/i })).toBeInTheDocument();
     });
 
     it('should link the button to the Google OAuth endpoint', () => {
         renderLoginPage();
 
-        const link = screen.getByRole('link', { name: /sign in with google/i });
+        const link = screen.getByRole('link', { name: /continue with google/i });
         expect(link).toHaveAttribute('href', expect.stringContaining('/auth/google'));
+    });
+
+    it('should render the welcome heading', () => {
+        renderLoginPage();
+
+        expect(
+            screen.getByRole('heading', { level: 1, name: /step back into the workshop/i }),
+        ).toBeInTheDocument();
     });
 
     it('should not redirect when no user is logged in', () => {

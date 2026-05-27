@@ -1,0 +1,11 @@
+.rating {
+    .rating__star {
+        fill: var(--border-strong);
+        stroke: var(--border-strong);
+
+        &[data-filled] {
+            fill: var(--accent-gold);
+            stroke: var(--accent-gold);
+        }
+    }
+}

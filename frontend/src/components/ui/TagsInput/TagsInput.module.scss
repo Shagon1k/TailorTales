@@ -1,0 +1,178 @@
+@use 'styles/typography' as *;
+
+.tags-input {
+    // ── Wrapper — the visible "input box" border ─────────────────────────
+    // Unlike TextInput where the border lives on the <input> itself,
+    // TagsInput puts pills + inputField inside wrapper, so border goes here.
+    .tags-input__wrapper {
+        min-height: 44px;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-md);
+        background: transparent;
+        transition:
+            border-color 100ms ease,
+            box-shadow 100ms ease;
+
+        &:focus-within {
+            outline: none;
+        }
+
+        &[data-disabled] {
+            opacity: var(--opacity-disabled);
+            cursor: not-allowed;
+        }
+    }
+
+    // ── Pills list — flex row of pills + inputField ──────────────────────
+    .tags-input__pills-list {
+        gap: var(--space-1);
+        padding: 0;
+        min-height: 28px;
+    }
+
+    // ── Individual tag pill ──────────────────────────────────────────────
+    .tags-input__pill {
+        @include t-body-sm;
+        border-radius: var(--radius-sm);
+        padding: 2px var(--space-2);
+        height: auto;
+        // Remove button inside the pill
+        button {
+            opacity: 0.6;
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    // ── Text input within the pills list ────────────────────────────────
+    .tags-input__input-field {
+        font-family: var(--font-sans);
+        font-size: var(--fs-md);
+        line-height: 1.2;
+        background: transparent;
+        min-width: 120px;
+        &:focus {
+            outline: none;
+        }
+    }
+
+    // ── Label / helper / error ───────────────────────────────────────────
+    .tags-input__label {
+        @include t-body-sm;
+        font-weight: 500;
+        margin-bottom: var(--space-1);
+    }
+
+    .tags-input__helper,
+    .tags-input__error {
+        @include t-body-sm;
+        margin-top: var(--space-1);
+    }
+
+    .tags-input__error {
+        color: var(--accent-warm);
+    }
+
+    // ── Twilight surface (dark background) ──────────────────────────────
+    &.m-twilight {
+        .tags-input__wrapper {
+            border: 1px solid var(--border-strong);
+
+            &:focus-within {
+                border: 2px solid var(--focus-ring-color);
+                box-shadow: 0 0 0 3px rgba(248, 110, 66, 0.15);
+            }
+        }
+
+        .tags-input__wrapper[data-error] {
+            border-color: var(--accent-warm);
+        }
+
+        .tags-input__pill {
+            background: rgba(248, 110, 66, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-strong);
+        }
+
+        .tags-input__input-field {
+            color: var(--text-primary);
+            &::placeholder {
+                color: var(--text-muted);
+            }
+        }
+
+        .tags-input__label {
+            color: var(--text-secondary);
+        }
+        .tags-input__helper {
+            color: var(--text-muted);
+        }
+    }
+
+    // ── Cream surface (on cards / modals) ───────────────────────────────
+    &.m-cream {
+        .tags-input__wrapper {
+            border: 1px solid var(--border-on-card);
+
+            &:focus-within {
+                border: 2px solid var(--focus-ring-color);
+                box-shadow: 0 0 0 3px rgba(248, 110, 66, 0.15);
+            }
+        }
+
+        .tags-input__wrapper[data-error] {
+            border-color: var(--accent-warm);
+        }
+
+        .tags-input__pill {
+            background: rgba(248, 110, 66, 0.08);
+            color: var(--text-on-card);
+            border: 1px solid var(--border-on-card);
+        }
+
+        .tags-input__input-field {
+            color: var(--text-on-card);
+            &::placeholder {
+                color: var(--text-on-card-3);
+            }
+        }
+
+        .tags-input__label {
+            color: var(--text-on-card-2);
+        }
+        .tags-input__helper {
+            color: var(--text-on-card-3);
+        }
+    }
+}
+
+// ── Dropdown — same as Select (portal-rendered, surface-independent) ────
+.tags-input__dropdown {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-1) 0;
+    overflow: hidden;
+}
+
+.tags-input__option {
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    color: var(--text-primary);
+    padding: var(--space-2) var(--space-5);
+    cursor: pointer;
+    transition: background 80ms ease;
+
+    &[data-combobox-selected] {
+        background: transparent;
+        color: var(--accent-primary);
+        font-weight: 500;
+    }
+
+    &[data-combobox-active],
+    &:hover {
+        background: rgba(248, 110, 66, 0.08);
+    }
+}

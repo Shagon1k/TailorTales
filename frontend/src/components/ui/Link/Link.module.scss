@@ -1,0 +1,36 @@
+.link {
+    font-family: inherit;
+    font-size: inherit;
+    text-underline-offset: 3px;
+    transition:
+        opacity var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out);
+
+    &.m-default {
+        color: var(--text-accent);
+        text-decoration: underline;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    &.m-quiet {
+        color: var(--text-secondary);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+    }
+
+    &.m-on-card {
+        color: var(--text-on-card-2);
+        text-decoration: underline;
+
+        &:hover {
+            color: var(--text-on-card);
+        }
+    }
+}

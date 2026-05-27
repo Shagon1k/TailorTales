@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+STAGED_FILES=$(git diff --name-only --diff-filter=ACMR --staged)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+# Format with Prettier (auto-fix + re-stage)
+echo "$STAGED_FILES" | tr '\n' '\0' | xargs -0 pnpm exec prettier --write --ignore-unknown
+echo "$STAGED_FILES" | tr '\n' '\0' | xargs -0 git add
+
+# Lint TS/TSX files with ESLint (auto-fix what we can; block commit if errors remain)
+STAGED_TS=$(echo "$STAGED_FILES" | grep -E '\.(ts|tsx)$' || true)
+if [ -n "$STAGED_TS" ]; then
+  echo "$STAGED_TS" | tr '\n' '\0' | xargs -0 pnpm exec eslint --fix
+  ESLINT_STATUS=$?
+  echo "$STAGED_TS" | tr '\n' '\0' | xargs -0 git add
+  exit $ESLINT_STATUS
+fi

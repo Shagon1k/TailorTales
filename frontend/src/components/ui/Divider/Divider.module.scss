@@ -1,0 +1,29 @@
+.divider {
+    &.m-solid {
+        border-color: var(--border-strong);
+    }
+
+    &.m-dashed {
+        border-color: var(--border-strong);
+        border-style: dashed;
+    }
+
+    // Custom layout: dashed line (::before) + needle SVG at the right end
+    &.m-needle {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        &::before {
+            content: '';
+            flex: 1;
+            height: 0;
+            border-top: 1px dashed var(--border-strong);
+        }
+    }
+
+    &__needle {
+        flex-shrink: 0;
+        fill: var(--border-strong);
+    }
+}

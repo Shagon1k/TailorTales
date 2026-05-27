@@ -3,11 +3,12 @@
 **Important!** Don't be lazy, or I will switch you with Codex.
 
 > Rules are scoped to where they apply:
+>
 > - **Project-wide**: [`.claude/rules/`](.claude/rules/) — `typescript.md`, `testing.md`, `git.md`
 > - **Backend-specific**: [`backend/.claude/rules/`](backend/.claude/rules/) — NestJS, Prisma, API patterns
 > - **Frontend-specific**: [`frontend/.claude/rules/`](frontend/.claude/rules/) — CSS, component patterns, Mantine
 > - Each package may also have its own `CLAUDE.md` for package-level instructions.
-> When adding a new convention, put it in the most specific location that applies.
+>   When adding a new convention, put it in the most specific location that applies.
 
 ## Core
 

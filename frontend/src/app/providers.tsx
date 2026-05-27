@@ -6,6 +6,7 @@ import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { useState } from 'react';
 import { UserProvider } from '@/context/UserContext';
+import { theme } from '@/theme/mantine';
 import type { IUser } from '@/types/user.types';
 
 interface IProvidersProps {
@@ -13,12 +14,15 @@ interface IProvidersProps {
     initialUser: IUser | null;
 }
 
-export default function Providers({ children, initialUser }: IProvidersProps): React.ReactElement {
+export default function Providers({
+    children,
+    initialUser,
+}: Readonly<IProvidersProps>): React.ReactElement {
     const [queryClient] = useState(() => new QueryClient());
 
     return (
         <QueryClientProvider client={queryClient}>
-            <MantineProvider>
+            <MantineProvider theme={theme}>
                 <ModalsProvider>
                     <UserProvider initialUser={initialUser}>{children}</UserProvider>
                 </ModalsProvider>

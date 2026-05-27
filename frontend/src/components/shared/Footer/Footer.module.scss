@@ -1,0 +1,51 @@
+@use 'styles/typography' as *;
+
+.footer {
+    border-top: 1px solid var(--border-subtle);
+}
+
+.footer__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+}
+
+.footer__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.footer__tagline {
+    @include t-body-sm;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.footer__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+.footer__link {
+    @include t-body-sm;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--duration-base) var(--ease-out);
+
+    &:hover {
+        color: var(--text-secondary);
+    }
+}
+
+.footer__separator {
+    @include t-body-sm;
+    color: var(--text-muted);
+    user-select: none;
+}

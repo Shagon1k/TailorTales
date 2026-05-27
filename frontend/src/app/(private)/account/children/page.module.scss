@@ -1,0 +1,13 @@
+@use 'styles/typography' as *;
+
+.heading {
+    @include t-heading-2xl;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.empty {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}

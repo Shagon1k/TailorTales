@@ -1,0 +1,58 @@
+@use 'styles/typography' as *;
+
+.account {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.account__hero {
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: var(--space-12) 0 var(--space-10);
+}
+
+.account__hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.account__eyebrow {
+    @include t-caps-xs;
+    color: var(--text-muted);
+}
+
+.account__heading {
+    @include t-heading-3xl-italic;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.account__subtitle {
+    @include t-body-md;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.account__body {
+    flex: 1;
+    padding: var(--space-8) 0 var(--space-16);
+}
+
+.account__body-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+}
+
+.account__content {
+    flex: 1;
+    min-width: 0;
+}

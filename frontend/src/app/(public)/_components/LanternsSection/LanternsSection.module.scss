@@ -1,0 +1,59 @@
+@use 'styles/typography' as *;
+
+.lanterns {
+    padding: var(--space-24) var(--space-6);
+}
+
+.lanterns__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-12);
+}
+
+.lanterns__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+}
+
+.lanterns__heading {
+    @include t-heading-3xl-italic;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.lanterns__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    width: 100%;
+}
+
+.lanterns__numeral {
+    display: block;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--fs-xl);
+    color: var(--text-accent);
+    line-height: var(--lh-tight);
+    margin-bottom: var(--space-3);
+}
+
+.lanterns__title {
+    @include t-body-md;
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.lanterns__body {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}

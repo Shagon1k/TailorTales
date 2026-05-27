@@ -1,0 +1,61 @@
+@use 'styles/typography' as *;
+
+.plans {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-10);
+    padding: 0 var(--space-6) var(--space-16);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.plans__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: var(--space-1);
+}
+
+.plans__toggle-btn {
+    @include t-body-base;
+    font-weight: 500;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-pill);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition:
+        background var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out);
+    min-height: var(--hit-min);
+
+    &[data-active='true'] {
+        background: var(--gradient-fox-bevel);
+        color: var(--text-on-card);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--focus-ring-color);
+        outline-offset: 2px;
+    }
+}
+
+.plans__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    width: 100%;
+    align-items: stretch; // equal-height so CTA buttons align at the bottom
+}
+
+.plans__note {
+    @include t-body-sm;
+    color: var(--text-muted);
+    text-align: center;
+    margin: 0;
+}
