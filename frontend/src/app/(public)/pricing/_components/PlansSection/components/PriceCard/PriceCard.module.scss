@@ -1,0 +1,77 @@
+@use 'styles/typography' as *;
+
+// Card outer shell (background, border, radius, padding) is owned by the Card atom.
+// This module handles only the internal layout and typography.
+
+.badge {
+    position: absolute;
+    top: calc(-1 * var(--space-4));
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+// Flex column wrapper — Card atom is closed (no className), so layout lives here.
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.name {
+    @include t-heading-2xl;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.tagline {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.price-amount {
+    @include t-display-5xl;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.price-period {
+    @include t-body-base;
+    color: var(--text-secondary);
+}
+
+.features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex: 1; // pushes the CTA to the bottom of equal-height cards
+}
+
+.feature {
+    @include t-body-base;
+    color: var(--text-secondary);
+    display: flex;
+    gap: var(--space-3);
+    align-items: baseline;
+}
+
+.feature-plus {
+    color: var(--text-accent);
+    flex-shrink: 0;
+}

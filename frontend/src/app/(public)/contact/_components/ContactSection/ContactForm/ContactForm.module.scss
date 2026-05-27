@@ -1,0 +1,37 @@
+@use 'styles/typography' as *;
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+// Input and Textarea styling is owned by the ui/Input and ui/Textarea atoms.
+
+.error {
+    @include t-body-sm;
+    color: var(--text-accent);
+    margin: 0;
+}
+
+.success {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-8);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+}
+
+.success__heading {
+    @include t-heading-2xl;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.success__body {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}

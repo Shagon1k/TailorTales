@@ -1,0 +1,84 @@
+@use 'styles/typography' as *;
+
+.section {
+    padding: var(--space-16) var(--space-6);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section__heading {
+    @include t-heading-3xl-italic;
+    color: var(--text-primary);
+    text-align: center;
+    margin: 0 0 var(--space-8);
+}
+
+.section__wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table__th-feature,
+.table__th,
+.table__th--accent {
+    @include t-body-sm;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: var(--space-4) var(--space-6);
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+}
+
+.table__th--accent {
+    color: var(--text-accent);
+}
+
+.table__th-feature {
+    width: 30%;
+}
+
+.table__group-header td {
+    @include t-body-sm;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding: var(--space-5) var(--space-6) var(--space-3);
+    background: var(--bg-card);
+}
+
+.table__row {
+    &:not(:last-child) td {
+        border-bottom: 1px solid var(--border-subtle);
+    }
+}
+
+.table__td-feature,
+.table__td,
+.table__td--accent {
+    @include t-body-base;
+    color: var(--text-secondary);
+    padding: var(--space-4) var(--space-6);
+    background: var(--bg-card);
+}
+
+.table__td--accent {
+    color: var(--text-primary);
+    background: var(--bg-card-2);
+}
+
+.table__check {
+    color: var(--text-accent);
+    font-weight: 600;
+}
+
+.table__dash {
+    color: var(--text-muted);
+}

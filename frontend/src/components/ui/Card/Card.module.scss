@@ -1,4 +1,6 @@
 .card {
+    position: relative;
+
     // Variants — control background, shadow, border
     &.m-default {
         background: var(--bg-card);
@@ -18,6 +20,11 @@
         box-shadow: var(--shadow-lg);
         color: var(--text-primary);
         border: 1px solid var(--border-strong);
+    }
+
+    &.m-outlined {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
     }
 
     // Sizes — control border-radius and padding

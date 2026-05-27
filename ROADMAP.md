@@ -170,6 +170,19 @@ Privacy · Contact _(both static pages)_
 | 1 | Refresh tokens + server-side logout | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP. | Post-MVP |
 | 2 | Magic email link auth | Requires email provider (already decided: Resend in Phase 5). Added as Post-MVP auth option alongside Apple OAuth. | Post-MVP |
 | 3 | Exact comic credit rate | Design confirms 2 credits/page. Final business confirmation during Phase 8 (Subscriptions) Paddle setup. | Phase 8 |
+| 4 | Contact form backend (`POST /contact`) | Resend (the logical transport) isn't wired until Phase 5. Frontend Server Action stub is in place; implement the actual endpoint in Phase 5 alongside Resend setup, or Phase 9 if email templates are added there. | Phase 5 |
+
+### In-code TODO cross-reference
+
+> Quick lookup: every `// TODO` comment in the frontend codebase, mapped to its ROADMAP resolution.
+
+| File | TODO summary | Resolves in |
+| ---- | ------------ | ----------- |
+| `contact/_components/ContactSection/actions.ts` | Wire `submitContact` to real `POST /contact` endpoint | Deferred Decision #4 → Phase 5 |
+| `pricing/page.tsx` | Replace hardcoded plan data with `GET /pricing` (real Plan records) | Phase 8 |
+| `(public)/_components/TalesSection/TalesSection.tsx` | Replace `MOCK_TALES` with `GET /stories?featured=true` | Phase 10 |
+| `(public)/_components/TalesSection/TalesSection.tsx` | Add link to `/tales` (public story library page) | Post-MVP |
+| `privacy/_components/PrivacyContent/PrivacyContent.tsx` | Extract privacy copy to CMS if non-dev editing is needed | Post-MVP |
 
 ---
 
@@ -369,6 +382,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] `AccountSidebar` — renders all sidebar items in correct order
 - [ ] Migrated components (`Badge`, `AuthGuard`, `ChildCard`, `ChildForm`) — existing tests pass after path change
 - [ ] ArtStyle seed: 8 rows with correct slugs
+- [ ] Static pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) — render smoke test: correct heading present, key elements render, no broken imports
 
 **Acceptance Check:**
 
@@ -801,4 +815,4 @@ Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rul
 - Image moderation provider — DALL-E's own safety flags are the default; explicit image moderation provider TBD if coverage proves insufficient.
 - Backup strategy specifics for Postgres + S3 — confirm in Phase 14.
 - Notification preferences storage — `User` JSON field vs separate `NotificationPreference` model — decide in Phase 9.
-- Pricing page FAQ copy — 6 questions; content is copywriting, not code scope. Write before Phase 3 ships.
+- Static page copy — all four static pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) contain placeholder copy. Content is copywriting scope, not code scope. All copy must be reviewed and finalised before Phase 3 merges to `main`. This includes: pricing plan names/taglines/features, FAQ questions and answers, how-it-works step descriptions, contact intro text, and privacy policy wording.
