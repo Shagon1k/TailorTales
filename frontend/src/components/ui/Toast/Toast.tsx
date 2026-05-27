@@ -16,7 +16,12 @@ function InfoIcon(): React.ReactElement {
     return (
         <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M9 8v4M9 5.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+                d="M9 8v4M9 5.5v.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
         </svg>
     );
 }
@@ -25,7 +30,13 @@ function SuccessIcon(): React.ReactElement {
     return (
         <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M5.5 9l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+                d="M5.5 9l2.5 2.5 4.5-5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
         </svg>
     );
 }
@@ -33,8 +44,18 @@ function SuccessIcon(): React.ReactElement {
 function WarningIcon(): React.ReactElement {
     return (
         <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M9 2L1.5 15.5h15L9 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-            <path d="M9 7.5v3M9 12.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+                d="M9 2L1.5 15.5h15L9 2z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M9 7.5v3M9 12.5v.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
         </svg>
     );
 }
@@ -43,7 +64,12 @@ function ErrorIcon(): React.ReactElement {
     return (
         <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M6 6l6 6M12 6l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+                d="M6 6l6 6M12 6l-6 6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
         </svg>
     );
 }

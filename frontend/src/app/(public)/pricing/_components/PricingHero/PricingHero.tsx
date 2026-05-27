@@ -11,9 +11,8 @@ export default function PricingHero(): React.ReactElement {
                 as the rest of us.
             </h1>
             <p className={styles.hero__sub}>
-                Tales are sold by the page, or in a small monthly bundle. No tricks,
-                no per-book add-ons, no hidden seats. Cancel any time — your shelf
-                stays yours.
+                Tales are sold by the page, or in a small monthly bundle. No tricks, no per-book
+                add-ons, no hidden seats. Cancel any time — your shelf stays yours.
             </p>
         </section>
     );

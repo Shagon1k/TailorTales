@@ -2,7 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import Textarea from '../Textarea';
 
-function renderTextarea(props: React.ComponentProps<typeof Textarea> = {}): ReturnType<typeof render> {
+function renderTextarea(
+    props: React.ComponentProps<typeof Textarea> = {},
+): ReturnType<typeof render> {
     return render(
         <MantineProvider>
             <Textarea {...props} />

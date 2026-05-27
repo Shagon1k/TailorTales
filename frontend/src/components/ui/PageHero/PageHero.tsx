@@ -7,7 +7,11 @@ interface IPageHeroProps {
     sub?: string;
 }
 
-export default function PageHero({ eyebrow, heading, sub }: Readonly<IPageHeroProps>): React.ReactElement {
+export default function PageHero({
+    eyebrow,
+    heading,
+    sub,
+}: Readonly<IPageHeroProps>): React.ReactElement {
     return (
         <section className={styles.hero}>
             {eyebrow && <CapsLabel>{eyebrow}</CapsLabel>}

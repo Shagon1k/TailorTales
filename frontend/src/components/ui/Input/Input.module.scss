@@ -11,9 +11,13 @@
         font-size: var(--fs-md);
         line-height: 1.2;
         width: 100%;
-        transition: border-color 100ms ease, box-shadow 100ms ease;
+        transition:
+            border-color 100ms ease,
+            box-shadow 100ms ease;
 
-        &:focus { outline: none; }
+        &:focus {
+            outline: none;
+        }
 
         &:disabled {
             opacity: var(--opacity-disabled);
@@ -33,7 +37,9 @@
         margin-top: var(--space-1);
     }
 
-    .input__error { color: var(--accent-warm); }
+    .input__error {
+        color: var(--accent-warm);
+    }
 
     // ── Twilight surface (dark background) ──────────────────────────────
     &.m-twilight {
@@ -41,7 +47,9 @@
             border: 1px solid var(--border-strong);
             color: var(--text-primary);
 
-            &::placeholder { color: var(--text-muted); }
+            &::placeholder {
+                color: var(--text-muted);
+            }
 
             &:focus {
                 border: 2px solid var(--focus-ring-color);
@@ -54,8 +62,12 @@
             border-color: var(--accent-warm);
         }
 
-        .input__label { color: var(--text-secondary); }
-        .input__helper { color: var(--text-muted); }
+        .input__label {
+            color: var(--text-secondary);
+        }
+        .input__helper {
+            color: var(--text-muted);
+        }
     }
 
     // ── Cream surface (on cards / modals) ───────────────────────────────
@@ -64,7 +76,9 @@
             border: 1px solid var(--border-on-card);
             color: var(--text-on-card);
 
-            &::placeholder { color: var(--text-on-card-3); }
+            &::placeholder {
+                color: var(--text-on-card-3);
+            }
 
             &:focus {
                 border: 2px solid var(--focus-ring-color);
@@ -76,7 +90,11 @@
             border-color: var(--accent-warm);
         }
 
-        .input__label { color: var(--text-on-card-2); }
-        .input__helper { color: var(--text-on-card-3); }
+        .input__label {
+            color: var(--text-on-card-2);
+        }
+        .input__helper {
+            color: var(--text-on-card-3);
+        }
     }
 }

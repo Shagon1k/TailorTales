@@ -59,22 +59,14 @@ export default function ChildForm({
     return (
         <form onSubmit={form.onSubmit(onSubmit)}>
             <Stack gap="sm">
-                <Input
-                    label="Name"
-                    placeholder="Child's name"
-                    {...form.getInputProps('name')}
-                />
+                <Input label="Name" placeholder="Child's name" {...form.getInputProps('name')} />
                 <Input
                     label="Birthdate"
                     type="date"
                     max={TODAY}
                     {...form.getInputProps('birthdate')}
                 />
-                <Select
-                    label="Gender"
-                    data={GENDER_OPTIONS}
-                    {...form.getInputProps('gender')}
-                />
+                <Select label="Gender" data={GENDER_OPTIONS} {...form.getInputProps('gender')} />
                 <TagsInput
                     label="Interests"
                     placeholder="Add interest and press Enter"

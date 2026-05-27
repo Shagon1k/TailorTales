@@ -5,7 +5,9 @@ interface IAccountLayoutProps {
     children: React.ReactNode;
 }
 
-export default function AccountLayout({ children }: Readonly<IAccountLayoutProps>): React.ReactElement {
+export default function AccountLayout({
+    children,
+}: Readonly<IAccountLayoutProps>): React.ReactElement {
     return (
         <div className={styles.account}>
             <div className={styles.account__hero}>
@@ -22,9 +24,7 @@ export default function AccountLayout({ children }: Readonly<IAccountLayoutProps
             <div className={styles.account__body}>
                 <div className={styles['account__body-inner']}>
                     <AccountSidebar />
-                    <div className={styles.account__content}>
-                        {children}
-                    </div>
+                    <div className={styles.account__content}>{children}</div>
                 </div>
             </div>
         </div>

@@ -12,9 +12,13 @@
         line-height: 1.5;
         width: 100%;
         resize: vertical;
-        transition: border-color 100ms ease, box-shadow 100ms ease;
+        transition:
+            border-color 100ms ease,
+            box-shadow 100ms ease;
 
-        &:focus { outline: none; }
+        &:focus {
+            outline: none;
+        }
 
         &:disabled {
             opacity: var(--opacity-disabled);
@@ -35,7 +39,9 @@
         margin-top: var(--space-1);
     }
 
-    .textarea__error { color: var(--accent-warm); }
+    .textarea__error {
+        color: var(--accent-warm);
+    }
 
     // ── Twilight surface (dark background) ──────────────────────────────
     &.m-twilight {
@@ -43,7 +49,9 @@
             border: 1px solid var(--border-strong);
             color: var(--text-primary);
 
-            &::placeholder { color: var(--text-muted); }
+            &::placeholder {
+                color: var(--text-muted);
+            }
 
             &:focus {
                 border: 2px solid var(--focus-ring-color);
@@ -56,8 +64,12 @@
             border-color: var(--accent-warm);
         }
 
-        .textarea__label { color: var(--text-secondary); }
-        .textarea__helper { color: var(--text-muted); }
+        .textarea__label {
+            color: var(--text-secondary);
+        }
+        .textarea__helper {
+            color: var(--text-muted);
+        }
     }
 
     // ── Cream surface (on cards / modals) ───────────────────────────────
@@ -66,7 +78,9 @@
             border: 1px solid var(--border-on-card);
             color: var(--text-on-card);
 
-            &::placeholder { color: var(--text-on-card-3); }
+            &::placeholder {
+                color: var(--text-on-card-3);
+            }
 
             &:focus {
                 border: 2px solid var(--focus-ring-color);
@@ -78,7 +92,11 @@
             border-color: var(--accent-warm);
         }
 
-        .textarea__label { color: var(--text-on-card-2); }
-        .textarea__helper { color: var(--text-on-card-3); }
+        .textarea__label {
+            color: var(--text-on-card-2);
+        }
+        .textarea__helper {
+            color: var(--text-on-card-3);
+        }
     }
 }

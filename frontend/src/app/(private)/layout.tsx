@@ -6,7 +6,9 @@ interface IPrivateLayoutProps {
     children: React.ReactNode;
 }
 
-export default function PrivateLayout({ children }: Readonly<IPrivateLayoutProps>): React.ReactElement {
+export default function PrivateLayout({
+    children,
+}: Readonly<IPrivateLayoutProps>): React.ReactElement {
     return (
         <AuthGuard>
             <Header variant="private" />

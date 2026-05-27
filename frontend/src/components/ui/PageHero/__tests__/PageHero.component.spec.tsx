@@ -7,7 +7,10 @@ describe('PageHero', () => {
             render(<PageHero heading="Three small steps, one lasting tale." />);
 
             expect(
-                screen.getByRole('heading', { level: 1, name: 'Three small steps, one lasting tale.' }),
+                screen.getByRole('heading', {
+                    level: 1,
+                    name: 'Three small steps, one lasting tale.',
+                }),
             ).toBeInTheDocument();
         });
     });

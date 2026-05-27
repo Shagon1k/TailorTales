@@ -1,15 +1,24 @@
-import { TextInput as MantineTextInput, type TextInputProps as IMantineTextInputProps } from '@mantine/core';
+import {
+    TextInput as MantineTextInput,
+    type TextInputProps as IMantineTextInputProps,
+} from '@mantine/core';
 import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Input.module.scss';
 
 export type TInputSurface = 'twilight' | 'cream';
 
-export interface IInputProps extends OmitStyling<IMantineTextInputProps, 'variant' | 'size' | 'radius'> {
+export interface IInputProps extends OmitStyling<
+    IMantineTextInputProps,
+    'variant' | 'size' | 'radius'
+> {
     surface?: TInputSurface;
 }
 
-export default function Input({ surface = 'twilight', ...props }: Readonly<IInputProps>): React.ReactElement {
+export default function Input({
+    surface = 'twilight',
+    ...props
+}: Readonly<IInputProps>): React.ReactElement {
     return (
         <MantineTextInput
             variant="unstyled"

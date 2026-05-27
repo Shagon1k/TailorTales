@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import TagsInput from '../TagsInput';
 
-function renderTagsInput(props: React.ComponentProps<typeof TagsInput> = {}): ReturnType<typeof render> {
+function renderTagsInput(
+    props: React.ComponentProps<typeof TagsInput> = {},
+): ReturnType<typeof render> {
     return render(
         <MantineProvider>
             <TagsInput {...props} />

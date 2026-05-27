@@ -2,7 +2,7 @@ import { Rating as MantineRating, type RatingProps as IMantineRatingProps } from
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Rating.module.scss';
 
-export type IRatingProps = OmitStyling<IMantineRatingProps, 'color' | 'size'>
+export type IRatingProps = OmitStyling<IMantineRatingProps, 'color' | 'size'>;
 
 export default function Rating({ ...props }: Readonly<IRatingProps>): React.ReactElement {
     return (

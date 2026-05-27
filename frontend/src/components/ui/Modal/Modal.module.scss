@@ -11,9 +11,15 @@
         border-radius: var(--radius-xl);
     }
 
-    &.m-sm { padding: var(--space-8); }
-    &.m-md { padding: var(--space-10); }
-    &.m-lg { padding: var(--space-12); }
+    &.m-sm {
+        padding: var(--space-8);
+    }
+    &.m-md {
+        padding: var(--space-10);
+    }
+    &.m-lg {
+        padding: var(--space-12);
+    }
 
     .modal__header {
         padding: 0;

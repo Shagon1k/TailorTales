@@ -6,19 +6,31 @@ const STEPS = [
         numeral: 'i.',
         title: 'Light a name',
         body: 'Tell us who the story is for — a first name, an age, and two or three things they love right now. Dinosaurs, puddles, their dog. We use that to anchor the tale in their world, not a generic one.',
-        details: ['Takes about a minute', 'One child per tale', 'You can save profiles for next time'],
+        details: [
+            'Takes about a minute',
+            'One child per tale',
+            'You can save profiles for next time',
+        ],
     },
     {
         numeral: 'ii.',
         title: 'Whisper a why',
         body: "Pick the question or theme that's been on their mind lately. Why is the sky dark? Where do lost things go? Choose from our curated list or type your own. The tale is built around that spark, not around a generic plot.",
-        details: ['40+ starter questions', 'Or write your own in plain words', 'Tone adjusts to age automatically'],
+        details: [
+            '40+ starter questions',
+            'Or write your own in plain words',
+            'Tone adjusts to age automatically',
+        ],
     },
     {
         numeral: 'iii.',
         title: 'Carry it home',
         body: 'In a few minutes, a printable PDF lands in your library. Five to twenty pages — the length fits the age. A picture book for four-year-olds, a longer comic for eight-year-olds. Theirs to keep, re-read, and print.',
-        details: ['PDF ready in under 5 minutes', 'Book or comic format', 'Print at home or at any copy shop'],
+        details: [
+            'PDF ready in under 5 minutes',
+            'Book or comic format',
+            'Print at home or at any copy shop',
+        ],
     },
 ] as const;
 

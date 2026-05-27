@@ -13,25 +13,33 @@
     &.m-info {
         border-color: var(--text-primary);
 
-        .toast__icon { color: var(--text-primary); }
+        .toast__icon {
+            color: var(--text-primary);
+        }
     }
 
     &.m-success {
         border-color: var(--accent-cool);
 
-        .toast__icon { color: var(--accent-cool); }
+        .toast__icon {
+            color: var(--accent-cool);
+        }
     }
 
     &.m-warning {
         border-color: var(--accent-gold);
 
-        .toast__icon { color: var(--accent-gold); }
+        .toast__icon {
+            color: var(--accent-gold);
+        }
     }
 
     &.m-error {
         border-color: var(--accent-warm);
 
-        .toast__icon { color: var(--accent-warm); }
+        .toast__icon {
+            color: var(--accent-warm);
+        }
     }
 
     &__icon {

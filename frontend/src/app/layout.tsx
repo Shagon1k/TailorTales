@@ -45,11 +45,7 @@ export default async function RootLayout({
     const fontClasses = `${newsreader.variable} ${jakarta.variable} ${caveat.variable} ${geistMono.variable}`;
 
     return (
-        <html
-            lang="en"
-            {...mantineHtmlProps}
-            className={fontClasses}
-        >
+        <html lang="en" {...mantineHtmlProps} className={fontClasses}>
             <head>
                 <ColorSchemeScript />
             </head>

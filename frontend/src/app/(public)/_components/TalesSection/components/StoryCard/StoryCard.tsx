@@ -26,9 +26,7 @@ export default function StoryCard({
     return (
         <article className={clsx(styles['story-card'], styles[`m-${tone}`])}>
             <div className={styles['story-card__hatch']} aria-hidden="true" />
-            <blockquote className={styles['story-card__quote']}>
-                &ldquo;{quote}&rdquo;
-            </blockquote>
+            <blockquote className={styles['story-card__quote']}>&ldquo;{quote}&rdquo;</blockquote>
             <footer className={styles['story-card__footer']}>
                 <p className={styles['story-card__meta']}>
                     for {childName}, {age} · {pages} pages{format === 'comic' ? ' · comic' : ''}

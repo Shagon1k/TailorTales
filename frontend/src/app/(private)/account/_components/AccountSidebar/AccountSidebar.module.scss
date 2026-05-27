@@ -86,7 +86,8 @@
     border: none;
     cursor: pointer;
     text-align: left;
-    transition: background var(--duration-base) var(--ease-out),
+    transition:
+        background var(--duration-base) var(--ease-out),
         color var(--duration-base) var(--ease-out);
 
     &:hover {
@@ -127,7 +128,8 @@
     cursor: pointer;
     text-align: left;
     width: 100%;
-    transition: color var(--duration-base) var(--ease-out),
+    transition:
+        color var(--duration-base) var(--ease-out),
         background var(--duration-base) var(--ease-out);
 
     &:hover {
@@ -147,7 +149,8 @@
     cursor: pointer;
     text-align: left;
     width: 100%;
-    transition: color var(--duration-base) var(--ease-out),
+    transition:
+        color var(--duration-base) var(--ease-out),
         background var(--duration-base) var(--ease-out);
 
     &:hover {

@@ -55,11 +55,7 @@ export default function ProfilePage(): React.ReactElement {
                             onChange={(e) => setEditedName(e.currentTarget.value)}
                         />
                         <Group>
-                            <Button
-                                variant="primary"
-                                onClick={handleSave}
-                                loading={isSaving}
-                            >
+                            <Button variant="primary" onClick={handleSave} loading={isSaving}>
                                 Save
                             </Button>
                             <Button

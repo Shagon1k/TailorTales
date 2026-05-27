@@ -14,7 +14,10 @@ interface IProvidersProps {
     initialUser: IUser | null;
 }
 
-export default function Providers({ children, initialUser }: Readonly<IProvidersProps>): React.ReactElement {
+export default function Providers({
+    children,
+    initialUser,
+}: Readonly<IProvidersProps>): React.ReactElement {
     const [queryClient] = useState(() => new QueryClient());
 
     return (

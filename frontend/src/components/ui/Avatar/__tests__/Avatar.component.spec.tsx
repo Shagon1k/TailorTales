@@ -19,7 +19,10 @@ describe('Avatar', () => {
 
         it('should use the provided src', () => {
             renderAvatar({ src: '/avatar.jpg', alt: 'Alice' });
-            expect(screen.getByRole('img', { name: /alice/i })).toHaveAttribute('src', '/avatar.jpg');
+            expect(screen.getByRole('img', { name: /alice/i })).toHaveAttribute(
+                'src',
+                '/avatar.jpg',
+            );
         });
     });
 });

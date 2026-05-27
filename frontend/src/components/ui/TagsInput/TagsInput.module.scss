@@ -9,9 +9,13 @@
         padding: var(--space-2) var(--space-3);
         border-radius: var(--radius-md);
         background: transparent;
-        transition: border-color 100ms ease, box-shadow 100ms ease;
+        transition:
+            border-color 100ms ease,
+            box-shadow 100ms ease;
 
-        &:focus-within { outline: none; }
+        &:focus-within {
+            outline: none;
+        }
 
         &[data-disabled] {
             opacity: var(--opacity-disabled);
@@ -33,7 +37,12 @@
         padding: 2px var(--space-2);
         height: auto;
         // Remove button inside the pill
-        button { opacity: 0.6; &:hover { opacity: 1; } }
+        button {
+            opacity: 0.6;
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
 
     // ── Text input within the pills list ────────────────────────────────
@@ -43,7 +52,9 @@
         line-height: 1.2;
         background: transparent;
         min-width: 120px;
-        &:focus { outline: none; }
+        &:focus {
+            outline: none;
+        }
     }
 
     // ── Label / helper / error ───────────────────────────────────────────
@@ -59,7 +70,9 @@
         margin-top: var(--space-1);
     }
 
-    .tags-input__error { color: var(--accent-warm); }
+    .tags-input__error {
+        color: var(--accent-warm);
+    }
 
     // ── Twilight surface (dark background) ──────────────────────────────
     &.m-twilight {
@@ -84,11 +97,17 @@
 
         .tags-input__input-field {
             color: var(--text-primary);
-            &::placeholder { color: var(--text-muted); }
+            &::placeholder {
+                color: var(--text-muted);
+            }
         }
 
-        .tags-input__label { color: var(--text-secondary); }
-        .tags-input__helper { color: var(--text-muted); }
+        .tags-input__label {
+            color: var(--text-secondary);
+        }
+        .tags-input__helper {
+            color: var(--text-muted);
+        }
     }
 
     // ── Cream surface (on cards / modals) ───────────────────────────────
@@ -114,11 +133,17 @@
 
         .tags-input__input-field {
             color: var(--text-on-card);
-            &::placeholder { color: var(--text-on-card-3); }
+            &::placeholder {
+                color: var(--text-on-card-3);
+            }
         }
 
-        .tags-input__label { color: var(--text-on-card-2); }
-        .tags-input__helper { color: var(--text-on-card-3); }
+        .tags-input__label {
+            color: var(--text-on-card-2);
+        }
+        .tags-input__helper {
+            color: var(--text-on-card-3);
+        }
     }
 }
 

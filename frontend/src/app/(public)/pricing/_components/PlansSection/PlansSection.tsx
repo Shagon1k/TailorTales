@@ -40,8 +40,8 @@ export default function PlansSection({ plans }: Readonly<IPlansectionProps>): Re
                 ))}
             </div>
             <p className={styles.plans__note}>
-                Page credits: 1 book page = 1 credit · 1 comic page = 2 credits.
-                Unused credits roll one month forward.
+                Page credits: 1 book page = 1 credit · 1 comic page = 2 credits. Unused credits roll
+                one month forward.
             </p>
         </section>
     );

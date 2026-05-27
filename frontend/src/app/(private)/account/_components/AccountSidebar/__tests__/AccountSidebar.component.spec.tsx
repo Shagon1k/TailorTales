@@ -72,9 +72,18 @@ describe('AccountSidebar', () => {
         it('should link nav items to the correct hrefs', () => {
             render(<AccountSidebar />);
 
-            expect(screen.getByRole('link', { name: /profile/i })).toHaveAttribute('href', '/account/profile');
-            expect(screen.getByRole('link', { name: /children/i })).toHaveAttribute('href', '/account/children');
-            expect(screen.getByRole('link', { name: /subscription/i })).toHaveAttribute('href', '/account/subscription');
+            expect(screen.getByRole('link', { name: /profile/i })).toHaveAttribute(
+                'href',
+                '/account/profile',
+            );
+            expect(screen.getByRole('link', { name: /children/i })).toHaveAttribute(
+                'href',
+                '/account/children',
+            );
+            expect(screen.getByRole('link', { name: /subscription/i })).toHaveAttribute(
+                'href',
+                '/account/subscription',
+            );
         });
     });
 

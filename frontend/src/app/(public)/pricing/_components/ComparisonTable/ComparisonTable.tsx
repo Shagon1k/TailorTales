@@ -7,12 +7,24 @@ interface IComparisonTableProps {
 }
 
 function Cell({ value }: Readonly<{ value: TComparisonCellValue }>): React.ReactElement {
-    if (value.type === 'check') return <span className={styles.table__check} aria-label="Included">✓</span>;
-    if (value.type === 'dash') return <span className={styles.table__dash} aria-label="Not included">—</span>;
+    if (value.type === 'check')
+        return (
+            <span className={styles.table__check} aria-label="Included">
+                ✓
+            </span>
+        );
+    if (value.type === 'dash')
+        return (
+            <span className={styles.table__dash} aria-label="Not included">
+                —
+            </span>
+        );
     return <span>{value.value}</span>;
 }
 
-export default function ComparisonTable({ groups }: Readonly<IComparisonTableProps>): React.ReactElement {
+export default function ComparisonTable({
+    groups,
+}: Readonly<IComparisonTableProps>): React.ReactElement {
     return (
         <section className={styles.section}>
             <h2 className={styles.section__heading}>What&apos;s in each tea?</h2>
@@ -34,10 +46,18 @@ export default function ComparisonTable({ groups }: Readonly<IComparisonTablePro
                                 </tr>
                                 {group.rows.map((row) => (
                                     <tr key={row.feature} className={styles.table__row}>
-                                        <td className={styles['table__td-feature']}>{row.feature}</td>
-                                        <td className={styles.table__td}><Cell value={row.free} /></td>
-                                        <td className={styles['table__td--accent']}><Cell value={row.storyHour} /></td>
-                                        <td className={styles.table__td}><Cell value={row.family} /></td>
+                                        <td className={styles['table__td-feature']}>
+                                            {row.feature}
+                                        </td>
+                                        <td className={styles.table__td}>
+                                            <Cell value={row.free} />
+                                        </td>
+                                        <td className={styles['table__td--accent']}>
+                                            <Cell value={row.storyHour} />
+                                        </td>
+                                        <td className={styles.table__td}>
+                                            <Cell value={row.family} />
+                                        </td>
                                     </tr>
                                 ))}
                             </Fragment>

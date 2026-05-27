@@ -17,18 +17,28 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                 <nav className={styles.header__nav} aria-label="Main navigation">
                     {variant === 'public' ? (
                         <>
-                            <Link href="/how-it-works" className={styles.header__link}>How it works</Link>
-                            <Link href="/pricing" className={styles.header__link}>Pricing</Link>
-                            <Link href="/sign-in" className={styles.header__link}>Sign in</Link>
-                            <ButtonLink href="/sign-up">
-                                Begin a tale →
-                            </ButtonLink>
+                            <Link href="/how-it-works" className={styles.header__link}>
+                                How it works
+                            </Link>
+                            <Link href="/pricing" className={styles.header__link}>
+                                Pricing
+                            </Link>
+                            <Link href="/sign-in" className={styles.header__link}>
+                                Sign in
+                            </Link>
+                            <ButtonLink href="/sign-up">Begin a tale →</ButtonLink>
                         </>
                     ) : (
                         <>
-                            <Link href="/account/library" className={styles.header__link}>Library</Link>
-                            <Link href="/account/workshop" className={styles.header__link}>Workshop</Link>
-                            <Link href="/account/children" className={styles.header__link}>Children</Link>
+                            <Link href="/account/library" className={styles.header__link}>
+                                Library
+                            </Link>
+                            <Link href="/account/workshop" className={styles.header__link}>
+                                Workshop
+                            </Link>
+                            <Link href="/account/children" className={styles.header__link}>
+                                Children
+                            </Link>
                             <span className={styles['header__nav-divider']} aria-hidden="true" />
                             <NotificationBell />
                             <HeaderUserChip />

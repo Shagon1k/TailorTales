@@ -5,9 +5,7 @@ describe('PrivacyPage', () => {
     it('should render the page heading', () => {
         render(<PrivacyPage />);
 
-        expect(
-            screen.getByRole('heading', { level: 1, name: /your family/i }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole('heading', { level: 1, name: /your family/i })).toBeInTheDocument();
     });
 
     it('should display the privacy policy sections', () => {

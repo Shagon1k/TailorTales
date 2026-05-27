@@ -5,11 +5,17 @@ import styles from './Select.module.scss';
 
 export type TSelectSurface = 'twilight' | 'cream';
 
-export interface ISelectProps extends OmitStyling<IMantineSelectProps, 'variant' | 'size' | 'radius'> {
+export interface ISelectProps extends OmitStyling<
+    IMantineSelectProps,
+    'variant' | 'size' | 'radius'
+> {
     surface?: TSelectSurface;
 }
 
-export default function Select({ surface = 'twilight', ...props }: Readonly<ISelectProps>): React.ReactElement {
+export default function Select({
+    surface = 'twilight',
+    ...props
+}: Readonly<ISelectProps>): React.ReactElement {
     return (
         <MantineSelect
             variant="unstyled"

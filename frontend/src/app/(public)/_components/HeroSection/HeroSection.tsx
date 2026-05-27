@@ -14,14 +14,12 @@ export default function HeroSection(): React.ReactElement {
                     become their <em className={styles['hero__accent']}>stories</em>.
                 </h1>
                 <p className={styles.hero__sub}>
-                    A small workshop that takes your child&apos;s name, age and curiosity,
-                    and stitches them into a tiny book or comic — five to twenty
-                    pages, glowing on the page, theirs forever.
+                    A small workshop that takes your child&apos;s name, age and curiosity, and
+                    stitches them into a tiny book or comic — five to twenty pages, glowing on the
+                    page, theirs forever.
                 </p>
                 <div className={styles.hero__actions}>
-                    <ButtonLink href="/sign-up">
-                        Light the first lantern →
-                    </ButtonLink>
+                    <ButtonLink href="/sign-up">Light the first lantern →</ButtonLink>
                     <ButtonLink href="/how-it-works" variant="secondary">
                         Hear the workshop
                     </ButtonLink>

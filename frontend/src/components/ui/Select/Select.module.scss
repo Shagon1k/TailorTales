@@ -12,9 +12,13 @@
         line-height: 1.2;
         width: 100%;
         cursor: pointer;
-        transition: border-color 100ms ease, box-shadow 100ms ease;
+        transition:
+            border-color 100ms ease,
+            box-shadow 100ms ease;
 
-        &:focus { outline: none; }
+        &:focus {
+            outline: none;
+        }
 
         &:disabled {
             opacity: var(--opacity-disabled);
@@ -39,7 +43,9 @@
         margin-top: var(--space-1);
     }
 
-    .select__error { color: var(--accent-warm); }
+    .select__error {
+        color: var(--accent-warm);
+    }
 
     // ── Twilight surface (dark background) ──────────────────────────────
     &.m-twilight {
@@ -57,8 +63,12 @@
             border-color: var(--accent-warm);
         }
 
-        .select__label { color: var(--text-secondary); }
-        .select__helper { color: var(--text-muted); }
+        .select__label {
+            color: var(--text-secondary);
+        }
+        .select__helper {
+            color: var(--text-muted);
+        }
     }
 
     // ── Cream surface (on cards / modals) ───────────────────────────────
@@ -77,8 +87,12 @@
             border-color: var(--accent-warm);
         }
 
-        .select__label { color: var(--text-on-card-2); }
-        .select__helper { color: var(--text-on-card-3); }
+        .select__label {
+            color: var(--text-on-card-2);
+        }
+        .select__helper {
+            color: var(--text-on-card-3);
+        }
     }
 }
 

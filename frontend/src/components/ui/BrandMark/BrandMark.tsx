@@ -8,7 +8,9 @@ interface IBrandMarkProps {
     size?: TBrandMarkSize;
 }
 
-export default function BrandMark({ size = 'default' }: Readonly<IBrandMarkProps>): React.ReactElement {
+export default function BrandMark({
+    size = 'default',
+}: Readonly<IBrandMarkProps>): React.ReactElement {
     return (
         <Link
             href="/"

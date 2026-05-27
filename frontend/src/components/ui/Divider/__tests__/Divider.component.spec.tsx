@@ -2,7 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import Divider from '../Divider';
 
-function renderDivider(props: React.ComponentProps<typeof Divider> = {}): ReturnType<typeof render> {
+function renderDivider(
+    props: React.ComponentProps<typeof Divider> = {},
+): ReturnType<typeof render> {
     return render(
         <MantineProvider>
             <Divider {...props} />

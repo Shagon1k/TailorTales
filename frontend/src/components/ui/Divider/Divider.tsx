@@ -1,11 +1,17 @@
-import { Divider as MantineDivider, type DividerProps as IMantineDividerProps } from '@mantine/core';
+import {
+    Divider as MantineDivider,
+    type DividerProps as IMantineDividerProps,
+} from '@mantine/core';
 import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Divider.module.scss';
 
 export type TDividerVariant = 'solid' | 'dashed' | 'needle';
 
-export interface IDividerProps extends OmitStyling<IMantineDividerProps, 'variant' | 'color' | 'size'> {
+export interface IDividerProps extends OmitStyling<
+    IMantineDividerProps,
+    'variant' | 'color' | 'size'
+> {
     variant?: TDividerVariant;
 }
 

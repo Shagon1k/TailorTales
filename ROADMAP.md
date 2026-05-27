@@ -24,46 +24,46 @@
 
 ## 2. Stack & Architecture Decisions
 
-| Area | Decision |
-| ---- | -------- |
-| Repo layout | Monorepo: `frontend/` + `backend/`, **pnpm workspaces** (no Turborepo for now) |
-| Backend | Nest.js (TypeScript), REST API with OpenAPI auto-generation |
-| Frontend | Next.js (React, TypeScript), CSS Modules, **Mantine** UI library |
-| State management (FE) | React Query (server state) + Zustand (UI state) |
-| Database | PostgreSQL via **Prisma** ORM |
-| Queue | **BullMQ** (Redis-backed) |
-| Object storage | **MinIO** for dev/local, **AWS S3** for production |
-| LLM (text) | **OpenRouter** — `claude-haiku-4-5` for prod, `gpt-4o-mini` for dev (configurable via env) |
-| Image generation | **DALL-E 3** via OpenAI API |
-| PDF generation | **Puppeteer** (HTML → PDF) |
-| Auth | **Google OAuth only** at MVP |
-| Payments | **Paddle** |
-| Email | **Resend** (decided in Phase 5 — story completion notification) |
-| Real-time progress | **SSE** (Server-Sent Events) |
-| Notifications | Email + in-app (bell + toast) |
-| Testing | Vitest + React Testing Library |
-| Containerization | Docker + docker-compose for dev; Dockerfiles deployed via **dokploy** |
-| CI/CD | GitHub Actions (lint + type-check + test) — minimal at start |
-| Observability | Pino logs only at MVP (no Sentry/OTel for now) |
-| Compliance | GDPR (EU-only target audience at MVP) |
+| Area                  | Decision                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| Repo layout           | Monorepo: `frontend/` + `backend/`, **pnpm workspaces** (no Turborepo for now)             |
+| Backend               | Nest.js (TypeScript), REST API with OpenAPI auto-generation                                |
+| Frontend              | Next.js (React, TypeScript), CSS Modules, **Mantine** UI library                           |
+| State management (FE) | React Query (server state) + Zustand (UI state)                                            |
+| Database              | PostgreSQL via **Prisma** ORM                                                              |
+| Queue                 | **BullMQ** (Redis-backed)                                                                  |
+| Object storage        | **MinIO** for dev/local, **AWS S3** for production                                         |
+| LLM (text)            | **OpenRouter** — `claude-haiku-4-5` for prod, `gpt-4o-mini` for dev (configurable via env) |
+| Image generation      | **DALL-E 3** via OpenAI API                                                                |
+| PDF generation        | **Puppeteer** (HTML → PDF)                                                                 |
+| Auth                  | **Google OAuth only** at MVP                                                               |
+| Payments              | **Paddle**                                                                                 |
+| Email                 | **Resend** (decided in Phase 5 — story completion notification)                            |
+| Real-time progress    | **SSE** (Server-Sent Events)                                                               |
+| Notifications         | Email + in-app (bell + toast)                                                              |
+| Testing               | Vitest + React Testing Library                                                             |
+| Containerization      | Docker + docker-compose for dev; Dockerfiles deployed via **dokploy**                      |
+| CI/CD                 | GitHub Actions (lint + type-check + test) — minimal at start                               |
+| Observability         | Pino logs only at MVP (no Sentry/OTel for now)                                             |
+| Compliance            | GDPR (EU-only target audience at MVP)                                                      |
 
 ---
 
 ## 3. Domain Model (high level)
 
-| Entity | Notes |
-| ------ | ----- |
-| **User** | Google OAuth identity, role (USER / ADMIN). |
-| **Child** | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input). |
-| **ArtStyle** | Admin-managed. Fields: id, name, slug, thumbnailUrl, promptPrefix, isActive, order. Seeded with 8 styles. |
-| **Story** | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child. Includes `isPublic boolean (default false)` — set via opt-in in rating flow. |
-| **Page** | Belongs to Story, ordered, contains text + illustration URL(s) + chapter title. |
-| **Template** | Pre-defined Story blueprint created by Admin. Users instantiate Stories from Templates with customization. |
-| **Plan** | Subscription tier definition. Fields: id, name, paddleProductId, priceMonthly, pagesPerMonth, regenerationsPerMonth, childrenLimit, retentionDays, watermark. |
-| **Subscription** | Paddle-backed. Fields: id, userId, planId, paddleSubscriptionId, status, currentPeriodEnd, pagesUsed, regenerationsUsed. |
-| **Rating** | Belongs to Story + User. Fields: score (1–5), comment (optional). One per user per story (upsert). |
-| **Job** | Tracks generation pipeline state and progress for SSE. |
-| **Notification** | In-app notification per User. Fields: id, userId, type, payload (JSON), readAt?, createdAt. |
+| Entity           | Notes                                                                                                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **User**         | Google OAuth identity, role (USER / ADMIN).                                                                                                                                         |
+| **Child**        | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input).                                                                      |
+| **ArtStyle**     | Admin-managed. Fields: id, name, slug, thumbnailUrl, promptPrefix, isActive, order. Seeded with 8 styles.                                                                           |
+| **Story**        | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child. Includes `isPublic boolean (default false)` — set via opt-in in rating flow. |
+| **Page**         | Belongs to Story, ordered, contains text + illustration URL(s) + chapter title.                                                                                                     |
+| **Template**     | Pre-defined Story blueprint created by Admin. Users instantiate Stories from Templates with customization.                                                                          |
+| **Plan**         | Subscription tier definition. Fields: id, name, paddleProductId, priceMonthly, pagesPerMonth, regenerationsPerMonth, childrenLimit, retentionDays, watermark.                       |
+| **Subscription** | Paddle-backed. Fields: id, userId, planId, paddleSubscriptionId, status, currentPeriodEnd, pagesUsed, regenerationsUsed.                                                            |
+| **Rating**       | Belongs to Story + User. Fields: score (1–5), comment (optional). One per user per story (upsert).                                                                                  |
+| **Job**          | Tracks generation pipeline state and progress for SSE.                                                                                                                              |
+| **Notification** | In-app notification per User. Fields: id, userId, type, payload (JSON), readAt?, createdAt.                                                                                         |
 
 **Unified naming:** `Story` covers both book and comic.
 
@@ -165,25 +165,25 @@ Privacy · Contact _(both static pages)_
 > Items explicitly deferred during development. Each entry records **what**, **why it was deferred**, and **when to revisit**.
 > New items require developer approval before being added.
 
-| # | Item | Deferred reason | Revisit at |
-| - | ---- | --------------- | ---------- |
-| 1 | Refresh tokens + server-side logout | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP. | Post-MVP |
-| 2 | Magic email link auth | Requires email provider (already decided: Resend in Phase 5). Added as Post-MVP auth option alongside Apple OAuth. | Post-MVP |
-| 3 | Exact comic credit rate | Design confirms 2 credits/page. Final business confirmation during Phase 8 (Subscriptions) Paddle setup. | Phase 8 |
-| 4 | Contact form backend (`POST /contact`) | Resend (the logical transport) isn't wired until Phase 5. Frontend Server Action stub is in place; implement the actual endpoint in Phase 5 alongside Resend setup, or Phase 9 if email templates are added there. | Phase 5 |
-| 5 | Static page copy finalization | All four public pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) use placeholder copy. Copy is a content/copywriting concern, not a code concern. Will be addressed in a dedicated content pass before launch. | Pre-launch content phase |
+| #   | Item                                   | Deferred reason                                                                                                                                                                                                                                                                        | Revisit at               |
+| --- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| 1   | Refresh tokens + server-side logout    | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP. | Post-MVP                 |
+| 2   | Magic email link auth                  | Requires email provider (already decided: Resend in Phase 5). Added as Post-MVP auth option alongside Apple OAuth.                                                                                                                                                                     | Post-MVP                 |
+| 3   | Exact comic credit rate                | Design confirms 2 credits/page. Final business confirmation during Phase 8 (Subscriptions) Paddle setup.                                                                                                                                                                               | Phase 8                  |
+| 4   | Contact form backend (`POST /contact`) | Resend (the logical transport) isn't wired until Phase 5. Frontend Server Action stub is in place; implement the actual endpoint in Phase 5 alongside Resend setup, or Phase 9 if email templates are added there.                                                                     | Phase 5                  |
+| 5   | Static page copy finalization          | All four public pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) use placeholder copy. Copy is a content/copywriting concern, not a code concern. Will be addressed in a dedicated content pass before launch.                                                              | Pre-launch content phase |
 
 ### In-code TODO cross-reference
 
 > Quick lookup: every `// TODO` comment in the frontend codebase, mapped to its ROADMAP resolution.
 
-| File | TODO summary | Resolves in |
-| ---- | ------------ | ----------- |
-| `contact/_components/ContactSection/actions.ts` | Wire `submitContact` to real `POST /contact` endpoint | Deferred Decision #4 → Phase 5 |
-| `pricing/page.tsx` | Replace hardcoded plan data with `GET /pricing` (real Plan records) | Phase 8 |
-| `(public)/_components/TalesSection/TalesSection.tsx` | Replace `MOCK_TALES` with `GET /stories?featured=true` | Phase 10 |
-| `(public)/_components/TalesSection/TalesSection.tsx` | Add link to `/tales` (public story library page) | Post-MVP |
-| `privacy/_components/PrivacyContent/PrivacyContent.tsx` | Extract privacy copy to CMS if non-dev editing is needed | Post-MVP |
+| File                                                    | TODO summary                                                        | Resolves in                    |
+| ------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------ |
+| `contact/_components/ContactSection/actions.ts`         | Wire `submitContact` to real `POST /contact` endpoint               | Deferred Decision #4 → Phase 5 |
+| `pricing/page.tsx`                                      | Replace hardcoded plan data with `GET /pricing` (real Plan records) | Phase 8                        |
+| `(public)/_components/TalesSection/TalesSection.tsx`    | Replace `MOCK_TALES` with `GET /stories?featured=true`              | Phase 10                       |
+| `(public)/_components/TalesSection/TalesSection.tsx`    | Add link to `/tales` (public story library page)                    | Post-MVP                       |
+| `privacy/_components/PrivacyContent/PrivacyContent.tsx` | Extract privacy copy to CMS if non-dev editing is needed            | Post-MVP                       |
 
 ---
 
@@ -297,9 +297,11 @@ Privacy · Contact _(both static pages)_
 **Sub-tasks:**
 
 **Dependencies**
+
 - [x] `@mantine/notifications@^9.2.1` — installed and in use (Toast atom)
 
 **CSS architecture setup**
+
 - [x] Migrate existing `src/app/globals.css` → `src/styles/globals.css`; update root layout import
 - [x] `src/styles/tokens.css` — CSS custom properties: all primitives, semantic aliases, spacing, radii, shadows, gradients, motion tokens (`--duration-base`, `--ease-out`, `--focus-ring-color`, `--hit-min: 44px`)
 - [x] `src/styles/globals.css` — imports `tokens.css`; global reset (existing); `prefers-reduced-motion` collapse rule; `:focus-visible` ring via `--focus-ring-color`
@@ -308,6 +310,7 @@ Privacy · Contact _(both static pages)_
 - [x] Verify CSS cascade order: Mantine's `@mantine/core/styles.css` < `tokens.css` < CSS Module overrides via `classNames` (manual visual check on Button + Input)
 
 **Route restructure (foundation for co-location)**
+
 - [x] Rename `src/app/(auth-guard)/` → `src/app/(private)/` (matches `(public)` paired group; symmetry + intent-based naming)
 - [x] Create `src/app/(public)/` route group with `layout.tsx` (imports `Header` + `Footer` from `shared/`)
 - [x] Create `src/app/(private)/layout.tsx` (imports `Header` + `Footer` from `shared/`, wraps children with `AuthGuard`)
@@ -316,6 +319,7 @@ Privacy · Contact _(both static pages)_
 - [x] Migrate existing routes: move `(auth-guard)/profile/` → `(private)/account/profile/`, `(auth-guard)/children/` → `(private)/account/children/`
 
 **Existing component migrations**
+
 - [x] `src/components/Tag/` → `src/components/ui/Badge/` (rename + update imports — corresponds to Mantine `Badge` plan)
 - [x] `src/components/AuthGuard/` → `src/app/(private)/_components/AuthGuard/` (only consumer is the private layout)
 - [x] `src/components/ChildCard/` → `src/app/(private)/account/children/_components/ChildCard/`
@@ -323,10 +327,12 @@ Privacy · Contact _(both static pages)_
 - [x] After all migrations: `src/components/` contains only `ui/` and `shared/`
 
 **Shared structural components** (`src/components/shared/`)
+
 - [x] `Header` — adapts nav links based on auth state (auth from `UserContext`); public: How it works · Pricing · Sign in · "Begin a tale →" CTA; private: Library · Workshop · `NotificationBell` · Avatar + plan name
 - [x] `Footer` — BrandMark + tagline + "Privacy · Contact" links; identical across public and private layouts
 
 **Mantine-based atoms** (`src/components/ui/`) — override visually via `classNames` + CSS Module:
+
 - [x] `Button` — variants: `m-primary` (fox bevel gradient), `m-secondary` (outlined), `m-quiet` (text-only), `m-on-card` (cream on dark card); all hit-target compliant (44px)
 - [x] `Card` (`Paper` base) — variants: `m-gradient` (warm cream, `--gradient-page`), `m-dark` (twilight, `--gradient-card-twilight`)
 - [x] `Badge` — variants: `m-filled`, `m-warm` (ember), `m-gold`
@@ -339,12 +345,14 @@ Privacy · Contact _(both static pages)_
 - [x] `Toast` (`Notification` + `@mantine/notifications`) — variants: `m-success`, `m-error`, `m-warning`, `m-info`; auto-dismiss; glyph per variant; `notifications.show()` helper wrapper
 
 **Form atoms** (`src/components/ui/`) — Mantine base, `classNames` slot override:
+
 - [x] `Input` (`TextInput`) — label, input, helper, error slots; `aria-describedby` wired
 - [x] `Textarea` (`Textarea`) — same slot pattern
 - [x] `Select` (`Select`) — same slot pattern
 - [x] `TagsInput` (`TagsInput`) — same slot pattern
 
 **Custom CSS Module atoms** (`src/components/ui/`) — no Mantine base:
+
 - [x] `CapsLabel` — `font: var(--font-mono)`, 11px, all-caps; variants: `m-on-card`, `m-gold`
 - [x] `BrandMark` — SVG logo + wordmark lockup; consumer passes `href` so it stays domain-free
 - [x] `StatCard` — stat value + label + delta; variants: `m-positive`, `m-negative`
@@ -352,6 +360,7 @@ Privacy · Contact _(both static pages)_
 - [ ] `SuggestionChip` — pill-shaped tappable chip for workshop question suggestions (deferred to Phase 4 — workshop form not yet designed)
 
 **Static pages** (placed inside route groups — chrome comes from group's `layout.tsx`)
+
 - [x] `src/app/(public)/page.tsx` — landing: hero, Three lanterns explainer (3-step cards), public stories grid (empty — wired in Phase 10), bottom CTA strip
 - [x] `src/app/login/page.tsx` (existing — restyle): split layout (illustration left, auth card right); "Continue with Google" primary button; legal note
 - [x] `src/app/(public)/how-it-works/page.tsx` — placeholder content
@@ -360,6 +369,7 @@ Privacy · Contact _(both static pages)_
 - [x] `src/app/(public)/contact/page.tsx` — static
 
 **Account shell** (sub-pages placeholder until their respective phases)
+
 - [x] `src/app/(private)/account/_components/AccountSidebar/` — sidebar nav with all sections (Profile [Phase 1 — existing], Children [Phase 2 — existing], Subscription [Phase 8], Notifications [Phase 9], Language [Phase 12], Privacy & data [Phase 8], Sign out [existing], Delete account [Phase 8])
 - [x] `src/app/(private)/account/page.tsx` — redirects to `/account/profile` (or shows overview)
 - [x] `src/app/(private)/account/subscription/page.tsx` — placeholder
@@ -368,6 +378,7 @@ Privacy · Contact _(both static pages)_
 - [x] `src/app/(private)/account/privacy/page.tsx` — placeholder
 
 **Backend — ArtStyle entity**
+
 - [x] Prisma `ArtStyle` model: `id`, `name`, `slug`, `thumbnailUrl`, `promptPrefix`, `isActive`, `order`, `createdAt`
 - [x] Prisma migration for `ArtStyle`
 - [x] Seed script: 8 art styles (Storybook, Watercolour, Crayon, Ink line, Felt-pen, Cut-paper, Soft 3D, Comic ink) with placeholder thumbnail URLs
@@ -789,23 +800,23 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 ## 12. Progress Tracking
 
-| Phase | Status | Notes |
-| ----- | ------ | ----- |
-| 0 — Infrastructure | ✅ Done | |
-| 1 — Auth | ✅ Done | |
-| 2 — Children | ✅ Done | |
-| 3 — Design System | ✅ Done | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase |
-| 4 — Stories & Templates | ⬜ Not started | |
-| 5 — Generation Pipeline | ⬜ Not started | |
-| 6 — Mid-point Documentation | ⬜ Not started | |
-| 7 — Regeneration | ⬜ Not started | |
-| 8 — Subscriptions | ⬜ Not started | |
-| 9 — Notifications | ⬜ Not started | |
-| 10 — Ratings & Public Sharing | ⬜ Not started | |
-| 11 — Admin Panel | ⬜ Not started | |
-| 12 — Localization | ⬜ Not started | |
-| 13 — Final Documentation | ⬜ Not started | |
-| 14 — Production Deploy | ⬜ Not started | |
+| Phase                         | Status         | Notes                                                                                    |
+| ----------------------------- | -------------- | ---------------------------------------------------------------------------------------- |
+| 0 — Infrastructure            | ✅ Done        |                                                                                          |
+| 1 — Auth                      | ✅ Done        |                                                                                          |
+| 2 — Children                  | ✅ Done        |                                                                                          |
+| 3 — Design System             | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase |
+| 4 — Stories & Templates       | ⬜ Not started |                                                                                          |
+| 5 — Generation Pipeline       | ⬜ Not started |                                                                                          |
+| 6 — Mid-point Documentation   | ⬜ Not started |                                                                                          |
+| 7 — Regeneration              | ⬜ Not started |                                                                                          |
+| 8 — Subscriptions             | ⬜ Not started |                                                                                          |
+| 9 — Notifications             | ⬜ Not started |                                                                                          |
+| 10 — Ratings & Public Sharing | ⬜ Not started |                                                                                          |
+| 11 — Admin Panel              | ⬜ Not started |                                                                                          |
+| 12 — Localization             | ⬜ Not started |                                                                                          |
+| 13 — Final Documentation      | ⬜ Not started |                                                                                          |
+| 14 — Production Deploy        | ⬜ Not started |                                                                                          |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval
 

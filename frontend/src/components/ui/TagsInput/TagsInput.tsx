@@ -1,15 +1,24 @@
-import { TagsInput as MantineTagsInput, type TagsInputProps as IMantineTagsInputProps } from '@mantine/core';
+import {
+    TagsInput as MantineTagsInput,
+    type TagsInputProps as IMantineTagsInputProps,
+} from '@mantine/core';
 import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './TagsInput.module.scss';
 
 export type TTagsInputSurface = 'twilight' | 'cream';
 
-export interface ITagsInputProps extends OmitStyling<IMantineTagsInputProps, 'variant' | 'size' | 'radius'> {
+export interface ITagsInputProps extends OmitStyling<
+    IMantineTagsInputProps,
+    'variant' | 'size' | 'radius'
+> {
     surface?: TTagsInputSurface;
 }
 
-export default function TagsInput({ surface = 'twilight', ...props }: Readonly<ITagsInputProps>): React.ReactElement {
+export default function TagsInput({
+    surface = 'twilight',
+    ...props
+}: Readonly<ITagsInputProps>): React.ReactElement {
     return (
         <MantineTagsInput
             variant="unstyled"

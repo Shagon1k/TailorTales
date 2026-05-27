@@ -39,7 +39,9 @@ export default function AccountSidebar(): React.ReactElement {
     return (
         <aside className={styles.sidebar}>
             <div className={styles.sidebar__user}>
-                <span className={styles['sidebar__user-avatar']} aria-hidden="true">{initial}</span>
+                <span className={styles['sidebar__user-avatar']} aria-hidden="true">
+                    {initial}
+                </span>
                 <div className={styles['sidebar__user-info']}>
                     <span className={styles['sidebar__user-name']}>{user?.name}</span>
                     <span className={styles['sidebar__user-email']}>{user?.email}</span>
@@ -62,10 +64,7 @@ export default function AccountSidebar(): React.ReactElement {
                         </li>
                     ))}
                     <li>
-                        <button
-                            type="button"
-                            className={styles['sidebar__nav-item']}
-                        >
+                        <button type="button" className={styles['sidebar__nav-item']}>
                             <span className={styles['sidebar__nav-icon']} aria-hidden="true" />
                             Export library
                         </button>
@@ -81,10 +80,7 @@ export default function AccountSidebar(): React.ReactElement {
                 >
                     Sign out
                 </button>
-                <button
-                    type="button"
-                    className={styles['sidebar__delete']}
-                >
+                <button type="button" className={styles['sidebar__delete']}>
                     Delete account
                 </button>
             </div>

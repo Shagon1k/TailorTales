@@ -58,7 +58,9 @@ export default function ChildCard({
                 {child.interests.length > 0 && (
                     <div className={styles.interests}>
                         {child.interests.map((interest) => (
-                            <Tag key={interest} variant="filled">{interest}</Tag>
+                            <Tag key={interest} variant="filled">
+                                {interest}
+                            </Tag>
                         ))}
                     </div>
                 )}

@@ -6,7 +6,10 @@ import styles from './Card.module.scss';
 export type TCardVariant = 'default' | 'dark' | 'gradient' | 'outlined';
 export type TCardSize = 'sm' | 'md' | 'lg' | 'hero';
 
-export interface ICardProps extends OmitStyling<IMantinePaperProps, 'shadow' | 'radius' | 'withBorder'> {
+export interface ICardProps extends OmitStyling<
+    IMantinePaperProps,
+    'shadow' | 'radius' | 'withBorder'
+> {
     variant?: TCardVariant;
     size?: TCardSize;
     children?: React.ReactNode;

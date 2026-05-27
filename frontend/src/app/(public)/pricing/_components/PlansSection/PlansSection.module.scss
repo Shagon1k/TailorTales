@@ -29,8 +29,9 @@
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: background var(--duration-base) var(--ease-out),
-                color var(--duration-base) var(--ease-out);
+    transition:
+        background var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out);
     min-height: var(--hit-min);
 
     &[data-active='true'] {

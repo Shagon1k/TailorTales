@@ -5,7 +5,9 @@ import Link from '../Link';
 function renderLink(props: React.ComponentProps<typeof Link> = {}): ReturnType<typeof render> {
     return render(
         <MantineProvider>
-            <Link href="/test" {...props}>Read more</Link>
+            <Link href="/test" {...props}>
+                Read more
+            </Link>
         </MantineProvider>,
     );
 }
@@ -26,7 +28,10 @@ describe('Link', () => {
     describe('given href prop', () => {
         it('should render with the correct href', () => {
             renderLink({ href: '/stories' });
-            expect(screen.getByRole('link', { name: /read more/i })).toHaveAttribute('href', '/stories');
+            expect(screen.getByRole('link', { name: /read more/i })).toHaveAttribute(
+                'href',
+                '/stories',
+            );
         });
     });
 });

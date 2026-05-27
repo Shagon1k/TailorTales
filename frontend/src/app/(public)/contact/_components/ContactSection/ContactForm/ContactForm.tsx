@@ -16,19 +16,16 @@ export default function ContactForm(): React.ReactElement {
         return (
             <div className={styles.success}>
                 <p className={styles.success__heading}>Message sent.</p>
-                <p className={styles.success__body}>We read every one. We&apos;ll write back soon.</p>
+                <p className={styles.success__body}>
+                    We read every one. We&apos;ll write back soon.
+                </p>
             </div>
         );
     }
 
     return (
         <form action={formAction} noValidate className={styles.form}>
-            <Input
-                name="name"
-                label="Your name"
-                placeholder="Ada"
-                required
-            />
+            <Input name="name" label="Your name" placeholder="Ada" required />
             <Input
                 name="email"
                 type="email"
@@ -44,7 +41,9 @@ export default function ContactForm(): React.ReactElement {
                 minRows={5}
             />
             {state.status === 'error' && (
-                <p className={styles.error} role="alert">{state.message}</p>
+                <p className={styles.error} role="alert">
+                    {state.message}
+                </p>
             )}
             <Button type="submit" disabled={isPending} aria-busy={isPending}>
                 {isPending ? 'Sending…' : 'Send message →'}

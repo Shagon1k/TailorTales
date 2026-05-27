@@ -7,6 +7,9 @@ export interface IButtonLinkProps extends Omit<IButtonProps, 'component'> {
     href: string;
 }
 
-export default function ButtonLink({ href, ...props }: Readonly<IButtonLinkProps>): React.ReactElement {
+export default function ButtonLink({
+    href,
+    ...props
+}: Readonly<IButtonLinkProps>): React.ReactElement {
     return <Button component={Link} href={href} {...props} />;
 }

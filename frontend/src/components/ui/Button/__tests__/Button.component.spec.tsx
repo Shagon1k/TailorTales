@@ -33,7 +33,10 @@ describe('Button', () => {
     describe('given loading={true}', () => {
         it('should have aria-busy set', () => {
             renderButton({ loading: true });
-            expect(screen.getByRole('button', { name: /click me/i })).toHaveAttribute('data-loading', 'true');
+            expect(screen.getByRole('button', { name: /click me/i })).toHaveAttribute(
+                'data-loading',
+                'true',
+            );
         });
     });
 });

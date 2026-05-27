@@ -5,6 +5,10 @@
     color: var(--text-muted);
     white-space: nowrap;
 
-    &.m-on-card { color: var(--text-on-card-3); }
-    &.m-gold    { color: var(--accent-gold); }
+    &.m-on-card {
+        color: var(--text-on-card-3);
+    }
+    &.m-gold {
+        color: var(--accent-gold);
+    }
 }

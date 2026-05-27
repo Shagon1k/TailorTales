@@ -18,14 +18,18 @@ describe('NotificationBell', () => {
     describe('given count > 0', () => {
         it('should include unread count in the accessible label', () => {
             render(<NotificationBell count={3} />);
-            expect(screen.getByRole('button', { name: 'Notifications, 3 unread' })).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: 'Notifications, 3 unread' }),
+            ).toBeInTheDocument();
         });
     });
 
     describe('given count > 9', () => {
         it('should include the raw count in the accessible label', () => {
             render(<NotificationBell count={12} />);
-            expect(screen.getByRole('button', { name: 'Notifications, 12 unread' })).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: 'Notifications, 12 unread' }),
+            ).toBeInTheDocument();
         });
     });
 

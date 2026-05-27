@@ -9,11 +9,18 @@ export type TModalSize = 'sm' | 'md' | 'lg';
 
 const SIZE_PX: Record<TModalSize, number> = { sm: 380, md: 520, lg: 720 };
 
-export interface IModalProps extends OmitStyling<IMantineModalProps, 'size' | 'radius' | 'shadow' | 'padding'> {
+export interface IModalProps extends OmitStyling<
+    IMantineModalProps,
+    'size' | 'radius' | 'shadow' | 'padding'
+> {
     size?: TModalSize;
 }
 
-export default function Modal({ size = 'md', closeButtonProps, ...props }: Readonly<IModalProps>): React.ReactElement {
+export default function Modal({
+    size = 'md',
+    closeButtonProps,
+    ...props
+}: Readonly<IModalProps>): React.ReactElement {
     return (
         <MantineModal
             centered

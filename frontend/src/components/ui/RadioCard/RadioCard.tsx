@@ -71,9 +71,7 @@ export default function RadioCard({
                     {isSelected && <CheckIcon />}
                 </span>
             </div>
-            {description && (
-                <p className={styles['radio-card__description']}>{description}</p>
-            )}
+            {description && <p className={styles['radio-card__description']}>{description}</p>}
         </button>
     );
 }

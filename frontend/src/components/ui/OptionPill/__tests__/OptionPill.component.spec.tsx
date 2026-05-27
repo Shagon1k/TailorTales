@@ -2,7 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import OptionPill from '../OptionPill';
 
-function renderPill(props: Omit<React.ComponentProps<typeof OptionPill>, 'children'> = {}): ReturnType<typeof render> {
+function renderPill(
+    props: Omit<React.ComponentProps<typeof OptionPill>, 'children'> = {},
+): ReturnType<typeof render> {
     return render(<OptionPill {...props}>Long · 12 pp</OptionPill>);
 }
 

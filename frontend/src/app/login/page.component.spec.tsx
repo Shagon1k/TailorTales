@@ -41,7 +41,9 @@ describe('LoginPage', () => {
     it('should render the welcome heading', () => {
         renderLoginPage();
 
-        expect(screen.getByRole('heading', { level: 1, name: /step back into the workshop/i })).toBeInTheDocument();
+        expect(
+            screen.getByRole('heading', { level: 1, name: /step back into the workshop/i }),
+        ).toBeInTheDocument();
     });
 
     it('should not redirect when no user is logged in', () => {

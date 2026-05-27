@@ -31,6 +31,10 @@
 
     // ── Tone modifiers — info line color only ────────────────────────────
     // These soft tints are data-viz specific; no semantic token exists for them.
-    &.m-positive .stat-card__info { color: #b6d8a8; }
-    &.m-negative .stat-card__info { color: #f0a3a8; }
+    &.m-positive .stat-card__info {
+        color: #b6d8a8;
+    }
+    &.m-negative .stat-card__info {
+        color: #f0a3a8;
+    }
 }

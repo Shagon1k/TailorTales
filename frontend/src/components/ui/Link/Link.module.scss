@@ -2,7 +2,8 @@
     font-family: inherit;
     font-size: inherit;
     text-underline-offset: 3px;
-    transition: opacity var(--duration-base) var(--ease-out),
+    transition:
+        opacity var(--duration-base) var(--ease-out),
         color var(--duration-base) var(--ease-out);
 
     &.m-default {

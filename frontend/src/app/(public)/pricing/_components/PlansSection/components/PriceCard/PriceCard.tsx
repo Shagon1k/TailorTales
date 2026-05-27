@@ -11,13 +11,14 @@ interface IPriceCardProps {
 
 function formatPrice(priceMonthly: number, cycle: 'monthly' | 'yearly'): string {
     if (priceMonthly === 0) return '€0';
-    const price = cycle === 'yearly'
-        ? Math.round(priceMonthly * 0.8 * 10) / 10
-        : priceMonthly;
+    const price = cycle === 'yearly' ? Math.round(priceMonthly * 0.8 * 10) / 10 : priceMonthly;
     return `€${price}`;
 }
 
-export default function PriceCard({ plan, billingCycle }: Readonly<IPriceCardProps>): React.ReactElement {
+export default function PriceCard({
+    plan,
+    billingCycle,
+}: Readonly<IPriceCardProps>): React.ReactElement {
     const { name, tagline, priceMonthly, features, ctaLabel, ctaHref, mostLoved } = plan;
     const isFree = priceMonthly === 0;
 
@@ -37,14 +38,14 @@ export default function PriceCard({ plan, billingCycle }: Readonly<IPriceCardPro
                     <span className={styles['price-amount']}>
                         {formatPrice(priceMonthly, billingCycle)}
                     </span>
-                    <span className={styles['price-period']}>
-                        {isFree ? 'forever' : '/ month'}
-                    </span>
+                    <span className={styles['price-period']}>{isFree ? 'forever' : '/ month'}</span>
                 </div>
                 <ul className={styles.features}>
                     {features.map((f) => (
                         <li key={f} className={styles.feature}>
-                            <span className={styles['feature-plus']} aria-hidden="true">+</span>
+                            <span className={styles['feature-plus']} aria-hidden="true">
+                                +
+                            </span>
                             {f}
                         </li>
                     ))}

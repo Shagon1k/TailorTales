@@ -12,9 +12,15 @@
     overflow: hidden;
     min-height: 200px;
 
-    &.m-rose { background: var(--accent-warm); }
-    &.m-fox  { background: var(--accent-primary); }
-    &.m-plum { background: var(--accent-deep); }
+    &.m-rose {
+        background: var(--accent-warm);
+    }
+    &.m-fox {
+        background: var(--accent-primary);
+    }
+    &.m-plum {
+        background: var(--accent-deep);
+    }
 }
 
 .story-card__hatch {
@@ -23,7 +29,6 @@
     background: var(--gradient-hatch-light);
     pointer-events: none;
 }
-
 
 .story-card__quote {
     @include t-heading-3xl-italic;

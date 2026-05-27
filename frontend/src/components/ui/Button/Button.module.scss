@@ -2,7 +2,8 @@
     font-family: var(--font-sans);
     font-weight: 400;
     letter-spacing: 0;
-    transition: box-shadow var(--duration-base) var(--ease-out),
+    transition:
+        box-shadow var(--duration-base) var(--ease-out),
         opacity var(--duration-base) var(--ease-out);
 
     &[data-disabled] {
