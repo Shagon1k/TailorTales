@@ -1,6 +1,11 @@
-import { Button, Group, Select, Stack, TagsInput, TextInput } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import Input from '@/components/ui/Input/Input';
+import Select from '@/components/ui/Select/Select';
+import TagsInput from '@/components/ui/TagsInput/TagsInput';
+import Button from '@/components/ui/Button/Button';
 import type { IGender } from '@/types/child.types';
+import styles from './ChildForm.module.scss';
 
 export interface IChildFormValues {
     name: string;
@@ -54,31 +59,35 @@ export default function ChildForm({
     return (
         <form onSubmit={form.onSubmit(onSubmit)}>
             <Stack gap="sm">
-                <TextInput
+                <Input
                     label="Name"
                     placeholder="Child's name"
                     {...form.getInputProps('name')}
                 />
-                <TextInput
+                <Input
                     label="Birthdate"
                     type="date"
                     max={TODAY}
                     {...form.getInputProps('birthdate')}
                 />
-                <Select label="Gender" data={GENDER_OPTIONS} {...form.getInputProps('gender')} />
+                <Select
+                    label="Gender"
+                    data={GENDER_OPTIONS}
+                    {...form.getInputProps('gender')}
+                />
                 <TagsInput
                     label="Interests"
                     placeholder="Add interest and press Enter"
                     {...form.getInputProps('interests')}
                 />
-                <Group justify="flex-end" mt="xs">
-                    <Button variant="subtle" onClick={onCancel} disabled={isSubmitting}>
+                <div className={styles.actions}>
+                    <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                         Cancel
                     </Button>
-                    <Button type="submit" loading={isSubmitting}>
+                    <Button type="submit" variant="primary" loading={isSubmitting}>
                         Save
                     </Button>
-                </Group>
+                </div>
             </Stack>
         </form>
     );

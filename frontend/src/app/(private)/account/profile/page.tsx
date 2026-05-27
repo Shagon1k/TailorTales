@@ -2,10 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Avatar, Button, Container, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Container, Group, Stack } from '@mantine/core';
+import Avatar from '@/components/ui/Avatar/Avatar';
+import Button from '@/components/ui/Button/Button';
+import Input from '@/components/ui/Input/Input';
 import { authApi } from '@/api/auth';
 import { useCurrentUser } from '@/context/UserContext';
 import { useUpdateUser } from '@/hooks/user';
+import styles from './page.module.scss';
 
 export default function ProfilePage(): React.ReactElement {
     const { user } = useCurrentUser();
@@ -35,30 +39,33 @@ export default function ProfilePage(): React.ReactElement {
     return (
         <Container size="xs" py="xl">
             <Stack align="center" gap="lg">
-                <Avatar src={user?.avatarUrl} size={80} radius="xl" />
-                <Title order={2}>{user?.name}</Title>
-                <Text c="dimmed">{user?.email}</Text>
+                <Avatar src={user?.avatarUrl ?? undefined} size="xl" />
+                <h2 className={styles.name}>{user?.name}</h2>
+                <p className={styles.email}>{user?.email}</p>
 
                 {editedName === null ? (
-                    <Button variant="subtle" onClick={startEditing}>
+                    <Button variant="quiet" onClick={startEditing}>
                         Edit name
                     </Button>
                 ) : (
                     <Stack w="100%" gap="sm">
-                        <TextInput
+                        <Input
                             label="Name"
                             value={editedName}
                             onChange={(e) => setEditedName(e.currentTarget.value)}
                         />
                         <Group>
-                            <Button onClick={handleSave} loading={isSaving} flex={1}>
+                            <Button
+                                variant="primary"
+                                onClick={handleSave}
+                                loading={isSaving}
+                            >
                                 Save
                             </Button>
                             <Button
-                                variant="subtle"
+                                variant="quiet"
                                 onClick={() => setEditedName(null)}
                                 disabled={isSaving}
-                                flex={1}
                             >
                                 Cancel
                             </Button>
@@ -66,7 +73,7 @@ export default function ProfilePage(): React.ReactElement {
                     </Stack>
                 )}
 
-                <Button variant="subtle" color="red" onClick={handleLogout}>
+                <Button variant="quiet" onClick={handleLogout}>
                     Sign out
                 </Button>
             </Stack>

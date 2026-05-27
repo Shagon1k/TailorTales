@@ -1,5 +1,8 @@
-import { Badge, Button, Card, Group, Stack, Text, Title } from '@mantine/core';
+import Card from '@/components/ui/Card/Card';
+import Tag from '@/components/ui/Tag/Tag';
+import Button from '@/components/ui/Button/Button';
 import type { IChild } from '@/types/child.types';
+import styles from './ChildCard.module.scss';
 
 interface IChildCardProps {
     child: IChild;
@@ -24,41 +27,42 @@ export default function ChildCard({
     onDelete,
 }: Readonly<IChildCardProps>): React.ReactElement {
     return (
-        <Card shadow="sm" padding="md" radius="md" withBorder>
-            <Stack gap="xs">
-                <Group justify="space-between" align="flex-start">
-                    <Stack gap={2}>
-                        <Title order={4}>{child.name}</Title>
-                        <Text size="sm" c="dimmed">
+        <Card variant="dark" size="md">
+            <div className={styles.body}>
+                <div className={styles.header}>
+                    <div className={styles.info}>
+                        <h4 className={styles.name}>{child.name}</h4>
+                        <p className={styles.meta}>
                             {getAgeLabel(child.birthdate)} ·{' '}
                             {child.gender === 'MALE' ? 'Boy' : 'Girl'}
-                        </Text>
-                    </Stack>
-                    <Group gap="xs">
-                        <Button size="xs" variant="subtle" onClick={() => onEdit(child)}>
+                        </p>
+                    </div>
+                    <div className={styles.actions}>
+                        <Button
+                            variant="quiet"
+                            onClick={() => onEdit(child)}
+                            aria-label={`Edit ${child.name}`}
+                        >
                             Edit
                         </Button>
                         <Button
-                            size="xs"
-                            variant="subtle"
-                            color="red"
+                            variant="secondary"
                             onClick={() => onDelete(child)}
+                            aria-label={`Delete ${child.name}`}
                         >
                             Delete
                         </Button>
-                    </Group>
-                </Group>
+                    </div>
+                </div>
 
                 {child.interests.length > 0 && (
-                    <Group gap="xs" wrap="wrap">
+                    <div className={styles.interests}>
                         {child.interests.map((interest) => (
-                            <Badge key={interest} variant="light" size="sm">
-                                {interest}
-                            </Badge>
+                            <Tag key={interest} variant="filled">{interest}</Tag>
                         ))}
-                    </Group>
+                    </div>
                 )}
-            </Stack>
+            </div>
         </Card>
     );
 }
