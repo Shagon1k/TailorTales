@@ -58,6 +58,13 @@ export interface IStoryDetail extends IStorySummary {
     pdfUrl: string | null;
 }
 
+export interface IStoryConfig {
+    allowedPageCounts: number[];
+    questionMinLength: number;
+    questionMaxLength: number;
+    questionSuggestions: string[];
+}
+
 export interface ICreateStoryPayload {
     childId: string;
     type: IStoryType;

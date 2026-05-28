@@ -1,0 +1,81 @@
+@use 'styles/typography' as *;
+
+.workshop {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-8);
+    align-items: start;
+
+    @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+    }
+
+    // ── Form column ─────────────────────────────────────────────────────────
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-10);
+    }
+
+    // ── Reader row ──────────────────────────────────────────────────────────
+    &__reader {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    // ── Numbered sections ───────────────────────────────────────────────────
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-5);
+    }
+
+    &__section-header {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-3);
+    }
+
+    &__section-number {
+        @include t-body-base;
+        color: var(--text-accent);
+        font-style: italic;
+        flex-shrink: 0;
+    }
+
+    &__section-title {
+        font-family: var(--font-serif);
+        font-size: var(--fs-lg);
+        font-weight: 400;
+        font-style: italic;
+        line-height: var(--lh-snug);
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    &__section-sub {
+        @include t-body-sm;
+        color: var(--text-muted);
+        margin: var(--space-1) 0 0;
+    }
+
+    &__section-note {
+        @include t-body-sm;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    // ── Suggestion jar ──────────────────────────────────────────────────────
+    &__jar {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+}

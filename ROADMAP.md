@@ -430,8 +430,8 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [x] `SuggestionChip` atom — pill-shaped tappable chip for workshop question suggestions
 - [x] Frontend types: `story.types.ts`, `story-blueprint.types.ts`, `art-style.types.ts`
 - [x] Frontend API layer: `stories.ts`, `stories.server.ts`, `story-blueprints.ts`, `art-styles.ts`
-- [ ] Seed script: at least 1 BOOK and 1 COMIC StoryBlueprint (required by Phase 5 auto-selection; coverImageKey + previewPageKeys left null/empty until Post-MVP upload flow)
-- [ ] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
+- [x] Seed script: at least 1 BOOK and 1 COMIC StoryBlueprint (required by Phase 5 auto-selection; coverImageKey + previewPageKeys left null/empty until Post-MVP upload flow)
+- [x] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
     - Child reader selector (loads user's children)
     - Question text input + 6 static suggestion chips
     - Format selector (Book / Comic) with credit cost display
@@ -499,6 +499,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
     - "Close safely" banner (email + address displayed)
 - [ ] Frontend: "In the Workshop" strip on `/library` dashboard wired (shows active job)
 - [ ] Frontend: Download PDF button wired on story reader on COMPLETED stories
+- [ ] Frontend: workshop summary panel — wire credit cost and remaining balance from subscription API (stubbed as `CREDIT_COST = 5` / `STUB_REMAINING = 12` in `WorkshopSummary.tsx` in Phase 4)
 - [ ] Email notification on story_completed (Resend) — also creates bell `Notification` record
 - [ ] Bell notification on story_failed — also creates bell `Notification` record
 - [ ] Resend client module (used here and expanded in Phase 9)
@@ -592,6 +593,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] Frontend: `/account` → Privacy & data section: GDPR info + "Delete account" flow
 - [ ] Frontend: stats bar on `/library` dashboard wired (pages this month / left / regenerations / tales count)
 - [ ] Frontend: regeneration quota count wired in story reader (was stubbed in Phase 7)
+- [ ] Frontend: workshop length section helper text wired ("N pages will use N of your N remaining credits this month." — depends on subscription quota API; currently absent from UI)
 - [ ] Frontend: `/pricing` page wired to real Plan data (replaces Phase 3 static hardcoded data — ships in Phase 8)
 - [ ] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account deletion flow
 
@@ -802,6 +804,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - **Workshop step-by-step wizard pagination** — currently a single scrollable form; a step-by-step flow (Reader → Question → Look → Review) could improve UX for new users at scale
 - **Family plan upsell card** — contextual upsell in the dashboard "Your readers" section, personalized based on usage patterns
 - **AI-flavored workshop log descriptions** — during generation, produce whimsical human-like prose for each log event instead of short labels (e.g. "The mountain breathed slowly into the story...")
+- **Workshop estimated paint time** — display "Estimated paint time: ~N minutes" in the summary panel before submission; estimate based on page count, story type, and live queue depth; surface via a dedicated API field once generation infrastructure is stable (Phase 5+ prerequisite)
 - **"Share with family"** — share a specific story link with other family members (grandparents, etc.)
 
 ---

@@ -1,5 +1,12 @@
 import type { ArtStyle, Child, Page, Story } from '../../generated/prisma/client.js';
 
+export interface IStoryConfig {
+    allowedPageCounts: readonly number[];
+    questionMinLength: number;
+    questionMaxLength: number;
+    questionSuggestions: readonly string[];
+}
+
 /** S3 keys are internal — clients never see raw bucket paths. */
 type StoryWithoutKeys = Omit<Story, 'coverImageKey' | 'pdfKey'>;
 

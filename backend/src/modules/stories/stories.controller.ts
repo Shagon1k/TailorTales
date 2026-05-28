@@ -3,18 +3,34 @@ import type { Story, User } from '../../generated/prisma/client.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Public } from '../auth/decorators/public.decorator.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
+import {
+    ALLOWED_PAGE_COUNTS,
+    QUESTION_SUGGESTIONS,
+    STORY_QUESTION_MAX_LENGTH,
+    STORY_QUESTION_MIN_LENGTH,
+} from './stories.constants.js';
 import { StoriesService } from './stories.service.js';
-import type { IStoryDetail, IStorySummary } from './stories.types.js';
+import type { IStoryConfig, IStoryDetail, IStorySummary } from './stories.types.js';
 
 @Controller('stories')
 export class StoriesController {
     constructor(private readonly storiesService: StoriesService) {}
 
-    // Public route must be declared before :id to avoid "public" being matched as an id param.
+    // Static routes must be declared before :id to avoid being matched as an id param.
     @Get('public')
     @Public()
     findPublic(): Promise<IStorySummary[]> {
         return this.storiesService.findPublic();
+    }
+
+    @Get('config')
+    getConfig(): IStoryConfig {
+        return {
+            allowedPageCounts: ALLOWED_PAGE_COUNTS,
+            questionMinLength: STORY_QUESTION_MIN_LENGTH,
+            questionMaxLength: STORY_QUESTION_MAX_LENGTH,
+            questionSuggestions: QUESTION_SUGGESTIONS,
+        };
     }
 
     @Get()

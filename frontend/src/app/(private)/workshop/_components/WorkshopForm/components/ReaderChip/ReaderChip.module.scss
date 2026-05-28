@@ -1,0 +1,86 @@
+@use 'styles/typography' as *;
+
+.reader-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+
+    &__left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        min-width: 0;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        min-width: 0;
+    }
+
+    &__for {
+        @include t-caps-xs;
+        color: var(--text-muted);
+    }
+
+    &__name {
+        @include t-body-md;
+        color: var(--text-primary);
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__interests {
+        @include t-body-sm;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__placeholder {
+        @include t-body-base;
+        color: var(--text-muted);
+    }
+
+    &__toggle {
+        @include t-body-sm;
+        color: var(--text-accent);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: var(--space-2) 0;
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-height: var(--hit-min);
+        transition: opacity 150ms ease;
+
+        &:hover {
+            opacity: var(--opacity-secondary);
+        }
+    }
+
+    &__empty {
+        @include t-body-base;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    &__add-link {
+        @include t-body-base;
+        color: var(--text-accent);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
