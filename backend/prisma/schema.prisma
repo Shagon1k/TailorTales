@@ -47,7 +47,7 @@ model User {
 
   children          Child[]
   stories           Story[]
-  createdTemplates  Template[]
+  createdBlueprints StoryBlueprint[]
 }
 
 model Child {
@@ -86,8 +86,8 @@ model Story {
   child      Child       @relation(fields: [childId], references: [id], onDelete: Cascade)
   type       StoryType
   status     StoryStatus @default(DRAFT)
-  templateId String?
-  template   Template?   @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  blueprintId String?
+  blueprint   StoryBlueprint? @relation(fields: [blueprintId], references: [id], onDelete: SetNull)
   question   String
   pageCount  Int
   artStyleId String
@@ -116,14 +116,14 @@ model Page {
   @@unique([storyId, order])
 }
 
-model Template {
+model StoryBlueprint {
   id              String    @id @default(cuid())
   name            String
   description     String
   type            StoryType
-  systemPrompt     String
-  coverImageKey    String?
-  previewPageKeys  String[]  @default([])
+  systemPrompt    String
+  coverImageKey   String?
+  previewPageKeys String[]  @default([])
   createdById     String
   createdBy       User      @relation(fields: [createdById], references: [id])
   createdAt       DateTime  @default(now())

@@ -30,5 +30,5 @@ export class CreateStoryDto {
 
     @IsString()
     @IsOptional()
-    templateId?: string;
+    blueprintId?: string;
 }

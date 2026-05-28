@@ -1,6 +1,6 @@
 import type { IStoryType } from './story.types';
 
-export interface ITemplateSummary {
+export interface IStoryBlueprintSummary {
     id: string;
     name: string;
     description: string;
@@ -12,6 +12,6 @@ export interface ITemplateSummary {
     previewPageUrls: string[];
 }
 
-export interface ITemplateDetail extends ITemplateSummary {
+export interface IStoryBlueprintDetail extends IStoryBlueprintSummary {
     systemPrompt: string;
 }

@@ -39,7 +39,7 @@ export interface IStorySummary {
     childId: string;
     type: IStoryType;
     status: IStoryStatus;
-    templateId: string | null;
+    blueprintId: string | null;
     question: string;
     pageCount: number;
     artStyleId: string;
@@ -65,5 +65,5 @@ export interface ICreateStoryPayload {
     pageCount: number;
     artStyleId: string;
     language: ILanguage;
-    templateId?: string;
+    blueprintId?: string;
 }

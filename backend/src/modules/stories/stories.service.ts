@@ -67,7 +67,7 @@ export class StoriesService {
                 pageCount: dto.pageCount,
                 artStyleId: dto.artStyleId,
                 language: dto.language,
-                ...(dto.templateId && { templateId: dto.templateId }),
+                ...(dto.blueprintId && { blueprintId: dto.blueprintId }),
             },
         });
     }
