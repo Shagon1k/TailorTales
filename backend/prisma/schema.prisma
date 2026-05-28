@@ -17,6 +17,11 @@ enum Gender {
   FEMALE
 }
 
+enum Language {
+  EN
+  RU
+}
+
 enum StoryType {
   BOOK
   COMIC
@@ -87,7 +92,7 @@ model Story {
   pageCount  Int
   artStyleId String
   artStyle   ArtStyle    @relation(fields: [artStyleId], references: [id])
-  language   String
+  language   Language
   title         String?
   isPublic      Boolean     @default(false)
   coverImageKey String?
