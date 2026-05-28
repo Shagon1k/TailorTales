@@ -1,4 +1,4 @@
-import { IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsIn, IsInt, IsString, MaxLength, MinLength } from 'class-validator';
 import { Language, StoryType } from '../../../generated/prisma/client.js';
 import {
     ALLOWED_PAGE_COUNTS,
@@ -27,8 +27,4 @@ export class CreateStoryDto {
 
     @IsEnum(Language)
     language!: Language;
-
-    @IsString()
-    @IsOptional()
-    blueprintId?: string;
 }

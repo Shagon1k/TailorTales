@@ -70,6 +70,9 @@ export class StoryBlueprintsService {
 
     // --- private helpers ---
 
+    // coverImageKey + previewPageKeys are S3 keys reserved for Post-MVP user-facing StoryBlueprint selection.
+    // Keys are always generated server-side via StorageKeys helpers — never passed from the client.
+
     private async toSummary(blueprint: StoryBlueprint): Promise<IStoryBlueprintSummary> {
         const { coverImageKey, previewPageKeys } = blueprint;
 

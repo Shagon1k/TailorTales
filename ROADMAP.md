@@ -358,7 +358,7 @@ Privacy · Contact _(both static pages)_
 - [x] `BrandMark` — SVG logo + wordmark lockup; consumer passes `href` so it stays domain-free
 - [x] `StatCard` — stat value + label + delta; variants: `m-positive`, `m-negative`
 - [x] `NotificationBell` — icon + unread count badge; visual shell at Phase 3 (no data wiring); full dropdown UI wires in Phase 9
-- [ ] `SuggestionChip` — pill-shaped tappable chip for workshop question suggestions (deferred to Phase 4 — workshop form not yet designed)
+- [x] `SuggestionChip` — pill-shaped tappable chip for workshop question suggestions (delivered in Phase 4)
 
 **Static pages** (placed inside route groups — chrome comes from group's `layout.tsx`)
 
@@ -414,19 +414,23 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 ---
 
-### Phase 4 — Story Entity & Templates
+### Phase 4 — Story Entity & StoryBlueprints
 
-**Goal:** data model for stories + templates, draft creation, workshop form, story reader (read-only), library grid. No generation yet.
+**Goal:** data model for stories + StoryBlueprints, draft creation, workshop form, story reader (read-only), library grid. No generation yet.
 
 **Sub-tasks:**
 
-- [ ] Prisma `Story` model: `id`, `userId`, `childId`, `type (BOOK | COMIC)`, `status (DRAFT | QUEUED | GENERATING | COMPLETED | FAILED)`, `templateId?`, `question`, `pageCount`, `artStyleId`, `language (Language enum)`, `title?` (LLM-generated), `isPublic (default false)`, `coverImageKey?`, `pdfKey?`, `createdAt`, `updatedAt`
-- [ ] Prisma `Page` model: `id`, `storyId`, `order`, `chapterTitle?`, `text?` (optional — book and comic pages may be illustration-only), `illustrations (JSON — array of { url, position })`, `layout?`
-- [ ] Prisma `StoryBlueprint` model: `id`, `name`, `description`, `type`, `systemPrompt` (structured with XML markers e.g. `<intro_prompt>`, `<climax_prompt>` for multi-stage LLM guidance), `coverImageKey?`, `previewPageKeys (String[] default [])`, `createdById`, `createdAt`, `updatedAt`
-- [ ] Prisma migrations
-- [ ] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
-- [ ] Stories module: CRUD (draft create, list user's stories, get by id, delete)
-- [ ] StoryBlueprints module: list (public to all users), CRUD (admin only)
+- [x] Prisma `Story` model: `id`, `userId`, `childId`, `type (BOOK | COMIC)`, `status (DRAFT | QUEUED | GENERATING | COMPLETED | FAILED)`, `blueprintId?`, `question`, `pageCount`, `artStyleId`, `language (Language enum)`, `title?` (LLM-generated), `isPublic (default false)`, `coverImageKey?`, `pdfKey?`, `createdAt`, `updatedAt`
+- [x] Prisma `Page` model: `id`, `storyId`, `order`, `chapterTitle?`, `text?` (optional — book and comic pages may be illustration-only), `illustrations (JSON — array of { url, position })`, `layout?`
+- [x] Prisma `StoryBlueprint` model: `id`, `name`, `description`, `type`, `systemPrompt` (structured with XML markers e.g. `<intro_prompt>`, `<climax_prompt>` for multi-stage LLM guidance), `coverImageKey?`, `previewPageKeys (String[] default [])`, `createdById`, `createdAt`, `updatedAt`
+- [x] Prisma migrations
+- [x] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
+- [x] Stories module: CRUD (draft create, list user's stories, get by id, delete)
+- [x] StoryBlueprints module: list (public to all users), CRUD (admin only)
+- [x] `SuggestionChip` atom — pill-shaped tappable chip for workshop question suggestions
+- [x] Frontend types: `story.types.ts`, `story-blueprint.types.ts`, `art-style.types.ts`
+- [x] Frontend API layer: `stories.ts`, `stories.server.ts`, `story-blueprints.ts`, `art-styles.ts`
+- [ ] Seed script: at least 1 BOOK and 1 COMIC StoryBlueprint (required by Phase 5 auto-selection; coverImageKey + previewPageKeys left null/empty until Post-MVP upload flow)
 - [ ] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
     - Child reader selector (loads user's children)
     - Question text input + 6 static suggestion chips
@@ -810,7 +814,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 | 1 — Auth                      | ✅ Done        |                                                                                          |
 | 2 — Children                  | ✅ Done        |                                                                                          |
 | 3 — Design System             | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase |
-| 4 — Stories & StoryBlueprints | ⬜ Not started |                                                                                          |
+| 4 — Stories & StoryBlueprints | 🟡 In progress | Backend + API layer + types + SuggestionChip done; seed + frontend pages + tests remain  |
 | 5 — Generation Pipeline       | ⬜ Not started |                                                                                          |
 | 6 — Mid-point Documentation   | ⬜ Not started |                                                                                          |
 | 7 — Regeneration              | ⬜ Not started |                                                                                          |

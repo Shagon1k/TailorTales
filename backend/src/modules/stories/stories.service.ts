@@ -58,6 +58,8 @@ export class StoriesService {
     }
 
     create(userId: string, dto: CreateStoryDto): Promise<Story> {
+        // blueprintId is intentionally absent — the generation pipeline auto-selects
+        // the appropriate StoryBlueprint by StoryType in Phase 5.
         return this.prisma.story.create({
             data: {
                 userId,
@@ -67,7 +69,6 @@ export class StoriesService {
                 pageCount: dto.pageCount,
                 artStyleId: dto.artStyleId,
                 language: dto.language,
-                ...(dto.blueprintId && { blueprintId: dto.blueprintId }),
             },
         });
     }

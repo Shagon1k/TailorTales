@@ -13,6 +13,7 @@
         "test:cov": "vitest run --coverage",
         "seed:admin": "tsx src/scripts/seed-admin.ts",
         "seed:art-styles": "tsx src/scripts/seed-art-styles.ts",
+        "seed:story-blueprints": "tsx src/scripts/seed-story-blueprints.ts",
         "db:generate": "prisma generate",
         "db:migrate": "prisma migrate dev",
         "db:migrate:deploy": "prisma migrate deploy",

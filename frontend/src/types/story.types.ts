@@ -65,5 +65,4 @@ export interface ICreateStoryPayload {
     pageCount: number;
     artStyleId: string;
     language: ILanguage;
-    blueprintId?: string;
 }
