@@ -1,0 +1,78 @@
+@use 'styles/typography' as *;
+
+.reader-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-6);
+    min-width: 220px;
+    max-width: 260px;
+    padding: var(--space-6);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    flex-shrink: 0;
+}
+
+.reader-card__top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.reader-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.reader-card__name {
+    @include t-body-md;
+
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.reader-card__last-tale {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.reader-card__interests {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.reader-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.reader-card__new-tale {
+    @include t-body-sm;
+
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: 600;
+    min-height: var(--hit-min);
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.reader-card__count {
+    @include t-body-sm;
+
+    color: var(--text-muted);
+}

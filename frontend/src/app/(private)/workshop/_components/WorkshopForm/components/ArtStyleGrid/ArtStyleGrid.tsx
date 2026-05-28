@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import clsx from 'clsx';
 import type { IArtStyle } from '@/types/art-style.types';
 import styles from './ArtStyleGrid.module.scss';
@@ -32,11 +33,12 @@ export default function ArtStyleGrid({
                         })}
                     >
                         <div className={styles['art-style-grid__thumb']}>
-                            <img
+                            <Image
                                 src={style.thumbnailUrl}
                                 alt={style.name}
+                                fill
+                                sizes="(min-width: 640px) 25vw, 50vw"
                                 className={styles['art-style-grid__img']}
-                                loading="lazy"
                             />
                             {isSelected && (
                                 <span

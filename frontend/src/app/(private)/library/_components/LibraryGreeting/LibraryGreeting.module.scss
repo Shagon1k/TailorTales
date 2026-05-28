@@ -1,0 +1,60 @@
+@use 'styles/typography' as *;
+
+.greeting {
+    padding: var(--space-10) var(--space-8) 0;
+
+    @media (min-width: 768px) {
+        padding: var(--space-12) var(--space-8) 0;
+    }
+}
+
+.greeting__left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.greeting__eyebrow {
+    @include t-caps-xs;
+
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.greeting__heading {
+    @include t-heading-3xl;
+
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.greeting__name {
+    color: var(--text-accent);
+    font-style: italic;
+}
+
+.greeting__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    margin-top: var(--space-6);
+}
+
+.greeting__stat {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-1);
+}
+
+.greeting__stat-value {
+    @include t-heading-2xl;
+
+    color: var(--text-accent);
+    line-height: 1;
+}
+
+.greeting__stat-label {
+    @include t-caps-xs;
+
+    color: var(--text-muted);
+}

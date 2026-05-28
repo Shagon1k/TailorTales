@@ -1,0 +1,82 @@
+@use 'styles/typography' as *;
+
+.reader-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: 0 var(--space-8);
+}
+
+.reader-row__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.reader-row__title {
+    @include t-heading-2xl;
+
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.reader-row__manage {
+    text-decoration: none;
+    color: var(--text-muted);
+    flex-shrink: 0;
+
+    &:hover {
+        color: var(--text-secondary);
+    }
+}
+
+.reader-row__track {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.reader-row__add {
+    min-width: 200px;
+    flex-shrink: 0;
+}
+
+.reader-row__add-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    height: 100%;
+    min-height: 180px;
+    padding: var(--space-6);
+    border: 1.5px dashed var(--border-subtle);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color var(--duration-base) var(--ease-out);
+
+    &:hover {
+        border-color: var(--border-strong);
+    }
+}
+
+.reader-row__add-icon {
+    @include t-heading-2xl;
+
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.reader-row__add-label {
+    @include t-body-base;
+
+    color: var(--text-muted);
+    text-align: center;
+}

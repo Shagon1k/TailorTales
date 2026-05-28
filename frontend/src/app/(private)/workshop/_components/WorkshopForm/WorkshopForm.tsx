@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { notifications } from '@mantine/notifications';
 import RadioCardGroup from '@/components/ui/RadioCard/RadioCardGroup';
 import RadioCard from '@/components/ui/RadioCard/RadioCard';
 import OptionPillGroup from '@/components/ui/OptionPill/OptionPillGroup';
@@ -33,25 +32,32 @@ export interface IWorkshopFormProps {
     readers: IChild[];
     artStyles: IArtStyle[];
     config: IStoryConfig;
+    /** Pre-selected child from `?childId=` query param. */
+    initialChildId?: string | null;
+    /** Pre-filled question from `?question=` query param. */
+    initialQuestion?: string;
 }
 
 export default function WorkshopForm({
     readers,
     artStyles,
     config,
+    initialChildId = null,
+    initialQuestion = '',
 }: Readonly<IWorkshopFormProps>): React.ReactElement {
     const router = useRouter();
 
     const [selectedChildId, setSelectedChildId] = useState<string | null>(
-        readers.length === 1 ? readers[0].id : null,
+        initialChildId ?? (readers.length === 1 ? readers[0].id : null),
     );
     const [isReaderOpen, setIsReaderOpen] = useState(false);
     const [storyType, setStoryType] = useState<IStoryType | null>(null);
     const [pageCount, setPageCount] = useState<string | null>(null);
     const [artStyleId, setArtStyleId] = useState<string | null>(null);
     const [language, setLanguage] = useState<ILanguage | null>(null);
-    const [question, setQuestion] = useState('');
+    const [question, setQuestion] = useState(initialQuestion);
     const [isPending, setIsPending] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const selectedChild = readers.find((r) => r.id === selectedChildId) ?? null;
     const selectedArtStyle = artStyles.find((s) => s.id === artStyleId) ?? null;
@@ -74,6 +80,7 @@ export default function WorkshopForm({
         // Type guard — isValid already ensures these are non-null.
         if (!selectedChildId || !storyType || !pageCount || !artStyleId || !language) return;
 
+        setSubmitError(null);
         setIsPending(true);
         try {
             const story = await storiesApi.create({
@@ -87,11 +94,7 @@ export default function WorkshopForm({
             router.push(`/library/${story.id}`);
         } catch (err: unknown) {
             console.error('Failed to create story', err);
-            notifications.show({
-                title: 'Something went wrong',
-                message: 'Could not save your tale. Please try again.',
-                color: 'red',
-            });
+            setSubmitError('Could not save your tale. Please try again.');
         } finally {
             setIsPending(false);
         }
@@ -239,6 +242,11 @@ export default function WorkshopForm({
                         <OptionPill disabled>Eesti · soon</OptionPill>
                     </OptionPillGroup>
                 </section>
+                {submitError !== null && (
+                    <p role="alert" className={styles['workshop__error']}>
+                        {submitError}
+                    </p>
+                )}
             </div>
 
             {/* ── Summary column ──────────────────────────────────────────── */}

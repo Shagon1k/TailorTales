@@ -1,0 +1,108 @@
+@use 'styles/typography' as *;
+
+.tale-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: 0 var(--space-8);
+}
+
+.tale-grid__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.tale-grid__title {
+    @include t-heading-2xl;
+
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.tale-grid__count {
+    @include t-body-md;
+
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-weight: 400;
+}
+
+.tale-grid__filters {
+    /* Reset fieldset browser defaults */
+    border: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.tale-grid__filter-label {
+    @include t-caps-xs;
+
+    color: var(--text-muted);
+    margin-right: var(--space-1);
+}
+
+.tale-grid__chip {
+    @include t-body-sm;
+
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-subtle);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    min-height: var(--hit-min);
+    transition:
+        border-color var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out),
+        background var(--duration-base) var(--ease-out);
+
+    &:hover {
+        border-color: var(--border-strong);
+        color: var(--text-primary);
+    }
+
+    &.m-active {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+        color: var(--text-inverse);
+        font-weight: 600;
+    }
+}
+
+.tale-grid__empty {
+    @include t-body-md;
+
+    margin: 0;
+    color: var(--text-muted);
+    padding: var(--space-8) 0;
+}
+
+.tale-grid__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+
+    @media (min-width: 480px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}

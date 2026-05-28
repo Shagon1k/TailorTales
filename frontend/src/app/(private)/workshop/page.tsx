@@ -5,8 +5,15 @@ import { storiesServerApi } from '@/api/stories.server';
 import WorkshopForm from './_components/WorkshopForm/WorkshopForm';
 import styles from './page.module.scss';
 
-export default async function WorkshopPage(): Promise<React.ReactElement> {
-    const [readers, artStyles, config] = await Promise.all([
+interface IWorkshopPageProps {
+    searchParams: Promise<{ childId?: string; question?: string }>;
+}
+
+export default async function WorkshopPage({
+    searchParams,
+}: Readonly<IWorkshopPageProps>): Promise<React.ReactElement> {
+    const [{ childId, question }, readers, artStyles, config] = await Promise.all([
+        searchParams,
         childrenServerApi.getAll(),
         artStylesServerApi.getAll(),
         storiesServerApi.getConfig(),
@@ -15,7 +22,13 @@ export default async function WorkshopPage(): Promise<React.ReactElement> {
     return (
         <main className={styles.page}>
             <PageHero eyebrow="· THE WORKSHOP ·" heading="Let's make one small tale." />
-            <WorkshopForm readers={readers} artStyles={artStyles} config={config} />
+            <WorkshopForm
+                readers={readers}
+                artStyles={artStyles}
+                config={config}
+                initialChildId={childId ?? null}
+                initialQuestion={question ?? ''}
+            />
         </main>
     );
 }

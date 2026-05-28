@@ -1,0 +1,59 @@
+@use 'styles/typography' as *;
+
+.tale-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition:
+        transform var(--duration-base) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    &:focus-visible {
+        outline-offset: 4px;
+    }
+}
+
+.tale-card__cover {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--gradient-hatch-light);
+}
+
+.tale-card__cover-img {
+    object-fit: cover;
+}
+
+.tale-card__cover-title {
+    @include t-lede-lg;
+
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-4);
+    margin: 0;
+    font-style: italic;
+    color: var(--text-primary);
+    background: var(--gradient-hatch-light);
+    word-break: break-word;
+}
+
+.tale-card__meta {
+    @include t-body-sm;
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    padding: 0 var(--space-1);
+}
