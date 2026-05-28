@@ -5,6 +5,7 @@ import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard.js';
 import { ChildrenModule } from './modules/children/children.module.js';
+import { StorageModule } from './modules/storage/storage.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -15,6 +16,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
             validate: validateEnv,
         }),
         PrismaModule,
+        StorageModule,
         AuthModule,
         ChildrenModule,
     ],
