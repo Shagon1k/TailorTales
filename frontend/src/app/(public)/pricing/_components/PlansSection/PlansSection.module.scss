@@ -38,11 +38,6 @@
         background: var(--gradient-fox-bevel);
         color: var(--text-on-card);
     }
-
-    &:focus-visible {
-        outline: 2px solid var(--focus-ring-color);
-        outline-offset: 2px;
-    }
 }
 
 .plans__grid {
@@ -50,7 +45,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
     width: 100%;
-    align-items: stretch; // equal-height so CTA buttons align at the bottom
+    align-items: stretch;
 }
 
 .plans__note {

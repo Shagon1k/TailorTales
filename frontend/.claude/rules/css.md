@@ -222,3 +222,4 @@ This applies at every level — route components, shared components, and ui atom
 - ❌ Modifier class for `:hover`, `:focus`, `:disabled` — use CSS pseudo-classes and HTML attributes.
 - ❌ Nested `__` (`.card__header__title`) — flatten to `.card__title`.
 - ❌ `<div onClick>` — use `<button>` for actions, `<a>` for navigation.
+- ❌ Per-component `:focus-visible` — the global rule in `globals.scss` already covers all interactive elements. Duplicating it in component modules is dead code.

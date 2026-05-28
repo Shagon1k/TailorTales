@@ -1,0 +1,40 @@
+@use 'styles/typography' as *;
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--hit-min);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-subtle);
+    background: var(--bg-elevated);
+    @include t-body-sm;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+        border-color var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out);
+
+    &:not([disabled]):hover {
+        border-color: var(--accent-primary);
+        color: var(--text-accent);
+    }
+
+    &:disabled {
+        opacity: var(--opacity-disabled);
+        cursor: not-allowed;
+    }
+}
+
+.chip__icon {
+    font-size: 1em;
+    line-height: 1;
+    color: var(--text-muted);
+    transition: color var(--duration-base) var(--ease-out);
+
+    .chip:not([disabled]):hover & {
+        color: var(--accent-primary);
+    }
+}
