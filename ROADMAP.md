@@ -426,6 +426,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
 - [ ] Stories module: CRUD (draft create, list user's stories, get by id, delete)
 - [ ] Templates module: list (public to all users), CRUD (admin only)
+- [ ] Template file upload endpoints: `POST /templates/:id/cover` and `POST /templates/:id/previews` (multipart — backend generates S3 keys via `StorageKeys`; client never constructs key paths)
 - [ ] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
     - Child reader selector (loads user's children)
     - Question text input + 6 static suggestion chips
