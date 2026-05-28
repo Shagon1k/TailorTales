@@ -88,9 +88,11 @@ model Story {
   artStyleId String
   artStyle   ArtStyle    @relation(fields: [artStyleId], references: [id])
   language   String
-  isPublic   Boolean     @default(false)
-  pdfUrl     String?
-  createdAt  DateTime    @default(now())
+  title         String?
+  isPublic      Boolean     @default(false)
+  coverImageKey String?
+  pdfKey        String?
+  createdAt     DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
   pages Page[]
@@ -114,9 +116,9 @@ model Template {
   name            String
   description     String
   type            StoryType
-  systemPrompt    String
-  coverImageUrl   String
-  previewPageUrls String[]
+  systemPrompt     String
+  coverImageKey    String
+  previewPageKeys  String[]
   createdById     String
   createdBy       User      @relation(fields: [createdById], references: [id])
   createdAt       DateTime  @default(now())
