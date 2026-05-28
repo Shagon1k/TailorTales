@@ -17,6 +17,19 @@ enum Gender {
   FEMALE
 }
 
+enum StoryType {
+  BOOK
+  COMIC
+}
+
+enum StoryStatus {
+  DRAFT
+  QUEUED
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -27,7 +40,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  children Child[]
+  children          Child[]
+  stories           Story[]
+  createdTemplates  Template[]
 }
 
 model Child {
@@ -41,6 +56,8 @@ model Child {
   avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  stories Story[]
 }
 
 model ArtStyle {
@@ -52,4 +69,58 @@ model ArtStyle {
   isActive     Boolean  @default(true)
   order        Int
   createdAt    DateTime @default(now())
+
+  stories Story[]
+}
+
+model Story {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  childId    String
+  child      Child       @relation(fields: [childId], references: [id], onDelete: Cascade)
+  type       StoryType
+  status     StoryStatus @default(DRAFT)
+  templateId String?
+  template   Template?   @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  question   String
+  pageCount  Int
+  artStyleId String
+  artStyle   ArtStyle    @relation(fields: [artStyleId], references: [id])
+  language   String
+  isPublic   Boolean     @default(false)
+  pdfUrl     String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  pages Page[]
+}
+
+model Page {
+  id            String  @id @default(cuid())
+  storyId       String
+  story         Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  order         Int
+  chapterTitle  String?
+  text          String?
+  illustrations Json
+  layout        String?
+
+  @@unique([storyId, order])
+}
+
+model Template {
+  id              String    @id @default(cuid())
+  name            String
+  description     String
+  type            StoryType
+  systemPrompt    String
+  coverImageUrl   String
+  previewPageUrls String[]
+  createdById     String
+  createdBy       User      @relation(fields: [createdById], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  stories Story[]
 }
