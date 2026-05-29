@@ -51,19 +51,20 @@
 
 ## 3. Domain Model (high level)
 
-| Entity           | Notes                                                                                                                                                                               |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **User**         | Google OAuth identity, role (USER / ADMIN).                                                                                                                                         |
-| **Child**        | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input).                                                                      |
-| **ArtStyle**     | Admin-managed. Fields: id, name, slug, thumbnailUrl, promptPrefix, isActive, order. Seeded with 8 styles.                                                                           |
-| **Story**        | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child. Includes `isPublic boolean (default false)` — set via opt-in in rating flow. |
-| **Page**         | Belongs to Story, ordered, contains text + illustration URL(s) + chapter title.                                                                                                     |
-| **Template**     | Pre-defined Story blueprint created by Admin. Users instantiate Stories from Templates with customization.                                                                          |
-| **Plan**         | Subscription tier definition. Fields: id, name, paddleProductId, priceMonthly, pagesPerMonth, regenerationsPerMonth, childrenLimit, retentionDays, watermark.                       |
-| **Subscription** | Paddle-backed. Fields: id, userId, planId, paddleSubscriptionId, status, currentPeriodEnd, pagesUsed, regenerationsUsed.                                                            |
-| **Rating**       | Belongs to Story + User. Fields: score (1–5), comment (optional). One per user per story (upsert).                                                                                  |
-| **Job**          | Tracks generation pipeline state and progress for SSE.                                                                                                                              |
-| **Notification** | In-app notification per User. Fields: id, userId, type, payload (JSON), readAt?, createdAt.                                                                                         |
+| Entity             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **User**           | Google OAuth identity, role (USER / ADMIN).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Child**          | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input).                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **ArtStyle**       | Admin-managed. Fields: id, name, slug, thumbnailUrl, promptPrefix, isActive, order. Seeded with 8 styles.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **Story**          | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child. Key fields: `question`, `pageCount`, `artStyleId`, `language (Language enum — EN\|RU)`, `title?` (LLM-generated, Phase 5), `coverImageKey?`, `pdfKey?` (S3 keys — never URLs; signed at serve time via StorageService). `isPublic boolean (default false)` — set via opt-in in rating flow.                                                                                                                                                                                       |
+| **Page**           | Belongs to Story, ordered. `text` is optional — both book and comic pages may be illustration-only. Contains illustration URL(s) + chapter title. Composite unique on `(storyId, order)`.                                                                                                                                                                                                                                                                                                                                                                                                |
+| **StoryBlueprint** | Pre-defined story blueprint created by Admin (previously named `Template`). `systemPrompt` carries structured LLM guidance using XML markers (e.g. `<intro_prompt>`, `<climax_prompt>`). Specifies font overrides applied on top of `PageTemplate` defaults. `coverImageKey` + `previewPageKeys` are S3 keys reserved for user-facing preview (Post-MVP). Auto-selected by the generation pipeline based on `StoryType`; user-facing selection deferred to Post-MVP.                                                                                                                     |
+| **PageTemplate**   | Typed page layout specification — single source of truth for LLM prompt builder, response validator, and PDF renderer. Defines A5 dimensions (1748×2480 px at 300 DPI), image zones (exact width/height, aspect ratio), text zones (maxChars, type: `body \| caption \| speech-bubble \| narration-box`), font defaults, and the Handlebars template file name. Lives in `page-templates.config.ts` — no DB model. Layouts: `book-cover`, `book-illustration`, `book-full-illustration`, `book-final`, `comic-cover`, `comic-2-panel`, `comic-3-panel`, `comic-4-panel`, `comic-splash`. |
+| **Plan**           | Subscription tier definition. Fields: id, name, paddleProductId, priceMonthly, pagesPerMonth, regenerationsPerMonth, childrenLimit, retentionDays, watermark.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Subscription**   | Paddle-backed. Fields: id, userId, planId, paddleSubscriptionId, status, currentPeriodEnd, pagesUsed, regenerationsUsed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| **Rating**         | Belongs to Story + User. Fields: score (1–5), comment (optional). One per user per story (upsert).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Job**            | Tracks generation pipeline state and progress for SSE.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Notification**   | In-app notification per User. Fields: id, userId, type, payload (JSON), readAt?, createdAt.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 **Unified naming:** `Story` covers both book and comic.
 
@@ -92,7 +93,7 @@
 - ✅ Google OAuth, USER + ADMIN roles
 - ✅ Multiple children per user (capped by plan's `childrenLimit`)
 - ✅ Stories: book + comic, single entity with `type`
-- ✅ Templates (admin-created, user-customized)
+- ✅ StoryBlueprints (admin-created; auto-selected during generation by StoryType; user-facing selection Post-MVP)
 - ✅ Generation pipeline (text via OpenRouter, images via DALL-E)
 - ✅ Customization: question, age, format, length, art style (from DB), language
 - ✅ 6 static question suggestion chips in workshop form ("the jar")
@@ -357,7 +358,7 @@ Privacy · Contact _(both static pages)_
 - [x] `BrandMark` — SVG logo + wordmark lockup; consumer passes `href` so it stays domain-free
 - [x] `StatCard` — stat value + label + delta; variants: `m-positive`, `m-negative`
 - [x] `NotificationBell` — icon + unread count badge; visual shell at Phase 3 (no data wiring); full dropdown UI wires in Phase 9
-- [ ] `SuggestionChip` — pill-shaped tappable chip for workshop question suggestions (deferred to Phase 4 — workshop form not yet designed)
+- [x] `SuggestionChip` — pill-shaped tappable chip for workshop question suggestions (delivered in Phase 4)
 
 **Static pages** (placed inside route groups — chrome comes from group's `layout.tsx`)
 
@@ -413,20 +414,24 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 ---
 
-### Phase 4 — Story Entity & Templates
+### Phase 4 — Story Entity & StoryBlueprints
 
-**Goal:** data model for stories + templates, draft creation, workshop form, story reader (read-only), library grid. No generation yet.
+**Goal:** data model for stories + StoryBlueprints, draft creation, workshop form, story reader (read-only), library grid. No generation yet.
 
 **Sub-tasks:**
 
-- [ ] Prisma `Story` model: `id`, `userId`, `childId`, `type (BOOK | COMIC)`, `status (DRAFT | QUEUED | GENERATING | COMPLETED | FAILED)`, `templateId?`, `customization (JSON)`, `artStyleId`, `language`, `isPublic (default false)`, `pdfUrl?`, `createdAt`, `updatedAt`
-- [ ] Prisma `Page` model: `id`, `storyId`, `order`, `chapterTitle?`, `text`, `illustrations (JSON — array of { url, position })`, `layout?`
-- [ ] Prisma `Template` model: `id`, `name`, `description`, `type`, `blueprint (JSON)`, `customizableFields (JSON)`, `coverImageUrl`, `createdById`, `createdAt`, `updatedAt`
-- [ ] Prisma migrations
-- [ ] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
-- [ ] Stories module: CRUD (draft create, list user's stories, get by id, delete)
-- [ ] Templates module: list (public to all users), CRUD (admin only)
-- [ ] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
+- [x] Prisma `Story` model: `id`, `userId`, `childId`, `type (BOOK | COMIC)`, `status (DRAFT | QUEUED | GENERATING | COMPLETED | FAILED)`, `blueprintId?`, `question`, `pageCount`, `artStyleId`, `language (Language enum)`, `title?` (LLM-generated), `isPublic (default false)`, `coverImageKey?`, `pdfKey?`, `createdAt`, `updatedAt`
+- [x] Prisma `Page` model: `id`, `storyId`, `order`, `chapterTitle?`, `text?` (optional — book and comic pages may be illustration-only), `illustrations (JSON — array of { url, position })`, `layout?`
+- [x] Prisma `StoryBlueprint` model: `id`, `name`, `description`, `type`, `systemPrompt` (structured with XML markers e.g. `<intro_prompt>`, `<climax_prompt>` for multi-stage LLM guidance), `coverImageKey?`, `previewPageKeys (String[] default [])`, `createdById`, `createdAt`, `updatedAt`
+- [x] Prisma migrations
+- [x] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
+- [x] Stories module: CRUD (draft create, list user's stories, get by id, delete)
+- [x] StoryBlueprints module: list (public to all users), CRUD (admin only)
+- [x] `SuggestionChip` atom — pill-shaped tappable chip for workshop question suggestions
+- [x] Frontend types: `story.types.ts`, `story-blueprint.types.ts`, `art-style.types.ts`
+- [x] Frontend API layer: `stories.ts`, `stories.server.ts`, `story-blueprints.ts`, `art-styles.ts`
+- [x] Seed script: at least 1 BOOK and 1 COMIC StoryBlueprint (required by Phase 5 auto-selection; coverImageKey + previewPageKeys left null/empty until Post-MVP upload flow)
+- [x] Frontend: `/workshop` — single scrollable creation form (NOT a wizard):
     - Child reader selector (loads user's children)
     - Question text input + 6 static suggestion chips
     - Format selector (Book / Comic) with credit cost display
@@ -434,27 +439,27 @@ Baseline rule: every atom ships with at least — render test, one test per vari
     - Art style grid (loaded from `ArtStyle` DB, thumbnails displayed)
     - Language selector (EN active; RU active; others "coming soon")
     - Sticky right panel: live summary (Reader, Format, Length, Style, Language, Credits X/Y) + "Light the lantern →" CTA + "Save as draft" link
-- [ ] Frontend: `/library` dashboard page (partial):
+- [x] Frontend: `/library` dashboard page (partial):
     - Greeting + tonight's tale (one static suggestion)
     - "Your readers" child cards with "+ New tale" quick action
     - "Your library" tale grid with filter chips (All / For [Child] / Books / Comics)
     - Stats bar stubbed (zeros until Phase 8 wires subscription data)
     - "In the Workshop" strip placeholder (wired in Phase 5)
-- [ ] Frontend: `/library/[storyId]` story reader (read-only at this stage):
+- [x] Frontend: `/library/[storyId]` story reader (read-only at this stage):
     - Breadcrumb + page header (title, subtitle, Download PDF stub)
     - Chapter list (left panel)
     - Spread viewer with navigation (center)
     - Details panel (right — created, reader, format, style, language, file size)
     - Regeneration and rating panels rendered but inactive (wired in Phases 7 and 10)
-- [ ] Admin frontend: template CRUD UI
-- [ ] Tests: Story CRUD, scoping, draft lifecycle, template admin-only create, workshop form renders and submits
+- [ ] Admin frontend: StoryBlueprint CRUD UI
+- [ ] Tests: Story CRUD, scoping, draft lifecycle, StoryBlueprint admin-only create, workshop form renders and submits
 
 **Acceptance Check:**
 
 - User can save a DRAFT story via the workshop form
 - Art styles load from DB in the form
-- Admin can CRUD templates
-- Stories scoped per user; templates publicly listable
+- Admin can CRUD StoryBlueprints
+- Stories scoped per user; StoryBlueprints publicly listable
 - Story reader renders chapter list and spread viewer
 - Tests pass
 
@@ -474,11 +479,13 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] OpenRouter client (configurable model via `OPENROUTER_MODEL` env)
 - [ ] DALL-E client (with exponential backoff retry, max 3 attempts)
 - [ ] 1-concurrent-story enforcement: check for active job before enqueuing; return 409 if one exists
-- [ ] **Stage 1 — Outline:** LLM generates page-by-page outline + chapter titles (using child age, interests, question, art style prompt prefix)
+- [ ] **PageTemplate system** (`src/modules/rendering/`): `page-templates.config.ts` typed config (A5 1748×2480px, image zones with exact px dimensions, text zones with maxChars + type, font defaults, Handlebars template file per layout); `PdfRendererService` (resolves layout by name, renders via Handlebars, Puppeteer A5 → single page PDF, pdf-lib stitches pages); Handlebars templates for all 9 layouts (`book-cover`, `book-illustration`, `book-full-illustration`, `book-final`, `comic-cover`, `comic-2-panel`, `comic-3-panel`, `comic-4-panel`, `comic-splash`)
+- [ ] **Layout resolution** (before Outline): assign a `PageTemplate` name to each page slot based on `StoryType`, `pageCount`, and composition rules (first page = cover, last = final, book pages alternate illustration sides, comic splash no more than once)
+- [ ] **Stage 1 — Outline:** LLM generates page-by-page outline + chapter titles; each page receives its resolved `PageTemplate` spec (exact image dimensions, maxChars) as hard constraints in the prompt
 - [ ] **Stage 2 — Words:** LLM writes content per page (parallelizable; age-adaptive prompt)
 - [ ] **Stage 3 — Pictures:** DALL-E generates image(s) per page (parallelizable; consistent style prefix + character description)
 - [ ] **Stage 4 — Moderation:** LLM-based text moderation; image moderation via DALL-E safety flags (runs silently — not a named user-visible stage)
-- [ ] **Stage 5 — Binding:** Puppeteer renders HTML pages → PDF; watermark applied for free-tier users
+- [ ] **Stage 5 — Binding:** `PdfRendererService` resolves Handlebars template by `Page.layout` name, injects page data, Puppeteer renders each page to A5 PDF; pdf-lib stitches single-page PDFs into final document; watermark layer applied for free-tier users via Puppeteer overlay
 - [ ] **Stage 6 — Ready:** PDF uploaded to S3, signed URL stored on Story; Story status → COMPLETED
 - [ ] SSE endpoint: `GET /stories/:id/progress` — streams per-page completion events (not just %) + stage transitions
 - [ ] Retry policy: exponential backoff, 3 retries, transient errors only (4xx fails immediately)
@@ -492,6 +499,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
     - "Close safely" banner (email + address displayed)
 - [ ] Frontend: "In the Workshop" strip on `/library` dashboard wired (shows active job)
 - [ ] Frontend: Download PDF button wired on story reader on COMPLETED stories
+- [ ] Frontend: workshop summary panel — wire credit cost and remaining balance from subscription API (stubbed as `CREDIT_COST = 5` / `STUB_REMAINING = 12` in `WorkshopSummary.tsx` in Phase 4)
 - [ ] Email notification on story_completed (Resend) — also creates bell `Notification` record
 - [ ] Bell notification on story_failed — also creates bell `Notification` record
 - [ ] Resend client module (used here and expanded in Phase 9)
@@ -585,6 +593,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] Frontend: `/account` → Privacy & data section: GDPR info + "Delete account" flow
 - [ ] Frontend: stats bar on `/library` dashboard wired (pages this month / left / regenerations / tales count)
 - [ ] Frontend: regeneration quota count wired in story reader (was stubbed in Phase 7)
+- [ ] Frontend: workshop length section helper text wired ("N pages will use N of your N remaining credits this month." — depends on subscription quota API; currently absent from UI)
 - [ ] Frontend: `/pricing` page wired to real Plan data (replaces Phase 3 static hardcoded data — ships in Phase 8)
 - [ ] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account deletion flow
 
@@ -674,7 +683,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] Admin-only frontend route group with auth guard
 - [ ] User management: list, suspend, change role
 - [ ] Story moderation queue: list flagged/reported stories, mark as reviewed, force-delete, toggle `isPublic`
-- [ ] Templates UI (polish Phase 4 implementation)
+- [ ] StoryBlueprints UI (polish Phase 4 implementation)
 - [ ] ArtStyle management UI: list, create, edit (name, slug, thumbnail, promptPrefix), activate/deactivate, reorder
 - [ ] Ratings + feedback view (list all ratings from Phase 9)
 - [ ] Stats dashboard: counts (users, stories, active subs), revenue from Paddle API
@@ -697,7 +706,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 **Sub-tasks:**
 
 - [ ] Frontend: `next-intl` setup, EN + RU translation files
-- [ ] `/account` → Language section wired: EN / RU switcher (persists to `User.language` if logged in, else cookie)
+- [ ] `/account` → Language section wired: EN / RU switcher (persists to `User.language Language` if logged in, else cookie — reuses `Language` enum already defined in Phase 4)
 - [ ] Backend: localized error messages via Accept-Language header
 - [ ] Generation: `language` param drives LLM output language (already passed in `customization` JSON — ensure prompts are language-aware)
 - [ ] Translate all existing UI strings to RU
@@ -769,6 +778,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 ## 10. Post-MVP Backlog (v2+)
 
+- User-facing StoryBlueprint selection in workshop (browse blueprints, preview pages via signed URLs, filter by StoryType); StoryBlueprint cover/preview image upload endpoints (`POST /story-blueprints/:id/cover`, `POST /story-blueprints/:id/previews`)
 - Photo personalization (switch image provider to Flux or SD with IP-Adapter)
 - Referral program (link-based, free book/pages reward)
 - Full public sharing gallery (browse all public stories)
@@ -794,6 +804,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - **Workshop step-by-step wizard pagination** — currently a single scrollable form; a step-by-step flow (Reader → Question → Look → Review) could improve UX for new users at scale
 - **Family plan upsell card** — contextual upsell in the dashboard "Your readers" section, personalized based on usage patterns
 - **AI-flavored workshop log descriptions** — during generation, produce whimsical human-like prose for each log event instead of short labels (e.g. "The mountain breathed slowly into the story...")
+- **Workshop estimated paint time** — display "Estimated paint time: ~N minutes" in the summary panel before submission; estimate based on page count, story type, and live queue depth; surface via a dedicated API field once generation infrastructure is stable (Phase 5+ prerequisite)
 - **"Share with family"** — share a specific story link with other family members (grandparents, etc.)
 
 ---
@@ -806,7 +817,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 | 1 — Auth                      | ✅ Done        |                                                                                          |
 | 2 — Children                  | ✅ Done        |                                                                                          |
 | 3 — Design System             | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase |
-| 4 — Stories & Templates       | ⬜ Not started |                                                                                          |
+| 4 — Stories & StoryBlueprints | 🟡 In progress | Backend + API layer + types + SuggestionChip done; seed + frontend pages + tests remain  |
 | 5 — Generation Pipeline       | ⬜ Not started |                                                                                          |
 | 6 — Mid-point Documentation   | ⬜ Not started |                                                                                          |
 | 7 — Regeneration              | ⬜ Not started |                                                                                          |

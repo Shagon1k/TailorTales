@@ -1,0 +1,97 @@
+@use 'styles/typography' as *;
+
+.summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    position: sticky;
+    top: var(--space-6);
+
+    &__question {
+        margin: 0;
+        padding: var(--space-4);
+        background: var(--border-subtle);
+        border: 1px solid var(--border-subtle);
+        border-left: 3px solid var(--accent-primary);
+        border-radius: var(--radius-sm);
+        min-height: 80px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    &__question-text {
+        @include t-lede-lg;
+        color: var(--text-primary);
+        font-style: italic;
+    }
+
+    &__question-placeholder {
+        @include t-body-base;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    &__rows {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2);
+    }
+
+    &__row-label {
+        @include t-body-sm;
+        color: var(--text-muted);
+    }
+
+    &__row-value {
+        @include t-body-sm;
+        color: var(--text-primary);
+        font-weight: 500;
+        text-align: right;
+    }
+
+    &__row-empty {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    &__divider {
+        border: none;
+        border-top: 1px solid var(--border-subtle);
+        margin: 0;
+    }
+
+    &__credits {
+        @include t-body-sm;
+        margin: 0;
+        text-align: center;
+    }
+
+    &__credits-cost {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    &__credits-remaining {
+        color: var(--text-muted);
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+}

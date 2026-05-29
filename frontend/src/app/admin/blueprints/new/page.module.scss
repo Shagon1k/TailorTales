@@ -1,0 +1,32 @@
+@use 'styles/typography' as *;
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-10) var(--space-8) var(--space-16);
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.page__breadcrumb {
+    margin-bottom: var(--space-2);
+}
+
+.page__back {
+    @include t-body-sm;
+
+    color: var(--text-muted);
+    text-decoration: none;
+
+    &:hover {
+        color: var(--text-secondary);
+    }
+}
+
+.page__title {
+    @include t-heading-2xl;
+
+    margin: 0;
+    color: var(--text-primary);
+}

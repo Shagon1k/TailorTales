@@ -1,0 +1,127 @@
+@use 'styles/typography' as *;
+
+.story-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    padding: var(--space-8);
+    min-height: 480px;
+}
+
+// ── Left page (text) ──────────────────────────────────────────────────────────
+
+.story-page__chapter {
+    @include t-caps-xs;
+
+    margin: 0 0 var(--space-6);
+    color: var(--text-on-card-3);
+    letter-spacing: var(--ls-caps);
+}
+
+.story-page__body {
+    flex: 1;
+}
+
+.story-page__text {
+    @include t-lede-lg;
+
+    margin: 0;
+    font-style: italic;
+    color: var(--text-on-card);
+    white-space: pre-line;
+
+    // Decorative drop cap — matches the large first-letter in the design
+    &::first-letter {
+        font-size: 3.5em;
+        font-style: normal;
+        font-weight: 600;
+        float: left;
+        line-height: 0.8;
+        margin-right: var(--space-2);
+        margin-top: var(--space-1);
+        color: var(--text-accent);
+    }
+}
+
+.story-page__empty {
+    @include t-lede-lg;
+
+    margin: 0;
+    font-style: italic;
+    color: var(--text-on-card-3);
+}
+
+.story-page__footer {
+    @include t-body-sm;
+
+    margin: var(--space-6) 0 0;
+    color: var(--text-on-card-3);
+    font-style: italic;
+}
+
+// ── Right page (illustration) ─────────────────────────────────────────────────
+
+.story-page__illustration {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.story-page__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    height: 100%;
+    min-height: 480px;
+    background: var(--gradient-hatch-dark);
+    border: 1.5px dashed var(--border-on-card);
+    border-radius: var(--radius-sm);
+}
+
+.story-page__placeholder-label {
+    @include t-caps-xs;
+
+    margin: 0;
+    color: var(--text-on-card-3);
+}
+
+.story-page__placeholder-caption {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-on-card-2);
+    font-style: italic;
+    text-align: center;
+    max-width: 24ch;
+}
+
+.story-page__painted-by {
+    @include t-body-sm;
+
+    position: absolute;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    margin: 0;
+    color: var(--text-on-card-3);
+    font-style: italic;
+}
+
+// Page number on the right (illustration) side — bottom center, matches design
+.story-page__number {
+    @include t-caps-xs;
+
+    position: absolute;
+    bottom: var(--space-4);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    color: var(--text-on-card-3);
+}

@@ -1,0 +1,86 @@
+@use 'styles/typography' as *;
+
+.blueprint-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.blueprint-list__th {
+    @include t-caps-xs;
+
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.blueprint-list__row {
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--duration-base) var(--ease-out);
+
+    &:hover {
+        background: var(--bg-elevated);
+    }
+}
+
+.blueprint-list__td {
+    @include t-body-sm;
+
+    padding: var(--space-4);
+    color: var(--text-secondary);
+    vertical-align: top;
+}
+
+.blueprint-list__name {
+    @include t-body-base;
+
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.blueprint-list__desc {
+    display: block;
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+    max-width: 48ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.blueprint-list__badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.blueprint-list__edit-link {
+    color: var(--text-accent);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.blueprint-list__empty {
+    @include t-body-md;
+
+    margin: 0;
+    color: var(--text-muted);
+    padding: var(--space-12) 0;
+}
+
+.blueprint-list__create-link {
+    color: var(--text-accent);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

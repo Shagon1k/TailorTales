@@ -19,6 +19,8 @@
 ## Process
 
 - Analyze impact before writing code.
+- Fight for the "obvious" solution. We should avoid being clever and doing things because they seems smart. We want everything we create to be so obvious it feels kid of stupid.
+  Receiving prompt, never hesitate to push back and suggest ways we could make things more obvious. Note that "obvious" and "simple" are not always aligned, sometimes "obvious" solution is more complex.
 - Ask when unclear — group all questions in one message, don't ask one-by-one.
 - For changes touching >5 files or ~100+ LOC: outline the plan -> get approval -> then deliver incrementally.
 - Names carry meaning and guide attention; they are not labels. Never reuse one name for different concepts, and never use different names for the same concept. Qualify ambiguous words, and ensure the same concept is named identically across code, docs, API, and UI (e.g., use ui_graph or knowledge_graph instead of just graph).

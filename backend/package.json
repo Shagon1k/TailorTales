@@ -13,12 +13,15 @@
         "test:cov": "vitest run --coverage",
         "seed:admin": "tsx src/scripts/seed-admin.ts",
         "seed:art-styles": "tsx src/scripts/seed-art-styles.ts",
+        "seed:story-blueprints": "tsx src/scripts/seed-story-blueprints.ts",
         "db:generate": "prisma generate",
         "db:migrate": "prisma migrate dev",
         "db:migrate:deploy": "prisma migrate deploy",
         "db:studio": "prisma studio"
     },
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.1055.0",
+        "@aws-sdk/s3-request-presigner": "^3.1055.0",
         "@nestjs/common": "^11.0.1",
         "@nestjs/config": "^4.0.4",
         "@nestjs/core": "^11.0.1",

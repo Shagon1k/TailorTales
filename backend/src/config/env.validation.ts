@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsInt, IsString, Min, validateSync } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Min, validateSync } from 'class-validator';
 
 enum Environment {
     Development = 'development',
@@ -36,6 +36,27 @@ class EnvironmentVariables {
     @IsInt()
     @Min(1)
     PORT: number = 3001;
+
+    // Storage (AWS S3 / MinIO)
+    @IsString()
+    STORAGE_REGION!: string;
+
+    @IsString()
+    STORAGE_ACCESS_KEY!: string;
+
+    @IsString()
+    STORAGE_SECRET_KEY!: string;
+
+    @IsString()
+    STORAGE_BUCKET!: string;
+
+    @IsString()
+    @IsOptional()
+    STORAGE_ENDPOINT?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    STORAGE_FORCE_PATH_STYLE: boolean = false;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
