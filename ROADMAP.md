@@ -439,13 +439,13 @@ Baseline rule: every atom ships with at least — render test, one test per vari
     - Art style grid (loaded from `ArtStyle` DB, thumbnails displayed)
     - Language selector (EN active; RU active; others "coming soon")
     - Sticky right panel: live summary (Reader, Format, Length, Style, Language, Credits X/Y) + "Light the lantern →" CTA + "Save as draft" link
-- [ ] Frontend: `/library` dashboard page (partial):
+- [x] Frontend: `/library` dashboard page (partial):
     - Greeting + tonight's tale (one static suggestion)
     - "Your readers" child cards with "+ New tale" quick action
     - "Your library" tale grid with filter chips (All / For [Child] / Books / Comics)
     - Stats bar stubbed (zeros until Phase 8 wires subscription data)
     - "In the Workshop" strip placeholder (wired in Phase 5)
-- [ ] Frontend: `/library/[storyId]` story reader (read-only at this stage):
+- [x] Frontend: `/library/[storyId]` story reader (read-only at this stage):
     - Breadcrumb + page header (title, subtitle, Download PDF stub)
     - Chapter list (left panel)
     - Spread viewer with navigation (center)

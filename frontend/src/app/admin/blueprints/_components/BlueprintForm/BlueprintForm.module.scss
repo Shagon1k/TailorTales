@@ -1,0 +1,53 @@
+@use 'styles/typography' as *;
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    max-width: 720px;
+}
+
+.form__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form__label {
+    @include t-body-base;
+
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.form__hint {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.form__error {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--accent-warm);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--accent-warm);
+    border-radius: var(--radius-md);
+}
+
+.form__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.form__delete-wrap {
+    margin-left: auto;
+}

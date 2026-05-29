@@ -15,3 +15,12 @@ export interface IStoryBlueprintSummary {
 export interface IStoryBlueprintDetail extends IStoryBlueprintSummary {
     systemPrompt: string;
 }
+
+export interface ICreateStoryBlueprintPayload {
+    name: string;
+    description: string;
+    type: IStoryType;
+    systemPrompt: string;
+}
+
+export type IUpdateStoryBlueprintPayload = Partial<ICreateStoryBlueprintPayload>;
