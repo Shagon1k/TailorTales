@@ -46,7 +46,7 @@ export default function StoryPage({
                 <p className={styles['story-page__chapter']}>{page.chapterTitle}</p>
             )}
             <div className={styles['story-page__body']}>
-                {page.text ?? <p className={styles['story-page__text']}>{page.text}</p>}
+                {page.text && <p className={styles['story-page__text']}>{page.text}</p>}
             </div>
             <p className={styles['story-page__footer']}>{`TailorTales · for ${childName}`}</p>
         </div>
