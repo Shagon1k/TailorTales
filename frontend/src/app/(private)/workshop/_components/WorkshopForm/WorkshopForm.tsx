@@ -83,7 +83,7 @@ export default function WorkshopForm({
         setSubmitError(null);
         setIsPending(true);
         try {
-            const story = await storiesApi.create({
+            await storiesApi.create({
                 childId: selectedChildId,
                 type: storyType,
                 question: question.trim(),
@@ -91,7 +91,9 @@ export default function WorkshopForm({
                 artStyleId,
                 language,
             });
-            router.push(`/library/${story.id}`);
+            // Phase 4: stories are created as DRAFT and hidden until generation completes.
+            // Phase 5 will redirect to /workshop/[jobId] for live generation progress.
+            router.push('/library');
         } catch (err: unknown) {
             console.error('Failed to create story', err);
             setSubmitError('Could not save your tale. Please try again.');
@@ -102,9 +104,7 @@ export default function WorkshopForm({
 
     return (
         <div className={styles.workshop}>
-            {/* ── Form column ─────────────────────────────────────────────── */}
             <div className={styles.workshop__form}>
-                {/* Reader row — unnumbered */}
                 <div className={styles.workshop__reader}>
                     <ReaderChip
                         child={selectedChild}
@@ -121,7 +121,6 @@ export default function WorkshopForm({
                     )}
                 </div>
 
-                {/* Section 1 — Question */}
                 <section className={styles.workshop__section} aria-labelledby="section-question">
                     <div className={styles['workshop__section-header']}>
                         <span className={styles['workshop__section-number']}>1.</span>
@@ -161,7 +160,6 @@ export default function WorkshopForm({
                     </div>
                 </section>
 
-                {/* Section 2 — Format */}
                 <section className={styles.workshop__section} aria-labelledby="section-format">
                     <div className={styles['workshop__section-header']}>
                         <span className={styles['workshop__section-number']}>2.</span>
@@ -187,7 +185,6 @@ export default function WorkshopForm({
                     </RadioCardGroup>
                 </section>
 
-                {/* Section 3 — Length */}
                 <section className={styles.workshop__section} aria-labelledby="section-length">
                     <div className={styles['workshop__section-header']}>
                         <span className={styles['workshop__section-number']}>3.</span>
@@ -204,7 +201,6 @@ export default function WorkshopForm({
                     </OptionPillGroup>
                 </section>
 
-                {/* Section 4 — Art style */}
                 <section className={styles.workshop__section} aria-labelledby="section-style">
                     <div className={styles['workshop__section-header']}>
                         <span className={styles['workshop__section-number']}>4.</span>
@@ -223,7 +219,6 @@ export default function WorkshopForm({
                     </p>
                 </section>
 
-                {/* Section 5 — Language */}
                 <section className={styles.workshop__section} aria-labelledby="section-language">
                     <div className={styles['workshop__section-header']}>
                         <span className={styles['workshop__section-number']}>5.</span>
@@ -249,7 +244,6 @@ export default function WorkshopForm({
                 )}
             </div>
 
-            {/* ── Summary column ──────────────────────────────────────────── */}
             <WorkshopSummary
                 child={selectedChild}
                 storyType={storyType}

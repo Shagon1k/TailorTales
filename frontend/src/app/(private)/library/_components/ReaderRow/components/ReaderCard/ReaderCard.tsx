@@ -2,8 +2,7 @@ import Link from 'next/link';
 import Avatar from '@/components/ui/Avatar/Avatar';
 import type { IChild } from '@/types/child.types';
 import type { IStorySummary } from '@/types/story.types';
-import { getAge } from '@/utils/date.utils';
-import { getRelativeTime } from './utils/reader-card.utils';
+import { getAge, getRelativeTime } from '@/utils/date.utils';
 import styles from './ReaderCard.module.scss';
 
 export interface IReaderCardProps {
