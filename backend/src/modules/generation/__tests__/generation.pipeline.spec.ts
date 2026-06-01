@@ -5,6 +5,7 @@ import { StoryPlanValidator } from '../story-plan.validator.js';
 import { PdfRendererService } from '../../rendering/pdf-renderer.service.js';
 import { AI_CLIENT } from '../../ai/ai.types.js';
 import { AiStubClient } from '../../ai/ai-stub.client.js';
+import { NotificationsService } from '../../notifications/notifications.service.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { StorageService } from '../../storage/storage.service.js';
 
@@ -90,6 +91,11 @@ const mockRenderer = {
     render: vi.fn().mockResolvedValue(Buffer.from('%PDF-mock')),
 };
 
+const mockNotifications = {
+    storyCompleted: vi.fn().mockResolvedValue(undefined),
+    storyFailed: vi.fn().mockResolvedValue(undefined),
+};
+
 describe('GenerationPipeline', () => {
     let pipeline: GenerationPipeline;
     let mockPrisma: ReturnType<typeof buildMockPrisma>;
@@ -116,6 +122,7 @@ describe('GenerationPipeline', () => {
                 { provide: PrismaService, useValue: mockPrisma },
                 { provide: StorageService, useValue: mockStorage },
                 { provide: PdfRendererService, useValue: mockRenderer },
+                { provide: NotificationsService, useValue: mockNotifications },
             ],
         }).compile();
 
@@ -182,6 +189,7 @@ describe('GenerationPipeline', () => {
                     { provide: PrismaService, useValue: mockPrisma },
                     { provide: StorageService, useValue: mockStorage },
                     { provide: PdfRendererService, useValue: mockRenderer },
+                    { provide: NotificationsService, useValue: mockNotifications },
                 ],
             }).compile();
 

@@ -75,6 +75,17 @@ class EnvironmentVariables {
     @IsBoolean()
     @IsOptional()
     USE_AI_STUBS: boolean = false;
+
+    // Resend — transactional email (story completed/failed, contact form)
+    @IsString()
+    RESEND_API_KEY!: string;
+
+    @IsString()
+    RESEND_FROM!: string;
+
+    /** Where contact-form submissions are routed. */
+    @IsString()
+    CONTACT_INBOX_EMAIL!: string;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {

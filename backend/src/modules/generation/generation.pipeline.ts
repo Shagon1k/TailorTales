@@ -13,6 +13,7 @@ import { PdfRendererService } from '../rendering/pdf-renderer.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import type { IPageToRender } from '../rendering/rendering.types.js';
 import { AI_CLIENT, type IAiClient, type IStoryPlan } from '../ai/ai.types.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
@@ -32,6 +33,7 @@ export class GenerationPipeline {
         private readonly renderer: PdfRendererService,
         private readonly promptBuilder: StoryPromptBuilder,
         private readonly validator: StoryPlanValidator,
+        private readonly notifications: NotificationsService,
         @Inject(AI_CLIENT) private readonly ai: IAiClient,
     ) {}
 
@@ -71,6 +73,14 @@ export class GenerationPipeline {
                 where: { id: jobId },
                 data: { status: 'COMPLETED' },
             });
+
+            // Notification (DB bell record + email) — failure here must not undo
+            // the successful generation, so notifications.service swallows email errors.
+            await this.notifications.storyCompleted(story.userId, {
+                storyId: story.id,
+                title: storyPlan.title,
+                childName: story.child.name,
+            });
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : String(err);
             this.logger.error(`Pipeline failed for job ${jobId}: ${message}`);
@@ -86,6 +96,15 @@ export class GenerationPipeline {
                 .update({
                     where: { id: story.id },
                     data: { status: 'FAILED' },
+                })
+                .catch(() => undefined);
+
+            await this.notifications
+                .storyFailed(story.userId, {
+                    storyId: story.id,
+                    childName: story.child.name,
+                    question: story.question,
+                    error: message,
                 })
                 .catch(() => undefined);
 

@@ -3,6 +3,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { AiModule } from '../ai/ai.module.js';
 import { RenderingModule } from '../rendering/rendering.module.js';
 import { StorageModule } from '../storage/storage.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 import { GenerationService } from './generation.service.js';
 import { GenerationPipeline } from './generation.pipeline.js';
 import { GenerationWorker } from './generation.worker.js';
@@ -16,6 +17,7 @@ import { GENERATION_QUEUE } from './generation.constants.js';
         AiModule,
         RenderingModule,
         StorageModule,
+        NotificationsModule,
     ],
     providers: [
         GenerationService,
