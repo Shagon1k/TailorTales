@@ -1,0 +1,12 @@
+ALTER TYPE "JobType" RENAME VALUE 'generation' TO 'GENERATION';
+ALTER TYPE "JobType" RENAME VALUE 'regeneration' TO 'REGENERATION';
+
+ALTER TYPE "JobStatus" RENAME VALUE 'pending' TO 'PENDING';
+ALTER TYPE "JobStatus" RENAME VALUE 'active' TO 'ACTIVE';
+ALTER TYPE "JobStatus" RENAME VALUE 'completed' TO 'COMPLETED';
+ALTER TYPE "JobStatus" RENAME VALUE 'failed' TO 'FAILED';
+
+ALTER TABLE "Job" ALTER COLUMN "status" SET DEFAULT 'PENDING'::"JobStatus";
+
+ALTER TYPE "NotificationType" RENAME VALUE 'story_completed' TO 'STORY_COMPLETED';
+ALTER TYPE "NotificationType" RENAME VALUE 'story_failed' TO 'STORY_FAILED';
