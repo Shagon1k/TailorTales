@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { storiesApi, type IProgressSnapshot } from '@/api/stories';
 import { formatTime, stageToStepIndex, STAGE_STEPS } from '../utils/stage.utils';
 
 export interface ILogEntry {
+    /** Monotonic id assigned on creation. Stable key for React lists. */
+    id: number;
     time: string;
     message: string;
 }
@@ -29,11 +31,14 @@ export function useGenerationStream(storyId: string, totalPages: number): IGener
     const [completedPageOrders, setCompletedPageOrders] = useState<Set<number>>(() => new Set());
     const [activePageOrder, setActivePageOrder] = useState<number | null>(null);
     const [log, setLog] = useState<ILogEntry[]>([]);
+    const logIdRef = useRef(0);
+    const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         const addLog = (message: string): void => {
             const time = formatTime(new Date());
-            setLog((prev) => [...prev.slice(-(LOG_MAX_ENTRIES - 1)), { time, message }]);
+            const id = ++logIdRef.current;
+            setLog((prev) => [...prev.slice(-(LOG_MAX_ENTRIES - 1)), { id, time, message }]);
         };
 
         const es = storiesApi.openProgressStream(storyId);
@@ -64,7 +69,10 @@ export function useGenerationStream(storyId: string, totalPages: number): IGener
             if (data.type === 'completed') {
                 addLog('Your tale is ready!');
                 es.close();
-                setTimeout(() => router.push(`/library/${storyId}`), COMPLETED_REDIRECT_DELAY_MS);
+                redirectTimerRef.current = setTimeout(
+                    () => router.push(`/library/${storyId}`),
+                    COMPLETED_REDIRECT_DELAY_MS,
+                );
             }
 
             if (data.type === 'failed') {
@@ -75,6 +83,10 @@ export function useGenerationStream(storyId: string, totalPages: number): IGener
 
         return () => {
             es.close();
+            if (redirectTimerRef.current) {
+                clearTimeout(redirectTimerRef.current);
+                redirectTimerRef.current = null;
+            }
         };
     }, [storyId, router, totalPages]);
 

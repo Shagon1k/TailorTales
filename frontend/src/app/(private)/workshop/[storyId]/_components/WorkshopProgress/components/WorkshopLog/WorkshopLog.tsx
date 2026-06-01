@@ -17,8 +17,8 @@ export default function WorkshopLog({
                 {isLive && <span className={styles.log__live}>● LIVE</span>}
             </div>
             <div className={styles.log__entries}>
-                {entries.map((entry, i) => (
-                    <div key={i} className={styles.log__entry}>
+                {entries.map((entry) => (
+                    <div key={entry.id} className={styles.log__entry}>
                         <span className={styles.log__time}>{entry.time}</span>
                         <span>{entry.message}</span>
                     </div>
