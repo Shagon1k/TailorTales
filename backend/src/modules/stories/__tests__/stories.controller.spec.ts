@@ -1,5 +1,6 @@
 import { Test } from '@nestjs/testing';
 import type { User } from '../../../generated/prisma/client.js';
+import { GenerationService } from '../../generation/generation.service.js';
 import { StoriesController } from '../stories.controller.js';
 import { StoriesService } from '../stories.service.js';
 import {
@@ -33,6 +34,7 @@ const MOCK_SUMMARY: IStorySummary = {
     artStyleId: 'style-1',
     language: 'EN',
     title: null,
+    styleAnchor: null,
     isPublic: false,
     createdAt: new Date('2026-05-01T10:00:00Z'),
     updatedAt: new Date('2026-05-01T10:00:00Z'),
@@ -69,6 +71,10 @@ describe('StoriesController', () => {
                 {
                     provide: StoriesService,
                     useValue: { findPublic, findAllByUser, findOneByUser, create, remove },
+                },
+                {
+                    provide: GenerationService,
+                    useValue: { enqueue: vi.fn() },
                 },
             ],
         }).compile();

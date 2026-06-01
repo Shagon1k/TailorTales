@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/co
 import type { Story, User } from '../../generated/prisma/client.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Public } from '../auth/decorators/public.decorator.js';
+import { GenerationService } from '../generation/generation.service.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
 import {
     ALLOWED_PAGE_COUNTS,
@@ -14,7 +15,10 @@ import type { IStoryConfig, IStoryDetail, IStorySummary } from './stories.types.
 
 @Controller('stories')
 export class StoriesController {
-    constructor(private readonly storiesService: StoriesService) {}
+    constructor(
+        private readonly storiesService: StoriesService,
+        private readonly generationService: GenerationService,
+    ) {}
 
     // Static routes must be declared before :id to avoid being matched as an id param.
     @Get('public')
@@ -46,6 +50,12 @@ export class StoriesController {
     @Post()
     create(@CurrentUser() user: User, @Body() dto: CreateStoryDto): Promise<Story> {
         return this.storiesService.create(user.id, dto);
+    }
+
+    @Post(':id/generate')
+    @HttpCode(202)
+    generate(@Param('id') id: string, @CurrentUser() user: User): Promise<{ jobId: string }> {
+        return this.generationService.enqueue(id, user.id);
     }
 
     @Delete(':id')

@@ -5,6 +5,7 @@ import type {
     IAiClient,
     IGenerateImageInput,
     IGenerateStoryPlanInput,
+    IModerationResult,
     IStoryPlan,
 } from './ai.types.js';
 import { BOOK_INTERIOR_TEMPLATE_NAMES } from '../rendering/page-templates.config.js';
@@ -57,13 +58,19 @@ export class AiStubClient implements IAiClient {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async moderateText(_text: string): Promise<IModerationResult> {
+        return { safe: true };
+    }
+
     async generateImage(_input: IGenerateImageInput): Promise<Buffer> {
         this.logger.log(`[STUB] Generating image (size: ${_input.size})`);
         return placeholderImageBuffer;
     }
 
     private extractPageCount(userPrompt: string): number {
-        const match = new RegExp(/(\d+)\s*pages?/i).exec(userPrompt);
+        // Matches "5-page", "5 pages", or "exactly 5" — all used in prompt builder output
+        const match = /(\d+)[-\s]pages?/i.exec(userPrompt) ?? /exactly (\d+)/i.exec(userPrompt);
         return match ? Number.parseInt(match[1], 10) : 5;
     }
 }

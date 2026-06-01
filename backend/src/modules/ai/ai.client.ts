@@ -4,10 +4,14 @@ import {
     type IAiClient,
     type IGenerateImageInput,
     type IGenerateStoryPlanInput,
+    type IModerationResult,
     type IStoryPlan,
+    MODERATION_JSON_SCHEMA,
     STORY_PLAN_JSON_SCHEMA,
+    moderationSchema,
     storyPlanSchema,
 } from './ai.types.js';
+import { MODERATION_SYSTEM_PROMPT } from '../generation/generation.prompts.js';
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 1_000;
@@ -81,6 +85,51 @@ export class AiClient implements IAiClient {
         }>('/chat/completions', body);
 
         return this.extractImageBuffer(data.choices[0]?.message?.content, input.size);
+    }
+
+    async moderateText(text: string): Promise<IModerationResult> {
+        this.logger.log('Moderating story text');
+
+        const body = {
+            model: this.textModel,
+            max_tokens: 60,
+            response_format: {
+                type: 'json_schema',
+                json_schema: MODERATION_JSON_SCHEMA,
+            },
+            messages: [
+                {
+                    role: 'system',
+                    content: MODERATION_SYSTEM_PROMPT,
+                },
+                {
+                    role: 'user',
+                    content: `Review this children's book text:\n\n${text.slice(0, 3000)}`,
+                },
+            ],
+        };
+
+        try {
+            const data = await this.post<{ choices: { message: { content: string } }[] }>(
+                '/chat/completions',
+                body,
+            );
+            const raw = data.choices[0]?.message?.content;
+            if (!raw) return { safe: true };
+
+            const parsed = moderationSchema.safeParse(JSON.parse(raw));
+            if (!parsed.success) {
+                this.logger.warn(
+                    `Moderation schema mismatch — defaulting to safe: ${parsed.error.message}`,
+                );
+                return { safe: true };
+            }
+            return parsed.data;
+        } catch {
+            // Moderation failures are non-fatal — log and allow rather than block stories
+            this.logger.warn('Moderation check failed — defaulting to safe');
+            return { safe: true };
+        }
     }
 
     private extractImageBuffer(content: unknown, size: string): Buffer {

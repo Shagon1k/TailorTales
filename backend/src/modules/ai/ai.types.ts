@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-// ---------------------------------------------------------------------------
-// Story Plan — single source of truth via Zod.
-// IStoryPlan type AND the OpenRouter JSON Schema are both derived from here.
-// ---------------------------------------------------------------------------
-
 const storyPlanPageSchema = z.object({
     template: z.string(),
     text: z.string().nullable(),
@@ -42,13 +37,24 @@ export interface IGenerateImageInput {
     referenceImageKeys?: string[];
 }
 
-// ---------------------------------------------------------------------------
-// AI client interface — implemented by AiClient and AiStubClient
-// ---------------------------------------------------------------------------
+const moderationResultSchema = z.object({
+    safe: z.boolean(),
+    reason: z.string().optional(),
+});
+
+export type IModerationResult = z.infer<typeof moderationResultSchema>;
+
+export const moderationSchema = moderationResultSchema;
+
+export const MODERATION_JSON_SCHEMA = {
+    name: 'moderation_result',
+    schema: z.toJSONSchema(moderationResultSchema),
+} as const;
 
 export interface IAiClient {
     generateStoryPlan(input: IGenerateStoryPlanInput): Promise<IStoryPlan>;
     generateImage(input: IGenerateImageInput): Promise<Buffer>;
+    moderateText(text: string): Promise<IModerationResult>;
 }
 
 export const AI_CLIENT = Symbol('AI_CLIENT');

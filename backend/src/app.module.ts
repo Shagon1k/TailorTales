@@ -12,6 +12,7 @@ import { ChildrenModule } from './modules/children/children.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
 import { RenderingModule } from './modules/rendering/rendering.module.js';
 import { AiModule } from './modules/ai/ai.module.js';
+import { GenerationModule } from './modules/generation/generation.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -31,6 +32,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
         StorageModule,
         RenderingModule,
         AiModule,
+        GenerationModule,
         AuthModule,
         ChildrenModule,
         ArtStylesModule,

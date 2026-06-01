@@ -630,7 +630,13 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 **Sub-tasks:**
 
-- [ ] Architecture overview doc: system design, data flow diagram, key decisions and their rationale (covers Phases 0–6)
+- [ ] Architecture overview doc: system design, data flow diagram, key decisions and their rationale (covers Phases 0–6). **Must cover:**
+    - Generation pipeline: all 5 stages (Planning → Moderation → Pictures → Binding → Ready), what each stage does, what it writes to DB/S3
+    - `GenerationModule` DI wiring: how `GenerationService`, `GenerationPipeline`, and `GenerationWorker` relate — who calls whom and why they are separate classes
+    - Why `POST /stories/:id/generate` lives in `StoriesController` (not `GenerationController`) — NestJS controller placement rationale
+    - How BullMQ decouples HTTP (enqueue) from processing (worker → pipeline) — why pipeline has no BullMQ dependency and can be tested without Redis
+    - `StoryPlanValidator` two-class failure model: structural errors vs length overflows and why truncation was rejected
+    - `AiClient` vs `AiStubClient` swap via `USE_AI_STUBS` — how the full pipeline runs offline in CI
 - [ ] API reference: all endpoints, request/response shapes, auth rules, error codes
 - [ ] Developer onboarding guide: prerequisites, env setup, local run (frontend + backend + workers), first contribution checklist
 - [ ] Review and improve all `_docs/phase-N-*.md` files (0–6): fill gaps, fix stale info, ensure commands still work
