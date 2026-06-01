@@ -8,3 +8,8 @@ pnpm-lock.yaml
 .claude
 .github
 **/next-env.d.ts
+
+# Handlebars templates — rendered by Puppeteer into PDFs where whitespace
+# inside <style> blocks affects layout. Prettier's HTML formatter tangles
+# with Handlebars syntax and produces unstable output.
+**/*.hbs
