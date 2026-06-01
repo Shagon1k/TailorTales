@@ -1,4 +1,6 @@
-export type StoryType = 'BOOK' | 'COMIC';
+import type { StoryType } from '../../generated/prisma/enums.js';
+
+export type { StoryType };
 export type PageTemplateRole = 'cover' | 'interior' | 'final';
 
 export interface IImageSlot {
