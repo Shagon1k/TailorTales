@@ -1,0 +1,60 @@
+<style>
+    .text-image {
+        width: 148mm;
+        height: 210mm;
+        display: flex;
+        flex-direction: column;
+        background: #fdf6ec;
+    }
+    .text-image__image {
+        width: 100%;
+        height: 110mm;
+        flex-shrink: 0;
+        overflow: hidden;
+        background: #e8d8c4;
+    }
+    .text-image__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .text-image__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 6mm 10mm 8mm;
+        overflow: hidden;
+    }
+    .text-image__chapter {
+        font-family: 'Nunito', sans-serif;
+        font-size: 8pt;
+        font-weight: 700;
+        color: #c26a2a;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 3mm;
+    }
+    .text-image__body {
+        font-family: 'Literata', serif;
+        font-size: 11pt;
+        line-height: 1.65;
+        color: #2d1a0e;
+        text-align: justify;
+        hyphens: auto;
+        flex: 1;
+        overflow: hidden;
+    }
+</style>
+
+<div class='text-image'>
+    <div class='text-image__image'>
+        {{#if imageBase64}}
+            <img src='data:image/png;base64,{{imageBase64}}' alt='' />
+        {{/if}}
+    </div>
+    <div class='text-image__content'>
+        {{#if chapterTitle}}<div class='text-image__chapter text-zone'>{{chapterTitle}}</div>{{/if}}
+        <div class='text-image__body text-zone'>{{text}}</div>
+    </div>
+</div>

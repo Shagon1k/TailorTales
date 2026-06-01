@@ -10,6 +10,7 @@ import { StoriesModule } from './modules/stories/stories.module.js';
 import { StoryBlueprintsModule } from './modules/story-blueprints/story-blueprints.module.js';
 import { ChildrenModule } from './modules/children/children.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
+import { RenderingModule } from './modules/rendering/rendering.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -27,6 +28,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
         }),
         PrismaModule,
         StorageModule,
+        RenderingModule,
         AuthModule,
         ChildrenModule,
         ArtStylesModule,

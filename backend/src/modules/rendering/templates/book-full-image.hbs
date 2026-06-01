@@ -1,0 +1,38 @@
+<style>
+    .full-image {
+        width: 148mm;
+        height: 210mm;
+        position: relative;
+        background: #1a0a00;
+    }
+    .full-image__img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .full-image__caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 4mm 8mm 5mm;
+        background: linear-gradient(to top, rgba(20, 8, 0, 0.7) 0%, transparent 100%);
+        font-family: 'Nunito', sans-serif;
+        font-size: 9pt;
+        font-style: italic;
+        color: rgba(253, 246, 236, 0.9);
+        text-align: center;
+    }
+</style>
+
+<div class='full-image'>
+    {{#if imageBase64}}
+        <img class='full-image__img' src='data:image/png;base64,{{imageBase64}}' alt='' />
+    {{/if}}
+    {{#if caption}}
+        <div class='full-image__caption text-zone'>{{caption}}</div>
+    {{/if}}
+</div>
