@@ -1,0 +1,59 @@
+@use 'styles/typography' as *;
+
+.hero {
+    background: var(--gradient-card-twilight);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+
+    &__fox {
+        width: 140px;
+        height: 140px;
+        filter: drop-shadow(0 0 20px rgba(244, 162, 89, 0.4));
+    }
+
+    // Native <progress> with cross-browser custom styling.
+    // Each engine exposes different pseudo-elements; rules must be duplicated.
+    &__progress {
+        // Reset browser defaults
+        appearance: none;
+        border: none;
+
+        width: 100%;
+        max-width: 700px;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: var(--radius-pill);
+        overflow: hidden;
+        color: var(--accent-primary); // Firefox uses `color` for the fill
+
+        // Chrome / Safari — track
+        &::-webkit-progress-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-pill);
+        }
+
+        // Chrome / Safari — fill
+        &::-webkit-progress-value {
+            background: var(--gradient-progress);
+            border-radius: var(--radius-pill);
+            transition: inline-size 0.5s ease;
+        }
+
+        // Firefox — fill (no separate track pseudo)
+        &::-moz-progress-bar {
+            background: var(--gradient-progress);
+            border-radius: var(--radius-pill);
+            transition: inline-size 0.5s ease;
+        }
+    }
+
+    &__label {
+        @include t-body-sm;
+        color: var(--text-muted);
+    }
+}

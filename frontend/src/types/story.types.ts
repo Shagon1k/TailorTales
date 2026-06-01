@@ -45,6 +45,7 @@ export interface IStorySummary {
     artStyleId: string;
     language: ILanguage;
     title: string | null;
+    styleAnchor: string | null;
     isPublic: boolean;
     createdAt: string;
     updatedAt: string;

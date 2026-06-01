@@ -1,5 +1,21 @@
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getApiBaseUrl } from '@/lib/api';
 import type { ICreateStoryPayload, IStoryDetail, IStorySummary } from '@/types/story.types';
+
+export interface IActiveJob {
+    jobId: string;
+    storyId: string;
+}
+
+export interface IProgressSnapshot {
+    type: 'snapshot' | 'page_complete' | 'completed' | 'failed';
+    jobId: string;
+    stage: string | null;
+    status: string;
+    completedPages: number;
+    totalPages: number;
+    error: string | null;
+    pageOrder?: number;
+}
 
 export const storiesApi = {
     getAll: (): Promise<IStorySummary[]> => apiFetch<IStorySummary[]>('/stories'),
@@ -8,11 +24,28 @@ export const storiesApi = {
 
     getPublic: (): Promise<IStorySummary[]> => apiFetch<IStorySummary[]>('/stories/public'),
 
+    getActiveJob: (): Promise<IActiveJob | null> =>
+        apiFetch<IActiveJob | null>('/stories/active-job'),
+
     create: (payload: ICreateStoryPayload): Promise<IStorySummary> =>
         apiFetch<IStorySummary>('/stories', {
             method: 'POST',
             body: JSON.stringify(payload),
         }),
 
+    generate: (id: string): Promise<{ jobId: string; storyId: string }> =>
+        apiFetch<{ jobId: string; storyId: string }>(`/stories/${id}/generate`, {
+            method: 'POST',
+        }),
+
     remove: (id: string): Promise<void> => apiFetch<void>(`/stories/${id}`, { method: 'DELETE' }),
+
+    /**
+     * Opens an SSE connection to the story's progress stream.
+     * Returns an EventSource; caller is responsible for closing it.
+     */
+    openProgressStream: (storyId: string): EventSource =>
+        new EventSource(`${getApiBaseUrl()}/stories/${storyId}/progress`, {
+            withCredentials: true,
+        }),
 };

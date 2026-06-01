@@ -1,0 +1,14 @@
+@use 'styles/typography' as *;
+
+.banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: rgba(244, 162, 89, 0.1);
+    border: 1px solid rgba(244, 162, 89, 0.3);
+    border-radius: var(--radius-md);
+    @include t-body-sm;
+    color: var(--text-muted);
+}

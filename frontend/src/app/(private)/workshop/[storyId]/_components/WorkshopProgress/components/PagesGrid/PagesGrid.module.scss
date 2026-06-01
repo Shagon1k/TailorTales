@@ -1,0 +1,76 @@
+@use 'styles/typography' as *;
+
+.pages {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: var(--space-5);
+        @include t-heading-2xl;
+        color: var(--text-primary);
+        font-style: italic;
+    }
+
+    &__count {
+        @include t-caps-xs;
+        color: var(--text-muted);
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-3);
+    }
+}
+
+.thumb {
+    aspect-ratio: 3 / 4;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.4s ease;
+
+    &.m-painted {
+        background-image: repeating-linear-gradient(
+            45deg,
+            rgba(244, 162, 89, 0.1),
+            rgba(244, 162, 89, 0.1) 4px,
+            rgba(244, 162, 89, 0.2) 4px,
+            rgba(244, 162, 89, 0.2) 8px
+        );
+        color: transparent;
+    }
+
+    &.m-active {
+        border-color: var(--accent-gold);
+        background: radial-gradient(circle, rgba(232, 178, 60, 0.4), rgba(232, 178, 60, 0.1));
+        box-shadow: 0 0 20px rgba(232, 178, 60, 0.5);
+        color: var(--accent-gold);
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    &__num {
+        @include t-heading-2xl;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+}
+
+@keyframes pulse-glow {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+}

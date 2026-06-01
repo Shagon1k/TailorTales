@@ -13,9 +13,10 @@ vi.mock('next/navigation', () => ({
 }));
 
 const mockStoriesCreate = vi.hoisted(() => vi.fn());
+const mockStoriesGenerate = vi.hoisted(() => vi.fn());
 
 vi.mock('@/api/stories', () => ({
-    storiesApi: { create: mockStoriesCreate },
+    storiesApi: { create: mockStoriesCreate, generate: mockStoriesGenerate },
 }));
 
 const READER: IChild = {
@@ -65,6 +66,8 @@ describe('WorkshopForm', () => {
     beforeEach(() => {
         mockRouterPush.mockClear();
         mockStoriesCreate.mockClear();
+        mockStoriesGenerate.mockClear();
+        mockStoriesGenerate.mockResolvedValue({ jobId: 'job-1', storyId: 'story-new' });
     });
 
     describe('given the form is rendered', () => {
@@ -163,13 +166,14 @@ describe('WorkshopForm', () => {
             });
         });
 
-        it('should redirect to /library after successful submission', async () => {
+        it('should redirect to /workshop/[storyId] after successful submission', async () => {
             mockStoriesCreate.mockResolvedValue({ id: 'story-new' });
 
             await fillAndSubmit();
 
             await waitFor(() => {
-                expect(mockRouterPush).toHaveBeenCalledWith('/library');
+                expect(mockStoriesGenerate).toHaveBeenCalledWith('story-new');
+                expect(mockRouterPush).toHaveBeenCalledWith('/workshop/story-new');
             });
         });
 
@@ -179,7 +183,7 @@ describe('WorkshopForm', () => {
             await fillAndSubmit();
 
             await waitFor(() => {
-                expect(screen.getByText(/could not save your tale/i)).toBeInTheDocument();
+                expect(screen.getByText(/could not start generation/i)).toBeInTheDocument();
             });
         });
     });
