@@ -31,6 +31,7 @@ const MOCK_STORY: Story = {
     artStyleId: 'style-1',
     language: 'EN',
     title: null,
+    styleAnchor: null,
     isPublic: false,
     coverImageKey: null,
     pdfKey: null,

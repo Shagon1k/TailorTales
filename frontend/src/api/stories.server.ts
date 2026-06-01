@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { apiFetchServer } from '@/lib/api.server';
+import type { IActiveJob } from '@/api/stories';
 import type { IStoryConfig, IStoryDetail, IStorySummary } from '@/types/story.types';
 
 export const storiesServerApi = {
@@ -11,4 +12,7 @@ export const storiesServerApi = {
     getPublic: (): Promise<IStorySummary[]> => apiFetchServer<IStorySummary[]>('/stories/public'),
 
     getConfig: (): Promise<IStoryConfig> => apiFetchServer<IStoryConfig>('/stories/config'),
+
+    getActiveJob: (): Promise<IActiveJob | null> =>
+        apiFetchServer<IActiveJob | null>('/stories/active-job'),
 };

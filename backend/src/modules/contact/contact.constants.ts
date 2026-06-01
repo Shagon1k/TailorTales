@@ -1,0 +1,3 @@
+export const CONTACT_NAME_MAX_LENGTH = 80;
+export const CONTACT_MESSAGE_MIN_LENGTH = 10;
+export const CONTACT_MESSAGE_MAX_LENGTH = 5_000;

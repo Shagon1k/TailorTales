@@ -57,6 +57,35 @@ class EnvironmentVariables {
     @IsBoolean()
     @IsOptional()
     STORAGE_FORCE_PATH_STYLE: boolean = false;
+
+    // Redis (BullMQ)
+    @IsString()
+    REDIS_URL!: string;
+
+    // OpenRouter — text + image generation
+    @IsString()
+    OPENROUTER_API_KEY!: string;
+
+    @IsString()
+    OPENROUTER_TEXT_MODEL!: string;
+
+    @IsString()
+    OPENROUTER_IMAGE_MODEL!: string;
+
+    @IsBoolean()
+    @IsOptional()
+    USE_AI_STUBS: boolean = false;
+
+    // Resend — transactional email (story completed/failed, contact form)
+    @IsString()
+    RESEND_API_KEY!: string;
+
+    @IsString()
+    RESEND_FROM!: string;
+
+    /** Where contact-form submissions are routed. */
+    @IsString()
+    CONTACT_INBOX_EMAIL!: string;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {

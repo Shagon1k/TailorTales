@@ -25,7 +25,9 @@
             "@nestjs/core",
             "@prisma/engines",
             "esbuild",
-            "prisma"
+            "msgpackr-extract",
+            "prisma",
+            "puppeteer"
         ],
         "ignoredBuiltDependencies": [
             "sharp",

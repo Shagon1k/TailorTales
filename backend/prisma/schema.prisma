@@ -35,6 +35,23 @@ enum StoryStatus {
   FAILED
 }
 
+enum JobType {
+  GENERATION
+  REGENERATION
+}
+
+enum JobStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  STORY_COMPLETED
+  STORY_FAILED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -48,6 +65,7 @@ model User {
   children          Child[]
   stories           Story[]
   createdBlueprints StoryBlueprint[]
+  notifications     Notification[]
 }
 
 model Child {
@@ -94,24 +112,27 @@ model Story {
   artStyle   ArtStyle    @relation(fields: [artStyleId], references: [id])
   language   Language
   title         String?
+  styleAnchor   String?
   isPublic      Boolean     @default(false)
   coverImageKey String?
   pdfKey        String?
   createdAt     DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  updatedAt     DateTime    @updatedAt
 
   pages Page[]
+  jobs  Job[]
 }
 
 model Page {
-  id            String  @id @default(cuid())
-  storyId       String
-  story         Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
-  order         Int
-  chapterTitle  String?
-  text          String?
-  illustrations Json
-  layout        String?
+  id                  String  @id @default(cuid())
+  storyId             String
+  story               Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  order               Int
+  chapterTitle        String?
+  text                String?
+  illustrations       Json
+  layout              String?
+  illustrationPrompt  String?
 
   @@unique([storyId, order])
 }
@@ -130,4 +151,27 @@ model StoryBlueprint {
   updatedAt       DateTime  @updatedAt
 
   stories Story[]
+}
+
+model Job {
+  id        String    @id @default(cuid())
+  storyId   String
+  story     Story     @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  type      JobType
+  status    JobStatus @default(PENDING)
+  stage     String?
+  error     String?
+  attempts  Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  payload   Json
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
 }

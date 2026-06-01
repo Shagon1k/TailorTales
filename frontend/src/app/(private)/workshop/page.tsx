@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import PageHero from '@/components/ui/PageHero/PageHero';
 import { childrenServerApi } from '@/api/children.server';
 import { artStylesServerApi } from '@/api/art-styles.server';
@@ -12,6 +13,11 @@ interface IWorkshopPageProps {
 export default async function WorkshopPage({
     searchParams,
 }: Readonly<IWorkshopPageProps>): Promise<React.ReactElement> {
+    const activeJob = await storiesServerApi.getActiveJob();
+    if (activeJob) {
+        redirect(`/workshop/${activeJob.storyId}`);
+    }
+
     const [{ childId, question }, readers, artStyles, config] = await Promise.all([
         searchParams,
         childrenServerApi.getAll(),

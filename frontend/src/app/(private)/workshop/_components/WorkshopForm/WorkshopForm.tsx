@@ -83,7 +83,7 @@ export default function WorkshopForm({
         setSubmitError(null);
         setIsPending(true);
         try {
-            await storiesApi.create({
+            const story = await storiesApi.create({
                 childId: selectedChildId,
                 type: storyType,
                 question: question.trim(),
@@ -91,12 +91,11 @@ export default function WorkshopForm({
                 artStyleId,
                 language,
             });
-            // Phase 4: stories are created as DRAFT and hidden until generation completes.
-            // Phase 5 will redirect to /workshop/[jobId] for live generation progress.
-            router.push('/library');
+            await storiesApi.generate(story.id);
+            router.push(`/workshop/${story.id}`);
         } catch (err: unknown) {
-            console.error('Failed to create story', err);
-            setSubmitError('Could not save your tale. Please try again.');
+            console.error('Failed to start generation', err);
+            setSubmitError('Could not start generation. Please try again.');
         } finally {
             setIsPending(false);
         }
@@ -179,8 +178,9 @@ export default function WorkshopForm({
                         />
                         <RadioCard
                             value="COMIC"
-                            title="Comic"
+                            title="Comic — coming soon"
                             description="Panels, speech bubbles, more zip. Great for readers 6+. 2 credits / page"
+                            disabled
                         />
                     </RadioCardGroup>
                 </section>

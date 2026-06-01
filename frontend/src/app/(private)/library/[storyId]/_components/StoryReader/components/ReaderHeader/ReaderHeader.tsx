@@ -51,10 +51,22 @@ export default function ReaderHeader({ story }: Readonly<IReaderHeaderProps>): R
                     <Button variant="secondary" disabled>
                         + Share with family
                     </Button>
-                    {/* Download enabled only when pdfUrl exists — wired in Phase 5 */}
-                    <Button variant="primary" disabled={!story.pdfUrl}>
-                        ↓ Download PDF
-                    </Button>
+                    {story.pdfUrl ? (
+                        <Button
+                            variant="primary"
+                            component="a"
+                            href={story.pdfUrl}
+                            download={`${story.title ?? 'story'}.pdf`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ↓ Download PDF
+                        </Button>
+                    ) : (
+                        <Button variant="primary" disabled>
+                            ↓ Download PDF
+                        </Button>
+                    )}
                 </div>
             </div>
 

@@ -1,0 +1,48 @@
+@use 'styles/typography' as *;
+
+.log {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    max-height: 480px;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: var(--space-5);
+        @include t-heading-2xl;
+        color: var(--text-primary);
+        font-style: italic;
+    }
+
+    &__live {
+        @include t-caps-xs;
+        color: var(--accent-primary);
+    }
+
+    &__entries {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    &__entry {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        gap: var(--space-3);
+        @include t-body-sm;
+        color: var(--text-primary);
+    }
+
+    &__time {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+}
