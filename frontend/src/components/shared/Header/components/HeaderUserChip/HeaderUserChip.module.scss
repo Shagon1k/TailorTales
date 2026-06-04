@@ -13,14 +13,14 @@
     min-height: var(--hit-min);
 
     &:hover {
-        background: var(--bg-card);
+        background: var(--bg-elevated-hover);
     }
 }
 
 .chip__info {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: var(--space-1);
 }
 
 .chip__name {
@@ -30,7 +30,11 @@
 }
 
 .chip__plan {
-    @include t-caps-xs;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--text-muted);
     line-height: 1;
 }

@@ -6,8 +6,26 @@
 .badge {
     position: absolute;
     top: calc(-1 * var(--space-4));
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    display: flex;
+    margin-right: var(--space-8);
+    justify-content: right;
+    pointer-events: none;
+}
+
+.badge-pill {
+    pointer-events: auto;
+    display: inline-block;
+    background: var(--accent-primary);
+    color: var(--color-moon);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-pill);
 }
 
 // Flex column wrapper — Card atom is closed (no className), so layout lives here.

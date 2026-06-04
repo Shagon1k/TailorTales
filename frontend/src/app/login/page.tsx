@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import Card from '@/components/ui/Card/Card';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
 import Button from '@/components/ui/Button/Button';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import Divider from '@/components/ui/Divider/Divider';
 import Link from '@/components/ui/Link/Link';
+import Footer from '@/components/shared/Footer/Footer';
 import { useCurrentUser } from '@/context/UserContext';
 import styles from './page.module.scss';
 
@@ -59,20 +60,12 @@ export default function LoginPage(): React.ReactElement {
 
             <main className={styles.main}>
                 <div className={styles.illustration} aria-hidden="true">
-                    <div className={styles['illustration__glow']} />
-                    <Image
-                        src="/images/fox-hero.webp"
-                        alt=""
-                        width={480}
-                        height={480}
-                        className={styles['illustration__img']}
-                        priority
-                    />
+                    <MascotImage image="fox-hero" size={280} glow="aura" />
                 </div>
 
                 <Card variant="dark" size="hero">
                     <div className={styles['card-content']}>
-                        <CapsLabel variant="gold">· Welcome back ·</CapsLabel>
+                        <CapsLabel variant="gold">· Sign in ·</CapsLabel>
 
                         <div className={styles['card-head']}>
                             <h1 className={styles['card-heading']}>Step back into the workshop.</h1>
@@ -85,21 +78,22 @@ export default function LoginPage(): React.ReactElement {
                         <Button
                             component="a"
                             href={`${BACKEND_URL}/auth/google`}
-                            variant="on-card"
+                            variant="light"
+                            fullWidth
                             leftSection={<GoogleIcon />}
                         >
                             Continue with Google
                         </Button>
 
-                        <Divider variant="dashed" />
+                        <Divider variant="needle" />
 
                         <p className={styles.legal}>
                             By continuing you agree to our{' '}
-                            <Link href="#" variant="on-card">
+                            <Link href="#" variant="gold">
                                 terms
                             </Link>{' '}
                             and{' '}
-                            <Link href="/privacy" variant="on-card">
+                            <Link href="/privacy" variant="gold">
                                 privacy
                             </Link>{' '}
                             policy. We will never sell your child&apos;s data. We promise.
@@ -108,20 +102,7 @@ export default function LoginPage(): React.ReactElement {
                 </Card>
             </main>
 
-            <footer className={styles.footer}>
-                <p className={styles['footer__copy']}>© TailorTales · Tallinn 2026</p>
-                <nav className={styles['footer__links']} aria-label="Footer navigation">
-                    <Link href="/privacy" variant="quiet">
-                        Privacy
-                    </Link>
-                    <Link href="#" variant="quiet">
-                        Terms
-                    </Link>
-                    <Link href="#" variant="quiet">
-                        Safety for kids
-                    </Link>
-                </nav>
-            </footer>
+            <Footer />
         </div>
     );
 }

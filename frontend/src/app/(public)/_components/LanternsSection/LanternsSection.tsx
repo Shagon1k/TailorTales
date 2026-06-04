@@ -25,7 +25,7 @@ export default function LanternsSection(): React.ReactElement {
         <section className={styles.lanterns}>
             <div className={styles.lanterns__inner}>
                 <div className={styles.lanterns__header}>
-                    <CapsLabel>· How the workshop works ·</CapsLabel>
+                    <CapsLabel variant="gold">· How the workshop works ·</CapsLabel>
                     <h2 className={styles.lanterns__heading}>Three lanterns, then a book.</h2>
                 </div>
                 <div className={styles.lanterns__grid}>

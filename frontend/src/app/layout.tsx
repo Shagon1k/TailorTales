@@ -4,6 +4,7 @@ import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '../styles/globals.scss';
 import { getServerUser } from '@/api/user.server';
+import StarField from '@/components/shared/StarField/StarField';
 import Providers from './providers';
 
 const newsreader = Newsreader({
@@ -50,6 +51,7 @@ export default async function RootLayout({
                 <ColorSchemeScript />
             </head>
             <body>
+                <StarField />
                 <Providers initialUser={initialUser}>{children}</Providers>
             </body>
         </html>

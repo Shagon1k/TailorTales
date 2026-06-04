@@ -7,9 +7,17 @@
 }
 
 .account__hero {
-    background: var(--bg-elevated);
+    position: relative;
+    z-index: 1;
     border-bottom: 1px solid var(--border-subtle);
     padding: var(--space-12) 0 var(--space-10);
+}
+
+.account__hero-mascot {
+    position: absolute;
+    bottom: -22px;
+    right: var(--space-6);
+    pointer-events: none;
 }
 
 .account__hero-inner {
@@ -18,12 +26,8 @@
     padding: 0 var(--space-6);
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-3);
-}
-
-.account__eyebrow {
-    @include t-caps-xs;
-    color: var(--text-muted);
 }
 
 .account__heading {

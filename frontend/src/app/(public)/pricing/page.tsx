@@ -22,7 +22,7 @@ const PRICING_DATA: IPricingData = {
                 'Email + in-app delivery',
             ],
             ctaLabel: 'Begin free →',
-            ctaHref: '/sign-up',
+            ctaHref: '/login',
         },
         {
             id: 'story-hour',
@@ -38,7 +38,7 @@ const PRICING_DATA: IPricingData = {
                 'Stories kept forever',
             ],
             ctaLabel: 'Join Story Hour →',
-            ctaHref: '/sign-up?plan=story-hour',
+            ctaHref: '/login',
             mostLoved: true,
         },
         {
@@ -55,7 +55,7 @@ const PRICING_DATA: IPricingData = {
                 'Early access to new art styles',
             ],
             ctaLabel: 'Open the workshop →',
-            ctaHref: '/sign-up?plan=family',
+            ctaHref: '/login',
         },
     ],
     comparison: {

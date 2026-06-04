@@ -116,13 +116,32 @@ describe('AccountSidebar', () => {
     });
 
     describe('when Sign out is clicked', () => {
-        it('should call authApi.logout and redirect to /login', async () => {
+        it('should call authApi.logout and hard-redirect home', async () => {
+            const hrefSetter = vi.fn();
+            const originalLocation = globalThis.location;
+            Object.defineProperty(globalThis, 'location', {
+                configurable: true,
+                value: {
+                    get href() {
+                        return '';
+                    },
+                    set href(value: string) {
+                        hrefSetter(value);
+                    },
+                },
+            });
+
             render(<AccountSidebar />);
 
             await userEvent.click(screen.getByRole('button', { name: /sign out/i }));
 
             expect(mockLogout).toHaveBeenCalled();
-            expect(mockRouterReplace).toHaveBeenCalledWith('/login');
+            expect(hrefSetter).toHaveBeenCalledWith('/');
+
+            Object.defineProperty(globalThis, 'location', {
+                configurable: true,
+                value: originalLocation,
+            });
         });
     });
 });

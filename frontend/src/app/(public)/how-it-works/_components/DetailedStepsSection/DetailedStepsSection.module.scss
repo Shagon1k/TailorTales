@@ -35,13 +35,13 @@
 
 .step__title {
     @include t-heading-2xl;
-    color: var(--text-on-card);
+    color: var(--text-primary);
     display: block;
 }
 
 .step__body {
     @include t-body-md;
-    color: var(--text-on-card-2);
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -56,7 +56,7 @@
 
 .step__detail-item {
     @include t-body-sm;
-    color: var(--text-on-card-3);
+    color: var(--text-muted);
     display: flex;
     gap: var(--space-2);
 }

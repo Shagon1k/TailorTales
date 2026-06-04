@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { authApi } from '@/api/auth';
 import { useCurrentUser } from '@/context/UserContext';
@@ -24,7 +24,6 @@ const NAV_ITEMS: INavItem[] = [
 export default function AccountSidebar(): React.ReactElement {
     const { user } = useCurrentUser();
     const pathname = usePathname();
-    const router = useRouter();
     const initial = user?.name?.charAt(0).toUpperCase() ?? '?';
 
     async function handleSignOut(): Promise<void> {
@@ -33,7 +32,7 @@ export default function AccountSidebar(): React.ReactElement {
         } catch (err: unknown) {
             console.error('Sign out failed', err);
         }
-        router.replace('/login');
+        window.location.href = '/';
     }
 
     return (

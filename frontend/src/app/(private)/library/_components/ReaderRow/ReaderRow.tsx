@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
+import CapsLink from '@/components/ui/CapsLink/CapsLink';
 import type { IChild } from '@/types/child.types';
 import type { IStorySummary } from '@/types/story.types';
 import ReaderCard from './components/ReaderCard/ReaderCard';
@@ -20,9 +20,7 @@ export default function ReaderRow({
                 <h2 id="readers-heading" className={styles['reader-row__title']}>
                     Your readers
                 </h2>
-                <Link href="/account/children" className={styles['reader-row__manage']}>
-                    <CapsLabel>Manage children →</CapsLabel>
-                </Link>
+                <CapsLink href="/account/children">Manage children →</CapsLink>
             </div>
 
             <div className={styles['reader-row__track']} role="list" aria-label="Readers">

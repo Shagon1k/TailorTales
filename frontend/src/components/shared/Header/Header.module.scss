@@ -4,14 +4,23 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--bg-canvas);
-    border-bottom: 1px solid var(--border-subtle);
+    background: transparent;
+    transition:
+        background var(--duration-slow) var(--ease-in-out),
+        box-shadow var(--duration-slow) var(--ease-in-out),
+        backdrop-filter var(--duration-slow) var(--ease-in-out);
+
+    &[data-scrolled='true'] {
+        background: color-mix(in srgb, var(--bg-canvas) 78%, transparent);
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow-glow-fox);
+    }
 }
 
 .header__inner {
-    max-width: 1200px;
+    max-width: var(--layout-max-width);
     margin: 0 auto;
-    padding: 0 var(--space-6);
+    padding: 0 var(--layout-gutter);
     height: var(--space-16);
     display: flex;
     align-items: center;

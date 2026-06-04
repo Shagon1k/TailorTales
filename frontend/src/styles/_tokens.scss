@@ -14,6 +14,7 @@
     --color-ink-3: #977774;
     --color-twilight: #2e1011;
     --color-twilight-2: #421c19;
+    --color-bark: #583b35;
     --color-moon: #f8eace;
     --color-fox: #f86e42;
     --color-fox-soft: #fbb08e;
@@ -25,13 +26,15 @@
     // ---- Semantic surfaces ----
     --bg-canvas: var(--color-twilight);
     --bg-elevated: var(--color-twilight-2);
+    --bg-elevated-hover: var(--color-bark);
     --bg-card: var(--color-paper);
     --bg-card-2: var(--color-paper-2);
+    --bg-card-3: var(--color-paper-3);
 
     // ---- Semantic text ----
     --text-primary: var(--color-moon);
     --text-secondary: rgba(248, 234, 206, 0.78);
-    --text-muted: rgba(248, 234, 206, 0.55);
+    --text-muted: rgba(248, 234, 206, 0.66);
     --text-on-card: var(--color-ink);
     --text-on-card-2: var(--color-ink-2);
     --text-on-card-3: var(--color-ink-3);
@@ -42,6 +45,7 @@
     --border-subtle: rgba(248, 234, 206, 0.16);
     --border-strong: rgba(248, 234, 206, 0.32);
     --border-on-card: rgba(78, 25, 30, 0.18);
+    --border-on-dark: var(--color-bark);
 
     // ---- Semantic accents ----
     --accent-primary: var(--color-fox);
@@ -79,8 +83,8 @@
 
     // ---- Line heights ----
     --lh-tight: 1; // display styles
-    --lh-snug: 1.1; // headings, caps
-    --lh-normal: 1.2; // body text
+    --lh-snug: 1.15; // headings
+    --lh-normal: 1.5; // body text
 
     // ---- Letter spacing ----
     --ls-display: -0.32px; // display headings
@@ -142,10 +146,16 @@
         rgba(78, 25, 30, 0.06) 5px
     );
 
+    // ---- Layout ----
+    --layout-max-width: 1200px;
+    --layout-gutter: var(--space-6);
+    --header-height: var(--space-16);
+
     // ---- Motion ----
     --duration-base: 200ms;
     --duration-slow: 400ms;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
 
     // ---- Focus & accessibility ----
     --focus-ring-color: var(--color-fox);

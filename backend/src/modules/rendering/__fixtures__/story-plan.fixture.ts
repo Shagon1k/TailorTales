@@ -1,5 +1,8 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 import type { IStoryToRender } from '../rendering.types.js';
 
 const placeholderBase64 = readFileSync(join(__dirname, '../assets/placeholder.png')).toString(

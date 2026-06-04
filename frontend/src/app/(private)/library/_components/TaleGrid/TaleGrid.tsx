@@ -35,15 +35,23 @@ export default function TaleGrid({
     return (
         <section className={styles['tale-grid']} aria-labelledby="library-heading">
             <div className={styles['tale-grid__header']}>
-                <h2 id="library-heading" className={styles['tale-grid__title']}>
-                    Your library
-                    <span
-                        className={styles['tale-grid__count']}
-                    >{` · ${stories.length} tales`}</span>
-                </h2>
+                <div className={styles['tale-grid__heading-group']}>
+                    <h2 id="library-heading" className={styles['tale-grid__title']}>
+                        Your library
+                    </h2>
+                    <span className={styles['tale-grid__count']}>
+                        {stories.length} {stories.length === 1 ? 'tale' : 'tales'}
+                    </span>
+                </div>
 
-                <fieldset className={styles['tale-grid__filters']} role="radiogroup">
-                    <legend className={styles['tale-grid__filter-label']}>Filter</legend>
+                <div
+                    role="radiogroup"
+                    aria-labelledby="tale-grid-filter-label"
+                    className={styles['tale-grid__filters']}
+                >
+                    <span id="tale-grid-filter-label" className={styles['tale-grid__filter-label']}>
+                        Filter
+                    </span>
                     {filterOptions.map(({ value, label }) => (
                         <button
                             key={value}
@@ -58,7 +66,7 @@ export default function TaleGrid({
                             {label}
                         </button>
                     ))}
-                </fieldset>
+                </div>
             </div>
 
             {filtered.length === 0 ? (

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import PageHero from '@/components/ui/PageHero/PageHero';
+import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import { childrenServerApi } from '@/api/children.server';
 import { artStylesServerApi } from '@/api/art-styles.server';
 import { storiesServerApi } from '@/api/stories.server';
@@ -27,7 +27,14 @@ export default async function WorkshopPage({
 
     return (
         <main className={styles.page}>
-            <PageHero eyebrow="· THE WORKSHOP ·" heading="Let's make one small tale." />
+            <PageHero
+                eyebrow="The workshop"
+                heading={
+                    <>
+                        Let&apos;s make one <HeroHighlight>small tale</HeroHighlight>.
+                    </>
+                }
+            />
             <WorkshopForm
                 readers={readers}
                 artStyles={artStyles}

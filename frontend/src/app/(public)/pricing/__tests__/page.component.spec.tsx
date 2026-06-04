@@ -2,6 +2,11 @@ import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import PricingPage from '../page';
 
+// CtaSection is an async server component (reads the session) — stub it for sync render.
+vi.mock('@/app/(public)/_components/CtaSection/CtaSection', () => ({
+    default: () => null,
+}));
+
 function renderWithMantine(ui: React.ReactElement): ReturnType<typeof render> {
     return render(<MantineProvider>{ui}</MantineProvider>);
 }

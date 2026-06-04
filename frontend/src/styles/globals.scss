@@ -15,8 +15,11 @@ html {
 }
 
 body {
+    position: relative;
     min-height: 100vh;
     background-color: var(--bg-canvas);
+    background-image: var(--gradient-page);
+    background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-sans);
 }

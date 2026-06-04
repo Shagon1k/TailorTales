@@ -29,30 +29,11 @@ export default function ChildCard({
     return (
         <Card variant="dark" size="md">
             <div className={styles.body}>
-                <div className={styles.header}>
-                    <div className={styles.info}>
-                        <h4 className={styles.name}>{child.name}</h4>
-                        <p className={styles.meta}>
-                            {getAgeLabel(child.birthdate)} ·{' '}
-                            {child.gender === 'MALE' ? 'Boy' : 'Girl'}
-                        </p>
-                    </div>
-                    <div className={styles.actions}>
-                        <Button
-                            variant="quiet"
-                            onClick={() => onEdit(child)}
-                            aria-label={`Edit ${child.name}`}
-                        >
-                            Edit
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={() => onDelete(child)}
-                            aria-label={`Delete ${child.name}`}
-                        >
-                            Delete
-                        </Button>
-                    </div>
+                <div className={styles.info}>
+                    <h4 className={styles.name}>{child.name}</h4>
+                    <p className={styles.meta}>
+                        {getAgeLabel(child.birthdate)} · {child.gender === 'MALE' ? 'Boy' : 'Girl'}
+                    </p>
                 </div>
 
                 {child.interests.length > 0 && (
@@ -64,6 +45,23 @@ export default function ChildCard({
                         ))}
                     </div>
                 )}
+
+                <div className={styles.actions}>
+                    <Button
+                        variant="quiet"
+                        onClick={() => onEdit(child)}
+                        aria-label={`Edit ${child.name}`}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={() => onDelete(child)}
+                        aria-label={`Delete ${child.name}`}
+                    >
+                        Delete
+                    </Button>
+                </div>
             </div>
         </Card>
     );

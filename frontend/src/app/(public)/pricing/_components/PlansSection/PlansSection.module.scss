@@ -35,8 +35,8 @@
     min-height: var(--hit-min);
 
     &[data-active='true'] {
-        background: var(--gradient-fox-bevel);
-        color: var(--text-on-card);
+        background: var(--accent-primary);
+        color: var(--color-moon);
     }
 }
 

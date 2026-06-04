@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import BrandMark from '@/components/ui/BrandMark/BrandMark';
 import styles from './Footer.module.scss';
 
 export default function Footer(): React.ReactElement {
@@ -7,7 +6,9 @@ export default function Footer(): React.ReactElement {
         <footer className={styles.footer}>
             <div className={styles.footer__inner}>
                 <div className={styles.footer__brand}>
-                    <BrandMark />
+                    <Link href="/" className={styles.footer__wordmark}>
+                        TailorTales
+                    </Link>
                     <p className={styles.footer__tagline}>
                         A small workshop for one child&apos;s questions.
                     </p>

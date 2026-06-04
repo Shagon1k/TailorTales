@@ -4,10 +4,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
-    background: var(--bg-card);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
     padding: var(--space-4);
-    box-shadow: var(--shadow-sm);
     width: 240px;
     flex-shrink: 0;
     align-self: flex-start;
@@ -91,12 +91,12 @@
         color var(--duration-base) var(--ease-out);
 
     &:hover {
-        background: var(--bg-elevated);
+        background: var(--bg-elevated-hover);
     }
 
     &.m-active {
         color: var(--text-accent);
-        background: var(--bg-elevated);
+        background: var(--bg-elevated-hover);
     }
 }
 
@@ -133,7 +133,7 @@
         background var(--duration-base) var(--ease-out);
 
     &:hover {
-        background: var(--bg-elevated);
+        background: var(--bg-elevated-hover);
         color: var(--text-primary);
     }
 }
@@ -154,6 +154,6 @@
         background var(--duration-base) var(--ease-out);
 
     &:hover {
-        background: var(--bg-elevated);
+        background: var(--bg-elevated-hover);
     }
 }

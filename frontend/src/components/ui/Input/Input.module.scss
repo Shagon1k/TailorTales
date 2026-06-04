@@ -46,6 +46,8 @@
         .input__field {
             border: 1px solid var(--border-strong);
             color: var(--text-primary);
+            // Render native controls (e.g. the date picker icon) in dark mode.
+            color-scheme: dark;
 
             &::placeholder {
                 color: var(--text-muted);

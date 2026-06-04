@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
@@ -10,10 +13,24 @@ interface IHeaderProps {
 }
 
 export default function Header({ variant }: Readonly<IHeaderProps>): React.ReactElement {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const onScroll = (): void => setScrolled(window.scrollY > 10);
+        // Defer the initial check out of the effect body (handles loads that
+        // start already scrolled, e.g. hash anchors) without a sync setState.
+        const raf = requestAnimationFrame(onScroll);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('scroll', onScroll);
+        };
+    }, []);
+
     return (
-        <header className={styles.header}>
+        <header className={styles.header} data-scrolled={scrolled}>
             <div className={styles.header__inner}>
-                <BrandMark size="sm" />
+                <BrandMark size="lg" />
                 <nav className={styles.header__nav} aria-label="Main navigation">
                     {variant === 'public' ? (
                         <>
@@ -23,21 +40,21 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                             <Link href="/pricing" className={styles.header__link}>
                                 Pricing
                             </Link>
-                            <Link href="/sign-in" className={styles.header__link}>
+                            <Link href="/login" className={styles.header__link}>
                                 Sign in
                             </Link>
-                            <ButtonLink href="/sign-up">Begin a tale →</ButtonLink>
+                            <ButtonLink href="/login">Begin a tale →</ButtonLink>
                         </>
                     ) : (
                         <>
-                            <Link href="/account/library" className={styles.header__link}>
+                            <Link href="/library" className={styles.header__link}>
                                 Library
                             </Link>
-                            <Link href="/account/workshop" className={styles.header__link}>
+                            <Link href="/workshop" className={styles.header__link}>
                                 Workshop
                             </Link>
-                            <Link href="/account/children" className={styles.header__link}>
-                                Children
+                            <Link href="/pricing" className={styles.header__link}>
+                                Pricing
                             </Link>
                             <span className={styles['header__nav-divider']} aria-hidden="true" />
                             <NotificationBell />

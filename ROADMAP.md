@@ -772,6 +772,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
     - "Share this story as an example for other families" opt-in toggle
     - "Save rating" button
 - [ ] Frontend: `/` landing page — wire public stories grid (was empty in Phase 3)
+- [ ] Frontend: custom `not-found.tsx` page (currently shows Next.js default 404)
 - [ ] Admin: manage `Story.isPublic` visibility (override/retract public status)
 - [ ] Tests: rating CRUD, upsert behavior, isPublic propagation, public story list, admin rating view
 

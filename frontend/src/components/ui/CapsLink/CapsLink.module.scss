@@ -1,0 +1,20 @@
+@use 'styles/typography' as *;
+
+.caps-link {
+    @include t-caps-xs;
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent-gold);
+    text-decoration: none;
+    transition:
+        color var(--duration-base) var(--ease-out),
+        opacity var(--duration-base) var(--ease-out);
+
+    &:hover {
+        color: var(--accent-primary);
+    }
+
+    &:active {
+        opacity: 0.7;
+    }
+}

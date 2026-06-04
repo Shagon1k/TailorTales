@@ -8,6 +8,18 @@
 
 // Input and Textarea styling is owned by the ui/Input and ui/Textarea atoms.
 
+.form__name-field {
+    position: relative;
+    padding-top: var(--space-10);
+}
+
+.form__name-mascot {
+    position: absolute;
+    top: -47px;
+    right: var(--space-1);
+    pointer-events: none;
+}
+
 .error {
     @include t-body-sm;
     color: var(--text-accent);

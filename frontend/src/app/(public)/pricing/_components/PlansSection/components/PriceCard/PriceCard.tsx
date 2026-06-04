@@ -1,6 +1,5 @@
 import Card from '@/components/ui/Card/Card';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
-import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import type { IPricingPlan } from '../../../types';
 import styles from './PriceCard.module.scss';
 
@@ -23,10 +22,10 @@ export default function PriceCard({
     const isFree = priceMonthly === 0;
 
     return (
-        <Card variant={mostLoved ? 'gradient' : 'outlined'} size="hero">
+        <Card variant={mostLoved ? 'featured' : 'dark'} size="hero">
             {mostLoved && (
                 <div className={styles.badge}>
-                    <CapsLabel variant="on-card">Most loved</CapsLabel>
+                    <span className={styles['badge-pill']}>Most loved</span>
                 </div>
             )}
             <div className={styles.body}>

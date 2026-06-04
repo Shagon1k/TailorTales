@@ -2,6 +2,11 @@ import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import HowItWorksPage from '../page';
 
+// CtaSection is an async server component (reads the session) — stub it for sync render.
+vi.mock('@/app/(public)/_components/CtaSection/CtaSection', () => ({
+    default: () => null,
+}));
+
 function renderWithMantine(ui: React.ReactElement): ReturnType<typeof render> {
     return render(<MantineProvider>{ui}</MantineProvider>);
 }
@@ -18,7 +23,7 @@ describe('HowItWorksPage', () => {
     it('should display the eyebrow label', () => {
         renderWithMantine(<HowItWorksPage />);
 
-        expect(screen.getByText('· The workshop ·')).toBeInTheDocument();
+        expect(screen.getByText('How it works')).toBeInTheDocument();
     });
 
     it('should display all three step cards', () => {
