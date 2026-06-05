@@ -607,14 +607,14 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 **Sub-tasks:**
 
-- [ ] Developer walkthrough of the full happy path: sign in → add child → workshop form → generate a book (real OpenRouter + Resend keys) → live progress → download PDF → read in-browser → rate/regenerate panels present
-- [ ] Cross-cutting UI review: every page/route renders, navigation (public + private headers, account sidebar), responsive-at-desktop, focus states, toasts, empty/loading/error states
-- [ ] Backend review: error responses + status codes, ownership scoping (cross-user access blocked), 1-concurrent 409, SSE stream behavior, failure handling (FAILED stories surface errors), signed-URL expiry
-- [ ] Generated-output quality pass: PDF layout per template (fonts, margins, image fit, text overflow safety net), watermark present, cover/final pages, age/language adaptation sanity check
-- [ ] Log every issue in a triage list with severity (blocker / major / minor / polish) and area (FE / BE / pipeline / content)
-- [ ] Fix all blocker + major issues; defer minor/polish to a tracked list (propose ROADMAP Deferred entries for anything not fixed, with developer approval)
-- [ ] Each fix is a focused commit referencing the issue; add a regression test where the bug had test-coverage value
-- [ ] Re-run the full automated suite (`pnpm test`, `type-check`, `lint`) green after fixes
+- [x] Developer walkthrough of the full happy path: sign in → add child → workshop form → generate a book (real OpenRouter + Resend keys) → live progress → download PDF → read in-browser → rate/regenerate panels present
+- [x] Cross-cutting UI review: every page/route renders, navigation (public + private headers, account sidebar), responsive-at-desktop, focus states, toasts, empty/loading/error states
+- [x] Backend review: error responses + status codes, ownership scoping (cross-user access blocked), 1-concurrent 409, SSE stream behavior, failure handling (FAILED stories surface errors), signed-URL expiry
+- [x] Generated-output quality pass: PDF layout per template (fonts, margins, image fit, text overflow safety net), watermark present, cover/final pages, age/language adaptation sanity check
+- [x] Log every issue in a triage list with severity (blocker / major / minor / polish) and area (FE / BE / pipeline / content)
+- [x] Fix all blocker + major issues; defer minor/polish to a tracked list (propose ROADMAP Deferred entries for anything not fixed, with developer approval)
+- [x] Each fix is a focused commit referencing the issue; add a regression test where the bug had test-coverage value
+- [x] Re-run the full automated suite (`pnpm test`, `type-check`, `lint`) green after fixes
 
 **Acceptance Check:**
 
@@ -943,7 +943,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 | 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                           |
 | 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                    |
 | 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred. |
-| 6 — Human Verification & Bug Fixing | ⬜ Not started | Human QA gate before docs — run the app, log + fix bugs                                                                                            |
+| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                         |
 | 7 — Mid-point Documentation         | ⬜ Not started |                                                                                                                                                    |
 | 8 — Regeneration                    | ⬜ Not started |                                                                                                                                                    |
 | 9 — Subscriptions                   | ⬜ Not started |                                                                                                                                                    |
