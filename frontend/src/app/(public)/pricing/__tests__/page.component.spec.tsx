@@ -16,7 +16,7 @@ describe('PricingPage', () => {
         renderWithMantine(<PricingPage />);
 
         expect(
-            screen.getByRole('heading', { level: 1, name: /pricing as quiet/i }),
+            screen.getByRole('heading', { level: 1, name: /priced like a small workshop/i }),
         ).toBeInTheDocument();
     });
 
