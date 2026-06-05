@@ -36,3 +36,9 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--space-6);
 }
+
+.failureActions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+}

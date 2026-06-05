@@ -1,6 +1,9 @@
+import type { Metadata } from 'next';
 import CtaSection from '../_components/CtaSection/CtaSection';
 import PricingHero from './_components/PricingHero/PricingHero';
 import PlansSection from './_components/PlansSection/PlansSection';
+
+export const metadata: Metadata = { title: 'Pricing' };
 import ComparisonTable from './_components/ComparisonTable/ComparisonTable';
 import FaqSection from './_components/FaqSection/FaqSection';
 import type { IPricingData } from './_components/types';
@@ -12,10 +15,10 @@ const PRICING_DATA: IPricingData = {
         {
             id: 'free',
             name: 'Free Chapter',
-            tagline: 'A first tale on the workshop.',
+            tagline: 'A first tale, free.',
             priceMonthly: 0,
             features: [
-                '1 short tale (up to 8 pages)',
+                '1 tale per month (up to 12 pages)',
                 'Watermarked PDF',
                 '1 child profile',
                 'All starter art styles',
@@ -28,9 +31,9 @@ const PRICING_DATA: IPricingData = {
             id: 'story-hour',
             name: 'Story Hour',
             tagline: 'The cosy bedtime bundle.',
-            priceMonthly: 8,
+            priceMonthly: 5,
             features: [
-                'Up to 48 pages a month',
+                'Up to 60 pages a month',
                 'Books and comics',
                 'Up to 3 children',
                 '10 page regenerations / month',
@@ -45,9 +48,9 @@ const PRICING_DATA: IPricingData = {
             id: 'family',
             name: 'Family Workshop',
             tagline: 'For voracious little readers.',
-            priceMonthly: 16,
+            priceMonthly: 10,
             features: [
-                'Up to 120 pages a month',
+                'Up to 150 pages a month',
                 'Unlimited children',
                 '30 regenerations / month',
                 'Priority queue · faster painting',
@@ -65,9 +68,9 @@ const PRICING_DATA: IPricingData = {
                 rows: [
                     {
                         feature: 'Pages per month',
-                        free: { type: 'text', value: '8' },
-                        storyHour: { type: 'text', value: '48' },
-                        family: { type: 'text', value: '120' },
+                        free: { type: 'text', value: '12' },
+                        storyHour: { type: 'text', value: '60' },
+                        family: { type: 'text', value: '150' },
                     },
                     {
                         feature: 'Books and comics',
@@ -162,7 +165,7 @@ const PRICING_DATA: IPricingData = {
         },
         {
             q: 'Can I gift a tale?',
-            a: 'You can. Story Hour comes with one giftable tale a month — perfect for nieces, nephews, and small friends.',
+            a: 'Yes. Both paid plans let you share finished tales — perfect for nieces, nephews, and small friends.',
         },
         {
             q: 'What languages?',

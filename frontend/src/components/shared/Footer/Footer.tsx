@@ -14,6 +14,12 @@ export default function Footer(): React.ReactElement {
                     </p>
                 </div>
                 <nav className={styles.footer__links} aria-label="Footer navigation">
+                    <Link href="/how-it-works" className={styles.footer__link}>
+                        How it works
+                    </Link>
+                    <span className={styles.footer__separator} aria-hidden="true">
+                        ·
+                    </span>
                     <Link href="/privacy" className={styles.footer__link}>
                         Privacy
                     </Link>

@@ -1,5 +1,8 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { storyBlueprintsServerApi } from '@/api/story-blueprints.server';
+
+export const metadata: Metadata = { title: 'Blueprints' };
 import BlueprintList from './_components/BlueprintList/BlueprintList';
 import styles from './page.module.scss';
 

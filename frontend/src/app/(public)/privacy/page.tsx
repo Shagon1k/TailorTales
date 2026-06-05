@@ -1,5 +1,8 @@
+import type { Metadata } from 'next';
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import PrivacyContent from './_components/PrivacyContent/PrivacyContent';
+
+export const metadata: Metadata = { title: 'Privacy' };
 
 export default function PrivacyPage(): React.ReactElement {
     return (

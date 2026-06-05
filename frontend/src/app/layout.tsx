@@ -33,7 +33,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'TailorTales',
+    title: {
+        default: 'TailorTales',
+        template: 'TailorTales | %s',
+    },
     description: 'Personalized AI-generated storybooks & comics for curious kids',
 };
 

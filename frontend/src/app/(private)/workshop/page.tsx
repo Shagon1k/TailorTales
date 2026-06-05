@@ -1,4 +1,7 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = { title: 'Workshop' };
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import { childrenServerApi } from '@/api/children.server';
 import { artStylesServerApi } from '@/api/art-styles.server';

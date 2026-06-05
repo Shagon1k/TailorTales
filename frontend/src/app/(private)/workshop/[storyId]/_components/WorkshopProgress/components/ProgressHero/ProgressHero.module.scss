@@ -10,12 +10,6 @@
     align-items: center;
     gap: var(--space-6);
 
-    &__fox {
-        width: 140px;
-        height: 140px;
-        filter: drop-shadow(0 0 20px rgba(244, 162, 89, 0.4));
-    }
-
     // Native <progress> with cross-browser custom styling.
     // Each engine exposes different pseudo-elements; rules must be duplicated.
     &__progress {

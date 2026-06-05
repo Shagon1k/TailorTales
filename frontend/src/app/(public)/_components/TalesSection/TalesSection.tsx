@@ -44,7 +44,7 @@ export default function TalesSection(): React.ReactElement {
         <section className={styles.tales}>
             <div className={styles.tales__inner}>
                 <div className={styles.tales__header}>
-                    <h2 className={styles.tales__heading}>Tales lit this week.</h2>
+                    <h2 className={styles.tales__heading}>Tales lit recently.</h2>
                     {/* TODO: link to /tales once the public library page is built */}
                     <CapsLink href="#">Browse the library →</CapsLink>
                 </div>

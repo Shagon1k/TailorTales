@@ -75,6 +75,19 @@ export class NotificationsService {
         }
     }
 
+    async getUnreadCount(userId: string): Promise<number> {
+        return this.prisma.notification.count({
+            where: { userId, readAt: null },
+        });
+    }
+
+    async markAllRead(userId: string): Promise<void> {
+        await this.prisma.notification.updateMany({
+            where: { userId, readAt: null },
+            data: { readAt: new Date() },
+        });
+    }
+
     async storyFailed(userId: string, payload: IStoryFailedPayload): Promise<void> {
         await this.prisma.notification.create({
             data: { userId, type: 'STORY_FAILED', payload: { ...payload } },

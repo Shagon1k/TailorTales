@@ -1,9 +1,17 @@
 @use 'styles/typography' as *;
 
 .steps {
+    position: relative;
     padding: 0 var(--space-6) var(--space-16);
     max-width: 800px;
     margin: 0 auto;
+}
+
+.steps__mascot {
+    z-index: 1;
+    position: absolute;
+    top: -90px;
+    right: var(--space-6);
 }
 
 .steps__list {

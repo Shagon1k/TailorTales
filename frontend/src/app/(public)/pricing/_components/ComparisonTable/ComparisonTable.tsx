@@ -28,7 +28,7 @@ export default function ComparisonTable({
 }: Readonly<IComparisonTableProps>): React.ReactElement {
     return (
         <section className={styles.section}>
-            <h2 className={styles.section__heading}>What&apos;s in each tea?</h2>
+            <h2 className={styles.section__heading}>What&apos;s in each tier?</h2>
             <div className={styles['section__table-area']}>
                 <div className={styles['section__mascot']} aria-hidden="true">
                     <MascotImage image="fox-scales" size={150} glow="outline" flip />

@@ -1,5 +1,8 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import BlueprintForm from '../_components/BlueprintForm/BlueprintForm';
+
+export const metadata: Metadata = { title: 'New Blueprint' };
 import styles from './page.module.scss';
 
 export default function NewBlueprintPage(): React.ReactElement {

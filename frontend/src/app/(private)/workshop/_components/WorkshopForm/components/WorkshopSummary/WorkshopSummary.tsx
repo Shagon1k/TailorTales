@@ -18,9 +18,10 @@ const LANGUAGE_LABEL: Record<ILanguage, string> = {
     RU: 'Russian',
 };
 
-// Stub credit cost — Phase 5 will wire real balance from the API.
+// Stub: 1 credit = 1 page; cost = pageCount. Real balance wired in Phase 9.
+// STUB_REMAINING reflects Story Hour quota (60 pages/month).
 const CREDIT_COST = 5;
-const STUB_REMAINING = 12;
+const STUB_REMAINING = 60;
 
 export interface IWorkshopSummaryProps {
     child: IChild | null;

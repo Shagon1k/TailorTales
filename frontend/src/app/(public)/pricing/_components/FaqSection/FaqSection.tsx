@@ -8,7 +8,7 @@ interface IFaqSectionProps {
 export default function FaqSection({ items }: Readonly<IFaqSectionProps>): React.ReactElement {
     return (
         <section className={styles.faq}>
-            <h2 className={styles.faq__heading}>Small questions, gently answered.</h2>
+            <h2 className={styles.faq__heading}>A few things worth knowing.</h2>
             <div className={styles.faq__grid}>
                 {items.map(({ q, a }) => (
                     <div key={q} className={styles.faq__card}>

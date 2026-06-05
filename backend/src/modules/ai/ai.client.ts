@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AppError } from '../../common/errors.js';
 import {
     type IAiClient,
     type IGenerateImageInput,
@@ -157,6 +158,11 @@ export class AiClient implements IAiClient {
             return this.dataUrlToBuffer(content);
         }
 
+        const preview =
+            typeof content === 'string'
+                ? content.slice(0, 120)
+                : JSON.stringify(content).slice(0, 120);
+        this.logger.error(`Unknown image response format (size: ${size}): ${preview}`);
         throw new Error(
             `Unexpected image response format from OpenRouter (size: ${size}). ` +
                 `Content type: ${typeof content}`,
@@ -192,16 +198,18 @@ export class AiClient implements IAiClient {
 
                 if (res.status >= 400 && res.status < 500) {
                     const text = await res.text();
-                    // 4xx = caller error — no point retrying
-                    throw Object.assign(
-                        new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`),
-                        { status: res.status, permanent: true },
-                    );
+                    this.logger.error(`OpenRouter ${res.status} on ${path}: ${text.slice(0, 500)}`);
+                    const userMessage =
+                        res.status === 429
+                            ? 'AI service rate limit reached. Please try again in a moment.'
+                            : 'AI service request failed. Please try again.';
+                    throw Object.assign(new AppError(userMessage), { permanent: true });
                 }
 
                 if (!res.ok) {
                     const text = await res.text();
-                    throw new Error(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+                    this.logger.error(`OpenRouter ${res.status} on ${path}: ${text.slice(0, 500)}`);
+                    throw new AppError('AI service temporarily unavailable. Please try again.');
                 }
 
                 return res.json() as Promise<TResponse>;

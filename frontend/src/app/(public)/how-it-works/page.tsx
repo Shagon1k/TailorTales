@@ -1,6 +1,9 @@
+import type { Metadata } from 'next';
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import CtaSection from '../_components/CtaSection/CtaSection';
 import DetailedStepsSection from './_components/DetailedStepsSection/DetailedStepsSection';
+
+export const metadata: Metadata = { title: 'How It Works' };
 
 export default function HowItWorksPage(): React.ReactElement {
     return (

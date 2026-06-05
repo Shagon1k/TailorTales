@@ -1,4 +1,7 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = { title: 'In the Workshop' };
 import { storiesServerApi } from '@/api/stories.server';
 import WorkshopProgress from './_components/WorkshopProgress/WorkshopProgress';
 

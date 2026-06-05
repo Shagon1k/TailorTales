@@ -96,10 +96,29 @@ export class StoriesService {
     }
 
     private async toDetail(story: StoryWithRelationsAndPages): Promise<IStoryDetail> {
-        const { coverImageKey, pdfKey, ...rest } = story;
+        const { coverImageKey, pdfKey, pages, ...rest } = story;
+
+        const resolvedPages = await Promise.all(
+            pages.map(async (page) => {
+                const rawIllustrations = page.illustrations as Array<{
+                    key: string;
+                    position?: string;
+                }> | null;
+
+                const illustrations = await Promise.all(
+                    (rawIllustrations ?? []).map(async ({ key, position }) => ({
+                        url: await this.storage.getSignedUrl(key),
+                        position,
+                    })),
+                );
+
+                return { ...page, illustrations };
+            }),
+        );
 
         return {
             ...rest,
+            pages: resolvedPages,
             coverImageUrl: coverImageKey ? await this.storage.getSignedUrl(coverImageKey) : null,
             pdfUrl: pdfKey ? await this.storage.getSignedUrl(pdfKey) : null,
         };

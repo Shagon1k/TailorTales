@@ -1,5 +1,8 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { storiesServerApi } from '@/api/stories.server';
+
+export const metadata: Metadata = { title: 'Story' };
 import StoryReader from './_components/StoryReader/StoryReader';
 
 interface IStoryPageProps {

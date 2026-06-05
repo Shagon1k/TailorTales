@@ -111,16 +111,18 @@ export class GenerationService {
 
                     const isFirstPoll = previousCompletedPages === -1;
                     const stageChanged = snapshot.stage !== previousStage;
-                    const newPages = snapshot.completedPages - previousCompletedPages;
+                    // On first poll start from 0 so already-completed pages are replayed.
+                    const baseline = isFirstPoll ? 0 : previousCompletedPages;
+                    const newPages = snapshot.completedPages - baseline;
 
                     if (isFirstPoll || stageChanged) {
                         subscriber.next({ data: { type: 'snapshot', ...snapshot } });
                         previousStage = snapshot.stage;
                     }
 
-                    if (!isFirstPoll && newPages > 0) {
+                    if (newPages > 0) {
                         for (let i = 0; i < newPages; i++) {
-                            const pageOrder = previousCompletedPages + i + 1;
+                            const pageOrder = baseline + i + 1;
                             subscriber.next({
                                 data: { type: 'page_complete', pageOrder, ...snapshot },
                             });

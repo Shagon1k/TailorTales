@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { AppError } from '../../common/errors.js';
 import type {
     ArtStyle,
     Child,
@@ -82,8 +83,16 @@ export class GenerationPipeline {
                 childName: story.child.name,
             });
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            this.logger.error(`Pipeline failed for job ${jobId}: ${message}`);
+            const techMessage = err instanceof Error ? err.message : String(err);
+            const stack = err instanceof Error ? err.stack : undefined;
+            this.logger.error(
+                `Pipeline failed for job ${jobId} (story ${story.id}): ${techMessage}`,
+                stack,
+            );
+            const message =
+                err instanceof AppError
+                    ? err.message
+                    : 'Something went wrong during generation. Please try again.';
 
             await this.prisma.job
                 .update({

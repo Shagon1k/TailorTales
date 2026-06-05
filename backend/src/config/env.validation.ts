@@ -76,6 +76,10 @@ class EnvironmentVariables {
     @IsOptional()
     USE_AI_STUBS: boolean = false;
 
+    @IsBoolean()
+    @IsOptional()
+    USE_EMAIL_STUBS: boolean = false;
+
     // Resend — transactional email (story completed/failed, contact form)
     @IsString()
     RESEND_API_KEY!: string;
@@ -88,8 +92,20 @@ class EnvironmentVariables {
     CONTACT_INBOX_EMAIL!: string;
 }
 
+const BOOLEAN_KEYS: Array<keyof EnvironmentVariables> = [
+    'USE_AI_STUBS',
+    'USE_EMAIL_STUBS',
+    'STORAGE_FORCE_PATH_STYLE',
+];
+
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
-    const validated = plainToInstance(EnvironmentVariables, config, {
+    const coerced: Record<string, unknown> = { ...config };
+    for (const key of BOOLEAN_KEYS) {
+        const v = coerced[key];
+        coerced[key] = v === 'true' || v === true;
+    }
+
+    const validated = plainToInstance(EnvironmentVariables, coerced, {
         enableImplicitConversion: true,
     });
 

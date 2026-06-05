@@ -1,5 +1,8 @@
+import type { Metadata } from 'next';
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import ContactSection from './_components/ContactSection/ContactSection';
+
+export const metadata: Metadata = { title: 'Contact' };
 
 export default function ContactPage(): React.ReactElement {
     return (

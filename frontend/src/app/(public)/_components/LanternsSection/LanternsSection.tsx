@@ -16,7 +16,7 @@ const STEPS = [
     {
         numeral: 'iii.',
         title: 'Carry it home',
-        body: 'A printable PDF in minutes. Five to twenty pages, age-fit, theirs to keep.',
+        body: 'A printable PDF in minutes. Five to twenty pages, age-matched, theirs to keep.',
     },
 ] as const;
 
@@ -26,7 +26,7 @@ export default function LanternsSection(): React.ReactElement {
             <div className={styles.lanterns__inner}>
                 <div className={styles.lanterns__header}>
                     <CapsLabel variant="gold">· How the workshop works ·</CapsLabel>
-                    <h2 className={styles.lanterns__heading}>Three lanterns, then a book.</h2>
+                    <h2 className={styles.lanterns__heading}>Three steps, then their book.</h2>
                 </div>
                 <div className={styles.lanterns__grid}>
                     {STEPS.map(({ numeral, title, body }) => (
