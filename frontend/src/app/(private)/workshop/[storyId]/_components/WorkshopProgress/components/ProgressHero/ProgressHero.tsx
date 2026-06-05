@@ -1,3 +1,4 @@
+import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import styles from './ProgressHero.module.scss';
 
 export interface IProgressHeroProps {
@@ -23,7 +24,7 @@ export default function ProgressHero({
 
     return (
         <div className={styles.hero}>
-            <img src="/fox-mascot.svg" alt="" className={styles.hero__fox} />
+            <MascotImage image="fox-books" size={140} glow="aura" />
             <progress
                 className={styles.hero__progress}
                 value={completedPages}

@@ -8,17 +8,38 @@
         padding: 14mm 12mm;
         background: #fdf6ec;
     }
+    .text-page__chapter {
+        font-family: 'Nunito', sans-serif;
+        font-size: 8pt;
+        font-weight: 700;
+        color: #c26a2a;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 4mm;
+    }
     .text-page__body {
         font-family: 'Literata', serif;
         font-size: 12pt;
         line-height: 1.75;
         color: #2d1a0e;
-        text-align: justify;
+        font-style: italic;
         hyphens: auto;
-        max-height: 182mm;
+        max-height: 178mm;
+        overflow: hidden;
+    }
+    .text-page__body::first-letter {
+        font-size: 3.5em;
+        font-style: normal;
+        font-weight: 700;
+        float: left;
+        line-height: 0.8;
+        margin-right: 2mm;
+        margin-top: 0.5mm;
+        color: #c26a2a;
     }
 </style>
 
 <div class='text-page'>
+    {{#if chapterTitle}}<div class='text-page__chapter text-zone'>{{chapterTitle}}</div>{{/if}}
     <div class='text-page__body text-zone'>{{text}}</div>
 </div>

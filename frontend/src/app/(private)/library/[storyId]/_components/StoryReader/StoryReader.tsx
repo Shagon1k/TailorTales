@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import type { IStoryDetail } from '@/types/story.types';
-import { getSpreads } from './utils/spread.utils';
 import ReaderHeader from './components/ReaderHeader/ReaderHeader';
 import ChapterList from './components/ChapterList/ChapterList';
 import SpreadViewer from './components/SpreadViewer/SpreadViewer';
@@ -16,17 +15,16 @@ export interface IStoryReaderProps {
 }
 
 export default function StoryReader({ story }: Readonly<IStoryReaderProps>): React.ReactElement {
-    const spreads = getSpreads(story.pages);
-    const [spreadIndex, setSpreadIndex] = useState(0);
-
-    const currentSpread = spreads[spreadIndex];
+    const [pageIndex, setPageIndex] = useState(0);
+    const totalPages = story.pages.length;
+    const currentPage = story.pages[pageIndex];
 
     function handlePrev(): void {
-        setSpreadIndex((i) => Math.max(0, i - 1));
+        setPageIndex((i) => Math.max(0, i - 1));
     }
 
     function handleNext(): void {
-        setSpreadIndex((i) => Math.min(spreads.length - 1, i + 1));
+        setPageIndex((i) => Math.min(totalPages - 1, i + 1));
     }
 
     return (
@@ -37,16 +35,17 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                 <aside className={styles.reader__chapters} aria-label="Chapter navigation">
                     <ChapterList
                         pages={story.pages}
-                        activeSpreadIndex={spreadIndex}
-                        onChapterClick={setSpreadIndex}
+                        activePageIndex={pageIndex}
+                        onPageClick={setPageIndex}
                     />
                 </aside>
 
                 <main className={styles.reader__spread}>
-                    {currentSpread && (
+                    {currentPage && (
                         <SpreadViewer
-                            spread={currentSpread}
-                            totalSpreads={spreads.length}
+                            page={currentPage}
+                            pageIndex={pageIndex}
+                            totalPages={totalPages}
                             childName={story.child.name}
                             onPrev={handlePrev}
                             onNext={handleNext}

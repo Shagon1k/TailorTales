@@ -1,4 +1,5 @@
 import Card from '@/components/ui/Card/Card';
+import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import styles from './DetailedStepsSection.module.scss';
 
 const STEPS = [
@@ -37,6 +38,9 @@ const STEPS = [
 export default function DetailedStepsSection(): React.ReactElement {
     return (
         <section className={styles.steps}>
+            <div className={styles.steps__mascot}>
+                <MascotImage image="fox-map" size={140} glow="outline" />
+            </div>
             <div className={styles.steps__list}>
                 {STEPS.map(({ numeral, title, body, details }) => (
                     <Card key={numeral} variant="dark" size="lg">

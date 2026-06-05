@@ -25,15 +25,6 @@
     margin: 0;
 }
 
-.tales__browse {
-    text-decoration: none;
-    flex-shrink: 0;
-
-    &:hover span {
-        color: var(--text-secondary);
-    }
-}
-
 .tales__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

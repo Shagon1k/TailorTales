@@ -82,9 +82,9 @@ describe('Header', () => {
             expect(screen.getByRole('link', { name: /workshop/i })).toBeInTheDocument();
         });
 
-        it('should render Children navigation link', () => {
+        it('should render Pricing navigation link', () => {
             renderWithMantine(<Header variant="private" />);
-            expect(screen.getByRole('link', { name: /children/i })).toBeInTheDocument();
+            expect(screen.getByRole('link', { name: /pricing/i })).toBeInTheDocument();
         });
 
         it('should render Notifications button', () => {
@@ -97,10 +97,10 @@ describe('Header', () => {
             expect(screen.getByRole('link', { name: /account settings/i })).toBeInTheDocument();
         });
 
-        it('should not render public navigation links', () => {
+        it('should not render unauthenticated-only navigation links', () => {
             renderWithMantine(<Header variant="private" />);
             expect(screen.queryByRole('link', { name: /how it works/i })).not.toBeInTheDocument();
-            expect(screen.queryByRole('link', { name: /pricing/i })).not.toBeInTheDocument();
+            expect(screen.queryByRole('link', { name: /sign in/i })).not.toBeInTheDocument();
         });
     });
 });

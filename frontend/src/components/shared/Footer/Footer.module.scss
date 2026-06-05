@@ -16,8 +16,22 @@
 
 .footer__brand {
     display: flex;
-    align-items: center;
-    gap: var(--space-4);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+}
+
+.footer__wordmark {
+    @include t-lede-lg;
+
+    font-style: italic;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: opacity var(--duration-base) var(--ease-out);
+
+    &:hover {
+        opacity: 0.75;
+    }
 }
 
 .footer__tagline {

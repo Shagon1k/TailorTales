@@ -40,7 +40,7 @@ export class AuthController {
             secure: process.env.NODE_ENV === 'production',
         });
 
-        res.redirect(frontendUrl);
+        res.redirect(`${frontendUrl}/library`);
     }
 
     @Post('logout')

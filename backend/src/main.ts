@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module.js';
+import { AllExceptionsFilter } from './common/http-exception.filter.js';
 
 const PORT = process.env.PORT ?? 3001;
 
@@ -15,6 +16,7 @@ async function bootstrap(): Promise<void> {
         credentials: true,
     });
     app.use(cookieParser());
+    app.useGlobalFilters(new AllExceptionsFilter());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.listen(PORT);
 }

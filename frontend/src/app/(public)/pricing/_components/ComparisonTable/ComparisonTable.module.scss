@@ -13,10 +13,25 @@
     margin: 0 0 var(--space-8);
 }
 
+.section__table-area {
+    position: relative;
+    padding-top: var(--space-12);
+}
+
+.section__mascot {
+    --_peek: 86px;
+
+    position: absolute;
+    top: calc(-1 * var(--_peek));
+    left: var(--space-4);
+    pointer-events: none;
+    z-index: 1;
+}
+
 .section__wrap {
     overflow-x: auto;
     border-radius: var(--radius-xl);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--border-on-dark);
 }
 
 .table {
@@ -35,7 +50,7 @@
     padding: var(--space-4) var(--space-6);
     text-align: left;
     border-bottom: 1px solid var(--border-subtle);
-    background: var(--bg-card);
+    background: var(--bg-elevated);
 }
 
 .table__th--accent {
@@ -47,11 +62,13 @@
 }
 
 .table__group-header td {
-    @include t-body-sm;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-style: italic;
     font-weight: 700;
     color: var(--text-primary);
     padding: var(--space-5) var(--space-6) var(--space-3);
-    background: var(--bg-card);
+    background: var(--bg-elevated);
 }
 
 .table__row {
@@ -66,17 +83,17 @@
     @include t-body-base;
     color: var(--text-secondary);
     padding: var(--space-4) var(--space-6);
-    background: var(--bg-card);
+    background: var(--bg-elevated);
 }
 
 .table__td--accent {
     color: var(--text-primary);
-    background: var(--bg-card-2);
+    background: var(--bg-elevated);
 }
 
 .table__check {
-    color: var(--text-accent);
-    font-weight: 600;
+    color: var(--text-secondary);
+    font-weight: 400;
 }
 
 .table__dash {

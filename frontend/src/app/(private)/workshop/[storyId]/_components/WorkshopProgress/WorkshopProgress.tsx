@@ -2,6 +2,7 @@
 
 import { getAge } from '@/utils/date.utils';
 import type { IStoryDetail } from '@/types/story.types';
+import ButtonLink from '@/components/ui/Button/ButtonLink';
 import ProgressHero from './components/ProgressHero/ProgressHero';
 import StageRow from './components/StageRow/StageRow';
 import PagesGrid from './components/PagesGrid/PagesGrid';
@@ -55,6 +56,16 @@ export default function WorkshopProgress({
             </div>
 
             {!isCompleted && !isFailed && <SafetyBanner childName={story.child.name} />}
+            {isFailed && (
+                <div className={styles.failureActions}>
+                    <ButtonLink href="/library" variant="secondary">
+                        Back to library
+                    </ButtonLink>
+                    <ButtonLink href="/workshop" variant="quiet">
+                        Start a new tale
+                    </ButtonLink>
+                </div>
+            )}
         </div>
     );
 }

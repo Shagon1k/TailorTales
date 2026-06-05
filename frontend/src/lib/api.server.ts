@@ -9,6 +9,7 @@ export async function apiFetchServer<T = void>(path: string, init?: RequestInit)
     const token = cookieStore.get('access_token');
 
     const res = await fetch(`${BACKEND_URL}${path}`, {
+        cache: 'no-store',
         ...init,
         headers: {
             'Content-Type': 'application/json',

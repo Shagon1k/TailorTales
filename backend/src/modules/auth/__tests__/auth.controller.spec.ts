@@ -57,7 +57,7 @@ describe('AuthController', () => {
                 'test.token',
                 expect.objectContaining({ httpOnly: true }),
             );
-            expect(res.redirect).toHaveBeenCalledWith('http://localhost:3000');
+            expect(res.redirect).toHaveBeenCalledWith('http://localhost:3000/library');
         });
     });
 });

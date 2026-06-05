@@ -1,4 +1,7 @@
+import type { Metadata } from 'next';
 import { getServerUser } from '@/api/user.server';
+
+export const metadata: Metadata = { title: 'Library' };
 import { childrenServerApi } from '@/api/children.server';
 import { storiesServerApi } from '@/api/stories.server';
 import LibraryGreeting from './_components/LibraryGreeting/LibraryGreeting';

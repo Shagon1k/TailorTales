@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Link.module.scss';
 
-export type TLinkVariant = 'default' | 'quiet' | 'on-card';
+export type TLinkVariant = 'default' | 'quiet' | 'on-card' | 'gold';
 
 export interface ILinkProps extends OmitStyling<IMantineAnchorProps, 'variant' | 'underline'> {
     variant?: TLinkVariant;

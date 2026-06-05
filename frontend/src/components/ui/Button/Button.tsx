@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Button.module.scss';
 
-export type TButtonVariant = 'primary' | 'secondary' | 'quiet' | 'on-card';
+export type TButtonVariant = 'primary' | 'secondary' | 'quiet' | 'on-card' | 'light';
 export type TButtonSize = 'default' | 'lg';
 
 export interface IButtonProps extends OmitStyling<
@@ -23,6 +23,7 @@ const _Button = ({ variant = 'primary', size = 'default', ...props }: IButtonPro
         variant="filled"
         classNames={{
             root: clsx(styles.button, styles[`m-${variant}`], styles[`m-${size}`]),
+            label: styles.button__label,
         }}
         {...props}
     />

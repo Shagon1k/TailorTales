@@ -1,26 +1,35 @@
 @use 'styles/typography' as *;
 
 .story-card {
-    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: var(--space-6);
-    padding: var(--space-8);
+    gap: var(--space-4);
+    padding: var(--space-3);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-subtle);
-    overflow: hidden;
-    min-height: 200px;
+    background-color: var(--bg-elevated);
+}
 
-    &.m-rose {
-        background: var(--accent-warm);
-    }
-    &.m-fox {
-        background: var(--accent-primary);
-    }
-    &.m-plum {
-        background: var(--accent-deep);
-    }
+.story-card__panel {
+    position: relative;
+    flex: 1;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.m-rose .story-card__panel {
+    background-color: var(--accent-warm);
+}
+.m-fox .story-card__panel {
+    background-color: var(--accent-primary);
+}
+.m-plum .story-card__panel {
+    background-color: var(--accent-deep);
 }
 
 .story-card__hatch {
@@ -30,9 +39,20 @@
     pointer-events: none;
 }
 
+.story-card__star {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    color: var(--accent-gold);
+    font-size: 16px;
+    line-height: 1;
+}
+
 .story-card__quote {
-    @include t-heading-3xl-italic;
+    @include t-lede-lg;
+    font-style: italic;
     color: var(--text-primary);
+    text-align: center;
     margin: 0;
     position: relative; // above hatch
 }
@@ -41,7 +61,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    position: relative; // above hatch
+    padding: 0 var(--space-3) var(--space-2);
 }
 
 .story-card__meta {

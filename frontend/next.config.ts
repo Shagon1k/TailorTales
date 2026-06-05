@@ -4,10 +4,24 @@ import { fileURLToPath } from 'node:url';
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
 
-const backendUrl = new URL(process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001');
-const rawProtocol = backendUrl.protocol.replace(':', '');
-if (rawProtocol !== 'http' && rawProtocol !== 'https') {
-    throw new Error(`NEXT_PUBLIC_BACKEND_URL uses unsupported protocol: ${rawProtocol}`);
+function parseUrl(envVar: string, fallback: string): URL {
+    const url = new URL(process.env[envVar] ?? fallback);
+    const protocol = url.protocol.replace(':', '');
+    if (protocol !== 'http' && protocol !== 'https') {
+        throw new Error(`${envVar} uses unsupported protocol: ${protocol}`);
+    }
+    return url;
+}
+
+const backendUrl = parseUrl('NEXT_PUBLIC_BACKEND_URL', 'http://localhost:3001');
+const storageUrl = parseUrl('NEXT_PUBLIC_STORAGE_URL', 'http://localhost:9000');
+
+function toRemotePattern(url: URL): { protocol: 'http' | 'https'; hostname: string; port: string } {
+    return {
+        protocol: url.protocol.replace(':', '') as 'http' | 'https',
+        hostname: url.hostname,
+        port: url.port,
+    };
 }
 
 const nextConfig: NextConfig = {
@@ -15,13 +29,7 @@ const nextConfig: NextConfig = {
         loadPaths: [path.join(configDir, 'src')],
     },
     images: {
-        remotePatterns: [
-            {
-                protocol: rawProtocol,
-                hostname: backendUrl.hostname,
-                port: backendUrl.port,
-            },
-        ],
+        remotePatterns: [toRemotePattern(backendUrl), toRemotePattern(storageUrl)],
     },
 };
 

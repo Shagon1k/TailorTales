@@ -7,7 +7,8 @@
     &.m-sm,
     &.m-md,
     &.m-lg {
-        background: var(--bg-card);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-subtle);
         border-radius: var(--radius-xl);
     }
 
@@ -31,11 +32,12 @@
 
     .modal__subheader {
         @include t-caps-xs;
-        color: var(--text-on-card-3);
+        font-size: var(--fs-sm);
+        color: var(--accent-gold);
     }
 
     .modal__close {
-        color: var(--text-on-card-3);
+        color: var(--text-muted);
         width: 20px;
         height: 20px;
         min-width: 0;

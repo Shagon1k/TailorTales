@@ -2,6 +2,7 @@
 
 import Button from '@/components/ui/Button/Button';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
+import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import type { IChild } from '@/types/child.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryType, ILanguage } from '@/types/story.types';
@@ -17,9 +18,10 @@ const LANGUAGE_LABEL: Record<ILanguage, string> = {
     RU: 'Russian',
 };
 
-// Stub credit cost — Phase 5 will wire real balance from the API.
+// Stub: 1 credit = 1 page; cost = pageCount. Real balance wired in Phase 9.
+// STUB_REMAINING reflects Story Hour quota (60 pages/month).
 const CREDIT_COST = 5;
-const STUB_REMAINING = 12;
+const STUB_REMAINING = 60;
 
 export interface IWorkshopSummaryProps {
     child: IChild | null;
@@ -48,7 +50,10 @@ export default function WorkshopSummary({
 
     return (
         <aside className={styles.summary}>
-            <CapsLabel>Your tale so far</CapsLabel>
+            <div className={styles['summary__mascot']} aria-hidden="true">
+                <MascotImage image="fox-write" size={120} glow="outline" />
+            </div>
+            <CapsLabel variant="gold">Your tale so far</CapsLabel>
 
             <blockquote className={styles.summary__question}>
                 {hasQuestion ? (

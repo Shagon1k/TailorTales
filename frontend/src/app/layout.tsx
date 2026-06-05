@@ -4,6 +4,7 @@ import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '../styles/globals.scss';
 import { getServerUser } from '@/api/user.server';
+import StarField from '@/components/shared/StarField/StarField';
 import Providers from './providers';
 
 const newsreader = Newsreader({
@@ -32,7 +33,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'TailorTales',
+    title: {
+        default: 'TailorTales',
+        template: 'TailorTales | %s',
+    },
     description: 'Personalized AI-generated storybooks & comics for curious kids',
 };
 
@@ -50,6 +54,7 @@ export default async function RootLayout({
                 <ColorSchemeScript />
             </head>
             <body>
+                <StarField />
                 <Providers initialUser={initialUser}>{children}</Providers>
             </body>
         </html>

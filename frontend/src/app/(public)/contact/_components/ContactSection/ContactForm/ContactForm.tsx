@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import Button from '@/components/ui/Button/Button';
+import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import { submitContact, type TContactFormState } from '../actions';
 import styles from './ContactForm.module.scss';
 
@@ -25,7 +26,12 @@ export default function ContactForm(): React.ReactElement {
 
     return (
         <form action={formAction} noValidate className={styles.form}>
-            <Input name="name" label="Your name" placeholder="Ada" required />
+            <div className={styles['form__name-field']}>
+                <div className={styles['form__name-mascot']} aria-hidden="true">
+                    <MascotImage image="fox-mail" size={130} glow="outline" />
+                </div>
+                <Input name="name" label="Your name" placeholder="Ada" required />
+            </div>
             <Input
                 name="email"
                 type="email"

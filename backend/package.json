@@ -2,10 +2,11 @@
     "name": "backend",
     "version": "0.0.1",
     "private": true,
+    "type": "module",
     "scripts": {
         "dev": "nest start --watch",
         "build": "nest build",
-        "start": "node dist/main",
+        "start": "node dist/main.js",
         "type-check": "tsc --noEmit",
         "lint": "eslint src/",
         "test": "vitest run",

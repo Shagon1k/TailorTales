@@ -8,9 +8,10 @@
         color: var(--text-on-card);
     }
 
+    // Lifted panel — subtle top-lighter gradient, soft hairline border, diffuse shadow.
     &.m-dark {
-        background: var(--bg-elevated);
-        box-shadow: var(--shadow-md);
+        background: var(--gradient-card-twilight);
+        box-shadow: var(--shadow-lg);
         color: var(--text-primary);
         border: 1px solid var(--border-subtle);
     }
@@ -20,6 +21,13 @@
         box-shadow: var(--shadow-lg);
         color: var(--text-primary);
         border: 1px solid var(--border-strong);
+    }
+
+    &.m-featured {
+        background: var(--gradient-card-twilight);
+        box-shadow: var(--shadow-glow-fox);
+        color: var(--text-primary);
+        border: 1px solid var(--accent-primary);
     }
 
     &.m-outlined {

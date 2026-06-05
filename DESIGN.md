@@ -56,7 +56,7 @@ For schools, Gift a tale, Safety, Sign in (footer), Pricing (footer).
 - Hero: large headline + subheadline + two CTAs ("Light the first lantern →", "Hear the workshop")
 - Fox + tree illustration (SVG/image asset)
 - "Three lanterns, then a book" — 3-step explainer cards (i. Light a name · ii. Whisper a why · iii. Carry it home)
-- "Tales lit this week" — grid of publicly shared stories (`Story.isPublic = true`); cards show title, for/age/pages/format
+- "Tales lit recently" — grid of publicly shared stories (`Story.isPublic = true`); cards show title, for/age/pages/format
 - Bottom CTA strip: "Begin a tale for free →"
 
 #### `/login` — Login / Auth
@@ -225,7 +225,7 @@ Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Desi
 | Rating location     | Story reader page (right panel)                        |
 | Rating model        | 1–5 stars + optional comment                           |
 | Public sharing      | Opt-in toggle in rating flow → `Story.isPublic = true` |
-| Public stories      | Appear on landing page "Tales lit this week"           |
+| Public stories      | Appear on landing page "Tales lit recently"            |
 | "Share with family" | Removed from MVP scope                                 |
 
 ### Notifications

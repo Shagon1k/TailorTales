@@ -12,7 +12,7 @@ import { EMAIL_CLIENT } from './email.types.js';
             provide: EMAIL_CLIENT,
             inject: [ConfigService, ResendClient, EmailStubClient],
             useFactory: (config: ConfigService, real: ResendClient, stub: EmailStubClient) =>
-                config.get<boolean>('USE_AI_STUBS') ? stub : real,
+                config.get<boolean>('USE_EMAIL_STUBS') ? stub : real,
         },
     ],
     exports: [EMAIL_CLIENT],

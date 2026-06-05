@@ -1,13 +1,14 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Handlebars from 'handlebars';
 import puppeteer, { type Browser } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
 import { PAGE_TEMPLATES } from './page-templates.config.js';
 import type { IPageToRender, IStoryToRender } from './rendering.types.js';
 
-// __dirname is available in CJS modules (NestJS/Node)
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, 'templates');
 const FONTS_DIR = join(__dirname, 'assets', 'fonts');
 
@@ -30,7 +31,12 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     async onModuleInit(): Promise<void> {
         this.browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+            ],
         });
         this.logger.log('Puppeteer browser started');
     }
@@ -43,9 +49,10 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     async render(story: IStoryToRender): Promise<Buffer> {
         this.logger.log(`Rendering PDF: "${story.title}" (${story.pages.length} pages)`);
 
-        const pageBuffers = await Promise.all(
-            story.pages.map((page) => this.renderPage(page, story)),
-        );
+        const pageBuffers: Buffer[] = [];
+        for (const page of story.pages) {
+            pageBuffers.push(await this.renderPage(page, story));
+        }
 
         return this.stitchPages(pageBuffers);
     }
@@ -67,7 +74,7 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
         const tab = await this.browser.newPage();
         try {
             await tab.setContent(fullHtml, { waitUntil: 'load' });
-            await tab.waitForFunction('document.fonts.ready');
+            await tab.waitForFunction('document.fonts.status === "loaded"');
 
             const pdfBytes = await tab.pdf({
                 width: '148mm',

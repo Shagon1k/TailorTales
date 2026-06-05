@@ -33,4 +33,13 @@
             color: var(--text-on-card);
         }
     }
+
+    &.m-gold {
+        color: var(--accent-gold);
+        text-decoration: underline;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
 }

@@ -4,10 +4,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-8);
-    padding: var(--space-10) var(--space-8);
-    background: var(--bg-elevated);
-    border-radius: var(--radius-xl);
-    margin: 0 var(--space-8);
+    padding: 0 var(--space-8);
 
     @media (min-width: 768px) {
         grid-template-columns: 280px 1fr;

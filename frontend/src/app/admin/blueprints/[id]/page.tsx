@@ -1,5 +1,8 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+export const metadata: Metadata = { title: 'Edit Blueprint' };
 import { storyBlueprintsServerApi } from '@/api/story-blueprints.server';
 import BlueprintForm from '../_components/BlueprintForm/BlueprintForm';
 import styles from './page.module.scss';

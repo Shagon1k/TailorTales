@@ -1,0 +1,28 @@
+.star-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.star-field__star {
+    position: absolute;
+    fill: var(--accent-gold);
+    opacity: var(--star-opacity);
+    animation-name: twinkle;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+}
+
+@keyframes twinkle {
+    0%,
+    100% {
+        opacity: var(--star-opacity);
+    }
+    50% {
+        opacity: calc(var(--star-opacity) * 0.3);
+    }
+}

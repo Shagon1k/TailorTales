@@ -21,16 +21,6 @@
     color: var(--text-primary);
 }
 
-.reader-row__manage {
-    text-decoration: none;
-    color: var(--text-muted);
-    flex-shrink: 0;
-
-    &:hover {
-        color: var(--text-secondary);
-    }
-}
-
 .reader-row__track {
     display: flex;
     gap: var(--space-4);

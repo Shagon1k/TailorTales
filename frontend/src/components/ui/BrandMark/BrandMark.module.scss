@@ -1,5 +1,4 @@
 .brand {
-    --_circle: 36px;
     --_text: var(--fs-xl);
     display: inline-flex;
     align-items: center;
@@ -13,27 +12,14 @@
     }
 }
 
-.m-sm {
-    --_circle: 24px;
-    --_text: var(--fs-base);
-}
-
 .m-lg {
-    --_circle: 56px;
     --_text: var(--fs-2xl);
 }
 
-.brand__mark {
-    width: var(--_circle);
-    height: var(--_circle);
-    flex-shrink: 0;
-    border-radius: var(--radius-pill);
-    background: var(--gradient-fox-bevel);
-}
-
 .brand__name {
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
     font-weight: 600;
     font-size: var(--_text);
     line-height: 1;
+    padding-top: var(--space-2);
 }

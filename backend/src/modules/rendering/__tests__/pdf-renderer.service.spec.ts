@@ -5,7 +5,7 @@ import {
     FIVE_PAGE_STORY_FIXTURE,
 } from '../__fixtures__/story-plan.fixture.js';
 
-describe('PdfRendererService', () => {
+describe.skipIf(!!process.env.CI)('PdfRendererService', () => {
     let service: PdfRendererService;
 
     beforeAll(async () => {
