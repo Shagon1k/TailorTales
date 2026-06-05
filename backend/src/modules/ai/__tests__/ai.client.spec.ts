@@ -91,7 +91,7 @@ describe('AiClient', () => {
                     userPrompt: 'usr',
                     maxTokens: 100,
                 }),
-            ).rejects.toThrow('422');
+            ).rejects.toThrow('AI service request failed. Please try again.');
 
             expect(fetchMock).toHaveBeenCalledTimes(1);
         });
@@ -115,7 +115,7 @@ describe('AiClient', () => {
                     userPrompt: 'usr',
                     maxTokens: 100,
                 }),
-            ).rejects.toThrow('503');
+            ).rejects.toThrow('AI service temporarily unavailable. Please try again.');
 
             vi.restoreAllMocks();
             // 1 initial + 3 retries = 4
