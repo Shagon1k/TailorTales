@@ -77,4 +77,18 @@ paths:
 
 ## BE / Nest.js
 
-> TODO: Define Nest.js-specific testing conventions (e.g. `@nestjs/testing`, supertest for e2e, module mocking patterns).
+- Build the unit under test with `Test.createTestingModule({ providers: [...] })` and get it
+  via `module.get(Service)`. Re-create the module in `beforeEach` so each test starts with
+  fresh mocks.
+- **Mock dependencies with `useValue`**, exposing only the methods the test exercises — e.g.
+  `{ provide: PrismaService, useValue: { story: { findFirst: vi.fn(), create: vi.fn() } } }`.
+  Mock our services/wrappers, never the real Prisma client or a third-party SDK directly.
+- Hold the `vi.fn()` handles in `let` bindings in the `describe` block so tests can set return
+  values and assert calls.
+- Test data comes from typed `MOCK_*` factory constants (typed against the Prisma model), not
+  inline literals repeated per test.
+- Assert thrown Nest exceptions by type — `await expect(call).rejects.toThrow(NotFoundException)`
+  — matching the service's contract (ownership mismatch → `NotFoundException`, not `Forbidden`).
+- The `GenerationPipeline` is intentionally BullMQ-free, so test it by calling `run(jobId)`
+  directly with the stub AI client (`AI_CLIENT` → `AiStubClient`) — no Redis needed.
+- supertest/e2e HTTP tests are not used yet — add the convention here when they are.

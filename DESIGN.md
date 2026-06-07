@@ -91,7 +91,7 @@ Sections, top → bottom:
 | #        | Section                 | Notes                                                                                                                                    |
 | -------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | 1        | Greeting                | "Good [evening], [Name]." + personalized subtitle (tale count recap)                                                                     |
-| 2        | Stats bar               | Pages this month / pages left / regenerations used / tales in library — **wired in Phase 8**                                             |
+| 2        | Stats bar               | Pages this month / pages left / regenerations used / tales in library — **wired in Phase 9**                                             |
 | 3        | "Tonight's Tale" card   | One pre-seeded question featured as a prompt; "Begin tale →" / "Pick another" (static pre-seeded list)                                   |
 | 4        | "Your readers"          | Child cards (avatar, name·age, interests, "+ New tale" CTA, tale count) + "Add child" card + "Manage children →" link                    |
 | 5        | "In the Workshop" strip | Visible only when a generation job is active: title, progress bar, page count, ~time remaining, "Open workshop →" — **wired in Phase 5** |
@@ -142,13 +142,13 @@ Breadcrumb: Library / For [Child] / Tale [N]
 | Center | Spread viewer — text page + illustration page; "← Previous spread" / "spread X of Y" / "Next spread →" |
 | Right  | Action panels (top → bottom): Regeneration, Rating, Details                                            |
 
-**Right panel — Regeneration** _(wired in Phase 7)_:
+**Right panel — Regeneration** _(wired in Phase 8)_:
 
 - "Regenerate words on this page" → opens modal (optional prompt field + submit)
 - "Repaint the picture" → opens modal (optional prompt field + submit)
 - "N regenerations left this month"
 
-**Right panel — Rating** _(wired in Phase 10)_:
+**Right panel — Rating** _(wired in Phase 11)_:
 
 - "Rate this tale" — 1–5 stars + optional comment textarea
 - "Share as example" opt-in toggle → sets `Story.isPublic = true`
@@ -169,13 +169,13 @@ Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Desi
 | -------------- | ------------------ | ----------------------------------------------- |
 | Profile        | Phase 1 (existing) | Name, avatar from Google                        |
 | Children       | Phase 2 (existing) | Links to child management                       |
-| Subscription   | Phase 8            | Plan card, usage bars, payment, invoices        |
-| Notifications  | Phase 9            | Per-event preferences (email vs in-app toggles) |
-| Language       | Phase 12           | EN / RU switcher                                |
-| Privacy & data | Phase 8            | GDPR info + delete account trigger              |
+| Subscription   | Phase 9            | Plan card, usage bars, payment, invoices        |
+| Notifications  | Phase 10           | Per-event preferences (email vs in-app toggles) |
+| Language       | Phase 13           | EN / RU switcher                                |
+| Privacy & data | Phase 9            | GDPR info + delete account trigger              |
 | Export library | Post-MVP           | ZIP of all user PDFs                            |
 | Sign out       | Phase 1 (existing) |                                                 |
-| Delete account | Phase 8            | Subscription must be cancelled first            |
+| Delete account | Phase 9            | Subscription must be cancelled first            |
 
 **Subscription sub-section details:**
 
@@ -237,7 +237,7 @@ Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Desi
 | Dual-channel rule         | Same event → toast + bell when user is active |
 | Bell shell                | Design System phase (visual only, no wiring)  |
 | Story events wired        | Phase 5                                       |
-| Subscription events wired | Phase 9                                       |
+| Subscription events wired | Phase 10                                      |
 
 ### Subscriptions & Billing
 
@@ -246,8 +246,8 @@ Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Desi
 | Payment provider        | Paddle                                            |
 | Billing data            | Not stored by us — displayed from Paddle API      |
 | VAT                     | Displayed from Paddle invoice data                |
-| `childrenLimit` on Plan | Yes — enforced at Phase 8                         |
-| Delete account          | Phase 8; requires subscription cancellation first |
+| `childrenLimit` on Plan | Yes — enforced at Phase 9                         |
+| Delete account          | Phase 9; requires subscription cancellation first |
 
 ---
 
@@ -257,9 +257,9 @@ Sidebar + content layout. Shell (routing, sidebar) created in **Phase 3 — Desi
 | --------------------- | ----- | ---- | ----- | ----- |
 | story_completed       | ✅    | ✅   | ✅    | 5     |
 | story_failed          | ✅    | ✅   | —     | 5     |
-| payment_failed        | —     | ✅   | ✅    | 9     |
-| subscription_canceled | —     | ✅   | ✅    | 9     |
-| subscription_renewed  | —     | —    | ✅    | 9     |
+| payment_failed        | —     | ✅   | ✅    | 10    |
+| subscription_canceled | —     | ✅   | ✅    | 10    |
+| subscription_renewed  | —     | —    | ✅    | 10    |
 
 Post-MVP: credits_low, marketing, story_expiry_warning (free tier retention)
 
@@ -267,13 +267,14 @@ Post-MVP: credits_low, marketing, story_expiry_warning (free tier retention)
 
 ## Styling Architecture
 
-Three layers, strictly ordered:
+Four layers, strictly ordered (SCSS — see [`css.md`](frontend/.claude/rules/css.md) for the full spec):
 
-| Layer            | File                       | Role                                                                                                                                                                                |
-| ---------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Tokens        | `src/styles/tokens.css`    | CSS custom properties — primitives + semantic aliases. Imported once in `globals.css`. Never re-imported.                                                                           |
-| 2. Mantine theme | `src/theme/mantine.ts`     | `createTheme()` wires Mantine's visual layer to token values globally.                                                                                                              |
-| 3. CSS Modules   | `ComponentName.module.css` | One module per component. Consumes semantic tokens via `var(--token)`. Base class is the component name; modifiers use `m-` prefix (e.g. `.m-primary`). CSS Modules provides scope. |
+| Layer            | File                          | Role                                                                                                                                                                                |
+| ---------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Tokens        | `src/styles/_tokens.scss`     | CSS custom properties — primitives + semantic aliases. Emitted once via `globals.scss`. Never re-imported.                                                                          |
+| 2. Typography    | `src/styles/_typography.scss` | Sass `@mixin` per text style (`@include t-body-base`). No CSS output on its own.                                                                                                    |
+| 3. Mantine theme | `src/theme/mantine.ts`        | `createTheme()` wires Mantine's visual layer to token values globally.                                                                                                              |
+| 4. SCSS Modules  | `ComponentName.module.scss`   | One module per component. Consumes semantic tokens via `var(--token)`. Base class is the component name; modifiers use `m-` prefix (e.g. `.m-primary`). CSS Modules provides scope. |
 
 Components consume **semantic tokens only** (`--text-primary`, `--accent-primary`). Primitive tokens (`--color-fox`) are reserved for brand assets (logo, illustrations).
 

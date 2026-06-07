@@ -6,6 +6,5 @@ export function applyFilter(stories: IStorySummary[], filter: TFilter): IStorySu
     if (filter === 'ALL') return stories;
     if (filter === 'BOOK') return stories.filter((s) => s.type === 'BOOK');
     if (filter === 'COMIC') return stories.filter((s) => s.type === 'COMIC');
-    // childId
     return stories.filter((s) => s.childId === filter);
 }

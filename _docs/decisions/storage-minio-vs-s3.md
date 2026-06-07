@@ -1,7 +1,5 @@
 # Decision: MinIO (dev) + AWS S3 (prod) for Object Storage
 
-> Captured during Phase 4. Reference this in Phase 6 mid-point documentation.
-
 ## Decision
 
 Use **MinIO** locally (via docker-compose) and **AWS S3** in production. Both are accessed through
@@ -35,6 +33,22 @@ object storage. MinIO is purpose-built for this, lighter, and simpler to operate
 MinIO has minor gaps vs real S3 in advanced features (object lock, replication policies, some
 ACL modes). The operations TailorTales uses — `PutObject`, `GetObject`, `DeleteObject`,
 pre-signed URLs — are fully compatible and well-tested in MinIO.
+
+## Environment variables
+
+The same `StorageService` reads different env vars in each environment:
+
+| Variable                   | Dev (MinIO)                    | Prod (AWS S3)            |
+| -------------------------- | ------------------------------ | ------------------------ |
+| `STORAGE_REGION`           | `us-east-1` (MinIO ignores it) | real AWS region          |
+| `STORAGE_ACCESS_KEY`       | `minioadmin`                   | IAM access key           |
+| `STORAGE_SECRET_KEY`       | `minioadmin`                   | IAM secret key           |
+| `STORAGE_BUCKET`           | `tailortales`                  | your S3 bucket name      |
+| `STORAGE_ENDPOINT`         | `http://localhost:9000`        | _unset_ (AWS default)    |
+| `STORAGE_FORCE_PATH_STYLE` | `true`                         | _unset_ (defaults false) |
+
+In production, leave `STORAGE_ENDPOINT` and `STORAGE_FORCE_PATH_STYLE` unset. The SDK
+resolves the correct regional S3 endpoint automatically.
 
 ## Revisit if
 

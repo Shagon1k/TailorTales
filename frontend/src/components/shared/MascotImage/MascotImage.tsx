@@ -15,6 +15,7 @@ export type TMascotImageName =
     | 'fox-scales'
     | 'fox-speak'
     | 'fox-star'
+    | 'fox-learn'
     | 'fox-write';
 
 interface IMascotImageProps {
