@@ -2,14 +2,6 @@
 
 **Important!** Don't be lazy, or I will switch you with Codex.
 
-> Rules are scoped to where they apply:
->
-> - **Project-wide**: [`.claude/rules/`](.claude/rules/) — `typescript.md`, `testing.md`, `git.md`
-> - **Backend-specific**: [`backend/.claude/rules/`](backend/.claude/rules/) — NestJS, Prisma, API patterns
-> - **Frontend-specific**: [`frontend/.claude/rules/`](frontend/.claude/rules/) — CSS, component patterns, Mantine
-> - Each package may also have its own `CLAUDE.md` for package-level instructions.
->   When adding a new convention, put it in the most specific location that applies.
-
 ## Core
 
 - **Definition of Done**: Deliverables must be fully complete or explicitly blocked. Claims of completion require the best available evidence; if proof is missing, state exactly what is absent. Never fake completion.
@@ -45,14 +37,19 @@
 
 ## Git
 
-- Follow [`.claude/rules/git.md`](.claude/rules/git.md): GitHub Flow, `TT-<type>-<descriptor>` branches, Conventional Commits, squash merge.
+- GitHub Flow, `TT-<type>-<descriptor>` branches, Conventional Commits, squash merge (full spec auto-loads from `git.md`).
 - One logical change per commit. Refactors require approval and go in a separate commit with no behavior change.
 - NEVER commit without explicit developer approval — describe the change and wait for a clear "yes" before running git commit.
 
 ## Documentation
 
-- `ROADMAP.md` is the single source of truth — update it on every scope change or decision.
-- Every completed phase MUST ship with a doc at `_docs/phase-N-<name>.md` covering: what was added, resulting structure, working commands, configuration/env vars, gotchas. Follow `_docs/TEMPLATE.md`.
+Three kinds of docs, different lifecycles:
+
+- **Durable docs** — `_docs/architecture/`, `_docs/api/`, `_docs/guides/`, `_docs/decisions/`, and the READMEs. **Human-facing**, phase-agnostic, the lasting source of truth.
+- **Per-phase docs (staging)** — while a phase is in progress, capture what it built in `_docs/phase-N-<name>.md` following `TEMPLATE.md`. Temporary working notes.
+- **Implementation guides** — `ROADMAP.md`, `DESIGN.md`, `TEMPLATE.md`. Phase planning, scope, and design-review history live here, and **only** here.
+
+Rules:
+
 - After each phase: propose updates to `CLAUDE.md` and `.claude/rules/*` based on what was learned. Apply only after developer approval.
-- A phase is NOT complete until its doc is written and acceptance checks pass.
 - When deferring a decision or tech debt item, propose adding it to `ROADMAP.md` section "Deferred Decisions & Tech Debt" — ALWAYS ask the developer before adding.

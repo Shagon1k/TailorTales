@@ -6,7 +6,7 @@
     - `TT-feat-google-oauth`
     - `TT-fix-session-cookie-expiry`
     - `TT-chore-bump-prisma`
-2. **Make focused commits** following [Conventional Commits](.claude/rules/git.md#commit-messages--conventional-commits).
+2. **Make focused commits** following [Conventional Commits](#commit-message-format) (below).
 3. **Open a PR** with title in Conventional Commits format.
 4. **Link the GitHub Milestone** for the ROADMAP phase (e.g. `Phase 1 — Auth`).
 5. **PR description** must include: ROADMAP phase, which acceptance checks pass, any new env vars / migrations.
@@ -30,8 +30,6 @@ fix(frontend): correct session cookie expiry
 chore: bump prisma to 5.10
 ```
 
-Full spec: [`.claude/rules/git.md`](.claude/rules/git.md).
-
 ## Enforcement (set up in Phase 0)
 
 - **`commitlint` + `husky`** validate commit messages on every commit.
@@ -39,8 +37,13 @@ Full spec: [`.claude/rules/git.md`](.claude/rules/git.md).
 
 ## Setup
 
+Full setup instructions (prerequisites, Docker services, env vars, database migrations, seeds):
+**[\_docs/guides/getting-started.md](_docs/guides/getting-started.md)**
+
+The minimal steps to have the repo ready for commits:
+
 ```bash
-pnpm install   # installs husky hooks automatically via the prepare script
+pnpm install   # installs all workspaces + Husky commit hooks (via the prepare script)
 ```
 
 After install, every `git commit` runs commitlint on the message. If it fails, the commit is rejected.
@@ -51,5 +54,5 @@ TailorTales is built in numbered phases (see [ROADMAP.md](ROADMAP.md)). Per phas
 
 - Track work via a GitHub Milestone named `Phase N — <name>`.
 - All PRs related to a phase carry that milestone.
-- Phase is complete when: all milestone PRs merged, acceptance checks pass, and `_docs/phase-N-<name>.md` is written (see [`_docs/TEMPLATE.md`](_docs/TEMPLATE.md)).
+- Phase is complete when: all milestone PRs merged, acceptance checks pass, and the phase's working `_docs/phase-N-<name>.md` is written (per `_docs/TEMPLATE.md`). At documentation phases these get consolidated into the durable docs (`_docs/architecture/`, `api/`, `guides/`) and removed.
 - After each phase, propose updates to `CLAUDE.md` and `.claude/rules/*` — apply only after developer approval.

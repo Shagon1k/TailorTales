@@ -168,17 +168,9 @@ Privacy · Contact _(both static pages)_
 
 - **ROADMAP.md is the single source of truth.** Update it on every scope change or decision.
 - **DESIGN.md** documents all UI/UX decisions from design screen reviews. Update after each design review session.
-- **Per-phase docs (mandatory):** every completed phase MUST produce `_docs/phase-N-<name>.md` following `_docs/TEMPLATE.md`. Each doc must include:
-    - **Summary** — one-paragraph overview of what was added
-    - **What was added** — entities, modules, endpoints, pages, jobs, etc.
-    - **Resulting structure** — directory tree of new/changed files
-    - **Commands** — how to run, build, test, seed, migrate (anything new in this phase)
-    - **Configuration / env vars** — new env vars introduced, with example values
-    - **External services** — any new third-party integrations and how to obtain credentials
-    - **Database migrations** — list of migrations and what they change
-    - **Gotchas / known limitations** — anything a future developer needs to know
+- **Per-phase docs (staging) → durable docs (lasting).** While a phase is in progress, capture what it built in `_docs/phase-N-<name>.md` following `TEMPLATE.md` (summary, what was added, structure, commands, env/migrations, gotchas). These are temporary working notes. At documentation phases (7, 14, …) the accumulated phase docs are **consolidated into the durable docs** (`architecture/`, `api/`, `guides/`, `decisions/`) and the `phase-N` files removed. Durable docs are **phase-agnostic** and human-facing — the lasting source of truth; anything unbuilt is "planned (see ROADMAP)".
 - **Rules revision:** after each phase, review and propose updates to `CLAUDE.md` and `.claude/rules/*.md` based on what was learned. **Each revision requires developer approval before commit.**
-- **Phase completion gate:** a phase is NOT complete until acceptance checks pass AND its `_docs/phase-N-*.md` is written. No half-finished phases in `main`.
+- **Phase completion gate:** a phase is NOT complete until acceptance checks pass AND its `_docs/phase-N-<name>.md` is written. No half-finished phases in `main`.
 
 ---
 
@@ -259,7 +251,7 @@ Privacy · Contact _(both static pages)_
 - Commit with invalid message is rejected by commitlint; valid Conventional Commit is accepted
 - CI green on a no-op PR
 
-**Deliverables:** `_docs/phase-0-infrastructure.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -291,7 +283,7 @@ Privacy · Contact _(both static pages)_
 - Admin role can be assigned via seed script
 - Tests pass
 
-**Deliverables:** `_docs/phase-1-auth.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -317,7 +309,7 @@ Privacy · Contact _(both static pages)_
 - Validation blocks invalid input
 - Tests pass
 
-**Deliverables:** `_docs/phase-2-children.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -442,7 +434,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - ArtStyle seed populates 8 styles
 - `pnpm test` passes; `pnpm type-check` passes; `pnpm lint` passes
 
-**Deliverables:** `_docs/phase-3-design-system.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 **Out of scope (explicit):** Mobile responsiveness — design system targets desktop at MVP; mobile breakpoints are post-MVP.
 
@@ -497,7 +489,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - Story reader renders chapter list and spread viewer
 - Tests pass
 
-**Deliverables:** `_docs/phase-4-stories.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -522,64 +514,64 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 **Schema deltas (minimal):**
 
-- [ ] Prisma `Job` model: `id`, `storyId`, `type (generation | regeneration)`, `status`, `progress`, `stage`, `error?`, `attempts`, `createdAt`, `updatedAt`
-- [ ] Prisma `Notification` model: `id`, `userId`, `type`, `payload (Json)`, `readAt?`, `createdAt` (created here; Phase 10 builds the UI + preferences on top)
-- [ ] `Page.illustrationPrompt String?` — prompt used to paint the page (provenance now, Phase 8 regen later)
-- [ ] `Story.styleAnchor String?` — recurring-character + style description, for consistent images across pages and on regeneration
-- [ ] Prisma migrations for all of the above
+- [x] Prisma `Job` model: `id`, `storyId`, `type (generation | regeneration)`, `status`, `progress`, `stage`, `error?`, `attempts`, `createdAt`, `updatedAt`
+- [x] Prisma `Notification` model: `id`, `userId`, `type`, `payload (Json)`, `readAt?`, `createdAt` (created here; Phase 10 builds the UI + preferences on top)
+- [x] `Page.illustrationPrompt String?` — prompt used to paint the page (provenance now, Phase 8 regen later)
+- [x] `Story.styleAnchor String?` — recurring-character + style description, for consistent images across pages and on regeneration
+- [x] Prisma migrations for all of the above
 
 **Increment 1 — Foundation (verify: boots + Redis connects):**
 
-- [ ] Install deps: `bullmq`, `@nestjs/bullmq`, `handlebars`, `puppeteer`, `pdf-lib`, `resend` (no `openai` SDK — OpenRouter via native `fetch`)
-- [ ] BullMQ module wired to Redis (`REDIS_URL`)
-- [ ] Env: `OPENROUTER_API_KEY`, `OPENROUTER_TEXT_MODEL`, `OPENROUTER_IMAGE_MODEL`, `RESEND_API_KEY`, `RESEND_FROM`, `USE_AI_STUBS`, `REDIS_URL`
+- [x] Install deps: `bullmq`, `@nestjs/bullmq`, `handlebars`, `puppeteer`, `pdf-lib`, `resend` (no `openai` SDK — OpenRouter via native `fetch`)
+- [x] BullMQ module wired to Redis (`REDIS_URL`)
+- [x] Env: `OPENROUTER_API_KEY`, `OPENROUTER_TEXT_MODEL`, `OPENROUTER_IMAGE_MODEL`, `RESEND_API_KEY`, `RESEND_FROM`, `USE_AI_STUBS`, `REDIS_URL`
 
 **Increment 2 — PDF renderer, no AI (verify: a fixture Story Plan → real A5 PDF):**
 
 - [x] `rendering/page-templates.config.ts` — `Record<string, IPageTemplate>` keyed by template name. Per entry: `htmlFile`, `type`, `role (cover|interior|final)`, `narrativePurpose`, `maxChars` (plain object keyed by zone name), `images: [{ name, aspect, size }]` with pixel dimensions matched to each template's display area. `book-*` defined; `comic-*` Post-MVP stubs.
-- [ ] Handlebars **base partial** (`_base.hbs`): `<!DOCTYPE>`, `@page { size: 148mm 210mm }`, reset, shared CSS vars; templates include the base and define only their unique layout
-- [ ] 5 `book-*` Handlebars templates (`book-cover`, `book-text`, `book-text-image`, `book-full-image`, `book-final`) with CSS auto-fit overflow safety net
-- [ ] **Self-host fonts** (Nunito, Comfortaa `.woff2`) locally in the repo — no CDN fetch at render time; wait for `document.fonts.ready` before printing (deterministic PDFs)
-- [ ] `PdfRendererService` — resolve template by `Page.layout`, inject data via Handlebars, Puppeteer renders each page to A5 PDF, pdf-lib stitches; free-tier watermark overlay
-- [ ] 2–3 placeholder illustrations + 3 canned Story Plan fixtures (drive validator + renderer tests offline)
+- [x] Handlebars **base partial** (`_base.hbs`): `<!DOCTYPE>`, `@page { size: 148mm 210mm }`, reset, shared CSS vars; templates include the base and define only their unique layout
+- [x] 5 `book-*` Handlebars templates (`book-cover`, `book-text`, `book-text-image`, `book-full-image`, `book-final`) with CSS auto-fit overflow safety net
+- [x] **Self-host fonts** (Nunito, Comfortaa `.woff2`) locally in the repo — no CDN fetch at render time; wait for `document.fonts.ready` before printing (deterministic PDFs)
+- [x] `PdfRendererService` — resolve template by `Page.layout`, inject data via Handlebars, Puppeteer renders each page to A5 PDF, pdf-lib stitches; free-tier watermark overlay
+- [x] 2–3 placeholder illustrations + 3 canned Story Plan fixtures (drive validator + renderer tests offline)
 
 **Increment 3 — AI client + stubs:**
 
-- [ ] `ai/AiClient` — `generateStoryPlan()` (JSON output) + `generateImage({ prompt, styleAnchor, referenceImageKeys? })` (reference-image param is a Post-MVP seam, unimplemented). OpenRouter via `fetch`; exponential backoff, 3 retries, 4xx fails immediately
-- [ ] `ai/AiStubClient` behind `USE_AI_STUBS` — deterministic text + placeholder images
-- [ ] Tests for both (mocked transport)
+- [x] `ai/AiClient` — `generateStoryPlan()` (JSON output) + `generateImage({ prompt, styleAnchor, referenceImageKeys? })` (reference-image param is a Post-MVP seam, unimplemented). OpenRouter via `fetch`; exponential backoff, 3 retries, 4xx fails immediately
+- [x] `ai/AiStubClient` behind `USE_AI_STUBS` — deterministic text + placeholder images
+- [x] Tests for both (mocked transport)
 
 **Increment 4 — Pipeline + Job service (verify: stub run → stored PDF, status COMPLETED):**
 
-- [ ] 1-concurrent-story enforcement: active job check before enqueue → 409 if one exists
-- [ ] **Stage: Planning** — auto-select StoryBlueprint by type → build prompt (artStyle.promptPrefix + styleAnchor + per-template constraints + dramaturgy guidance + **child age** for age-adaptive vocabulary/complexity + **target language** so the story text is written in EN/RU; language handling refined in Phase 13) → `generateStoryPlan()`
-- [ ] **Validation** — template exists + allowed for type, structural invariants (cover/final/count), per-template text limits (bounded repair → truncate), image count per template; persist as `Story.title`, `Story.styleAnchor`, `Page` rows
-- [ ] **Stage: Moderation (silent)** — LLM text moderation immediately after planning, _before_ spending on images; image safety via provider flags. Unsafe → FAILED with reason
-- [ ] **Stage: Pictures** — per-page image generation, capped concurrency; upload bytes → store key on `Page.illustrations`
-- [ ] **Stage: Binding** — `PdfRendererService` stitches the document
-- [ ] **Stage: Ready** — upload PDF, store `pdfKey` + `coverImageKey`; Story → COMPLETED
-- [ ] Failure handling: any stage error → Story FAILED, error stored on Job, surfaced to user
+- [x] 1-concurrent-story enforcement: active job check before enqueue → 409 if one exists
+- [x] **Stage: Planning** — auto-select StoryBlueprint by type → build prompt (artStyle.promptPrefix + styleAnchor + per-template constraints + dramaturgy guidance + **child age** for age-adaptive vocabulary/complexity + **target language** so the story text is written in EN/RU; language handling refined in Phase 13) → `generateStoryPlan()`
+- [x] **Validation** — template exists + allowed for type, structural invariants (cover/final/count), per-template text limits (bounded repair → truncate), image count per template; persist as `Story.title`, `Story.styleAnchor`, `Page` rows
+- [x] **Stage: Moderation (silent)** — LLM text moderation immediately after planning, _before_ spending on images; image safety via provider flags. Unsafe → FAILED with reason
+- [x] **Stage: Pictures** — per-page image generation, capped concurrency; upload bytes → store key on `Page.illustrations`
+- [x] **Stage: Binding** — `PdfRendererService` stitches the document
+- [x] **Stage: Ready** — upload PDF, store `pdfKey` + `coverImageKey`; Story → COMPLETED
+- [x] Failure handling: any stage error → Story FAILED, error stored on Job, surfaced to user
 
 **Increment 5 — SSE + workshop routing:**
 
-- [ ] `GET /stories/:id/progress` — streams stage transitions + **one event per page as its image completes** (drives the per-page UI)
-- [ ] `/workshop` routing: active job → redirect to `/workshop/[jobId]`; else show form
+- [x] `GET /stories/:id/progress` — streams stage transitions + **one event per page as its image completes** (drives the per-page UI)
+- [x] `/workshop` routing: active job → redirect to `/workshop/[jobId]`; else show form
 
 **Increment 6 — Frontend:**
 
-- [ ] `/workshop/[jobId]` progress page: fox + progress bar; stage row **Planning → Pictures → Binding → Ready** (Outline/Words shown as cosmetic sub-ticks inside Planning); "Pages so far" grid (thumbnail lights up per image-completion event, active page glows); workshop log (LIVE); "Close safely" email banner
-- [ ] "In the Workshop" strip on `/library` (active job)
-- [ ] Download PDF button on reader for COMPLETED stories
-- [ ] Workshop Book/Comic toggle: **Comic shows "coming soon"** (disabled path) until comic generation ships
-- [ ] Workshop summary credit cost/balance: **stays stubbed** (`CREDIT_COST = 5` / `STUB_REMAINING = 60`) — real balance is Phase 9
+- [x] `/workshop/[jobId]` progress page: fox + progress bar; stage row **Planning → Pictures → Binding → Ready** (Outline/Words shown as cosmetic sub-ticks inside Planning); "Pages so far" grid (thumbnail lights up per image-completion event, active page glows); workshop log (LIVE); "Close safely" email banner
+- [x] "In the Workshop" strip on `/library` (active job)
+- [x] Download PDF button on reader for COMPLETED stories
+- [x] Workshop Book/Comic toggle: **Comic shows "coming soon"** (disabled path) until comic generation ships
+- [x] Workshop summary credit cost/balance: **stays stubbed** (`CREDIT_COST = 5` / `STUB_REMAINING = 60`) — real balance is Phase 9
 
 **Increment 7 — Notifications + contact + docs:**
 
-- [ ] Email on `story_completed` (Resend) + bell `Notification` record
-- [ ] Bell `Notification` on `story_failed` (+ email)
-- [ ] `ResendClient` module (expanded in Phase 10)
-- [ ] `POST /contact` endpoint — resolves Deferred Decision #4; wire the Phase 3 frontend Server Action stub
-- [ ] Tests: planning/validation/moderation/pictures/binding stages (stubbed AI), SSE events, 1-concurrent 409, failure handling
+- [x] Email on `story_completed` (Resend) + bell `Notification` record
+- [x] Bell `Notification` on `story_failed` (+ email)
+- [x] `ResendClient` module (expanded in Phase 10)
+- [x] `POST /contact` endpoint — resolves Deferred Decision #4; wire the Phase 3 frontend Server Action stub
+- [x] Tests: planning/validation/moderation/pictures/binding stages (stubbed AI), SSE events, 1-concurrent 409, failure handling
 
 **Acceptance Check:**
 
@@ -593,7 +585,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 > **Stub vs. live verification:** CI and local runs use `USE_AI_STUBS` — the full pipeline, 409, failure handling, watermarking, and PDF assembly are all verifiable offline, but stub generation completes near-instantly (the per-page progress UX is best _observed_ against real generation). The two checks that require live credentials are **real story generation** (OpenRouter key) and **email on completion** (Resend key) — these are manual/integration checks, not CI.
 
-**Deliverables:** `_docs/phase-5-generation.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 **Out of scope (explicit):** Comic generation (Deferred #6); real credit balance (Phase 9); photo-input character likeness (Post-MVP); notification preferences + bell UI (Phase 10).
 
@@ -621,9 +613,9 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - The full happy path completes against the real app with no blocker/major bugs open
 - Every triaged issue is either fixed or explicitly deferred with developer sign-off
 - Automated suite green after fixes
-- `_docs/phase-6-verification.md` captures the triage list, what was fixed, and what was deferred (with rationale)
+- The QA triage (issues found, fixes applied, deferrals with rationale) is captured in the Phase 6 commit history and the ROADMAP Deferred entries (#8)
 
-**Deliverables:** `_docs/phase-6-verification.md` (QA report: issues found, fixes applied, deferrals)
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -633,27 +625,28 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 **Sub-tasks:**
 
-- [ ] Architecture overview doc: system design, data flow diagram, key decisions and their rationale (covers Phases 0–6). **Must cover:**
+- [x] Establish the durable-docs structure (`_docs/architecture/`, `api/`, `guides/`) — phase-agnostic, the current source of truth — and a root + `_docs` README that route into it
+- [x] Architecture overview docs: system design, module map, data-flow + ER diagrams (mermaid), key decisions and their rationale. **Must cover:**
     - Generation pipeline: all 5 stages (Planning → Moderation → Pictures → Binding → Ready), what each stage does, what it writes to DB/S3
     - `GenerationModule` DI wiring: how `GenerationService`, `GenerationPipeline`, and `GenerationWorker` relate — who calls whom and why they are separate classes
     - Why `POST /stories/:id/generate` lives in `StoriesController` (not `GenerationController`) — NestJS controller placement rationale
     - How BullMQ decouples HTTP (enqueue) from processing (worker → pipeline) — why pipeline has no BullMQ dependency and can be tested without Redis
     - `StoryPlanValidator` two-class failure model: structural errors vs length overflows and why truncation was rejected
     - `AiClient` vs `AiStubClient` swap via `USE_AI_STUBS` — how the full pipeline runs offline in CI
-- [ ] API reference: all endpoints, request/response shapes, auth rules, error codes
-- [ ] Developer onboarding guide: prerequisites, env setup, local run (frontend + backend + workers), first contribution checklist
-- [ ] Review and improve all `_docs/phase-N-*.md` files (0–6): fill gaps, fix stale info, ensure commands still work
-- [ ] Sweep `CLAUDE.md` + all `.claude/rules/*.md`: incorporate patterns and lessons learned from Phases 1–6; propose updates for developer approval
-- [ ] Verify `DESIGN.md` and `ROADMAP.md` reflect actual built state (no drift)
+- [x] API reference: all endpoints, request/response shapes, auth rules, error codes
+- [x] Developer onboarding + external-services guides: prerequisites, env setup, local run, credentials, first contribution checklist
+- [x] Remove the per-phase `_docs/phase-N-*.md` scaffolding; migrate any still-live content (OAuth/external-service setup) into the durable guides. Phase history now lives in this ROADMAP + git history
+- [x] Sweep `CLAUDE.md` + all `.claude/rules/*.md`: incorporate patterns and lessons learned; add scoped module `CLAUDE.md` where valuable; propose updates for developer approval
+- [x] Verify `DESIGN.md` and `ROADMAP.md` reflect actual built state (no drift)
 
 **Acceptance Check:**
 
 - A new developer can clone the repo, follow the onboarding guide, and run the full stack locally without assistance
-- All `_docs/phase-0` through `_docs/phase-6` docs are accurate and complete
+- The durable docs (`architecture/`, `api/`, `guides/`) accurately describe the system as built; no `phase-N` docs remain in `_docs/`
 - `CLAUDE.md` and rules files updated with any new conventions discovered
 - Architecture overview covers all major system components
 
-**Deliverables:** `_docs/phase-7-midpoint-docs.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -680,7 +673,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - PDF updates correctly
 - Tests pass
 
-**Deliverables:** `_docs/phase-8-regeneration.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -721,7 +714,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - Free-tier PDFs expire per retention policy
 - Tests pass
 
-**Deliverables:** `_docs/phase-9-subscriptions.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -759,7 +752,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - User can toggle notification preferences per event type
 - Tests pass
 
-**Deliverables:** `_docs/phase-10-notifications.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -791,7 +784,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Admin can view all ratings and manage public visibility
 - Tests pass
 
-**Deliverables:** `_docs/phase-11-ratings.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -817,7 +810,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Non-admins blocked from admin routes
 - Tests pass
 
-**Deliverables:** `_docs/phase-12-admin.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -840,7 +833,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Generated stories respect language param
 - Tests pass
 
-**Deliverables:** `_docs/phase-13-localization.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -853,20 +846,20 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [ ] Ops runbook: deployment procedure, rollback steps, env variable reference (all vars across all services), health check endpoints
 - [ ] Monitoring & alerting guide: log structure (Pino), what to watch, how to diagnose common failures
 - [ ] Backup strategy doc: Postgres backup schedule + restore procedure, S3 versioning policy
-- [ ] Final sweep of all `_docs/phase-N-*.md` (0–13): verify accuracy, update any commands or configs that changed during later phases
+- [ ] Final sweep of all durable docs (`_docs/architecture/`, `api/`, `guides/`, `decisions/`): verify accuracy, update any commands or configs that changed during later phases
 - [ ] Final sweep of `CLAUDE.md` + all `.claude/rules/*.md`: incorporate all patterns and lessons from Phases 7–13; propose updates for developer approval
 - [ ] Final review of `DESIGN.md`: confirm it matches what was actually built (no deferred items silently dropped)
 - [ ] Final review of `ROADMAP.md`: move completed items to ✅, update open questions, archive resolved deferred decisions
-- [ ] Update architecture overview doc (from Phase 7) to reflect full system including Phases 7–13 additions
+- [ ] Update the architecture docs to reflect the full system including Phases 7–13 additions
 
 **Acceptance Check:**
 
 - Ops runbook covers full deployment from zero to live
-- All per-phase docs accurate and complete through Phase 13
+- All durable docs accurate and complete through Phase 13
 - `CLAUDE.md` and rules files reflect all conventions established across the full build
 - `ROADMAP.md` accurately reflects the shipped product
 
-**Deliverables:** `_docs/phase-14-final-docs.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 
@@ -894,7 +887,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - End-to-end flow works (login → generate → download)
 - Backups configured
 
-**Deliverables:** `_docs/phase-15-deploy.md`
+**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
 ---
 

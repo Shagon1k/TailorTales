@@ -1,7 +1,7 @@
 import { createTheme, type MantineColorsTuple } from '@mantine/core';
 
 // Mantine requires actual hex values (not CSS vars) to compute interactive states.
-// index 6 = --color-fox (primary). Keep in sync with tokens.css if primitives change.
+// index 6 = --color-fox (primary). Keep in sync with _tokens.scss if primitives change.
 const fox: MantineColorsTuple = [
     '#fff0eb',
     '#ffdcd0',

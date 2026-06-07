@@ -1,5 +1,9 @@
 # Frontend
 
+Next.js App Router + Mantine. Components co-locate with their route (`_components/`) and lift
+only on a second consumer. Session comes from an RSC fetch in the root layout → `UserProvider`;
+everything else is React Query. CSS/design-system conventions auto-load from the rules.
+
 ## React Query
 
 - `QueryClient` must be created with `useState(() => new QueryClient())` — module-scope creation causes SSR data leaks between users.

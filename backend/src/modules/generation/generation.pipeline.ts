@@ -51,22 +51,17 @@ export class GenerationPipeline {
         });
 
         try {
-            // Stage 1: Planning
             const storyPlan = await this.runPlanning(story);
 
-            // Stage 2: Moderation
             await this.setJobStage(jobId, 'moderation');
             await this.runModeration(storyPlan);
 
-            // Stage 3: Pictures
             await this.setJobStage(jobId, 'pictures');
             const pages = await this.runPictures(story);
 
-            // Stage 4: Binding
             await this.setJobStage(jobId, 'binding');
             const pdfBuffer = await this.runBinding(story, pages);
 
-            // Stage 5: Ready
             await this.setJobStage(jobId, 'ready');
             await this.runReady(story, pdfBuffer);
 
@@ -253,13 +248,11 @@ export class GenerationPipeline {
             );
         }
 
-        // Reload pages with updated illustrations
         const updated = await this.prisma.page.findMany({
             where: { storyId: story.id },
             orderBy: { order: 'asc' },
         });
 
-        // Set cover image key from page 1's illustration
         const coverPage = updated[0];
         const coverIllustrations = coverPage?.illustrations as Array<{ key: string }> | null;
         const coverKey = coverIllustrations?.[0]?.key;
