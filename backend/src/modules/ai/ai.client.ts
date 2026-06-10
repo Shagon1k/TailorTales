@@ -4,6 +4,7 @@ import { AppError } from '../../common/errors.js';
 import {
     type IAiClient,
     type IGenerateImageInput,
+    type IGeneratePageTextInput,
     type IGenerateStoryPlanInput,
     type IModerationResult,
     type IStoryPlan,
@@ -67,6 +68,28 @@ export class AiClient implements IAiClient {
         }
 
         return result.data;
+    }
+
+    async generatePageText(input: IGeneratePageTextInput): Promise<string> {
+        this.logger.log(`Generating page text (model: ${this.textModel})`);
+
+        const body = {
+            model: this.textModel,
+            max_tokens: input.maxTokens,
+            messages: [
+                { role: 'system', content: input.systemPrompt },
+                { role: 'user', content: input.userPrompt },
+            ],
+        };
+
+        const data = await this.post<{ choices: { message: { content: string } }[] }>(
+            '/chat/completions',
+            body,
+        );
+
+        const text = data.choices[0]?.message?.content;
+        if (!text?.trim()) throw new Error('OpenRouter returned empty page text content');
+        return text.trim();
     }
 
     async generateImage(input: IGenerateImageInput): Promise<Buffer> {

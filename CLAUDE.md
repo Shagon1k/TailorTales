@@ -20,6 +20,26 @@
 - Logs are future context. Log exactly what happened, where it happened, and the expected vs. actual outcomes when relevant. Prefer durable artifacts or compact handoff notes over conversational noise, and include a single, brief next-step hint when useful.
 - When a conversation produces a reusable pattern or architectural decision, propose adding it to the relevant CLAUDE.md or .claude/rules/\*.md. Wait for approval before applying.
 
+## Compact Representation
+
+Prefer structured formats over prose — they compress better for both human skimming and AI attention.
+
+Format selection (in priority order):
+
+```
+flow / state / relationship  →  Mermaid diagram
+algorithm / decision tree    →  pseudo-code
+config / structured data     →  JSON with inline // comments
+narrative that resists above →  prose (last resort)
+```
+
+**By file type:**
+
+- **AI-facing** (CLAUDE.md, AGENTS.md, `.claude/rules/*.md`): diagrams and pseudo-code first; prose only when structure genuinely doesn't fit.
+- **Shared docs** (`_docs/`, READMEs): balance — use compact formats where they compress cleanly, prose where narrative context matters for human readers.
+
+**Session context hygiene:** apply the same rule within every session. Plans, summaries, and handoff notes default to the most compact lossless form. If something in context can be expressed as a diagram or structured block without losing meaning — convert it.
+
 ## Code
 
 - Write minimal but readable code. The codebase should remain easy to follow for any developer picking it up.

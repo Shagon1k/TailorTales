@@ -21,6 +21,7 @@ export const STORY_OUTPUT_RULES = [
     '  • chapterTitle: short chapter label shown above the text (null if not needed)',
     '  • illustration.prompt: a complete, self-contained image generation prompt',
     '  • styleAnchor: describe recurring characters + overall visual style — prepended to every illustration prompt',
+    '  • Every prose page text (interior and final pages) must end with a complete sentence — the last character must be ., !, ?, … or ,',
 ].join('\n');
 
 export const MODERATION_SYSTEM_PROMPT = [
