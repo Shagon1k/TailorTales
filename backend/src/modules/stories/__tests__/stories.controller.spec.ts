@@ -35,6 +35,7 @@ const MOCK_SUMMARY: IStorySummary = {
     language: 'EN',
     title: null,
     styleAnchor: null,
+    characterId: null,
     isPublic: false,
     createdAt: new Date('2026-05-01T10:00:00Z'),
     updatedAt: new Date('2026-05-01T10:00:00Z'),
