@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { ArtStyle, Child, Language, StoryBlueprint } from '../../generated/prisma/client.js';
+import type {
+    ArtStyle,
+    Character,
+    Child,
+    Language,
+    StoryBlueprint,
+} from '../../generated/prisma/client.js';
 import {
     BOOK_INTERIOR_TEMPLATE_NAMES,
     PAGE_TEMPLATES,
@@ -9,6 +15,7 @@ import {
     STORY_OUTPUT_RULES_HEADER,
     STORY_STRUCTURE_RULES_HEADER,
     STORY_SYSTEM_PROMPT_SUFFIX,
+    buildCharacterPromptSection,
 } from './generation.prompts.js';
 
 interface IPromptContext {
@@ -18,6 +25,8 @@ interface IPromptContext {
     question: string;
     pageCount: number;
     language: Language;
+    /** When present, guides the LLM's styleAnchor generation and illustration prompts. */
+    character?: Pick<Character, 'name' | 'description'>;
 }
 
 @Injectable()
@@ -45,6 +54,9 @@ export class StoryPromptBuilder {
             '',
             `QUESTION TO ANSWER: "${ctx.question}"`,
             '',
+            ...(ctx.character
+                ? [buildCharacterPromptSection(ctx.character.name, ctx.character.description), '']
+                : []),
             `ART STYLE: ${ctx.artStyle.promptPrefix}`,
             `Use this style when writing illustration prompts — describe scenes vividly.`,
             '',

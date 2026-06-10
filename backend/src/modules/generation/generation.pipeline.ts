@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { AppError } from '../../common/errors.js';
 import type {
     ArtStyle,
+    Character,
     Child,
     Page,
     Story,
@@ -122,6 +123,7 @@ export class GenerationPipeline {
 
     private async runPlanning(story: StoryWithRelations): Promise<IStoryPlan> {
         const blueprint = await this.selectBlueprint(story.type);
+        const character = await this.loadCharacterForStory(story);
 
         const systemPrompt = this.promptBuilder.buildSystemPrompt(blueprint);
         const userPrompt = this.promptBuilder.buildUserPrompt({
@@ -131,6 +133,7 @@ export class GenerationPipeline {
             question: story.question,
             pageCount: story.pageCount,
             language: story.language,
+            character: character ?? undefined,
         });
         const maxTokens = computeMaxTokens(story.pageCount, story.language);
 
@@ -168,7 +171,7 @@ export class GenerationPipeline {
             );
         }
 
-        await this.persistStoryPlan(story, plan, blueprint.id);
+        await this.persistStoryPlan(story, plan, blueprint.id, character?.id ?? null);
         return plan;
     }
 
@@ -185,10 +188,11 @@ export class GenerationPipeline {
         story: StoryWithRelations,
         plan: IStoryPlan,
         blueprintId: string,
+        characterId: string | null,
     ): Promise<void> {
         await this.prisma.story.update({
             where: { id: story.id },
-            data: { title: plan.title, styleAnchor: plan.styleAnchor, blueprintId },
+            data: { title: plan.title, styleAnchor: plan.styleAnchor, blueprintId, characterId },
         });
 
         await this.prisma.page.createMany({
@@ -351,6 +355,20 @@ export class GenerationPipeline {
     // ---------------------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------------------
+
+    /**
+     * Looks up the Character associated with the story's child (if any).
+     * Returns null when no character exists — the pipeline continues without one.
+     * Uses PrismaService directly so GenerationModule has no dependency on CharactersModule.
+     */
+    private async loadCharacterForStory(
+        story: Story,
+    ): Promise<Pick<Character, 'id' | 'name' | 'description'> | null> {
+        return this.prisma.character.findFirst({
+            where: { childId: story.childId, userId: story.userId },
+            select: { id: true, name: true, description: true },
+        });
+    }
 
     private async loadStory(storyId: string): Promise<StoryWithRelations> {
         const story = await this.prisma.story.findUnique({
