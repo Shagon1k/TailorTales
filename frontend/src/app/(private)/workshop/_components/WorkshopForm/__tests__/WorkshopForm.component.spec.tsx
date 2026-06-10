@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { IChild } from '@/types/child.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig } from '@/types/story.types';
@@ -17,6 +18,14 @@ const mockStoriesGenerate = vi.hoisted(() => vi.fn());
 
 vi.mock('@/api/stories', () => ({
     storiesApi: { create: mockStoriesCreate, generate: mockStoriesGenerate },
+}));
+
+// WorkshopForm uses useCharacters/useCreateCharacter/useUpdateCharacter — mock the entire module
+// so tests focus on WorkshopForm behaviour and don't need a real API.
+vi.mock('@/hooks/characters', () => ({
+    useCharacters: vi.fn().mockReturnValue({ data: [] }),
+    useCreateCharacter: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
+    useUpdateCharacter: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
 }));
 
 const READER: IChild = {
@@ -50,15 +59,18 @@ const CONFIG: IStoryConfig = {
 };
 
 function renderForm(overrides: Partial<Parameters<typeof WorkshopForm>[0]> = {}): void {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(
-        <MantineProvider>
-            <WorkshopForm
-                readers={[READER]}
-                artStyles={[ART_STYLE]}
-                config={CONFIG}
-                {...overrides}
-            />
-        </MantineProvider>,
+        <QueryClientProvider client={queryClient}>
+            <MantineProvider>
+                <WorkshopForm
+                    readers={[READER]}
+                    artStyles={[ART_STYLE]}
+                    config={CONFIG}
+                    {...overrides}
+                />
+            </MantineProvider>
+        </QueryClientProvider>,
     );
 }
 

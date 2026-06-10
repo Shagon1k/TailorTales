@@ -8,7 +8,7 @@ import ChildCard from './_components/ChildCard/ChildCard';
 import ChildForm, { type IChildFormValues } from './_components/ChildForm/ChildForm';
 import CharacterForm, {
     type ICharacterFormValues,
-} from './_components/CharacterForm/CharacterForm';
+} from '../../_components/CharacterForm/CharacterForm';
 import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/hooks/children';
 import { useCharacters, useCreateCharacter, useUpdateCharacter } from '@/hooks/characters';
 import type { IChild } from '@/types/child.types';
