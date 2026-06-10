@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button/Button';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import type { IChild } from '@/types/child.types';
+import type { ICharacter } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryType, ILanguage } from '@/types/story.types';
 import styles from './WorkshopSummary.module.scss';
@@ -25,6 +26,7 @@ const STUB_REMAINING = 60;
 
 export interface IWorkshopSummaryProps {
     child: IChild | null;
+    character: ICharacter | null;
     storyType: IStoryType | null;
     pageCount: string | null;
     artStyle: IArtStyle | null;
@@ -33,10 +35,12 @@ export interface IWorkshopSummaryProps {
     isValid: boolean;
     isPending: boolean;
     onSubmit: () => void;
+    onCharacterEdit: () => void;
 }
 
 export default function WorkshopSummary({
     child,
+    character,
     storyType,
     pageCount,
     artStyle,
@@ -45,6 +49,7 @@ export default function WorkshopSummary({
     isValid,
     isPending,
     onSubmit,
+    onCharacterEdit,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
     const hasQuestion = question.trim().length > 0;
 
@@ -67,6 +72,15 @@ export default function WorkshopSummary({
 
             <ul className={styles.summary__rows}>
                 <SummaryRow label="Reader" value={child?.name ?? null} />
+                <SummaryRow
+                    label="Character"
+                    value={character?.name ?? null}
+                    action={{
+                        label: character ? 'Edit' : 'Add',
+                        onClick: onCharacterEdit,
+                        disabled: child === null,
+                    }}
+                />
                 <SummaryRow label="Format" value={storyType ? FORMAT_LABEL[storyType] : null} />
                 <SummaryRow label="Length" value={pageCount ? `${pageCount} pages` : null} />
                 <SummaryRow label="Language" value={language ? LANGUAGE_LABEL[language] : null} />
@@ -110,18 +124,37 @@ export default function WorkshopSummary({
 
 // ── Private sub-component ─────────────────────────────────────────────────────
 
+interface ISummaryRowAction {
+    label: string;
+    onClick: () => void;
+    disabled?: boolean;
+}
+
 interface ISummaryRowProps {
     label: string;
     value: string | null;
+    action?: ISummaryRowAction;
 }
 
-function SummaryRow({ label, value }: ISummaryRowProps): React.ReactElement {
+function SummaryRow({ label, value, action }: Readonly<ISummaryRowProps>): React.ReactElement {
     return (
-        <li className={styles.summary__row}>
+        <li className={styles['summary__row']}>
             <span className={styles['summary__row-label']}>{label}</span>
-            <span className={styles['summary__row-value']}>
-                {value ?? <span className={styles['summary__row-empty']}>—</span>}
-            </span>
+            <div className={styles['summary__row-value-group']}>
+                <span className={styles['summary__row-value']}>
+                    {value ?? <span className={styles['summary__row-empty']}>—</span>}
+                </span>
+                {action && (
+                    <button
+                        type="button"
+                        className={styles['summary__row-action']}
+                        onClick={action.onClick}
+                        disabled={action.disabled}
+                    >
+                        {action.label}
+                    </button>
+                )}
+            </div>
         </li>
     );
 }

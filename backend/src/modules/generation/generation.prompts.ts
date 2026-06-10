@@ -21,7 +21,24 @@ export const STORY_OUTPUT_RULES = [
     '  • chapterTitle: short chapter label shown above the text (null if not needed)',
     '  • illustration.prompt: a complete, self-contained image generation prompt',
     '  • styleAnchor: describe recurring characters + overall visual style — prepended to every illustration prompt',
+    '  • Every prose page text (interior and final pages) must end with a complete sentence — the last character must be ., !, ?, … or ,',
 ].join('\n');
+
+/**
+ * Builds the character identity section injected into the user prompt when a Character
+ * is associated with the story's child. The section guides the LLM to use this description
+ * as the basis for `styleAnchor` and to keep all character illustrations consistent.
+ *
+ * No-character fallback: omit this section entirely — the LLM composes styleAnchor
+ * from art style alone, which is the pre-Character default behaviour.
+ */
+export function buildCharacterPromptSection(name: string, description: string): string {
+    return [
+        'CHARACTER (recurring visual identity — inform styleAnchor and every illustration prompt):',
+        `  ${name}: ${description}`,
+        '  Every illustration of this character must match this description precisely.',
+    ].join('\n');
+}
 
 export const MODERATION_SYSTEM_PROMPT = [
     "You are a content safety reviewer for a children's book platform.",

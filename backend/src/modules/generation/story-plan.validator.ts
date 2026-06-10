@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { endsWithCompleteSentence } from '../../common/text.utils.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import type { IStoryPlan } from '../ai/ai.types.js';
 
@@ -25,85 +26,122 @@ export class StoryPlanValidator {
         expectedPageCount: number,
         storyType: 'BOOK' | 'COMIC',
     ): IValidationResult {
-        const structural: string[] = [];
-        const lengthOverflows: IValidationResult['lengthOverflows'] = [];
-
-        // Page count
-        if (plan.pages.length !== expectedPageCount) {
-            structural.push(`Expected ${expectedPageCount} pages but got ${plan.pages.length}.`);
+        if (plan.pages.length === 0) {
+            return {
+                structuralErrors: this.checkPlanFrame(plan, expectedPageCount),
+                lengthOverflows: [],
+            };
         }
 
-        if (plan.pages.length === 0) return { structuralErrors: structural, lengthOverflows };
+        return {
+            structuralErrors: [
+                ...this.checkPlanFrame(plan, expectedPageCount),
+                ...plan.pages.flatMap((page, i) =>
+                    this.checkPageStructural(page, i + 1, plan.pages.length, storyType),
+                ),
+            ],
+            lengthOverflows: plan.pages.flatMap((page, i) =>
+                this.checkPageLengthOverflow(page, i + 1),
+            ),
+        };
+    }
 
-        // Cover invariant
+    /**
+     * Plan-level structural checks: page count, cover template, final template.
+     */
+    private checkPlanFrame(plan: IStoryPlan, expectedPageCount: number): string[] {
+        const errors: string[] = [];
+
+        if (plan.pages.length !== expectedPageCount) {
+            errors.push(`Expected ${expectedPageCount} pages but got ${plan.pages.length}.`);
+        }
+
+        if (plan.pages.length === 0) return errors;
+
         const firstTemplate = PAGE_TEMPLATES[plan.pages[0].template];
         if (!firstTemplate) {
-            structural.push(`Page 1 uses unknown template "${plan.pages[0].template}".`);
+            errors.push(`Page 1 uses unknown template "${plan.pages[0].template}".`);
         } else if (firstTemplate.role !== 'cover') {
-            structural.push(
+            errors.push(
                 `Page 1 must use a cover template, got "${plan.pages[0].template}" (role: ${firstTemplate.role}).`,
             );
         }
 
-        // Final invariant
         const lastPage = plan.pages[plan.pages.length - 1];
         const lastTemplate = PAGE_TEMPLATES[lastPage.template];
         if (!lastTemplate) {
-            structural.push(`Last page uses unknown template "${lastPage.template}".`);
+            errors.push(`Last page uses unknown template "${lastPage.template}".`);
         } else if (lastTemplate.role !== 'final') {
-            structural.push(
+            errors.push(
                 `Last page must use a final template, got "${lastPage.template}" (role: ${lastTemplate.role}).`,
             );
         }
 
-        // Per-page checks
-        for (let i = 0; i < plan.pages.length; i++) {
-            const page = plan.pages[i];
-            const pageNum = i + 1;
-            const tpl = PAGE_TEMPLATES[page.template];
+        return errors;
+    }
 
-            // Unknown template
-            if (!tpl) {
-                structural.push(`Page ${pageNum}: unknown template "${page.template}".`);
-                continue;
-            }
+    /**
+     * Per-page structural checks: template validity, story-type match, role constraints,
+     * illustration prompt presence, and prose sentence completeness.
+     */
+    private checkPageStructural(
+        page: IStoryPlan['pages'][number],
+        pageNum: number,
+        totalPages: number,
+        storyType: 'BOOK' | 'COMIC',
+    ): string[] {
+        const errors: string[] = [];
+        const tpl = PAGE_TEMPLATES[page.template];
 
-            // Wrong story type
-            if (tpl.type !== storyType) {
-                structural.push(
-                    `Page ${pageNum}: template "${page.template}" is for ${tpl.type}, story is ${storyType}.`,
-                );
-            }
-
-            // Interior pages must not use cover/final templates
-            if (pageNum > 1 && pageNum < plan.pages.length && tpl.role !== 'interior') {
-                structural.push(
-                    `Page ${pageNum}: interior pages must not use role "${tpl.role}" template "${page.template}".`,
-                );
-            }
-
-            // Illustration prompt required when template has image zones
-            if (tpl.images.length > 0 && !page.illustration.prompt) {
-                structural.push(
-                    `Page ${pageNum}: template "${page.template}" requires an illustration prompt.`,
-                );
-            }
-
-            // Length overflow check (non-blocking)
-            if (page.text) {
-                const zoneId = PRIMARY_TEXT_ZONE[page.template];
-                const maxChars = zoneId ? tpl.maxChars[zoneId] : undefined;
-                if (maxChars !== undefined && page.text.length > maxChars) {
-                    lengthOverflows.push({
-                        page: pageNum,
-                        zone: zoneId,
-                        actual: page.text.length,
-                        max: maxChars,
-                    });
-                }
-            }
+        if (!tpl) {
+            errors.push(`Page ${pageNum}: unknown template "${page.template}".`);
+            return errors; // remaining checks require a resolved template
         }
 
-        return { structuralErrors: structural, lengthOverflows };
+        if (tpl.type !== storyType) {
+            errors.push(
+                `Page ${pageNum}: template "${page.template}" is for ${tpl.type}, story is ${storyType}.`,
+            );
+        }
+
+        if (pageNum > 1 && pageNum < totalPages && tpl.role !== 'interior') {
+            errors.push(
+                `Page ${pageNum}: interior pages must not use role "${tpl.role}" template "${page.template}".`,
+            );
+        }
+
+        if (tpl.images.length > 0 && !page.illustration.prompt) {
+            errors.push(
+                `Page ${pageNum}: template "${page.template}" requires an illustration prompt.`,
+            );
+        }
+
+        // Cover text is a title, not prose — skip sentence completeness check.
+        if (tpl.role !== 'cover' && page.text?.trim() && !endsWithCompleteSentence(page.text)) {
+            errors.push(
+                `Page ${pageNum}: text does not end with a complete sentence (last character must be ., !, ?, or …).`,
+            );
+        }
+
+        return errors;
+    }
+
+    /**
+     * Per-page length overflow check (non-blocking — CSS handles visual clipping).
+     */
+    private checkPageLengthOverflow(
+        page: IStoryPlan['pages'][number],
+        pageNum: number,
+    ): IValidationResult['lengthOverflows'] {
+        if (!page.text) return [];
+
+        const tpl = PAGE_TEMPLATES[page.template];
+        if (!tpl) return [];
+
+        const zoneId = PRIMARY_TEXT_ZONE[page.template];
+        const maxChars = zoneId ? tpl.maxChars[zoneId] : undefined;
+        if (maxChars === undefined || page.text.length <= maxChars) return [];
+
+        return [{ page: pageNum, zone: zoneId, actual: page.text.length, max: maxChars }];
     }
 }

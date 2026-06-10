@@ -6,32 +6,57 @@ import Modal from '@/components/ui/Modal/Modal';
 import Button from '@/components/ui/Button/Button';
 import ChildCard from './_components/ChildCard/ChildCard';
 import ChildForm, { type IChildFormValues } from './_components/ChildForm/ChildForm';
+import CharacterForm, {
+    type ICharacterFormValues,
+} from '../../_components/CharacterForm/CharacterForm';
 import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/hooks/children';
+import { useCharacters, useCreateCharacter, useUpdateCharacter } from '@/hooks/characters';
 import type { IChild } from '@/types/child.types';
+import type { ICharacter } from '@/types/character.types';
 import styles from './page.module.scss';
 
 type TModalState =
     | { kind: 'closed' }
     | { kind: 'add' }
     | { kind: 'edit'; child: IChild }
-    | { kind: 'delete'; child: IChild };
+    | { kind: 'delete'; child: IChild }
+    | { kind: 'character'; child: IChild; character: ICharacter | null };
 
 export default function ChildrenPage(): React.ReactElement {
     const { data: children = [], isLoading } = useChildren();
+    const { data: characters = [] } = useCharacters();
     const { mutate: createChild, isPending: isCreating } = useCreateChild();
     const { mutate: updateChild, isPending: isUpdating } = useUpdateChild();
     const { mutate: deleteChild, isPending: isDeleting } = useDeleteChild();
+    const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
+    const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
 
     const [modal, setModal] = useState<TModalState>({ kind: 'closed' });
     const close = (): void => setModal({ kind: 'closed' });
 
-    const isFormOpen = modal.kind === 'add' || modal.kind === 'edit';
+    const characterByChildId = new Map(
+        characters
+            .filter((c): c is ICharacter & { childId: string } => c.childId !== null)
+            .map((c) => [c.childId, c]),
+    );
 
-    function handleSubmit(values: IChildFormValues): void {
+    const isFormOpen = modal.kind === 'add' || modal.kind === 'edit';
+    const isCharacterFormOpen = modal.kind === 'character';
+
+    function handleChildSubmit(values: IChildFormValues): void {
         if (modal.kind === 'edit') {
             updateChild({ id: modal.child.id, payload: values }, { onSuccess: close });
         } else {
             createChild(values, { onSuccess: close });
+        }
+    }
+
+    function handleCharacterSubmit(values: ICharacterFormValues): void {
+        if (modal.kind !== 'character') return;
+        if (modal.character) {
+            updateCharacter({ id: modal.character.id, payload: values }, { onSuccess: close });
+        } else {
+            createCharacter({ ...values, childId: modal.child.id }, { onSuccess: close });
         }
     }
 
@@ -64,8 +89,16 @@ export default function ChildrenPage(): React.ReactElement {
                             <ChildCard
                                 key={child.id}
                                 child={child}
+                                character={characterByChildId.get(child.id) ?? null}
                                 onEdit={(c) => setModal({ kind: 'edit', child: c })}
                                 onDelete={(c) => setModal({ kind: 'delete', child: c })}
+                                onCharacterEdit={(c) =>
+                                    setModal({
+                                        kind: 'character',
+                                        child: c,
+                                        character: characterByChildId.get(c.id) ?? null,
+                                    })
+                                }
                             />
                         ))}
                     </div>
@@ -89,9 +122,39 @@ export default function ChildrenPage(): React.ReactElement {
                                   }
                                 : undefined
                         }
-                        onSubmit={handleSubmit}
+                        onSubmit={handleChildSubmit}
                         onCancel={close}
                         isSubmitting={modal.kind === 'edit' ? isUpdating : isCreating}
+                    />
+                )}
+            </Modal>
+
+            <Modal
+                opened={isCharacterFormOpen}
+                onClose={close}
+                title={
+                    modal.kind === 'character' && modal.character
+                        ? 'Edit character'
+                        : 'Add character'
+                }
+            >
+                {isCharacterFormOpen && (
+                    <CharacterForm
+                        initialValues={
+                            modal.character
+                                ? {
+                                      name: modal.character.name,
+                                      description: modal.character.description,
+                                  }
+                                : undefined
+                        }
+                        onSubmit={handleCharacterSubmit}
+                        onCancel={close}
+                        isSubmitting={
+                            modal.kind === 'character' && modal.character
+                                ? isUpdatingCharacter
+                                : isCreatingCharacter
+                        }
                     />
                 )}
             </Modal>

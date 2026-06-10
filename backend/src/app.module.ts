@@ -9,6 +9,7 @@ import { ArtStylesModule } from './modules/art-styles/art-styles.module.js';
 import { StoriesModule } from './modules/stories/stories.module.js';
 import { StoryBlueprintsModule } from './modules/story-blueprints/story-blueprints.module.js';
 import { ChildrenModule } from './modules/children/children.module.js';
+import { CharactersModule } from './modules/characters/characters.module.js';
 import { StorageModule } from './modules/storage/storage.module.js';
 import { RenderingModule } from './modules/rendering/rendering.module.js';
 import { AiModule } from './modules/ai/ai.module.js';
@@ -41,6 +42,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
         GenerationModule,
         AuthModule,
         ChildrenModule,
+        CharactersModule,
         ArtStylesModule,
         StoriesModule,
         StoryBlueprintsModule,

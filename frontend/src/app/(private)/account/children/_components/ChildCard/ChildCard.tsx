@@ -2,12 +2,15 @@ import Card from '@/components/ui/Card/Card';
 import Tag from '@/components/ui/Tag/Tag';
 import Button from '@/components/ui/Button/Button';
 import type { IChild } from '@/types/child.types';
+import type { ICharacter } from '@/types/character.types';
 import styles from './ChildCard.module.scss';
 
 interface IChildCardProps {
     child: IChild;
+    character: ICharacter | null;
     onEdit: (child: IChild) => void;
     onDelete: (child: IChild) => void;
+    onCharacterEdit: (child: IChild) => void;
 }
 
 function getAgeLabel(birthdate: string): string {
@@ -23,8 +26,10 @@ function getAgeLabel(birthdate: string): string {
 
 export default function ChildCard({
     child,
+    character,
     onEdit,
     onDelete,
+    onCharacterEdit,
 }: Readonly<IChildCardProps>): React.ReactElement {
     return (
         <Card variant="dark" size="md">
@@ -45,6 +50,31 @@ export default function ChildCard({
                         ))}
                     </div>
                 )}
+
+                <div className={styles.character}>
+                    <span className={styles['character__label']}>Character</span>
+                    {character ? (
+                        <>
+                            <p className={styles['character__name']}>{character.name}</p>
+                            <p className={styles['character__description']}>
+                                {character.description}
+                            </p>
+                        </>
+                    ) : (
+                        <p className={styles['character__empty']}>No character yet.</p>
+                    )}
+                    <Button
+                        variant="quiet"
+                        onClick={() => onCharacterEdit(child)}
+                        aria-label={
+                            character
+                                ? `Edit character for ${child.name}`
+                                : `Add character for ${child.name}`
+                        }
+                    >
+                        {character ? 'Edit character' : 'Add character'}
+                    </Button>
+                </div>
 
                 <div className={styles.actions}>
                     <Button

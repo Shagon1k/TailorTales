@@ -64,6 +64,9 @@ function buildMockPrisma() {
         storyBlueprint: {
             findFirst: vi.fn().mockResolvedValue(mockBlueprint),
         },
+        character: {
+            findFirst: vi.fn().mockResolvedValue(null), // no character by default
+        },
         page: {
             createMany: vi.fn().mockImplementation(({ data }: { data: unknown[] }) => {
                 pages.push(...data.map((p, i) => ({ ...(p as object), id: `page-${i + 1}` })));

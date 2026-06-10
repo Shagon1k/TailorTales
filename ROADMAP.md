@@ -17,8 +17,8 @@
 ### Customization inputs (per generation)
 
 - **Required:** child question, child age, output format (book/comic), length (5/8/12/16/20 pages), art style, language.
-- **Optional:** child interests/hobbies.
-- **Future (v2):** child photo, parent photo for character likeness.
+- **Optional:** child interests/hobbies, Character description for visual consistency.
+- **Future (v2):** child photo / parent photo reference images for character likeness, with explicit guardian consent and retention controls.
 
 ---
 
@@ -60,6 +60,7 @@
 | **PageTemplate**   | Typed **code** config in `page-templates.config.ts` (no DB model). The contract shared by prompt builder, validator, and renderer. Each entry: `htmlFile`, `type`, `role (cover\|interior\|final)`, `narrativePurpose`, `maxChars` (plain object keyed by zone name), `images` (array of `{ name, aspect, size }` — pixel dimensions for the image generation API). Config is a plain `Record<string, IPageTemplate>` keyed by template name. Named e.g. `book-cover`. |
 | **Story Plan**     | The structured JSON the **LLM returns** during generation: `title`, `styleAnchor`, and per page `{ template, text, illustration.prompt }`. Validated, then persisted as `Page` rows. Not a DB entity, not stored as a blob.                                                                                                                                                                                                                                            |
 | **StoryBlueprint** | DB entity. Admin-authored **narrative DNA** (`systemPrompt` with XML markers). Auto-selected by story `type` to guide planning. Distinct from "Story Plan" — the blueprint shapes the prompt; the plan is the output.                                                                                                                                                                                                                                                  |
+| **Character**      | DB entity. A reusable visual identity owned by a User, usually linked to a Child. MVP source is text description/manual generation; Post-MVP source may include reference images. Used to produce a stable per-story `styleAnchor`.                                                                                                                                                                                                                                    |
 | **styleAnchor**    | Text description of recurring characters + style, generated once and prepended to every image prompt for cross-page consistency. Stored on `Story`.                                                                                                                                                                                                                                                                                                                    |
 | **ArtStyle**       | DB entity. The visual style (`promptPrefix`) the parent picks in the workshop (e.g. Watercolour).                                                                                                                                                                                                                                                                                                                                                                      |
 | **PricingTier**    | DB entity. A subscription tier (Phase 9). Named `PricingTier`, **not `Plan`**, to avoid collision with "Story Plan" / "Phase Plan".                                                                                                                                                                                                                                                                                                                                    |
@@ -73,9 +74,10 @@
 | Entity             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **User**           | Google OAuth identity, role (USER / ADMIN).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| **Child**          | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl (reserved for v2 photo input).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Child**          | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl for UI avatar/display only. Character likeness belongs to `Character`, not `Child`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Character**      | Belongs to User, optionally references Child. Fields: name, description, source (`MANUAL_DESCRIPTION` at MVP; `REFERENCE_IMAGE` Post-MVP), referenceImageKey? (Post-MVP), generatedPreviewImageKey?, consentAt? (required before storing child/person reference images Post-MVP), createdAt, updatedAt. Story creation selects the child's default Character; the generation pipeline snapshots it into `Story.styleAnchor` so older stories stay stable if the Character changes later.                                                                                                                                                                                                                                                                                                                                  |
 | **ArtStyle**       | Admin-managed. Fields: id, name, slug, thumbnailUrl, promptPrefix, isActive, order. Seeded with 8 styles.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| **Story**          | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child. Key fields: `question`, `pageCount`, `artStyleId`, `language (Language enum — EN\|RU)`, `title?` (LLM-generated, Phase 5), `styleAnchor?` (recurring-character + style description for cross-page image consistency, Phase 5), `coverImageKey?`, `pdfKey?` (S3 keys — never URLs; signed at serve time via StorageService). `isPublic boolean (default false)` — set via opt-in in rating flow.                                                                                                                                                                                                                                                                                                                    |
+| **Story**          | Unified entity for books AND comics, distinguished by `type` field. Belongs to User, references Child and optionally the Character snapshot used at creation time. Key fields: `question`, `pageCount`, `artStyleId`, `language (Language enum — EN\|RU)`, `title?` (LLM-generated, Phase 5), `styleAnchor?` (recurring-character + style description for cross-page image consistency, Phase 5; generated from Character when present), `coverImageKey?`, `pdfKey?` (S3 keys — never URLs; signed at serve time via StorageService). `isPublic boolean (default false)` — set via opt-in in rating flow.                                                                                                                                                                                                                 |
 | **Page**           | Belongs to Story, ordered. `text` is optional — both book and comic pages may be illustration-only. Contains illustration key(s) + chapter title + `illustrationPrompt?` (prompt used to paint the page; reused by Phase 8 regeneration). `layout` stores the PageTemplate name (e.g. `book-cover`). Page rows are the materialized Story Plan and the source the PDF renders from. Composite unique on `(storyId, order)`.                                                                                                                                                                                                                                                                                                                                                                                               |
 | **StoryBlueprint** | Pre-defined story blueprint created by Admin (previously named `Template`). `systemPrompt` carries structured LLM guidance using XML markers (e.g. `<intro_prompt>`, `<climax_prompt>`). `coverImageKey` + `previewPageKeys` are S3 keys reserved for user-facing preview (Post-MVP). Auto-selected by the generation pipeline based on `StoryType`; user-facing selection deferred to Post-MVP.                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | **PageTemplate**   | Typed page layout specification — single source of truth for the LLM prompt builder, the response validator, and the PDF renderer. Defines A5 page (148×210 mm = 1748×2480 px at 300 DPI), `role (cover \| interior \| final)`, `narrativePurpose` (when the LLM should pick it), text zones (`maxChars` per named zone, type: `body \| caption \| speech-bubble \| narration-box`), and image zones — each carries a layout `zonePx` (PDF placement) plus an `aspectRatio` + `sizeTier` used for image generation (the LLM never emits these). Lives in `page-templates.config.ts` — no DB model. **Book layouts (MVP):** `book-cover`, `book-text`, `book-text-image`, `book-full-image`, `book-final`. **Comic layouts (Post-MVP):** `comic-cover`, `comic-2-panel`, `comic-3-panel`, `comic-4-panel`, `comic-splash`. |
@@ -95,6 +97,7 @@
 - **Tiers:** Free Chapter (€0 · 1 tale/month up to 12 pages · watermarked) · Story Hour (€5 · 60 pages/month) · Family Workshop (€10 · 150 pages/month). Decided Phase 6 after AI cost analysis.
 - **Generation:** fully automated end-to-end. User submits customization → receives final PDF.
 - **Concurrent generation:** 1 active generation job per user at MVP.
+- **Character consistency:** every generated story uses a per-story `styleAnchor`; when a Child has a Character, that Character is the canonical source for recurring visual identity.
 - **Regeneration:** user can regenerate specific pages (text / illustration / both) with an optional prompt. Limited per subscription tier.
 - **Free tier:** PDFs are watermarked. Retention policies differ per tier (free PDFs may expire).
 - **Content safety:** strict — text and image moderation pre-delivery. Child-friendly only.
@@ -114,6 +117,7 @@
 - ✅ Multiple children per user (capped by PricingTier's `childrenLimit`)
 - ✅ Stories: single entity with `type` (BOOK | COMIC); **book generation only** at MVP — see comic note below
 - ✅ StoryBlueprints (admin-created; auto-selected during generation by StoryType; user-facing selection Post-MVP)
+- ✅ Character entity for repeatable visual identity across pages/stories; MVP supports text-description/manual generation, not photo likeness
 - ✅ Generation pipeline — **book** (text + images both via OpenRouter, one provider)
 - ✅ Customization: question, age, format, length, art style (from DB), language
 - ✅ 6 static question suggestion chips in workshop form ("the jar")
@@ -126,17 +130,18 @@
 - ✅ Email notifications (story completed, story failed, subscription events) via Resend
 - ✅ Admin panel (users, stories review, templates, art styles, ratings, basic stats)
 - ✅ Content moderation (text + image)
+- ✅ GDPR baseline: privacy/data page, data export, account deletion, S3 object cleanup, retention cleanup, and launch copy/legal review gate
 - ✅ Watermark on free tier
 - ✅ EN + RU localization
 - ✅ `/account` settings page (Profile, Children, Subscription, Notifications, Language, Privacy & data)
-- ✅ Delete account (GDPR)
-- ✅ Schema reserved for photo input (avatarUrl on Child) — extendable later
+- ✅ Delete account (GDPR) including generated PDFs/images and reference-image objects where present
+- ✅ Schema reserved for reference-image input — Character can gain `referenceImageKey` later without changing the story-generation contract
 
 ### OUT (Post-MVP / v2)
 
 - ❌ **Comic generation** — the data model (`Story.type`, comic StoryBlueprint seed), the workshop Comic toggle ("coming soon"), and the comic PageTemplate slots are kept in place; only the generation path (panel contract, speech-bubble rendering, multi-image-per-page) is deferred. The Phase 5 engine is built comic-ready so this is additive. See Deferred Decision #6.
 - ❌ Magic email link auth
-- ❌ Photo input for character likeness — deferred, but **no longer assumed to require a provider switch**: OpenRouter image models (e.g. Nano Banana Pro) support reference images / identity preservation, and the `AiClient.generateImage` signature reserves a `referenceImageKeys?` seam. Revisit once the book happy-path is stable.
+- ❌ Photo/reference-image input for character likeness — deferred, but **no longer assumed to require a provider switch**: OpenRouter image models (e.g. Nano Banana Pro) support reference images / identity preservation, and the `AiClient.generateImage` signature reserves a `referenceImageKeys?` seam. Before shipping, add explicit guardian consent, upload/delete UX, retention rules, and privacy-copy updates.
 - ❌ Referral program
 - ❌ Public story sharing gallery (beyond opt-in landing page display)
 - ❌ Advanced analytics & observability (Sentry, OTel)
@@ -190,6 +195,8 @@ Privacy · Contact _(both static pages)_
 | 7   | BullMQ multi-worker / FlowProducer                                 | MVP uses one in-process BullMQ worker with internal capped image concurrency. Single server is fine — generation is I/O-bound (waiting on OpenRouter), so one box handles many concurrent stories; the "1 active job per user" cap is a business rule, not a capacity limit. Horizontal scale = add worker processes against the shared Redis queue (no code change). FlowProducer (cross-job per-page fan-out/fan-in) only needed if true distributed parallelism is required.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | When concurrent load grows                   |
 | 8   | FAILED stories visible in library                                  | Found in Phase 6 verification. Library currently filters to `COMPLETED` only — FAILED stories are unreachable after navigating off the progress page. Fixed the immediate gap (failure actions added to the progress page), but FAILED stories should also surface in the library with a visual badge and a "Try again" action so users have a persistent record. Requires: stop filtering library to COMPLETED-only, add a failed-state visual to TaleCard, wire a "Try again" link back to `/workshop?storyId=…`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | MVP (before Phase 9 subscriptions)           |
 | 9   | Story reader: iframe-based page preview for 1:1 PDF alignment      | **Problem:** web reader uses React components (Newsreader + Plus Jakarta Sans) while PDF uses Handlebars templates (Literata + Nunito) — structural drift is guaranteed and grows with every template change. **Agreed solution:** the PDF pipeline already renders each page through `PdfRendererService.renderPage()` which produces a full HTML string before passing it to Puppeteer. The iframe approach taps the same path: `page data → Handlebars → HTML → HTTP response` (browser renders) and `→ Puppeteer → PDF` (unchanged). One renderer, two consumers, zero duplication. **Implementation plan:** (1) Change `fontsDir` from `file://` absolute path to an HTTP path (e.g. `/static/fonts/…`) — NestJS serves the font files as static assets; Puppeteer uses the same HTTP path, eliminating `file://` entirely. (2) Expose `GET /stories/:id/pages/:order/html` — calls `renderPage()` and returns the HTML string. (3) Frontend `StoryPage` becomes `<iframe srcdoc={html} />` — fetch the HTML per page on demand, cache in React state. (4) The iframe is a **passive renderer only** — all navigation (prev/next buttons, chapter list, page counter) stays in the React parent exactly as today; `pageIndex` in React drives which HTML is fetched. (5) Sizing: iframe has fixed internal size (148×210 mm); scale to fit the reader column via CSS `transform: scale()` + `transform-origin: top center`. (6) Fonts load inside the iframe HTML — no global CSS pollution, lazy by nature (only when reader opens). | Phase 8 (alongside regeneration reader work) |
+| 10  | Photo-based character creation                                     | Parents could upload a photo of their child as a visual reference: a vision LLM extracts appearance traits and pre-fills `Character.description`. Technically feasible via OpenRouter vision models. Blocked on legal review before any implementation: children's photos are biometric/sensitive data under GDPR Art. 9 and COPPA, requiring explicit parental consent, strict retention limits, and guaranteed deletion. Generating synthetic images from real children's likenesses raises additional right-of-publicity concerns and misuse risk. Requires a dedicated privacy policy section and legal sign-off. Connected to Open Question: "GDPR launch readiness — child/reference-image handling".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Post-MVP                                     |
+| 11  | Character preview image as visual reference in image generation    | `Character.previewKey` is generated and stored but not currently used in the pipeline — only `Character.description` (text) flows into illustration prompts via `styleAnchor`. Using the preview image as a visual reference input to the image model would give stronger cross-page character consistency than text alone. **Blocker:** not all image models support image-as-reference input; passing an unsupported input silently breaks or is ignored depending on the model. **Agreed approach when revisited:** query the OpenRouter model metadata (or maintain a local capability map keyed by `OPENROUTER_IMAGE_MODEL`) to detect whether the active model accepts image reference inputs; if yes, fetch `Character.previewKey` and pass it alongside the prompt; if no, fall back to text-only (current behaviour). `IGenerateImageInput` would grow an optional `referenceImageBuffer?: Buffer` field, and `AiClient.generateImage()` conditionally includes it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Post-MVP                                     |
 
 ### In-code TODO cross-reference
 
@@ -211,6 +218,7 @@ Privacy · Contact _(both static pages)_
 - Backup strategy specifics for Postgres + S3 — confirm in Phase 15.
 - Notification preferences storage — `User` JSON field vs separate `NotificationPreference` model — decide in Phase 10.
 - Static page copy — all four static pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) contain placeholder copy. Deferred to a dedicated content pass before launch. See Deferred Decision #5.
+- GDPR launch readiness — confirm privacy policy copy, sub-processor list, data export/delete behavior, retention periods, and child/reference-image handling before production deploy.
 
 ---
 
@@ -587,7 +595,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 **Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
 
-**Out of scope (explicit):** Comic generation (Deferred #6); real credit balance (Phase 9); photo-input character likeness (Post-MVP); notification preferences + bell UI (Phase 10).
+**Out of scope (explicit):** Comic generation (Deferred #6); real credit balance (Phase 9); photo/reference-image character likeness (Post-MVP); notification preferences + bell UI (Phase 10).
 
 ---
 
@@ -650,12 +658,19 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 ---
 
-### Phase 8 — Page Regeneration
+### Phase 8 — Character Consistency & Page Regeneration
 
-**Goal:** users can regenerate specific pages within tier limits, with an optional prompt.
+**Goal:** users get consistent character appearance across generated pages/stories, and can regenerate specific pages within tier limits with an optional prompt.
 
 **Sub-tasks:**
 
+- [ ] Prisma `Character` model: `id`, `userId`, `childId?`, `name`, `description`, `source (MANUAL_DESCRIPTION at MVP)`, `generatedPreviewImageKey?`, `createdAt`, `updatedAt`
+- [ ] Prisma migration; add `Story.characterId?` for provenance while keeping `Story.styleAnchor` as the immutable per-story visual snapshot
+- [ ] Character module: CRUD endpoints scoped to current user; child default character lookup for story creation
+- [ ] Frontend: `/account/children` character description field/section so a parent can describe the child character's stable look without uploading a photo
+- [ ] Frontend: workshop summary shows the selected child's Character and lets the user edit/confirm the description before generation
+- [ ] Generation prompt: build `Story.styleAnchor` from Character + ArtStyle + story context; store the snapshot once and prepend it to every image prompt, including regenerated pages
+- [ ] Optional preview generation: generate/store one non-story preview image for a Character if needed for user confidence; use the same storage/signing rules as story images
 - [ ] Endpoint: `POST /stories/:id/pages/:order/regenerate` with body `{ what: 'text' | 'illustration' | 'both', prompt?: string }`
 - [ ] Track regenerations per User per month; enforce per-tier limits (read from Subscription; use free-tier placeholder limit until Phase 9)
 - [ ] Re-render PDF after page regeneration, replace S3 file
@@ -664,16 +679,19 @@ Baseline rule: every atom ships with at least — render test, one test per vari
     - "Repaint the picture" → opens modal (illustration description as context + optional prompt field + submit)
     - "N regenerations left this month" (stubbed count until Phase 9 wires subscription quota)
 - [ ] Tests: regeneration flow, optional prompt forwarded to the AI client (text + image via OpenRouter), quota enforcement (placeholder limit)
+- [ ] Tests: Character ownership, child default Character selection, `styleAnchor` snapshot stability after Character edits, regenerated image prompt includes the original snapshot
 
 **Acceptance Check:**
 
+- A story generated for the same child uses the child's Character description as the canonical recurring visual identity
+- Editing a Character after story creation does not mutate existing stories; new stories use the updated Character
 - User can regenerate text / illustration / both for a page
 - Optional prompt is respected in regenerated output
 - Quota tracked and enforced (at least with free-tier placeholder)
 - PDF updates correctly
 - Tests pass
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-8-character-regeneration.md` + ROADMAP progress.
 
 ---
 
@@ -690,31 +708,35 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] Quota service: validate pages + regenerations against subscription before allowing operations
 - [ ] Quota service: deduct page credits on generation completion (1 per book page, 2 per comic page)
 - [ ] Children limit enforcement: `childrenLimit` from PricingTier enforced in children endpoint (backfills Phase 2's uncapped endpoint)
-- [ ] `DELETE /me`: cancel active Paddle subscription (if any) then delete user + all owned data
-- [ ] Retention cleanup job (cron): delete PDFs past tier `retentionDays`
+- [ ] GDPR data export endpoint: `GET /me/export` returns user profile, children, characters, stories metadata, pages, ratings, notifications, subscription state, and signed links to generated PDFs/images that still exist
+- [ ] `DELETE /me`: cancel active Paddle subscription (if any), delete DB rows, and delete all owned S3 objects (`coverImageKey`, `pdfKey`, page illustrations, Character previews/reference images when present)
+- [ ] Storage cleanup audit: hard-delete orphaned generated assets when a Story/Child/User is deleted; log expected vs actual object delete counts
+- [ ] Retention cleanup job (cron): delete PDFs and generated images past tier `retentionDays`; preserve metadata only when legally/operationally needed and documented
+- [ ] Privacy & data copy: state what personal/child data is collected, why it is processed, sub-processors, retention, export/delete rights, and reference-image handling policy before the feature exists
 - [ ] Frontend: `/account` → Subscription section wired:
     - Current plan card (name, billing, description, next renewal, VAT breakdown)
     - Usage bars: pages painted X/Y · regenerations X/Y · children profiles X/Y
     - Payment details section (card "Change" → Paddle billing portal; billing email / address / Tax ID displayed from Paddle API)
     - Past parcels list (invoice history from Paddle API)
     - Upgrade / Cancel subscription actions
-- [ ] Frontend: `/account` → Privacy & data section: GDPR info + "Delete account" flow
+- [ ] Frontend: `/account` → Privacy & data section: GDPR info, "Export my data", and "Delete account" flow with explicit irreversible-delete confirmation
 - [ ] Frontend: stats bar on `/library` dashboard wired (pages this month / left / regenerations / tales count)
 - [ ] Frontend: regeneration quota count wired in story reader (was stubbed in Phase 8)
 - [ ] Frontend: workshop length section helper text wired ("N pages will use N of your N remaining credits this month." — depends on subscription quota API; currently absent from UI)
 - [ ] Frontend: `/pricing` page wired to real PricingTier data (replaces Phase 3 static hardcoded data — ships in Phase 9)
-- [ ] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account deletion flow
+- [ ] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account export, account deletion DB + S3 cleanup flow
 
 **Acceptance Check:**
 
 - User can subscribe via Paddle
 - Quotas enforced before generation and regeneration
 - Children limit enforced per plan
-- Account deletion cancels subscription and removes all user data
+- Account export returns the user's structured data and links to retained files
+- Account deletion cancels subscription and removes all user data plus owned generated assets
 - Free-tier PDFs expire per retention policy
 - Tests pass
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-9-subscriptions.md` + ROADMAP progress.
 
 ---
 
@@ -752,7 +774,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - User can toggle notification preferences per event type
 - Tests pass
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-10-notifications.md` + ROADMAP progress.
 
 ---
 
@@ -784,7 +806,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Admin can view all ratings and manage public visibility
 - Tests pass
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-11-ratings.md` + ROADMAP progress.
 
 ---
 
@@ -810,7 +832,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Non-admins blocked from admin routes
 - Tests pass
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-12-admin.md` + ROADMAP progress.
 
 ---
 
@@ -833,7 +855,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Generated stories respect language param
 - Tests pass
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-13-localization.md` + ROADMAP progress.
 
 ---
 
@@ -851,6 +873,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [ ] Final review of `DESIGN.md`: confirm it matches what was actually built (no deferred items silently dropped)
 - [ ] Final review of `ROADMAP.md`: move completed items to ✅, update open questions, archive resolved deferred decisions
 - [ ] Update the architecture docs to reflect the full system including Phases 7–13 additions
+- [ ] GDPR launch review: verify privacy policy copy, sub-processors, cookies, account export/delete, S3 retention cleanup, public-story opt-in consent, and child/reference-image handling against production behavior
 
 **Acceptance Check:**
 
@@ -858,8 +881,9 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - All durable docs accurate and complete through Phase 13
 - `CLAUDE.md` and rules files reflect all conventions established across the full build
 - `ROADMAP.md` accurately reflects the shipped product
+- GDPR launch checklist is complete or explicitly blocked before production deploy
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-14-final-docs.md` + ROADMAP progress.
 
 ---
 
@@ -887,7 +911,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - End-to-end flow works (login → generate → download)
 - Backups configured
 
-**Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
+**Deliverables:** `_docs/phase-15-deploy.md` + ROADMAP progress.
 
 ---
 
@@ -895,7 +919,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 - **Comic generation** — extend the Phase 5 engine with `comic-*` PageTemplates, speech-bubble HTML/CSS, a panel contract (`panels: [{ imagePrompt, dialogue, speaker }]`), and panel-to-panel consistency handling; flip the workshop Comic toggle from "coming soon" to live. Engine is built comic-ready in Phase 5 (see Deferred Decision #6).
 - User-facing StoryBlueprint selection in workshop (browse blueprints, preview pages via signed URLs, filter by StoryType); StoryBlueprint cover/preview image upload endpoints (`POST /story-blueprints/:id/cover`, `POST /story-blueprints/:id/previews`)
-- Photo personalization (switch image provider to Flux or SD with IP-Adapter)
+- Photo/reference-image personalization for Character likeness (upload, consent, delete, retention, and provider-specific reference-image support)
 - Referral program (link-based, free book/pages reward)
 - Full public sharing gallery (browse all public stories)
 - Sentry + OpenTelemetry observability
@@ -938,7 +962,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 | 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred. |
 | 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                         |
 | 7 — Mid-point Documentation         | ⬜ Not started |                                                                                                                                                    |
-| 8 — Regeneration                    | ⬜ Not started |                                                                                                                                                    |
+| 8 — Character + Regeneration        | ⬜ Not started |                                                                                                                                                    |
 | 9 — Subscriptions                   | ⬜ Not started |                                                                                                                                                    |
 | 10 — Notifications                  | ⬜ Not started |                                                                                                                                                    |
 | 11 — Ratings & Public Sharing       | ⬜ Not started |                                                                                                                                                    |

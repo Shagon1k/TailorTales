@@ -37,6 +37,16 @@ export interface IGenerateImageInput {
     referenceImageKeys?: string[];
 }
 
+export interface IGeneratePageTextInput {
+    systemPrompt: string;
+    userPrompt: string;
+    /**
+     * Token ceiling for the response. Caller computes this from the page template's
+     * maxChars and the story language (using CHARS_PER_TOKEN from generation.constants).
+     */
+    maxTokens: number;
+}
+
 const moderationResultSchema = z.object({
     safe: z.boolean(),
     reason: z.string().optional(),
@@ -53,6 +63,7 @@ export const MODERATION_JSON_SCHEMA = {
 
 export interface IAiClient {
     generateStoryPlan(input: IGenerateStoryPlanInput): Promise<IStoryPlan>;
+    generatePageText(input: IGeneratePageTextInput): Promise<string>;
     generateImage(input: IGenerateImageInput): Promise<Buffer>;
     moderateText(text: string): Promise<IModerationResult>;
 }

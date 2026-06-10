@@ -23,4 +23,8 @@ export const StorageKeys = {
     /** Template example spread images. Admin-uploaded. */
     templatePreview: (templateId: string, index: number): string =>
         `templates/${templateId}/previews/${index}`,
+
+    /** AI-generated preview image for a Character. Private — signed URL after ownership check. */
+    characterPreview: (userId: string, characterId: string): string =>
+        `users/${userId}/characters/${characterId}/preview`,
 };

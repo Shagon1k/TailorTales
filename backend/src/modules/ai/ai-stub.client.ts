@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import type {
     IAiClient,
     IGenerateImageInput,
+    IGeneratePageTextInput,
     IGenerateStoryPlanInput,
     IModerationResult,
     IStoryPlan,
@@ -59,6 +60,12 @@ export class AiStubClient implements IAiClient {
                 },
             ],
         };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async generatePageText(_input: IGeneratePageTextInput): Promise<string> {
+        this.logger.log('[STUB] Generating page text');
+        return 'The sun rose over the mountain, casting golden light across the valley. The little explorer looked around with wide eyes, ready for the adventure ahead.';
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

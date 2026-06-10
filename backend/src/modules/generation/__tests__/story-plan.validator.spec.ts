@@ -13,7 +13,7 @@ const makePlan = (overrides: Partial<IStoryPlan> = {}): IStoryPlan => ({
         },
         {
             template: 'book-text-image',
-            text: 'Page 2 text',
+            text: 'Something wonderful happened on page two.',
             chapterTitle: 'Chapter 1',
             illustration: { prompt: 'An illustration' },
         },
@@ -86,10 +86,29 @@ describe('StoryPlanValidator', () => {
         });
     });
 
+    describe('given an interior prose page whose text ends mid-sentence', () => {
+        it('should report a structural error', () => {
+            const plan = makePlan();
+            plan.pages[1] = { ...plan.pages[1], text: 'The fox ran through the forest' };
+            const result = validator.validate(plan, 3, 'BOOK');
+            expect(result.structuralErrors.some((e) => e.includes('complete sentence'))).toBe(true);
+        });
+
+        it('should not flag a cover page title for missing sentence terminal', () => {
+            const plan = makePlan();
+            // Cover text is a title — no terminal expected
+            plan.pages[0] = { ...plan.pages[0], text: 'My Great Adventure' };
+            const result = validator.validate(plan, 3, 'BOOK');
+            expect(result.structuralErrors.every((e) => !e.includes('complete sentence'))).toBe(
+                true,
+            );
+        });
+    });
+
     describe('given text exceeding the zone maxChars', () => {
         it('should report a length overflow (non-structural)', () => {
             const plan = makePlan();
-            plan.pages[1] = { ...plan.pages[1], text: 'x'.repeat(400) }; // book-text-image body max is 300
+            plan.pages[1] = { ...plan.pages[1], text: 'x'.repeat(399) + '.' }; // 400 chars > book-text-image body max of 300; ends with terminal
             const result = validator.validate(plan, 3, 'BOOK');
             expect(result.structuralErrors).toHaveLength(0);
             expect(result.lengthOverflows).toHaveLength(1);
