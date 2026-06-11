@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { ArtStyle, Child, Page, Story } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { StorageService } from '../storage/storage.service.js';
+import { PdfRendererService } from '../rendering/pdf-renderer.service.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
 import { PUBLIC_STORIES_LIMIT } from './stories.constants.js';
 import type { IStoryDetail, IStorySummary } from './stories.types.js';
@@ -23,6 +24,7 @@ export class StoriesService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly storage: StorageService,
+        private readonly renderer: PdfRendererService,
     ) {}
 
     async findAllByUser(userId: string): Promise<IStorySummary[]> {
@@ -81,6 +83,45 @@ export class StoriesService {
         // when generation produces files. DRAFT stories have no assets yet.
 
         await this.prisma.story.delete({ where: { id } });
+    }
+
+    async getPageHtml(storyId: string, pageOrder: number, userId: string): Promise<string> {
+        const story = await this.prisma.story.findFirst({
+            where: { id: storyId, userId },
+            include: { child: { select: { name: true } } },
+        });
+        if (!story) throw new NotFoundException(`Story ${storyId} not found`);
+
+        const page = await this.prisma.page.findFirst({
+            where: { storyId, order: pageOrder },
+        });
+        if (!page) throw new NotFoundException(`Page ${pageOrder} not found in story ${storyId}`);
+
+        const illustrations = page.illustrations as Array<{ key: string }> | null;
+        const imageKey = illustrations?.[0]?.key ?? null;
+        let imageBase64: string | null = null;
+        if (imageKey) {
+            const url = await this.storage.getSignedUrl(imageKey);
+            const resp = await fetch(url);
+            const buf = await resp.arrayBuffer();
+            imageBase64 = Buffer.from(buf).toString('base64');
+        }
+
+        return this.renderer.buildPageHtml(
+            {
+                order: page.order,
+                layout: page.layout ?? 'book-text',
+                text: page.text,
+                chapterTitle: page.chapterTitle,
+                imageBase64,
+            },
+            {
+                title: story.title ?? story.question,
+                childName: story.child.name,
+                pages: [],
+                watermark: true, // Phase 9 wires real tier check
+            },
+        );
     }
 
     // --- private helpers ---

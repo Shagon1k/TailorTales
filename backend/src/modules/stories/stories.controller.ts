@@ -8,8 +8,10 @@ import {
     Param,
     ParseIntPipe,
     Post,
+    Res,
     Sse,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import type { Story, User } from '../../generated/prisma/client.js';
 import type { Observable } from 'rxjs';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
@@ -86,6 +88,19 @@ export class StoriesController {
         @CurrentUser() user: User,
     ): Promise<{ jobId: string; storyId: string }> {
         return this.generationService.enqueue(id, user.id);
+    }
+
+    /** Returns the rendered HTML for a single page — used by the iframe-based page preview. */
+    @Get(':id/pages/:order/html')
+    async getPageHtml(
+        @Param('id') storyId: string,
+        @Param('order', ParseIntPipe) pageOrder: number,
+        @CurrentUser() user: User,
+        @Res() res: Response,
+    ): Promise<void> {
+        const html = await this.storiesService.getPageHtml(storyId, pageOrder, user.id);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(html);
     }
 
     @Post(':id/pages/:order/regenerate')

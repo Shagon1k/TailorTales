@@ -1,16 +1,24 @@
 import 'reflect-metadata';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module.js';
 import { AllExceptionsFilter } from './common/http-exception.filter.js';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ?? 3001;
 
 async function bootstrap(): Promise<void> {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const configService = app.get(ConfigService);
+
+    app.useStaticAssets(join(__dirname, 'modules', 'rendering', 'assets', 'fonts'), {
+        prefix: '/static/fonts',
+    });
     app.enableCors({
         origin: configService.getOrThrow<string>('FRONTEND_URL'),
         credentials: true,
