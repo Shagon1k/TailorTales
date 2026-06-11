@@ -33,13 +33,22 @@ export default function ArtStyleGrid({
                         })}
                     >
                         <div className={styles['art-style-grid__thumb']}>
-                            <Image
-                                src={style.thumbnailUrl}
-                                alt={style.name}
-                                fill
-                                sizes="(min-width: 640px) 25vw, 50vw"
-                                className={styles['art-style-grid__img']}
-                            />
+                            {style.thumbnailUrl ? (
+                                <Image
+                                    src={style.thumbnailUrl}
+                                    alt={style.name}
+                                    fill
+                                    sizes="(min-width: 640px) 25vw, 50vw"
+                                    className={styles['art-style-grid__img']}
+                                />
+                            ) : (
+                                <span
+                                    className={styles['art-style-grid__placeholder']}
+                                    aria-hidden="true"
+                                >
+                                    {style.name[0]}
+                                </span>
+                            )}
                             {isSelected && (
                                 <span
                                     className={styles['art-style-grid__check']}

@@ -39,7 +39,7 @@ export interface IStoryArtStyle {
     id: string;
     name: string;
     slug: string;
-    thumbnailUrl: string;
+    thumbnailUrl: string | null;
 }
 
 export interface IStorySummary {
