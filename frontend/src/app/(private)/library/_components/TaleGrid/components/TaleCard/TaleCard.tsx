@@ -26,12 +26,12 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
     const coverColor = getCoverColor(story.id);
     const age = getAge(story.child.birthdate);
 
+    const isFailed = story.status === 'FAILED';
+    const href = isFailed ? `/workshop?storyId=${story.id}` : `/library/${story.id}`;
+    const ariaLabel = isFailed ? `${displayTitle} — generation failed, try again` : displayTitle;
+
     return (
-        <Link
-            href={`/library/${story.id}`}
-            className={styles['tale-card']}
-            aria-label={displayTitle}
-        >
+        <Link href={href} className={styles['tale-card']} aria-label={ariaLabel}>
             <div
                 className={styles['tale-card__cover']}
                 style={{ backgroundColor: coverColor }}
@@ -48,14 +48,26 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                 ) : (
                     <p className={styles['tale-card__cover-title']}>{displayTitle}</p>
                 )}
+
+                {isFailed && (
+                    <div className={styles['tale-card__failed-overlay']} aria-hidden="true">
+                        Generation failed
+                    </div>
+                )}
             </div>
 
             <div className={styles['tale-card__meta']}>
-                <span>age {age}</span>
-                <span>·</span>
-                <span>{story.pageCount}pp</span>
-                <span>·</span>
-                <span>{story.type.toLowerCase()}</span>
+                {isFailed ? (
+                    <span className={styles['tale-card__retry-cta']}>Try again →</span>
+                ) : (
+                    <>
+                        <span>age {age}</span>
+                        <span>·</span>
+                        <span>{story.pageCount}pp</span>
+                        <span>·</span>
+                        <span>{story.type.toLowerCase()}</span>
+                    </>
+                )}
             </div>
         </Link>
     );
