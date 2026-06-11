@@ -1,0 +1,27 @@
+@use 'styles/typography' as *;
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.body__description {
+    @include t-body-base;
+
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.body__error {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--accent-warm);
+}
+
+.body__actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
