@@ -1,4 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { RegenerationService } from '../regeneration.service.js';
 import { FREE_TIER_REGENERATION_LIMIT } from '../regeneration.constants.js';
 
@@ -211,5 +211,72 @@ describe('RegenerationService', () => {
 
         expect(prisma.user.update).not.toHaveBeenCalled();
         expect(prisma.job.create).not.toHaveBeenCalled();
+    });
+
+    it('throws NotFoundException when the story does not exist or belong to the user', async () => {
+        const prisma = createPrismaMock();
+        prisma.story.findFirst.mockResolvedValue(null);
+        const { service } = createService(prisma);
+
+        await expect(
+            service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' }),
+        ).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws BadRequestException when the story is not COMPLETED', async () => {
+        const prisma = createPrismaMock();
+        prisma.story.findFirst.mockResolvedValue({ ...mockStory, status: 'GENERATING' });
+        const { service } = createService(prisma);
+
+        await expect(
+            service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' }),
+        ).rejects.toThrow(BadRequestException);
+    });
+
+    it('throws NotFoundException when the page does not exist', async () => {
+        const prisma = createPrismaMock();
+        prisma.page.findUnique.mockResolvedValue(null);
+        const { service } = createService(prisma);
+
+        await expect(
+            service.regeneratePage(STORY_ID, 99, USER_ID, { what: 'text' }),
+        ).rejects.toThrow(NotFoundException);
+    });
+
+    it('regenerates both text and illustration for what: both', async () => {
+        const { service, ai, prisma, storage, pdfBinding } = createService();
+
+        await service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'both' });
+
+        expect(ai.generatePageText).toHaveBeenCalledTimes(1);
+        expect(ai.generateImage).toHaveBeenCalledTimes(1);
+        expect(prisma.page.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                data: expect.objectContaining({ text: expect.any(String) }),
+            }),
+        );
+        expect(storage.upload).toHaveBeenCalled();
+        expect(pdfBinding.buildAndStore).toHaveBeenCalled();
+    });
+
+    it('throws when text is still incomplete after the retry', async () => {
+        const { service, ai } = createService();
+        ai.generatePageText.mockResolvedValue('Maya looked up at the'); // no terminal punctuation
+
+        await expect(
+            service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' }),
+        ).rejects.toThrow(/complete sentence after retry/i);
+
+        expect(ai.generatePageText).toHaveBeenCalledTimes(2);
+    });
+
+    it('throws BadRequestException when the page has no illustration prompt stored', async () => {
+        const prisma = createPrismaMock();
+        prisma.page.findUnique.mockResolvedValue({ ...mockPage, illustrationPrompt: null });
+        const { service } = createService(prisma);
+
+        await expect(
+            service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'illustration' }),
+        ).rejects.toThrow(BadRequestException);
     });
 });
