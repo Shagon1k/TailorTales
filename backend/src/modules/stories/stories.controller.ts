@@ -6,6 +6,7 @@ import {
     HttpCode,
     MessageEvent,
     Param,
+    ParseIntPipe,
     Post,
     Sse,
 } from '@nestjs/common';
@@ -14,6 +15,8 @@ import type { Observable } from 'rxjs';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Public } from '../auth/decorators/public.decorator.js';
 import { GenerationService } from '../generation/generation.service.js';
+import { RegenerationService } from '../regeneration/regeneration.service.js';
+import { RegeneratePageDto } from '../regeneration/dto/regenerate-page.dto.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
 import {
     ALLOWED_PAGE_COUNTS,
@@ -29,6 +32,7 @@ export class StoriesController {
     constructor(
         private readonly storiesService: StoriesService,
         private readonly generationService: GenerationService,
+        private readonly regenerationService: RegenerationService,
     ) {}
 
     // Static routes must be declared before :id to avoid being matched as an id param.
@@ -82,6 +86,17 @@ export class StoriesController {
         @CurrentUser() user: User,
     ): Promise<{ jobId: string; storyId: string }> {
         return this.generationService.enqueue(id, user.id);
+    }
+
+    @Post(':id/pages/:order/regenerate')
+    @HttpCode(200)
+    regeneratePage(
+        @Param('id') storyId: string,
+        @Param('order', ParseIntPipe) pageOrder: number,
+        @CurrentUser() user: User,
+        @Body() dto: RegeneratePageDto,
+    ): Promise<void> {
+        return this.regenerationService.regeneratePage(storyId, pageOrder, user.id, dto);
     }
 
     @Delete(':id')

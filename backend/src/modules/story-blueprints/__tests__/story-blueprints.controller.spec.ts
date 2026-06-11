@@ -15,6 +15,8 @@ const MOCK_ADMIN: User = {
     role: 'ADMIN',
     createdAt: new Date(),
     updatedAt: new Date(),
+    regenerationsInWindow: 0,
+    regenerationWindowStartedAt: null,
 };
 
 const MOCK_SUMMARY: IStoryBlueprintSummary = {
