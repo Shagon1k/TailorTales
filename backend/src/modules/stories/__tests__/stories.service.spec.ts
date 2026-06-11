@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import type { ArtStyle, Child, Story } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { StorageService } from '../../storage/storage.service.js';
+import { PdfRendererService } from '../../rendering/pdf-renderer.service.js';
 import { StoriesService } from '../stories.service.js';
 import type { CreateStoryDto } from '../dto/create-story.dto.js';
 
@@ -83,6 +84,10 @@ describe('StoriesService', () => {
                 {
                     provide: StorageService,
                     useValue: { getSignedUrl },
+                },
+                {
+                    provide: PdfRendererService,
+                    useValue: { buildPageHtml: vi.fn() },
                 },
             ],
         }).compile();

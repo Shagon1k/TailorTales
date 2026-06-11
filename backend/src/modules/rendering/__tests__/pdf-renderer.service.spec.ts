@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { PdfRendererService } from '../pdf-renderer.service.js';
 import {
     THREE_PAGE_STORY_FIXTURE,
@@ -10,7 +11,13 @@ describe.skipIf(!!process.env.CI)('PdfRendererService', () => {
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
-            providers: [PdfRendererService],
+            providers: [
+                PdfRendererService,
+                {
+                    provide: ConfigService,
+                    useValue: { getOrThrow: () => 'http://localhost:3001' },
+                },
+            ],
         }).compile();
 
         service = module.get(PdfRendererService);
