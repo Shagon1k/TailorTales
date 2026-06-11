@@ -18,6 +18,7 @@ async function bootstrap(): Promise<void> {
 
     app.useStaticAssets(join(__dirname, 'modules', 'rendering', 'assets', 'fonts'), {
         prefix: '/static/fonts',
+        setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
     });
     app.enableCors({
         origin: configService.getOrThrow<string>('FRONTEND_URL'),

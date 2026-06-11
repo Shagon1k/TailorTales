@@ -43,10 +43,10 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                 <main className={styles.reader__spread}>
                     {currentPage && (
                         <SpreadViewer
+                            storyId={story.id}
                             page={currentPage}
                             pageIndex={pageIndex}
                             totalPages={totalPages}
-                            childName={story.child.name}
                             onPrev={handlePrev}
                             onNext={handleNext}
                         />

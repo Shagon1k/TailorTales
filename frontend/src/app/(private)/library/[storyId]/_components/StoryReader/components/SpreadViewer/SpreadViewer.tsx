@@ -1,24 +1,24 @@
 import Button from '@/components/ui/Button/Button';
 import type { IPage } from '@/types/story.types';
-import StoryPage from './components/StoryPage/StoryPage';
+import StoryPageIframe from './components/StoryPageIframe/StoryPageIframe';
 import styles from './SpreadViewer.module.scss';
 
 const PAGE_REGION_ID = 'story-page-region';
 
 export interface ISpreadViewerProps {
+    storyId: string;
     page: IPage;
     pageIndex: number;
     totalPages: number;
-    childName: string;
     onPrev: () => void;
     onNext: () => void;
 }
 
 export default function SpreadViewer({
+    storyId,
     page,
     pageIndex,
     totalPages,
-    childName,
     onPrev,
     onNext,
 }: Readonly<ISpreadViewerProps>): React.ReactElement {
@@ -40,7 +40,7 @@ export default function SpreadViewer({
                 className={styles.viewer__page}
                 aria-label={`Page ${currentNumber} of ${totalPages}`}
             >
-                <StoryPage page={page} childName={childName} />
+                <StoryPageIframe storyId={storyId} pageOrder={page.order} />
             </div>
 
             <div className={styles.viewer__nav} role="group" aria-label="Page navigation">

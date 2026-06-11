@@ -55,6 +55,14 @@ export const storiesApi = {
             body: JSON.stringify(payload),
         }),
 
+    getPageHtml: async (storyId: string, pageOrder: number): Promise<string> => {
+        const res = await fetch(`${getApiBaseUrl()}/stories/${storyId}/pages/${pageOrder}/html`, {
+            credentials: 'include',
+        });
+        if (!res.ok) throw new Error(`Failed to load page HTML: ${res.status} ${res.statusText}`);
+        return res.text();
+    },
+
     /**
      * Opens an SSE connection to the story's progress stream.
      * Returns an EventSource; caller is responsible for closing it.
