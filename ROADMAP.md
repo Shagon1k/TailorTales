@@ -942,6 +942,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - **AI-flavored workshop log descriptions** — during generation, produce whimsical human-like prose for each log event instead of short labels (e.g. "The mountain breathed slowly into the story...")
 - **Workshop estimated paint time** — display "Estimated paint time: ~N minutes" in the summary panel before submission; estimate based on page count, story type, and live queue depth; surface via a dedicated API field once generation infrastructure is stable (Phase 5+ prerequisite)
 - **"Share with family"** — share a specific story link with other family members (grandparents, etc.)
+- **Competitor analysis** — audit competing personalized children's story/book services (Wonderbly, Hooray Heroes, AI-native equivalents): what they offer, quality, pricing tiers, and feature gaps. Informs v2 pricing/tier decisions and backlog prioritization.
 
 ---
 

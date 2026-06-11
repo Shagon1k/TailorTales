@@ -47,6 +47,17 @@
         object-fit: cover;
     }
 
+    &__placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--text-tertiary);
+        user-select: none;
+    }
+
     &__check {
         position: absolute;
         top: var(--space-1);

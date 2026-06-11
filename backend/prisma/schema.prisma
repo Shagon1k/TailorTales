@@ -94,7 +94,7 @@ model ArtStyle {
   id           String   @id @default(cuid())
   name         String
   slug         String   @unique
-  thumbnailUrl String
+  thumbnailUrl String?
   promptPrefix String
   isActive     Boolean  @default(true)
   order        Int
