@@ -18,9 +18,9 @@ export default async function LibraryPage(): Promise<React.ReactElement> {
         storiesServerApi.getConfig(),
     ]);
 
-    // DRAFT / in-progress stories are not shown in the library — they live in the
-    // workshop until generation completes (Phase 5). Only finished tales appear here.
-    const stories = allStories.filter((story) => story.status === 'COMPLETED');
+    const stories = allStories.filter(
+        (story) => story.status === 'COMPLETED' || story.status === 'FAILED',
+    );
 
     return (
         <div className={styles.page}>

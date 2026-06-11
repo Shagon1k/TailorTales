@@ -1,5 +1,10 @@
 import { apiFetch, getApiBaseUrl } from '@/lib/api';
-import type { ICreateStoryPayload, IStoryDetail, IStorySummary } from '@/types/story.types';
+import type {
+    ICreateStoryPayload,
+    IRegeneratePagePayload,
+    IStoryDetail,
+    IStorySummary,
+} from '@/types/story.types';
 
 export interface IActiveJob {
     jobId: string;
@@ -39,6 +44,24 @@ export const storiesApi = {
         }),
 
     remove: (id: string): Promise<void> => apiFetch<void>(`/stories/${id}`, { method: 'DELETE' }),
+
+    regeneratePage: (
+        storyId: string,
+        pageOrder: number,
+        payload: IRegeneratePagePayload,
+    ): Promise<void> =>
+        apiFetch<void>(`/stories/${storyId}/pages/${pageOrder}/regenerate`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+        }),
+
+    getPageHtml: async (storyId: string, pageOrder: number): Promise<string> => {
+        const res = await fetch(`${getApiBaseUrl()}/stories/${storyId}/pages/${pageOrder}/html`, {
+            credentials: 'include',
+        });
+        if (!res.ok) throw new Error(`Failed to load page HTML: ${res.status} ${res.statusText}`);
+        return res.text();
+    },
 
     /**
      * Opens an SSE connection to the story's progress stream.

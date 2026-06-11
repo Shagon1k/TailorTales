@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { GenerationPipeline } from '../generation.pipeline.js';
 import { StoryPromptBuilder } from '../story-prompt-builder.js';
 import { StoryPlanValidator } from '../story-plan.validator.js';
-import { PdfRendererService } from '../../rendering/pdf-renderer.service.js';
+import { PdfBindingService } from '../../rendering/pdf-binding.service.js';
 import { AI_CLIENT } from '../../ai/ai.types.js';
 import { AiStubClient } from '../../ai/ai-stub.client.js';
 import { NotificationsService } from '../../notifications/notifications.service.js';
@@ -90,8 +90,8 @@ const mockStorage = {
     getSignedUrl: vi.fn().mockResolvedValue('https://example.com/image.png'),
 };
 
-const mockRenderer = {
-    render: vi.fn().mockResolvedValue(Buffer.from('%PDF-mock')),
+const mockPdfBinding = {
+    buildAndStore: vi.fn().mockResolvedValue(undefined),
 };
 
 const mockNotifications = {
@@ -107,14 +107,6 @@ describe('GenerationPipeline', () => {
         mockPrisma = buildMockPrisma();
         vi.clearAllMocks();
 
-        // Mock fetch for getSignedUrl image download in binding stage
-        vi.stubGlobal(
-            'fetch',
-            vi.fn().mockResolvedValue({
-                arrayBuffer: () => Promise.resolve(Buffer.from('fake-image').buffer),
-            }),
-        );
-
         const module = await Test.createTestingModule({
             providers: [
                 GenerationPipeline,
@@ -124,7 +116,7 @@ describe('GenerationPipeline', () => {
                 { provide: AI_CLIENT, useClass: AiStubClient },
                 { provide: PrismaService, useValue: mockPrisma },
                 { provide: StorageService, useValue: mockStorage },
-                { provide: PdfRendererService, useValue: mockRenderer },
+                { provide: PdfBindingService, useValue: mockPdfBinding },
                 { provide: NotificationsService, useValue: mockNotifications },
             ],
         }).compile();
@@ -141,21 +133,18 @@ describe('GenerationPipeline', () => {
                 expect.objectContaining({ data: expect.objectContaining({ status: 'COMPLETED' }) }),
             );
 
-            // Story marked COMPLETED with pdfKey
+            // Story marked COMPLETED (pdfKey is set inside PdfBindingService.buildAndStore)
             expect(mockPrisma.story.update).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    data: expect.objectContaining({
-                        status: 'COMPLETED',
-                        pdfKey: expect.any(String),
-                    }),
+                    data: expect.objectContaining({ status: 'COMPLETED' }),
                 }),
             );
 
             // Pages created for story plan
             expect(mockPrisma.page.createMany).toHaveBeenCalled();
 
-            // PDF rendered
-            expect(mockRenderer.render).toHaveBeenCalled();
+            // PDF built and stored via shared service
+            expect(mockPdfBinding.buildAndStore).toHaveBeenCalled();
         });
     });
 
@@ -191,7 +180,7 @@ describe('GenerationPipeline', () => {
                     { provide: AI_CLIENT, useValue: stubClient },
                     { provide: PrismaService, useValue: mockPrisma },
                     { provide: StorageService, useValue: mockStorage },
-                    { provide: PdfRendererService, useValue: mockRenderer },
+                    { provide: PdfBindingService, useValue: mockPdfBinding },
                     { provide: NotificationsService, useValue: mockNotifications },
                 ],
             }).compile();

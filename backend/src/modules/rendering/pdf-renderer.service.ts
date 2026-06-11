@@ -5,17 +5,22 @@ import { fileURLToPath } from 'node:url';
 import Handlebars from 'handlebars';
 import puppeteer, { type Browser } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
+import { ConfigService } from '@nestjs/config';
 import { PAGE_TEMPLATES } from './page-templates.config.js';
 import type { IPageToRender, IStoryToRender } from './rendering.types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, 'templates');
-const FONTS_DIR = join(__dirname, 'assets', 'fonts');
 
 @Injectable()
 export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(PdfRendererService.name);
     private browser!: Browser;
+    private readonly fontsUrl: string;
+
+    constructor(config: ConfigService) {
+        this.fontsUrl = `${config.getOrThrow<string>('BACKEND_URL')}/static/fonts`;
+    }
 
     private readonly baseTemplate = Handlebars.compile(
         readFileSync(join(TEMPLATES_DIR, '_base.hbs'), 'utf8'),
@@ -57,19 +62,25 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
         return this.stitchPages(pageBuffers);
     }
 
-    private async renderPage(page: IPageToRender, story: IStoryToRender): Promise<Buffer> {
+    /** Returns the full HTML string for a single page. Used by both PDF rendering and the
+     *  browser iframe preview endpoint (`GET /stories/:id/pages/:order/html`). */
+    buildPageHtml(page: IPageToRender, story: IStoryToRender): string {
         const templateFn = this.pageTemplates.get(page.layout);
         if (!templateFn) {
             throw new Error(`Unknown page template: "${page.layout}"`);
         }
 
         const pageContent = templateFn(this.buildPageContext(page, story));
-        const fullHtml = this.baseTemplate({
+        return this.baseTemplate({
             lang: 'en',
-            fontsDir: `file://${FONTS_DIR}`,
+            fontsDir: this.fontsUrl,
             watermark: story.watermark,
             pageContent,
         });
+    }
+
+    private async renderPage(page: IPageToRender, story: IStoryToRender): Promise<Buffer> {
+        const fullHtml = this.buildPageHtml(page, story);
 
         const tab = await this.browser.newPage();
         try {

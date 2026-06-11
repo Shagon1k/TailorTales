@@ -62,6 +62,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  /** Number of page regenerations used in the current 30-day window. */
+  regenerationsInWindow      Int       @default(0)
+  /** When the current 30-day regeneration window started. Null until first regen. */
+  regenerationWindowStartedAt DateTime?
+
   children          Child[]
   stories           Story[]
   characters        Character[]

@@ -10,7 +10,7 @@ import WorkshopForm from './_components/WorkshopForm/WorkshopForm';
 import styles from './page.module.scss';
 
 interface IWorkshopPageProps {
-    searchParams: Promise<{ childId?: string; question?: string }>;
+    searchParams: Promise<{ childId?: string; question?: string; storyId?: string }>;
 }
 
 export default async function WorkshopPage({
@@ -21,12 +21,21 @@ export default async function WorkshopPage({
         redirect(`/workshop/${activeJob.storyId}`);
     }
 
-    const [{ childId, question }, readers, artStyles, config] = await Promise.all([
+    const [{ childId, question, storyId }, readers, artStyles, config] = await Promise.all([
         searchParams,
         childrenServerApi.getAll(),
         artStylesServerApi.getAll(),
         storiesServerApi.getConfig(),
     ]);
+
+    let prefillStory: Awaited<ReturnType<typeof storiesServerApi.getOne>> | null = null;
+    if (storyId) {
+        try {
+            prefillStory = await storiesServerApi.getOne(storyId);
+        } catch (err) {
+            console.error('Failed to load story for pre-fill, showing blank form:', err);
+        }
+    }
 
     return (
         <main className={styles.page}>
@@ -42,8 +51,12 @@ export default async function WorkshopPage({
                 readers={readers}
                 artStyles={artStyles}
                 config={config}
-                initialChildId={childId ?? null}
-                initialQuestion={question ?? ''}
+                initialChildId={prefillStory?.childId ?? childId ?? null}
+                initialQuestion={prefillStory?.question ?? question ?? ''}
+                initialStoryType={prefillStory?.type ?? null}
+                initialPageCount={prefillStory?.pageCount ?? null}
+                initialArtStyleId={prefillStory?.artStyleId ?? null}
+                initialLanguage={prefillStory?.language ?? null}
             />
         </main>
     );

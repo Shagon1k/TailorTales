@@ -38,10 +38,18 @@ export interface IWorkshopFormProps {
     readers: IChild[];
     artStyles: IArtStyle[];
     config: IStoryConfig;
-    /** Pre-selected child from `?childId=` query param. */
+    /** Pre-selected child — from `?childId=` param or a failed story retry. */
     initialChildId?: string | null;
-    /** Pre-filled question from `?question=` query param. */
+    /** Pre-filled question — from `?question=` param or a failed story retry. */
     initialQuestion?: string;
+    /** Pre-selected story type — from a failed story retry. */
+    initialStoryType?: IStoryType | null;
+    /** Pre-selected page count — from a failed story retry. */
+    initialPageCount?: number | null;
+    /** Pre-selected art style — from a failed story retry. */
+    initialArtStyleId?: string | null;
+    /** Pre-selected language — from a failed story retry. */
+    initialLanguage?: ILanguage | null;
 }
 
 export default function WorkshopForm({
@@ -50,6 +58,10 @@ export default function WorkshopForm({
     config,
     initialChildId = null,
     initialQuestion = '',
+    initialStoryType = null,
+    initialPageCount = null,
+    initialArtStyleId = null,
+    initialLanguage = null,
 }: Readonly<IWorkshopFormProps>): React.ReactElement {
     const router = useRouter();
 
@@ -57,10 +69,12 @@ export default function WorkshopForm({
         initialChildId ?? (readers.length === 1 ? readers[0].id : null),
     );
     const [isReaderOpen, setIsReaderOpen] = useState(false);
-    const [storyType, setStoryType] = useState<IStoryType | null>(null);
-    const [pageCount, setPageCount] = useState<string | null>(null);
-    const [artStyleId, setArtStyleId] = useState<string | null>(null);
-    const [language, setLanguage] = useState<ILanguage | null>(null);
+    const [storyType, setStoryType] = useState<IStoryType | null>(initialStoryType);
+    const [pageCount, setPageCount] = useState<string | null>(
+        initialPageCount !== null ? String(initialPageCount) : null,
+    );
+    const [artStyleId, setArtStyleId] = useState<string | null>(initialArtStyleId);
+    const [language, setLanguage] = useState<ILanguage | null>(initialLanguage);
     const [question, setQuestion] = useState(initialQuestion);
     const [isPending, setIsPending] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);

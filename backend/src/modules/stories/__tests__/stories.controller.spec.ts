@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import type { User } from '../../../generated/prisma/client.js';
 import { GenerationService } from '../../generation/generation.service.js';
+import { RegenerationService } from '../../regeneration/regeneration.service.js';
 import { StoriesController } from '../stories.controller.js';
 import { StoriesService } from '../stories.service.js';
 import {
@@ -20,6 +21,8 @@ const MOCK_USER: User = {
     role: 'USER',
     createdAt: new Date(),
     updatedAt: new Date(),
+    regenerationsInWindow: 0,
+    regenerationWindowStartedAt: null,
 };
 
 const MOCK_SUMMARY: IStorySummary = {
@@ -76,6 +79,10 @@ describe('StoriesController', () => {
                 {
                     provide: GenerationService,
                     useValue: { enqueue: vi.fn() },
+                },
+                {
+                    provide: RegenerationService,
+                    useValue: { regeneratePage: vi.fn() },
                 },
             ],
         }).compile();

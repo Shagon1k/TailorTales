@@ -1,0 +1,54 @@
+@use 'styles/typography' as *;
+
+.page-iframe {
+    width: 100%;
+    overflow: hidden;
+}
+
+// Fixed A5 stage (559×794 px), scaled from top-left to fill the container width.
+.page-iframe__stage {
+    transform-origin: top left;
+    // width and height are set via inline style
+}
+
+.page-iframe__skeleton {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-card);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+        opacity: 0.6;
+    }
+}
+
+@keyframes skeleton-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.page-iframe__error {
+    @include t-body-sm;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-5);
+    background: var(--bg-card);
+    color: var(--accent-warm);
+    text-align: center;
+}
+
+.page-iframe__frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+}

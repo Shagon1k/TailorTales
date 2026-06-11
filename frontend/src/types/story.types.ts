@@ -16,6 +16,15 @@ export interface IPage {
     text: string | null;
     illustrations: IIllustration[];
     layout: string | null;
+    illustrationPrompt: string | null;
+}
+
+export type IRegenerateWhat = 'text' | 'illustration' | 'both';
+
+export interface IRegeneratePagePayload {
+    what: IRegenerateWhat;
+    /** Optional author note to guide the regeneration. */
+    prompt?: string;
 }
 
 /** Embedded child snapshot returned inside story responses. */

@@ -11,9 +11,8 @@ import type {
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { StorageKeys } from '../storage/storage.keys.js';
-import { PdfRendererService } from '../rendering/pdf-renderer.service.js';
+import { PdfBindingService } from '../rendering/pdf-binding.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
-import type { IPageToRender } from '../rendering/rendering.types.js';
 import { AI_CLIENT, type IAiClient, type IStoryPlan } from '../ai/ai.types.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
@@ -32,7 +31,7 @@ export class GenerationPipeline {
     constructor(
         private readonly prisma: PrismaService,
         private readonly storage: StorageService,
-        private readonly renderer: PdfRendererService,
+        private readonly pdfBinding: PdfBindingService,
         private readonly promptBuilder: StoryPromptBuilder,
         private readonly validator: StoryPlanValidator,
         private readonly notifications: NotificationsService,
@@ -61,10 +60,10 @@ export class GenerationPipeline {
             const pages = await this.runPictures(story);
 
             await this.setJobStage(jobId, 'binding');
-            const pdfBuffer = await this.runBinding(story, pages);
+            await this.pdfBinding.buildAndStore(story, pages);
 
             await this.setJobStage(jobId, 'ready');
-            await this.runReady(story, pdfBuffer);
+            await this.runReady(story);
 
             await this.prisma.job.update({
                 where: { id: jobId },
@@ -301,55 +300,20 @@ export class GenerationPipeline {
     }
 
     // ---------------------------------------------------------------------------
-    // Stage 4 — Binding
+    // Stage 4 — Binding: delegates to PdfBindingService (shared with regeneration)
     // ---------------------------------------------------------------------------
-
-    private async runBinding(story: StoryWithRelations, pages: Page[]): Promise<Buffer> {
-        const pagesToRender: IPageToRender[] = await Promise.all(
-            pages.map(async (page) => {
-                const illustrations = page.illustrations as Array<{ key: string }> | null;
-                const imageKey = illustrations?.[0]?.key ?? null;
-
-                let imageBase64: string | null = null;
-                if (imageKey) {
-                    const url = await this.storage.getSignedUrl(imageKey);
-                    const res = await fetch(url);
-                    const buf = await res.arrayBuffer();
-                    imageBase64 = Buffer.from(buf).toString('base64');
-                }
-
-                return {
-                    order: page.order,
-                    layout: page.layout ?? 'book-text',
-                    text: page.text,
-                    chapterTitle: page.chapterTitle,
-                    imageBase64,
-                };
-            }),
-        );
-
-        return this.renderer.render({
-            title: story.title ?? story.question,
-            childName: story.child.name,
-            pages: pagesToRender,
-            watermark: true, // Phase 9 wires real tier check
-        });
-    }
 
     // ---------------------------------------------------------------------------
     // Stage 5 — Ready
     // ---------------------------------------------------------------------------
 
-    private async runReady(story: StoryWithRelations, pdfBuffer: Buffer): Promise<void> {
-        const pdfKey = StorageKeys.storyPdf(story.userId, story.id);
-        await this.storage.upload(pdfBuffer, pdfKey, 'application/pdf');
-
+    private async runReady(story: StoryWithRelations): Promise<void> {
         await this.prisma.story.update({
             where: { id: story.id },
-            data: { pdfKey, status: 'COMPLETED' },
+            data: { status: 'COMPLETED' },
         });
 
-        this.logger.log(`Story ${story.id} completed — PDF stored at ${pdfKey}`);
+        this.logger.log(`Story ${story.id} completed`);
     }
 
     // ---------------------------------------------------------------------------

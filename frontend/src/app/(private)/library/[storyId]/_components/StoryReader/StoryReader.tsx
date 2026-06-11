@@ -5,7 +5,7 @@ import type { IStoryDetail } from '@/types/story.types';
 import ReaderHeader from './components/ReaderHeader/ReaderHeader';
 import ChapterList from './components/ChapterList/ChapterList';
 import SpreadViewer from './components/SpreadViewer/SpreadViewer';
-import AboutPanel from './components/AboutPanel/AboutPanel';
+import RegenerationPanel from './components/RegenerationPanel/RegenerationPanel';
 import RatingPanel from './components/RatingPanel/RatingPanel';
 import DetailsPanel from './components/DetailsPanel/DetailsPanel';
 import styles from './StoryReader.module.scss';
@@ -43,10 +43,10 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                 <main className={styles.reader__spread}>
                     {currentPage && (
                         <SpreadViewer
+                            storyId={story.id}
                             page={currentPage}
                             pageIndex={pageIndex}
                             totalPages={totalPages}
-                            childName={story.child.name}
                             onPrev={handlePrev}
                             onNext={handleNext}
                         />
@@ -54,7 +54,7 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                 </main>
 
                 <aside className={styles.reader__panels}>
-                    <AboutPanel />
+                    {currentPage && <RegenerationPanel storyId={story.id} page={currentPage} />}
                     <RatingPanel childName={story.child.name} />
                     <DetailsPanel story={story} />
                 </aside>
