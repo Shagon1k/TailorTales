@@ -707,6 +707,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [ ] Paddle integration: checkout link generation, webhook handler (created, updated, canceled, payment_failed)
 - [ ] Quota service: validate pages + regenerations against subscription before allowing operations
 - [ ] Quota service: deduct page credits on generation completion (1 per book page, 2 per comic page)
+- [ ] Migrate regeneration quota from `User` MVP fields to `Subscription`: replace `User.regenerationsInWindow` + `User.regenerationWindowStartedAt` + `FREE_TIER_REGENERATION_LIMIT` with `Subscription.regenerationsUsed` + `PricingTier.regenerationsPerMonth`; window-reset logic in `RegenerationService` disappears — Paddle webhook owns the cycle. Drop the two `User` columns in a migration.
 - [ ] Children limit enforcement: `childrenLimit` from PricingTier enforced in children endpoint (backfills Phase 2's uncapped endpoint)
 - [ ] GDPR data export endpoint: `GET /me/export` returns user profile, children, characters, stories metadata, pages, ratings, notifications, subscription state, and signed links to generated PDFs/images that still exist
 - [ ] `DELETE /me`: cancel active Paddle subscription (if any), delete DB rows, and delete all owned S3 objects (`coverImageKey`, `pdfKey`, page illustrations, Character previews/reference images when present)
