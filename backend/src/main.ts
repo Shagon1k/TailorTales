@@ -13,7 +13,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ?? 3001;
 
 async function bootstrap(): Promise<void> {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+    // rawBody is required for Paddle webhook signature verification (req.rawBody)
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
     const configService = app.get(ConfigService);
 
     app.useStaticAssets(join(__dirname, 'modules', 'rendering', 'assets', 'fonts'), {

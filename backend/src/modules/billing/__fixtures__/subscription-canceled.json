@@ -1,0 +1,12 @@
+{
+    "eventType": "subscription.canceled",
+    "data": {
+        "id": "sub_stub_001",
+        "customerId": "ctm_stub_001",
+        "status": "canceled",
+        "customData": { "userId": "REPLACE_WITH_USER_ID" },
+        "items": [{ "price": { "id": "pri_stub_story_hour" } }],
+        "currentBillingPeriod": null,
+        "scheduledChange": null
+    }
+}

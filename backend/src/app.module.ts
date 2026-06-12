@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -17,6 +18,9 @@ import { ContactModule } from './modules/contact/contact.module.js';
 import { EmailModule } from './modules/email/email.module.js';
 import { GenerationModule } from './modules/generation/generation.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
+import { BillingModule } from './modules/billing/billing.module.js';
+import { PricingTiersModule } from './modules/pricing-tiers/pricing-tiers.module.js';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -26,6 +30,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
             isGlobal: true,
             validate: validateEnv,
         }),
+        ScheduleModule.forRoot(),
         BullModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({
@@ -46,6 +51,9 @@ import { PrismaModule } from './prisma/prisma.module.js';
         ArtStylesModule,
         StoriesModule,
         StoryBlueprintsModule,
+        PricingTiersModule,
+        SubscriptionsModule,
+        BillingModule,
     ],
     controllers: [AppController],
     providers: [

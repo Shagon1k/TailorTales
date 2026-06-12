@@ -1,0 +1,12 @@
+{
+    "eventType": "subscription.activated",
+    "data": {
+        "id": "sub_stub_001",
+        "customerId": "ctm_stub_001",
+        "status": "active",
+        "customData": { "userId": "REPLACE_WITH_USER_ID" },
+        "items": [{ "price": { "id": "pri_stub_story_hour" } }],
+        "currentBillingPeriod": { "endsAt": "2026-07-11T10:00:00.000Z" },
+        "scheduledChange": null
+    }
+}
