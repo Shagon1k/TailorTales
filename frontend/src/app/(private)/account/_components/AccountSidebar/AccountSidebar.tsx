@@ -79,9 +79,9 @@ export default function AccountSidebar(): React.ReactElement {
                 >
                     Sign out
                 </button>
-                <button type="button" className={styles['sidebar__delete']}>
+                <Link href="/account/privacy" className={styles['sidebar__delete']}>
                     Delete account
-                </button>
+                </Link>
             </div>
         </aside>
     );
