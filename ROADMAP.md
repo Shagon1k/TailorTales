@@ -1011,6 +1011,18 @@ flowchart LR
 - [ ] Confirm single OpenRouter account is sufficient (no env isolation needed — model names differ per env)
 - [ ] Set cheaper models for UAT (`OPENROUTER_TEXT_MODEL` / `OPENROUTER_IMAGE_MODEL`) to keep UAT generation cost low
 
+**Legal & compliance (GDPR — must land before prod launch)**
+
+> Technical GDPR side (export, delete, retention) shipped in Phase 9. What remains is paperwork.
+
+- [ ] Real Privacy Policy text replacing the Phase 9 placeholder (`PrivacyInfo`): data collected, purposes, legal bases, sub-processors (Paddle, OpenRouter, Resend, AWS), retention per tier, user rights, supervisory-authority complaint right
+- [ ] **Children's data section** in the policy: parent enters and consents to the child's data; child's name/interests are sent in generation prompts to AI providers (cross-border transfer — covered by sub-processor SCCs/DPF)
+- [ ] Terms of Service incl. **"service for adults 18+, accounts operated by parents"** clause (keeps US COPPA out of scope — children are not users and we collect nothing from them)
+- [ ] Accept/sign DPAs with sub-processors: OpenRouter, Resend, AWS, Paddle (independent controllers for payments)
+- [ ] Short internal breach-notification procedure (72h to supervisory authority)
+- [ ] Note: no cookie banner needed today (session cookie only, no analytics) — **adding any analytics requires a consent banner first**
+- [ ] US state laws (CCPA/CPRA etc.): thresholds not met at MVP scale — no action beyond the ToS clause; revisit at scale
+
 **Deployment pipeline (dokploy)**
 
 - [ ] Dockerfiles tested end-to-end for both backend and frontend
