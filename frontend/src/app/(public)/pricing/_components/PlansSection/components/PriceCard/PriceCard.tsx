@@ -1,25 +1,87 @@
+'use client';
+
 import Card from '@/components/ui/Card/Card';
+import Button from '@/components/ui/Button/Button';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
+import { useCurrentUser } from '@/context/UserContext';
+import { useSubscription } from '@/hooks/subscription';
+import { getPaddle, PADDLE_CHECKOUT_SETTINGS } from '@/lib/paddle';
+import { formatMoney } from '@/utils/money.utils';
 import type { IPricingPlan } from '../../../types';
 import styles from './PriceCard.module.scss';
 
 interface IPriceCardProps {
     plan: IPricingPlan;
-    billingCycle: 'monthly' | 'yearly';
 }
 
-function formatPrice(priceMonthly: number, cycle: 'monthly' | 'yearly'): string {
-    if (priceMonthly === 0) return '€0';
-    const price = cycle === 'yearly' ? Math.round(priceMonthly * 0.8 * 10) / 10 : priceMonthly;
-    return `€${price}`;
-}
-
-export default function PriceCard({
-    plan,
-    billingCycle,
-}: Readonly<IPriceCardProps>): React.ReactElement {
-    const { name, tagline, priceMonthly, features, ctaLabel, ctaHref, mostLoved } = plan;
+export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.ReactElement {
+    const { name, tagline, priceMonthly, features, ctaLabel, paddlePriceId, mostLoved } = plan;
     const isFree = priceMonthly === 0;
+    const buttonVariant = mostLoved ? 'primary' : 'secondary';
+
+    const { user } = useCurrentUser();
+    const { data: subscription } = useSubscription();
+
+    const openCheckout = async (): Promise<void> => {
+        if (!user || !paddlePriceId) return;
+        const paddle = await getPaddle();
+        if (!paddle) return;
+
+        paddle.Checkout.open({
+            items: [{ priceId: paddlePriceId, quantity: 1 }],
+            customData: { userId: user.id },
+            customer: { email: user.email },
+            settings: {
+                ...PADDLE_CHECKOUT_SETTINGS,
+                successUrl: `${window.location.origin}/account/subscription?checkout=success`,
+            },
+        });
+    };
+
+    const renderCta = (): React.ReactElement => {
+        // Unauthenticated — every road starts at sign-in
+        if (!user) {
+            return (
+                <ButtonLink href="/login" variant={buttonVariant}>
+                    {ctaLabel}
+                </ButtonLink>
+            );
+        }
+
+        const isCurrentPlan = subscription?.tier.id === plan.id;
+        if (isCurrentPlan) {
+            return (
+                <Button variant={buttonVariant} disabled>
+                    Your current plan
+                </Button>
+            );
+        }
+
+        // Paid subscribers change plans via the Paddle portal in account settings
+        const hasPaidSubscription =
+            subscription !== undefined && subscription.tier.priceMonthly > 0;
+        if (hasPaidSubscription || isFree) {
+            return (
+                <ButtonLink href="/account/subscription" variant={buttonVariant}>
+                    Manage in account →
+                </ButtonLink>
+            );
+        }
+
+        // Free-tier user upgrading — overlay checkout (disabled until Paddle is configured)
+        const checkoutAvailable = Boolean(
+            paddlePriceId && process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN,
+        );
+        return (
+            <Button
+                variant={buttonVariant}
+                disabled={!checkoutAvailable}
+                onClick={() => openCheckout()}
+            >
+                {checkoutAvailable ? ctaLabel : 'Checkout coming soon'}
+            </Button>
+        );
+    };
 
     return (
         <Card variant={mostLoved ? 'featured' : 'dark'} size="hero">
@@ -34,9 +96,7 @@ export default function PriceCard({
                     <p className={styles.tagline}>{tagline}</p>
                 </div>
                 <div className={styles.price}>
-                    <span className={styles['price-amount']}>
-                        {formatPrice(priceMonthly, billingCycle)}
-                    </span>
+                    <span className={styles['price-amount']}>{formatMoney(priceMonthly)}</span>
                     <span className={styles['price-period']}>{isFree ? 'forever' : '/ month'}</span>
                 </div>
                 <ul className={styles.features}>
@@ -49,9 +109,7 @@ export default function PriceCard({
                         </li>
                     ))}
                 </ul>
-                <ButtonLink href={ctaHref} variant={mostLoved ? 'primary' : 'secondary'}>
-                    {ctaLabel}
-                </ButtonLink>
+                {renderCta()}
             </div>
         </Card>
     );

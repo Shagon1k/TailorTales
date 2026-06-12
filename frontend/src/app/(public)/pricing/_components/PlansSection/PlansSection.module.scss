@@ -10,36 +10,6 @@
     margin: 0 auto;
 }
 
-.plans__toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-pill);
-    padding: var(--space-1);
-}
-
-.plans__toggle-btn {
-    @include t-body-base;
-    font-weight: 500;
-    padding: var(--space-2) var(--space-5);
-    border-radius: var(--radius-pill);
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition:
-        background var(--duration-base) var(--ease-out),
-        color var(--duration-base) var(--ease-out);
-    min-height: var(--hit-min);
-
-    &[data-active='true'] {
-        background: var(--accent-primary);
-        color: var(--color-moon);
-    }
-}
-
 .plans__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

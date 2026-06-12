@@ -1,13 +1,14 @@
-export type TPricingPlanId = 'free' | 'story-hour' | 'family';
-
+/** View model for a pricing card — DB tier numbers merged with marketing copy. */
 export interface IPricingPlan {
-    id: TPricingPlanId;
+    /** PricingTier id from the backend. */
+    id: string;
     name: string;
     tagline: string;
+    /** Euro cents (matches the API). */
     priceMonthly: number;
     features: string[];
     ctaLabel: string;
-    ctaHref: string;
+    paddlePriceId: string | null;
     mostLoved?: boolean;
 }
 
@@ -31,12 +32,4 @@ export interface IComparisonGroup {
 export interface IFaqItem {
     q: string;
     a: string;
-}
-
-export interface IPricingData {
-    plans: IPricingPlan[];
-    comparison: {
-        groups: IComparisonGroup[];
-    };
-    faq: IFaqItem[];
 }
