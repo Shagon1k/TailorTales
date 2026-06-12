@@ -27,6 +27,24 @@
     margin: 0;
 }
 
+.add-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.add-row__limit-hint {
+    @include t-body-sm;
+    color: var(--text-secondary);
+    margin: 0;
+
+    a {
+        color: var(--accent-primary);
+        text-decoration: underline;
+    }
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

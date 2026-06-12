@@ -10,6 +10,10 @@ vi.mock('@/context/UserContext', () => ({
     useCurrentUser: mockUseCurrentUser,
 }));
 
+vi.mock('@/hooks/subscription', () => ({
+    useSubscription: () => ({ data: undefined }),
+}));
+
 const TEST_USER: IUser = {
     id: 'user-1',
     email: 'alice@example.com',

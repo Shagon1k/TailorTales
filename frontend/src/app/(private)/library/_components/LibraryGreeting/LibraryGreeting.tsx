@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSubscription } from '@/hooks/subscription';
 import { formatDateLine, getPeriod, getPeriodLabel } from './utils/greeting.utils';
 import styles from './LibraryGreeting.module.scss';
 
@@ -14,6 +15,12 @@ export default function LibraryGreeting({
     storyCount,
 }: Readonly<ILibraryGreetingProps>): React.ReactElement {
     const [now] = useState(() => new Date());
+    const { data: subscription } = useSubscription();
+    const pagesThisCycle = subscription?.pagesUsed ?? '--';
+    const pagesLeft = subscription
+        ? Math.max(subscription.tier.pagesPerMonth - subscription.pagesUsed, 0)
+        : '--';
+    const regenerationsUsed = subscription?.regenerationsUsed ?? '--';
     const period = getPeriod(now.getHours());
     const periodLabel = getPeriodLabel(period);
     const dateLine = formatDateLine(now, period);
@@ -41,16 +48,16 @@ export default function LibraryGreeting({
                         <dd className={styles['greeting__stat-value']}>{storyCount}</dd>
                     </div>
                     <div className={styles.greeting__stat}>
-                        <dt className={styles['greeting__stat-label']}>pages this month</dt>
-                        <dd className={styles['greeting__stat-value']}>--</dd>
+                        <dt className={styles['greeting__stat-label']}>pages this cycle</dt>
+                        <dd className={styles['greeting__stat-value']}>{pagesThisCycle}</dd>
                     </div>
                     <div className={styles.greeting__stat}>
                         <dt className={styles['greeting__stat-label']}>pages left</dt>
-                        <dd className={styles['greeting__stat-value']}>--</dd>
+                        <dd className={styles['greeting__stat-value']}>{pagesLeft}</dd>
                     </div>
                     <div className={styles.greeting__stat}>
                         <dt className={styles['greeting__stat-label']}>regenerations used</dt>
-                        <dd className={styles['greeting__stat-value']}>--</dd>
+                        <dd className={styles['greeting__stat-value']}>{regenerationsUsed}</dd>
                     </div>
                 </dl>
             </div>

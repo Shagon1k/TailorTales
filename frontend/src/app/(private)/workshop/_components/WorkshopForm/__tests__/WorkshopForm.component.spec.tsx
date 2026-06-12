@@ -13,6 +13,10 @@ vi.mock('next/navigation', () => ({
     useRouter: vi.fn().mockReturnValue({ push: mockRouterPush }),
 }));
 
+vi.mock('@/hooks/subscription', () => ({
+    useSubscription: () => ({ data: undefined }),
+}));
+
 const mockStoriesCreate = vi.hoisted(() => vi.fn());
 const mockStoriesGenerate = vi.hoisted(() => vi.fn());
 
