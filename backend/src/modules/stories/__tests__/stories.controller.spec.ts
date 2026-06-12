@@ -21,8 +21,6 @@ const MOCK_USER: User = {
     role: 'USER',
     createdAt: new Date(),
     updatedAt: new Date(),
-    regenerationsInWindow: 0,
-    regenerationWindowStartedAt: null,
 };
 
 const MOCK_SUMMARY: IStorySummary = {

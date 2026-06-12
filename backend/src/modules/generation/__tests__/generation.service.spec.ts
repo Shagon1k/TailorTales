@@ -1,11 +1,13 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getQueueToken } from '@nestjs/bullmq';
 import { GenerationService } from '../generation.service.js';
 import { GENERATION_QUEUE } from '../generation.constants.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
+import { QuotaService } from '../../subscriptions/quota.service.js';
 
 const mockQueue = { add: vi.fn().mockResolvedValue({}) };
+const mockQuota = { assertPageCredits: vi.fn().mockResolvedValue(undefined) };
 
 const mockPrisma = {
     story: { findFirst: vi.fn(), update: vi.fn() },
@@ -22,6 +24,7 @@ describe('GenerationService', () => {
             providers: [
                 GenerationService,
                 { provide: PrismaService, useValue: mockPrisma },
+                { provide: QuotaService, useValue: mockQuota },
                 { provide: getQueueToken(GENERATION_QUEUE), useValue: mockQueue },
             ],
         }).compile();
@@ -53,6 +56,25 @@ describe('GenerationService', () => {
                     { jobId: 'job-1' },
                     { jobId: 'job-1' },
                 );
+            });
+        });
+
+        describe('given the user lacks page credits', () => {
+            it('should throw ForbiddenException before creating any Job', async () => {
+                mockPrisma.story.findFirst.mockResolvedValue({
+                    id: 's1',
+                    status: 'DRAFT',
+                    userId: 'u1',
+                    pageCount: 12,
+                    type: 'BOOK',
+                });
+                mockQuota.assertPageCredits.mockRejectedValueOnce(
+                    new ForbiddenException('quota exceeded'),
+                );
+
+                await expect(service.enqueue('s1', 'u1')).rejects.toThrow(ForbiddenException);
+                expect(mockPrisma.job.create).not.toHaveBeenCalled();
+                expect(mockQueue.add).not.toHaveBeenCalled();
             });
         });
 

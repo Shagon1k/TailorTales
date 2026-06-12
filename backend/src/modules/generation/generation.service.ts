@@ -9,6 +9,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { Observable } from 'rxjs';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { QuotaService } from '../subscriptions/quota.service.js';
 import { GENERATION_QUEUE } from './generation.constants.js';
 
 const SSE_POLL_INTERVAL_MS = 800;
@@ -28,6 +29,7 @@ export class GenerationService {
 
     constructor(
         private readonly prisma: PrismaService,
+        private readonly quotaService: QuotaService,
         @InjectQueue(GENERATION_QUEUE) private readonly queue: Queue,
     ) {}
 
@@ -37,6 +39,9 @@ export class GenerationService {
         if (story.status !== 'DRAFT') {
             throw new ConflictException(`Story must be in DRAFT status to generate`);
         }
+
+        // Quota check before any Job exists; deduction happens at the Ready stage.
+        await this.quotaService.assertPageCredits(userId, story.pageCount, story.type);
 
         // One active generation per user — check PENDING + ACTIVE via Story.userId join
         const activeJob = await this.prisma.job.findFirst({

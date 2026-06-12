@@ -1,7 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Child } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
+import { SubscriptionsService } from '../../subscriptions/subscriptions.service.js';
 import { ChildrenService } from '../children.service.js';
 import type { CreateChildDto } from '../dto/create-child.dto.js';
 import type { UpdateChildDto } from '../dto/update-child.dto.js';
@@ -25,6 +26,8 @@ describe('ChildrenService', () => {
     let childCreate: ReturnType<typeof vi.fn>;
     let childUpdate: ReturnType<typeof vi.fn>;
     let childDelete: ReturnType<typeof vi.fn>;
+    let childCount: ReturnType<typeof vi.fn>;
+    let getOrCreateForUser: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         childFindMany = vi.fn();
@@ -32,6 +35,10 @@ describe('ChildrenService', () => {
         childCreate = vi.fn();
         childUpdate = vi.fn();
         childDelete = vi.fn();
+        childCount = vi.fn().mockResolvedValue(0);
+        getOrCreateForUser = vi.fn().mockResolvedValue({
+            pricingTier: { childrenLimit: 1 },
+        });
 
         const module = await Test.createTestingModule({
             providers: [
@@ -45,8 +52,13 @@ describe('ChildrenService', () => {
                             create: childCreate,
                             update: childUpdate,
                             delete: childDelete,
+                            count: childCount,
                         },
                     },
+                },
+                {
+                    provide: SubscriptionsService,
+                    useValue: { getOrCreateForUser },
                 },
             ],
         }).compile();
@@ -137,6 +149,23 @@ describe('ChildrenService', () => {
             expect(childCreate).toHaveBeenCalledWith(
                 expect.objectContaining({ data: expect.objectContaining({ interests: [] }) }),
             );
+        });
+
+        it('should throw ForbiddenException when the tier children limit is reached', async () => {
+            childCount.mockResolvedValue(1); // free tier limit is 1
+            const dto: CreateChildDto = { name: 'Max', birthdate: '2020-06-15', gender: 'MALE' };
+
+            await expect(service.create('user-123', dto)).rejects.toThrow(ForbiddenException);
+            expect(childCreate).not.toHaveBeenCalled();
+        });
+
+        it('should not cap creation when the tier childrenLimit is null (unlimited)', async () => {
+            getOrCreateForUser.mockResolvedValue({ pricingTier: { childrenLimit: null } });
+            childCount.mockResolvedValue(50);
+            childCreate.mockResolvedValue(MOCK_CHILD);
+            const dto: CreateChildDto = { name: 'Max', birthdate: '2020-06-15', gender: 'MALE' };
+
+            await expect(service.create('user-123', dto)).resolves.toBe(MOCK_CHILD);
         });
     });
 
