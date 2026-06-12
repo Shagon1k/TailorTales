@@ -3,8 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import {
     CreateBucketCommand,
     DeleteObjectCommand,
+    DeleteObjectsCommand,
     GetObjectCommand,
     HeadBucketCommand,
+    ListObjectsV2Command,
     PutObjectCommand,
     S3Client,
 } from '@aws-sdk/client-s3';
@@ -97,5 +99,52 @@ export class StorageService implements OnModuleInit {
             this.logger.error(`Failed to delete object: ${key}`, err);
             throw err;
         }
+    }
+
+    /** Lists every object key under a prefix (paginated — safe for large prefixes). */
+    async listKeys(prefix: string): Promise<string[]> {
+        const keys: string[] = [];
+        let continuationToken: string | undefined;
+
+        do {
+            const response = await this.client.send(
+                new ListObjectsV2Command({
+                    Bucket: this.bucket,
+                    Prefix: prefix,
+                    ContinuationToken: continuationToken,
+                }),
+            );
+            for (const obj of response.Contents ?? []) {
+                if (obj.Key) keys.push(obj.Key);
+            }
+            continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
+        } while (continuationToken);
+
+        return keys;
+    }
+
+    /**
+     * Bulk delete (1000-key API batches). Returns requested vs actually deleted
+     * counts so callers can log the GDPR cleanup audit line.
+     */
+    async deleteMany(keys: string[]): Promise<{ requested: number; deleted: number }> {
+        const BATCH_SIZE = 1000;
+        let deleted = 0;
+
+        for (let i = 0; i < keys.length; i += BATCH_SIZE) {
+            const batch = keys.slice(i, i + BATCH_SIZE);
+            const response = await this.client.send(
+                new DeleteObjectsCommand({
+                    Bucket: this.bucket,
+                    Delete: { Objects: batch.map((key) => ({ Key: key })) },
+                }),
+            );
+            deleted += response.Deleted?.length ?? 0;
+            for (const error of response.Errors ?? []) {
+                this.logger.error(`Failed to delete object: ${error.Key} (${error.Message})`);
+            }
+        }
+
+        return { requested: keys.length, deleted };
     }
 }
