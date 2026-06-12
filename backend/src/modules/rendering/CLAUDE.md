@@ -25,5 +25,5 @@ The LLM only picks a template name and writes the text/illustration prompt — i
   `document.fonts.ready` before printing so PDFs are deterministic. Don't add remote/CDN fonts.
 - A5 = 148×210 mm; the `@page` size lives in `_base.hbs`. Text overflow is clipped by CSS (the
   auto-fit safety net) **by design** — don't "fix" overflow by truncating text in code.
-- **Watermark is hard-coded `true`** at MVP (tier-based watermarking is planned).
+- **Watermark is tier-driven** — `QuotaService.getWatermarkForUser()` reads `PricingTier.watermark` from the DB and passes it through `IStoryToRender`. `_base.hbs` conditionally injects the CSS class and `<div>` only when `watermark = true` (Free Chapter). Paid tiers get a clean PDF.
 - `comic-*` templates are Post-MVP stubs — present in the config but not generated.

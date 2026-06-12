@@ -3,6 +3,7 @@ import type { Child, Page, Story } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { StorageKeys } from '../storage/storage.keys.js';
+import { QuotaService } from '../subscriptions/quota.service.js';
 import { PdfRendererService } from './pdf-renderer.service.js';
 import type { IPageToRender } from './rendering.types.js';
 
@@ -18,6 +19,7 @@ export class PdfBindingService {
         private readonly prisma: PrismaService,
         private readonly storage: StorageService,
         private readonly renderer: PdfRendererService,
+        private readonly quotaService: QuotaService,
     ) {}
 
     /**
@@ -56,7 +58,7 @@ export class PdfBindingService {
             title: story.title ?? story.question,
             childName: story.child.name,
             pages: pagesToRender,
-            watermark: true, // Phase 9 wires real tier check
+            watermark: await this.quotaService.getWatermarkForUser(story.userId),
         });
 
         const pdfKey = StorageKeys.storyPdf(story.userId, story.id);

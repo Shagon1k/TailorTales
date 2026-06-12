@@ -1,5 +1,7 @@
 import { Test } from '@nestjs/testing';
 import type { User } from '../../../generated/prisma/client.js';
+import { AccountDeletionService } from '../account-deletion.service.js';
+import { DataExportService } from '../data-export.service.js';
 import { UserController } from '../user.controller.js';
 import { UserService } from '../user.service.js';
 
@@ -12,8 +14,6 @@ const MOCK_USER: User = {
     role: 'USER',
     createdAt: new Date(),
     updatedAt: new Date(),
-    regenerationsInWindow: 0,
-    regenerationWindowStartedAt: null,
 };
 
 describe('UserController', () => {
@@ -25,7 +25,11 @@ describe('UserController', () => {
 
         const module = await Test.createTestingModule({
             controllers: [UserController],
-            providers: [{ provide: UserService, useValue: { updateName } }],
+            providers: [
+                { provide: UserService, useValue: { updateName } },
+                { provide: DataExportService, useValue: { exportUserData: vi.fn() } },
+                { provide: AccountDeletionService, useValue: { deleteAccount: vi.fn() } },
+            ],
         }).compile();
 
         controller = module.get(UserController);

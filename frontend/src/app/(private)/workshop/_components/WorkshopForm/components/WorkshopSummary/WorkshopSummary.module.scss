@@ -135,6 +135,17 @@
         color: var(--text-muted);
     }
 
+    &__quota {
+        @include t-body-sm;
+        margin: 0;
+        text-align: center;
+        color: var(--text-secondary);
+
+        &[data-over] {
+            color: var(--accent-warm);
+        }
+    }
+
     &__actions {
         display: flex;
         flex-direction: column;

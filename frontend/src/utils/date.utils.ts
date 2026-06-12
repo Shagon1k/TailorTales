@@ -24,6 +24,18 @@ export function getRelativeTime(isoDate: string): string {
     return rtf.format(-months, 'month'); // "last month" / "3 months ago"
 }
 
+/**
+ * Long human date for an ISO string.
+ * @example formatLongDate('2026-07-11T10:00:00Z') // "July 11, 2026"
+ */
+export function formatLongDate(isoDate: string): string {
+    return new Date(isoDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+}
+
 /** Compute integer age from an ISO birthdate string. */
 export function getAge(birthdate: string): number {
     const birth = new Date(birthdate);

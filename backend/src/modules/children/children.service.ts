@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { type Child } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service.js';
 import { CreateChildDto } from './dto/create-child.dto.js';
 import { UpdateChildDto } from './dto/update-child.dto.js';
 
 @Injectable()
 export class ChildrenService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly subscriptions: SubscriptionsService,
+    ) {}
 
     findAllByUser(userId: string): Promise<Child[]> {
         return this.prisma.child.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } });
@@ -18,7 +22,19 @@ export class ChildrenService {
         return child;
     }
 
-    create(userId: string, dto: CreateChildDto): Promise<Child> {
+    async create(userId: string, dto: CreateChildDto): Promise<Child> {
+        const subscription = await this.subscriptions.getOrCreateForUser(userId);
+        const limit = subscription.pricingTier.childrenLimit; // null = unlimited
+
+        if (limit !== null) {
+            const childCount = await this.prisma.child.count({ where: { userId } });
+            if (childCount >= limit) {
+                throw new ForbiddenException(
+                    `Your plan allows up to ${limit} child profile(s) — upgrade to add more`,
+                );
+            }
+        }
+
         return this.prisma.child.create({
             data: {
                 userId,

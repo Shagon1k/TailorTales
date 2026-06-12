@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button/Button';
+import { useSubscription } from '@/hooks/subscription';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import type { IChild } from '@/types/child.types';
@@ -19,10 +20,8 @@ const LANGUAGE_LABEL: Record<ILanguage, string> = {
     RU: 'Russian',
 };
 
-// Stub: 1 credit = 1 page; cost = pageCount. Real balance wired in Phase 9.
-// STUB_REMAINING reflects Story Hour quota (60 pages/month).
-const CREDIT_COST = 5;
-const STUB_REMAINING = 60;
+// 1 book page = 1 credit (comics — post-MVP — cost 2 per page).
+const CREDITS_PER_BOOK_PAGE = 1;
 
 export interface IWorkshopSummaryProps {
     child: IChild | null;
@@ -52,6 +51,13 @@ export default function WorkshopSummary({
     onCharacterEdit,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
     const hasQuestion = question.trim().length > 0;
+
+    const { data: subscription } = useSubscription();
+    const creditCost = pageCount ? Number(pageCount) * CREDITS_PER_BOOK_PAGE : 0;
+    const creditsRemaining = subscription
+        ? Math.max(subscription.tier.pagesPerMonth - subscription.pagesUsed, 0)
+        : null;
+    const overBudget = creditsRemaining !== null && creditCost > creditsRemaining;
 
     return (
         <aside className={styles.summary}>
@@ -90,12 +96,20 @@ export default function WorkshopSummary({
             <hr className={styles.summary__divider} aria-hidden="true" />
 
             <p className={styles.summary__credits}>
-                <span className={styles['summary__credits-cost']}>{CREDIT_COST} credits</span>
+                <span className={styles['summary__credits-cost']}>{creditCost} credits</span>
                 <span className={styles['summary__credits-remaining']}>
                     {' '}
-                    · {STUB_REMAINING} remaining
+                    · {creditsRemaining ?? '--'} remaining
                 </span>
             </p>
+
+            {pageCount && creditsRemaining !== null && (
+                <p className={styles.summary__quota} data-over={overBudget || undefined}>
+                    {overBudget
+                        ? `This tale needs ${creditCost} credits but only ${creditsRemaining} remain this cycle — pick a shorter length or upgrade your plan.`
+                        : `${pageCount} pages will use ${creditCost} of your ${creditsRemaining} remaining credits this cycle.`}
+                </p>
+            )}
 
             <div className={styles.summary__actions}>
                 {/* Phase 4: both buttons create a DRAFT. Phase 5: "Light the lantern" triggers generation. */}
@@ -103,7 +117,7 @@ export default function WorkshopSummary({
                     variant="primary"
                     size="lg"
                     fullWidth
-                    disabled={!isValid || isPending}
+                    disabled={!isValid || isPending || overBudget}
                     loading={isPending}
                     onClick={onSubmit}
                 >

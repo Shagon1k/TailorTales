@@ -6,6 +6,7 @@ import { PdfBindingService } from '../../rendering/pdf-binding.service.js';
 import { AI_CLIENT } from '../../ai/ai.types.js';
 import { AiStubClient } from '../../ai/ai-stub.client.js';
 import { NotificationsService } from '../../notifications/notifications.service.js';
+import { QuotaService } from '../../subscriptions/quota.service.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { StorageService } from '../../storage/storage.service.js';
 
@@ -99,6 +100,10 @@ const mockNotifications = {
     storyFailed: vi.fn().mockResolvedValue(undefined),
 };
 
+const mockQuota = {
+    deductPageCredits: vi.fn().mockResolvedValue(undefined),
+};
+
 describe('GenerationPipeline', () => {
     let pipeline: GenerationPipeline;
     let mockPrisma: ReturnType<typeof buildMockPrisma>;
@@ -118,6 +123,7 @@ describe('GenerationPipeline', () => {
                 { provide: StorageService, useValue: mockStorage },
                 { provide: PdfBindingService, useValue: mockPdfBinding },
                 { provide: NotificationsService, useValue: mockNotifications },
+                { provide: QuotaService, useValue: mockQuota },
             ],
         }).compile();
 
@@ -142,6 +148,9 @@ describe('GenerationPipeline', () => {
 
             // Pages created for story plan
             expect(mockPrisma.page.createMany).toHaveBeenCalled();
+
+            // Page credits deducted on success only (Ready stage)
+            expect(mockQuota.deductPageCredits).toHaveBeenCalledTimes(1);
 
             // PDF built and stored via shared service
             expect(mockPdfBinding.buildAndStore).toHaveBeenCalled();
@@ -182,6 +191,7 @@ describe('GenerationPipeline', () => {
                     { provide: StorageService, useValue: mockStorage },
                     { provide: PdfBindingService, useValue: mockPdfBinding },
                     { provide: NotificationsService, useValue: mockNotifications },
+                    { provide: QuotaService, useValue: mockQuota },
                 ],
             }).compile();
 
@@ -192,6 +202,9 @@ describe('GenerationPipeline', () => {
             expect(mockPrisma.job.update).toHaveBeenCalledWith(
                 expect.objectContaining({ data: expect.objectContaining({ status: 'FAILED' }) }),
             );
+
+            // FAILED stories never charge the user
+            expect(mockQuota.deductPageCredits).not.toHaveBeenCalled();
         });
     });
 });

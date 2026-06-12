@@ -20,3 +20,14 @@
     flex-direction: column;
     gap: var(--space-2);
 }
+
+.panel__quota {
+    @include t-body-sm;
+    margin: 0;
+    color: var(--text-secondary);
+    text-align: center;
+
+    &[data-exhausted] {
+        color: var(--accent-warm);
+    }
+}

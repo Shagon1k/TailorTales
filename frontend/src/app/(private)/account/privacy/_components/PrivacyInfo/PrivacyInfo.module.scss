@@ -1,0 +1,13 @@
+@use 'styles/typography' as *;
+
+.privacy-info__title {
+    @include t-body-md;
+    font-weight: 600;
+    margin: 0 0 var(--space-1);
+}
+
+.privacy-info__body {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}

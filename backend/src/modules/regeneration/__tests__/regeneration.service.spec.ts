@@ -1,6 +1,5 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { RegenerationService } from '../regeneration.service.js';
-import { FREE_TIER_REGENERATION_LIMIT } from '../regeneration.constants.js';
 
 const STORY_ID = 'story-1';
 const USER_ID = 'user-1';
@@ -40,13 +39,7 @@ const mockPage = {
     illustrationPrompt: 'Maya in pajamas waves to the moon from her window.',
 };
 
-function createPrismaMock(userQuota = {}) {
-    const user = {
-        regenerationsInWindow: 0,
-        regenerationWindowStartedAt: NOW,
-        ...userQuota,
-    };
-
+function createPrismaMock() {
     const prisma = {
         story: {
             findFirst: vi.fn().mockResolvedValue(mockStory),
@@ -55,10 +48,6 @@ function createPrismaMock(userQuota = {}) {
         page: {
             findUnique: vi.fn().mockResolvedValue(mockPage),
             findMany: vi.fn().mockResolvedValue([mockPage]),
-            update: vi.fn().mockResolvedValue({}),
-        },
-        user: {
-            findUnique: vi.fn().mockResolvedValue(user),
             update: vi.fn().mockResolvedValue({}),
         },
         job: {
@@ -80,6 +69,10 @@ function createService(prisma = createPrismaMock()) {
     const pdfBinding = {
         buildAndStore: vi.fn().mockResolvedValue(undefined),
     };
+    const quota = {
+        assertRegenerationCredit: vi.fn().mockResolvedValue(undefined),
+        recordRegeneration: vi.fn().mockResolvedValue(undefined),
+    };
     const ai = {
         generateStoryPlan: vi.fn(),
         generatePageText: vi.fn().mockResolvedValue('Maya smiled.'),
@@ -92,26 +85,18 @@ function createService(prisma = createPrismaMock()) {
             prisma as never,
             storage as never,
             pdfBinding as never,
+            quota as never,
             ai,
         ),
         prisma,
         storage,
         pdfBinding,
+        quota,
         ai,
     };
 }
 
 describe('RegenerationService', () => {
-    beforeEach(() => {
-        vi.useFakeTimers();
-        vi.setSystemTime(NOW);
-    });
-
-    afterEach(() => {
-        vi.useRealTimers();
-        vi.unstubAllGlobals();
-    });
-
     it('retries text regeneration once when the first result is incomplete', async () => {
         const { service, prisma, ai } = createService();
         ai.generatePageText
@@ -152,14 +137,12 @@ describe('RegenerationService', () => {
     });
 
     it('creates a COMPLETED regeneration job and consumes quota only after success', async () => {
-        const { service, prisma, pdfBinding } = createService();
+        const { service, prisma, quota, pdfBinding } = createService();
 
         await service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' });
 
-        expect(prisma.user.update).toHaveBeenCalledWith({
-            where: { id: USER_ID },
-            data: { regenerationsInWindow: { increment: 1 } },
-        });
+        // Quota usage is recorded inside the same transaction as the Job row
+        expect(quota.recordRegeneration).toHaveBeenCalledWith(USER_ID, prisma);
         expect(prisma.job.create).toHaveBeenCalledWith({
             data: { storyId: STORY_ID, type: 'REGENERATION', status: 'COMPLETED' },
         });
@@ -171,11 +154,10 @@ describe('RegenerationService', () => {
     });
 
     it('throws at the quota boundary before doing AI work', async () => {
-        const prisma = createPrismaMock({
-            regenerationsInWindow: FREE_TIER_REGENERATION_LIMIT,
-            regenerationWindowStartedAt: NOW,
-        });
-        const { service, ai } = createService(prisma);
+        const { service, quota, ai, prisma } = createService();
+        quota.assertRegenerationCredit.mockRejectedValue(
+            new ForbiddenException('Regeneration quota of 3 per month has been reached'),
+        );
 
         await expect(
             service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' }),
@@ -185,31 +167,15 @@ describe('RegenerationService', () => {
         expect(prisma.job.create).not.toHaveBeenCalled();
     });
 
-    it('starts a fresh quota window on successful regeneration after rollover', async () => {
-        const oldWindowStart = new Date('2026-05-01T12:00:00.000Z');
-        const prisma = createPrismaMock({
-            regenerationsInWindow: FREE_TIER_REGENERATION_LIMIT,
-            regenerationWindowStartedAt: oldWindowStart,
-        });
-        const { service } = createService(prisma);
-
-        await service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' });
-
-        expect(prisma.user.update).toHaveBeenCalledWith({
-            where: { id: USER_ID },
-            data: { regenerationsInWindow: 1, regenerationWindowStartedAt: NOW },
-        });
-    });
-
     it('does not create a job or consume quota when regeneration fails', async () => {
-        const { service, prisma, ai } = createService();
+        const { service, prisma, quota, ai } = createService();
         ai.generatePageText.mockRejectedValue(new Error('AI unavailable'));
 
         await expect(
             service.regeneratePage(STORY_ID, 2, USER_ID, { what: 'text' }),
         ).rejects.toThrow('AI unavailable');
 
-        expect(prisma.user.update).not.toHaveBeenCalled();
+        expect(quota.recordRegeneration).not.toHaveBeenCalled();
         expect(prisma.job.create).not.toHaveBeenCalled();
     });
 

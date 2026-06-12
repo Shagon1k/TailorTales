@@ -11,6 +11,10 @@ vi.mock('@/context/UserContext', () => ({
     useCurrentUser: mockUseCurrentUser,
 }));
 
+vi.mock('@/hooks/subscription', () => ({
+    useSubscription: () => ({ data: undefined }),
+}));
+
 vi.mock('next/navigation', () => ({
     useRouter: vi.fn().mockReturnValue({ replace: mockRouterReplace }),
     usePathname: vi.fn().mockReturnValue('/account'),

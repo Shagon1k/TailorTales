@@ -1,11 +1,4 @@
-import {
-    BadRequestException,
-    ForbiddenException,
-    Inject,
-    Injectable,
-    Logger,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type { Child, Page, Story } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { endsWithCompleteSentence } from '../../common/text.utils.js';
@@ -15,7 +8,7 @@ import { PdfBindingService } from '../rendering/pdf-binding.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import { AI_CLIENT, type IAiClient } from '../ai/ai.types.js';
 import { CHARS_PER_TOKEN } from '../generation/generation.constants.js';
-import { FREE_TIER_REGENERATION_LIMIT, REGEN_WINDOW_DAYS } from './regeneration.constants.js';
+import { QuotaService } from '../subscriptions/quota.service.js';
 import { buildPageTextSystemPrompt, buildPageTextUserPrompt } from './regeneration.prompts.js';
 import type { RegeneratePageDto } from './dto/regenerate-page.dto.js';
 
@@ -31,6 +24,7 @@ export class RegenerationService {
         private readonly prisma: PrismaService,
         private readonly storage: StorageService,
         private readonly pdfBinding: PdfBindingService,
+        private readonly quotaService: QuotaService,
         @Inject(AI_CLIENT) private readonly ai: IAiClient,
     ) {}
 
@@ -57,8 +51,8 @@ export class RegenerationService {
         if (!page)
             throw new NotFoundException(`Page order ${pageOrder} not found in story ${storyId}`);
 
-        // 3. Fail-fast quota check (read-only — no increment and no reset yet)
-        await this.checkQuota(userId);
+        // 3. Fail-fast quota check (read-only — no increment yet)
+        await this.quotaService.assertRegenerationCredit(userId);
 
         // 4. Compute phase — all AI calls, zero DB/S3 writes
         //    Both calls may run; neither is persisted until both succeed.
@@ -101,58 +95,18 @@ export class RegenerationService {
     // ---------------------------------------------------------------------------
 
     /**
-     * Reads the user's current quota state.
-     * Throws ForbiddenException when the limit has been reached for the current window.
-     * Does NOT mutate quota state — the 30-day window starts only after successful regeneration.
-     *
-     * TODO(Phase 9): replace User quota fields with Subscription.regenerationsUsed vs
-     *   PricingTier.regenerationsPerMonth. Rolling-window reset logic below also goes away.
+     * Quota consumption + COMPLETED Job record, written atomically, success only.
+     * Limits and counters live on Subscription/PricingTier (QuotaService);
+     * the billing cycle (counter reset) is owned by the Paddle webhook / free-tier cron.
      */
-    private async checkQuota(userId: string): Promise<void> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: { regenerationsInWindow: true, regenerationWindowStartedAt: true },
-        });
-        if (!user) throw new NotFoundException(`User ${userId} not found`);
-
-        if (this.isQuotaWindowExpired(user.regenerationWindowStartedAt, new Date())) return;
-
-        if (user.regenerationsInWindow >= FREE_TIER_REGENERATION_LIMIT) {
-            throw new ForbiddenException(
-                `Regeneration quota of ${FREE_TIER_REGENERATION_LIMIT} per ${REGEN_WINDOW_DAYS} days has been reached`,
-            );
-        }
-    }
-
     private async recordSuccessfulRegeneration(userId: string, storyId: string): Promise<void> {
         await this.prisma.$transaction(async (tx) => {
-            const user = await tx.user.findUnique({
-                where: { id: userId },
-                select: { regenerationsInWindow: true, regenerationWindowStartedAt: true },
-            });
-            if (!user) throw new NotFoundException(`User ${userId} not found`);
-
-            const now = new Date();
-            const windowExpired = this.isQuotaWindowExpired(user.regenerationWindowStartedAt, now);
-
-            await tx.user.update({
-                where: { id: userId },
-                data: windowExpired
-                    ? { regenerationsInWindow: 1, regenerationWindowStartedAt: now }
-                    : { regenerationsInWindow: { increment: 1 } },
-            });
+            await this.quotaService.recordRegeneration(userId, tx);
 
             await tx.job.create({
                 data: { storyId, type: 'REGENERATION', status: 'COMPLETED' },
             });
         });
-    }
-
-    private isQuotaWindowExpired(windowStart: Date | null, now: Date): boolean {
-        return (
-            !windowStart ||
-            now.getTime() - windowStart.getTime() > REGEN_WINDOW_DAYS * 24 * 60 * 60 * 1000
-        );
     }
 
     // ---------------------------------------------------------------------------

@@ -11,6 +11,7 @@ import CharacterForm, {
 } from '../../_components/CharacterForm/CharacterForm';
 import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/hooks/children';
 import { useCharacters, useCreateCharacter, useUpdateCharacter } from '@/hooks/characters';
+import { useSubscription } from '@/hooks/subscription';
 import type { IChild } from '@/types/child.types';
 import type { ICharacter } from '@/types/character.types';
 import styles from './page.module.scss';
@@ -25,11 +26,15 @@ type TModalState =
 export default function ChildrenPage(): React.ReactElement {
     const { data: children = [], isLoading } = useChildren();
     const { data: characters = [] } = useCharacters();
+    const { data: subscription } = useSubscription();
     const { mutate: createChild, isPending: isCreating } = useCreateChild();
     const { mutate: updateChild, isPending: isUpdating } = useUpdateChild();
     const { mutate: deleteChild, isPending: isDeleting } = useDeleteChild();
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
     const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
+
+    const childrenLimit = subscription?.tier.childrenLimit ?? null;
+    const atChildrenLimit = childrenLimit !== null && children.length >= childrenLimit;
 
     const [modal, setModal] = useState<TModalState>({ kind: 'closed' });
     const close = (): void => setModal({ kind: 'closed' });
@@ -75,15 +80,31 @@ export default function ChildrenPage(): React.ReactElement {
             {children.length === 0 ? (
                 <div className={styles.empty}>
                     <p className={styles['empty__text']}>No children yet.</p>
-                    <Button variant="primary" onClick={() => setModal({ kind: 'add' })}>
+                    <Button
+                        variant="primary"
+                        onClick={() => setModal({ kind: 'add' })}
+                        disabled={atChildrenLimit}
+                    >
                         Add your first child
                     </Button>
                 </div>
             ) : (
                 <>
-                    <Button variant="secondary" onClick={() => setModal({ kind: 'add' })}>
-                        Add child
-                    </Button>
+                    <div className={styles['add-row']}>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setModal({ kind: 'add' })}
+                            disabled={atChildrenLimit}
+                        >
+                            Add child
+                        </Button>
+                        {atChildrenLimit && (
+                            <p className={styles['add-row__limit-hint']}>
+                                You&apos;ve reached the child limit for your plan.{' '}
+                                <a href="/pricing">Upgrade</a> to add more.
+                            </p>
+                        )}
+                    </div>
                     <div className={styles.grid}>
                         {children.map((child) => (
                             <ChildCard

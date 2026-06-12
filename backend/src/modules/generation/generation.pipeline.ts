@@ -15,6 +15,7 @@ import { PdfBindingService } from '../rendering/pdf-binding.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import { AI_CLIENT, type IAiClient, type IStoryPlan } from '../ai/ai.types.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { QuotaService } from '../subscriptions/quota.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
@@ -35,6 +36,7 @@ export class GenerationPipeline {
         private readonly promptBuilder: StoryPromptBuilder,
         private readonly validator: StoryPlanValidator,
         private readonly notifications: NotificationsService,
+        private readonly quotaService: QuotaService,
         @Inject(AI_CLIENT) private readonly ai: IAiClient,
     ) {}
 
@@ -312,6 +314,9 @@ export class GenerationPipeline {
             where: { id: story.id },
             data: { status: 'COMPLETED' },
         });
+
+        // Credits are deducted only on success — FAILED stories never charge the user.
+        await this.quotaService.deductPageCredits(story.userId, story.pageCount, story.type);
 
         this.logger.log(`Story ${story.id} completed`);
     }

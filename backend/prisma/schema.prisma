@@ -52,6 +52,12 @@ enum NotificationType {
   STORY_FAILED
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -62,16 +68,59 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  /** Number of page regenerations used in the current 30-day window. */
-  regenerationsInWindow      Int       @default(0)
-  /** When the current 30-day regeneration window started. Null until first regen. */
-  regenerationWindowStartedAt DateTime?
-
   children          Child[]
   stories           Story[]
   characters        Character[]
   createdBlueprints StoryBlueprint[]
   notifications     Notification[]
+  subscription      Subscription?
+}
+
+model PricingTier {
+  id              String  @id @default(cuid())
+  name            String  @unique
+  /** Paddle catalog ids — null on the free tier (no Paddle product behind it). */
+  paddleProductId String?
+  /** Paddle.js checkout opens with a PRICE id, not a product id. */
+  paddlePriceId   String?
+  /** Euro cents (0 / 500 / 1000). Format to € only at the frontend edge. */
+  priceMonthly          Int
+  pagesPerMonth         Int
+  regenerationsPerMonth Int
+  /** Null = unlimited. */
+  childrenLimit Int?
+  /** Null = retained forever. */
+  retentionDays Int?
+  watermark     Boolean @default(false)
+  /** Pricing-page sort order. */
+  order         Int
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id            String      @id @default(cuid())
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pricingTierId String
+  pricingTier   PricingTier @relation(fields: [pricingTierId], references: [id])
+
+  /** Null on the free tier. */
+  paddleSubscriptionId String? @unique
+  /** Kept after cancel — billing portal and invoice history need it. */
+  paddleCustomerId     String?
+
+  status            SubscriptionStatus @default(ACTIVE)
+  /** Paddle scheduled cancellation — drives the "cancels on <date>" UI. */
+  cancelAtPeriodEnd Boolean            @default(false)
+  /** Null on the free tier. */
+  currentPeriodEnd  DateTime?
+
+  pagesUsed         Int @default(0)
+  regenerationsUsed Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Child {

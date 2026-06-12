@@ -7,6 +7,11 @@ enum Environment {
     Test = 'test',
 }
 
+enum PaddleEnvironment {
+    Sandbox = 'sandbox',
+    Production = 'production',
+}
+
 class EnvironmentVariables {
     @IsString()
     DATABASE_URL!: string;
@@ -90,11 +95,30 @@ class EnvironmentVariables {
     /** Where contact-form submissions are routed. */
     @IsString()
     CONTACT_INBOX_EMAIL!: string;
+
+    // Paddle — billing. Keys are optional because the stub client (USE_PADDLE_STUBS)
+    // needs none of them; the real client throws at boot when they are missing.
+    @IsBoolean()
+    @IsOptional()
+    USE_PADDLE_STUBS: boolean = false;
+
+    @IsString()
+    @IsOptional()
+    PADDLE_API_KEY?: string;
+
+    @IsString()
+    @IsOptional()
+    PADDLE_WEBHOOK_SECRET?: string;
+
+    @IsEnum(PaddleEnvironment)
+    @IsOptional()
+    PADDLE_ENVIRONMENT: PaddleEnvironment = PaddleEnvironment.Sandbox;
 }
 
 const BOOLEAN_KEYS: Array<keyof EnvironmentVariables> = [
     'USE_AI_STUBS',
     'USE_EMAIL_STUBS',
+    'USE_PADDLE_STUBS',
     'STORAGE_FORCE_PATH_STYLE',
 ];
 

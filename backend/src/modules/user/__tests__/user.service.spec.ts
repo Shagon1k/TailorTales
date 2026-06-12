@@ -12,20 +12,22 @@ const MOCK_USER: User = {
     role: 'USER',
     createdAt: new Date(),
     updatedAt: new Date(),
-    regenerationsInWindow: 0,
-    regenerationWindowStartedAt: null,
 };
+
+const MOCK_FREE_TIER = { id: 'tier-free', name: 'Free Chapter', priceMonthly: 0 };
 
 describe('UserService', () => {
     let service: UserService;
     let userFindUnique: ReturnType<typeof vi.fn>;
     let userCreate: ReturnType<typeof vi.fn>;
     let userUpdate: ReturnType<typeof vi.fn>;
+    let pricingTierFindFirst: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         userFindUnique = vi.fn();
         userCreate = vi.fn();
         userUpdate = vi.fn();
+        pricingTierFindFirst = vi.fn().mockResolvedValue(MOCK_FREE_TIER);
 
         const module = await Test.createTestingModule({
             providers: [
@@ -37,6 +39,9 @@ describe('UserService', () => {
                             findUnique: userFindUnique,
                             create: userCreate,
                             update: userUpdate,
+                        },
+                        pricingTier: {
+                            findFirst: pricingTierFindFirst,
                         },
                     },
                 },
@@ -79,9 +84,34 @@ describe('UserService', () => {
             expect(result).toBe(MOCK_USER);
         });
 
-        it('should create and return a new user when the googleId does not exist', async () => {
+        it('should create a new user with a free-tier subscription when the googleId does not exist', async () => {
             userFindUnique.mockResolvedValue(null);
             userCreate.mockResolvedValue(MOCK_USER);
+
+            const params = { googleId: 'google-abc', email: 'alice@example.com', name: 'Alice' };
+            const result = await service.findOrCreate(params);
+
+            expect(userCreate).toHaveBeenCalledWith({
+                data: {
+                    googleId: 'google-abc',
+                    email: 'alice@example.com',
+                    name: 'Alice',
+                    avatarUrl: undefined,
+                    subscription: {
+                        create: {
+                            pricingTierId: MOCK_FREE_TIER.id,
+                            currentPeriodEnd: expect.any(Date),
+                        },
+                    },
+                },
+            });
+            expect(result).toBe(MOCK_USER);
+        });
+
+        it('should create the user without a subscription when no free tier is seeded', async () => {
+            userFindUnique.mockResolvedValue(null);
+            userCreate.mockResolvedValue(MOCK_USER);
+            pricingTierFindFirst.mockResolvedValue(null);
 
             const params = { googleId: 'google-abc', email: 'alice@example.com', name: 'Alice' };
             const result = await service.findOrCreate(params);

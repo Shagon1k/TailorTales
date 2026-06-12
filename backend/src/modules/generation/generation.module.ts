@@ -4,6 +4,7 @@ import { AiModule } from '../ai/ai.module.js';
 import { RenderingModule } from '../rendering/rendering.module.js';
 import { StorageModule } from '../storage/storage.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module.js';
 import { GenerationService } from './generation.service.js';
 import { GenerationPipeline } from './generation.pipeline.js';
 import { GenerationWorker } from './generation.worker.js';
@@ -18,6 +19,7 @@ import { GENERATION_QUEUE } from './generation.constants.js';
         RenderingModule,
         StorageModule,
         NotificationsModule,
+        SubscriptionsModule,
     ],
     providers: [
         GenerationService,

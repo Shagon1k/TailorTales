@@ -1,0 +1,45 @@
+@use 'styles/typography' as *;
+
+.invoice-list__empty {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.invoice-list__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.invoice-list__item {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr auto auto auto;
+    gap: var(--space-4);
+    align-items: baseline;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border-subtle);
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.invoice-list__date,
+.invoice-list__description {
+    @include t-body-base;
+}
+
+.invoice-list__amount {
+    @include t-body-base;
+    font-weight: 600;
+}
+
+.invoice-list__status {
+    @include t-body-sm;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}

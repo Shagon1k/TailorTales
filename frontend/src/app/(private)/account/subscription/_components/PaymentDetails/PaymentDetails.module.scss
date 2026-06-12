@@ -1,0 +1,13 @@
+@use 'styles/typography' as *;
+
+.payment-details__copy {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.payment-details__error {
+    @include t-body-sm;
+    color: var(--accent-warm);
+    margin: 0;
+}

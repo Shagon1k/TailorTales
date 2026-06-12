@@ -1,7 +1,23 @@
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = { title: 'Privacy' };
+import { Stack } from '@mantine/core';
+import { useSubscription } from '@/hooks/subscription';
+import PrivacyInfo from './_components/PrivacyInfo/PrivacyInfo';
+import ExportSection from './_components/ExportSection/ExportSection';
+import DeleteAccountSection from './_components/DeleteAccountSection/DeleteAccountSection';
 
 export default function PrivacyPage(): React.ReactElement {
-    return <div>Privacy &amp; data — coming soon</div>;
+    const { data: subscription } = useSubscription();
+    const hasPaidSubscription =
+        subscription !== undefined &&
+        subscription.tier.priceMonthly > 0 &&
+        !subscription.cancelAtPeriodEnd;
+
+    return (
+        <Stack gap="xl">
+            <PrivacyInfo />
+            <ExportSection />
+            <DeleteAccountSection hasPaidSubscription={hasPaidSubscription} />
+        </Stack>
+    );
 }

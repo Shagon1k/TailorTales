@@ -4,6 +4,7 @@ import type { ArtStyle, Child, Story } from '../../../generated/prisma/client.js
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { StorageService } from '../../storage/storage.service.js';
 import { PdfRendererService } from '../../rendering/pdf-renderer.service.js';
+import { QuotaService } from '../../subscriptions/quota.service.js';
 import { StoriesService } from '../stories.service.js';
 import type { CreateStoryDto } from '../dto/create-story.dto.js';
 
@@ -59,6 +60,7 @@ describe('StoriesService', () => {
     let storyCreate: ReturnType<typeof vi.fn>;
     let storyDelete: ReturnType<typeof vi.fn>;
     let getSignedUrl: ReturnType<typeof vi.fn>;
+    let storageDeleteMany: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         storyFindMany = vi.fn();
@@ -66,6 +68,7 @@ describe('StoriesService', () => {
         storyCreate = vi.fn();
         storyDelete = vi.fn();
         getSignedUrl = vi.fn();
+        storageDeleteMany = vi.fn().mockResolvedValue({ requested: 3, deleted: 3 });
 
         const module = await Test.createTestingModule({
             providers: [
@@ -83,11 +86,15 @@ describe('StoriesService', () => {
                 },
                 {
                     provide: StorageService,
-                    useValue: { getSignedUrl },
+                    useValue: { getSignedUrl, deleteMany: storageDeleteMany },
                 },
                 {
                     provide: PdfRendererService,
                     useValue: { buildPageHtml: vi.fn() },
+                },
+                {
+                    provide: QuotaService,
+                    useValue: { getWatermarkForUser: vi.fn().mockResolvedValue(true) },
                 },
             ],
         }).compile();
@@ -205,11 +212,32 @@ describe('StoriesService', () => {
 
     describe('remove', () => {
         it('should delete the story when the user owns it', async () => {
-            storyFindFirst.mockResolvedValue(MOCK_STORY);
+            storyFindFirst.mockResolvedValue({ ...MOCK_STORY, pages: [] });
             storyDelete.mockResolvedValue(MOCK_STORY);
 
             await service.remove('story-1', 'user-123');
 
+            expect(storyDelete).toHaveBeenCalledWith({ where: { id: 'story-1' } });
+            // DRAFT story with no assets — no S3 calls
+            expect(storageDeleteMany).not.toHaveBeenCalled();
+        });
+
+        it('should delete S3 assets (pdf, cover, illustrations) before the DB row', async () => {
+            storyFindFirst.mockResolvedValue({
+                ...MOCK_STORY,
+                pdfKey: 'users/user-123/stories/story-1/story.pdf',
+                coverImageKey: 'users/user-123/stories/story-1/cover',
+                pages: [{ illustrations: [{ key: 'users/user-123/stories/story-1/pages/1' }] }],
+            });
+            storyDelete.mockResolvedValue(MOCK_STORY);
+
+            await service.remove('story-1', 'user-123');
+
+            expect(storageDeleteMany).toHaveBeenCalledWith([
+                'users/user-123/stories/story-1/story.pdf',
+                'users/user-123/stories/story-1/cover',
+                'users/user-123/stories/story-1/pages/1',
+            ]);
             expect(storyDelete).toHaveBeenCalledWith({ where: { id: 'story-1' } });
         });
 

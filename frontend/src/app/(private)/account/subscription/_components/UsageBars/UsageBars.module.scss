@@ -1,0 +1,22 @@
+@use 'styles/typography' as *;
+
+.usage-bars__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.usage-bars__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.usage-bars__label {
+    @include t-body-base;
+}
+
+.usage-bars__count {
+    @include t-body-sm;
+    color: var(--text-secondary);
+}

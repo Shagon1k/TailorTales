@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type { ArtStyle, Child, Page, Story } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { PdfRendererService } from '../rendering/pdf-renderer.service.js';
+import { QuotaService } from '../subscriptions/quota.service.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
 import { PUBLIC_STORIES_LIMIT } from './stories.constants.js';
 import type { IStoryDetail, IStorySummary } from './stories.types.js';
@@ -21,10 +22,13 @@ const STORY_LIST_INCLUDE = {
 
 @Injectable()
 export class StoriesService {
+    private readonly logger = new Logger(StoriesService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly storage: StorageService,
         private readonly renderer: PdfRendererService,
+        private readonly quotaService: QuotaService,
     ) {}
 
     async findAllByUser(userId: string): Promise<IStorySummary[]> {
@@ -76,11 +80,27 @@ export class StoriesService {
     }
 
     async remove(id: string, userId: string): Promise<void> {
-        const story = await this.prisma.story.findFirst({ where: { id, userId } });
+        const story = await this.prisma.story.findFirst({
+            where: { id, userId },
+            include: { pages: { select: { illustrations: true } } },
+        });
         if (!story) throw new NotFoundException(`Story ${id} not found`);
 
-        // Phase 5: add S3 asset deletion here (coverImageKey, pdfKey, page illustrations)
-        // when generation produces files. DRAFT stories have no assets yet.
+        const keys = [
+            story.pdfKey,
+            story.coverImageKey,
+            ...story.pages.flatMap((page) => {
+                const illustrations = page.illustrations as Array<{ key: string }> | null;
+                return illustrations?.map((i) => i.key) ?? [];
+            }),
+        ].filter((key): key is string => Boolean(key));
+
+        if (keys.length > 0) {
+            const { requested, deleted } = await this.storage.deleteMany(keys);
+            const auditLine = `Story ${id} deletion: expected=${requested} deleted=${deleted}`;
+            if (deleted < requested) this.logger.warn(auditLine);
+            else this.logger.log(auditLine);
+        }
 
         await this.prisma.story.delete({ where: { id } });
     }
@@ -119,7 +139,7 @@ export class StoriesService {
                 title: story.title ?? story.question,
                 childName: story.child.name,
                 pages: [],
-                watermark: true, // Phase 9 wires real tier check
+                watermark: await this.quotaService.getWatermarkForUser(story.userId),
             },
         );
     }
