@@ -1,0 +1,23 @@
+@use 'styles/typography' as *;
+
+.plan-card__name {
+    @include t-heading-2xl;
+    margin: 0;
+}
+
+.plan-card__price {
+    @include t-body-base;
+    color: var(--text-secondary);
+}
+
+.plan-card__renewal {
+    @include t-body-sm;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.plan-card__warning {
+    @include t-body-sm;
+    color: var(--accent-warm);
+    margin: 0;
+}
