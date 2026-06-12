@@ -72,7 +72,7 @@
 ## 4. Domain Model (high level)
 
 | Entity             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------- |
 | **User**           | Google OAuth identity, role (USER / ADMIN).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | **Child**          | Belongs to User. Fields: name, birthdate, gender, interests, optional avatarUrl for UI avatar/display only. Character likeness belongs to `Character`, not `Child`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | **Character**      | Belongs to User, optionally references Child. Fields: name, description, source (`MANUAL_DESCRIPTION` at MVP; `REFERENCE_IMAGE` Post-MVP), referenceImageKey? (Post-MVP), generatedPreviewImageKey?, consentAt? (required before storing child/person reference images Post-MVP), createdAt, updatedAt. Story creation selects the child's default Character; the generation pipeline snapshots it into `Story.styleAnchor` so older stories stay stable if the Character changes later.                                                                                                                                                                                                                                                                                                                                  |
@@ -81,8 +81,8 @@
 | **Page**           | Belongs to Story, ordered. `text` is optional — both book and comic pages may be illustration-only. Contains illustration key(s) + chapter title + `illustrationPrompt?` (prompt used to paint the page; reused by Phase 8 regeneration). `layout` stores the PageTemplate name (e.g. `book-cover`). Page rows are the materialized Story Plan and the source the PDF renders from. Composite unique on `(storyId, order)`.                                                                                                                                                                                                                                                                                                                                                                                               |
 | **StoryBlueprint** | Pre-defined story blueprint created by Admin (previously named `Template`). `systemPrompt` carries structured LLM guidance using XML markers (e.g. `<intro_prompt>`, `<climax_prompt>`). `coverImageKey` + `previewPageKeys` are S3 keys reserved for user-facing preview (Post-MVP). Auto-selected by the generation pipeline based on `StoryType`; user-facing selection deferred to Post-MVP.                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | **PageTemplate**   | Typed page layout specification — single source of truth for the LLM prompt builder, the response validator, and the PDF renderer. Defines A5 page (148×210 mm = 1748×2480 px at 300 DPI), `role (cover \| interior \| final)`, `narrativePurpose` (when the LLM should pick it), text zones (`maxChars` per named zone, type: `body \| caption \| speech-bubble \| narration-box`), and image zones — each carries a layout `zonePx` (PDF placement) plus an `aspectRatio` + `sizeTier` used for image generation (the LLM never emits these). Lives in `page-templates.config.ts` — no DB model. **Book layouts (MVP):** `book-cover`, `book-text`, `book-text-image`, `book-full-image`, `book-final`. **Comic layouts (Post-MVP):** `comic-cover`, `comic-2-panel`, `comic-3-panel`, `comic-4-panel`, `comic-splash`. |
-| **PricingTier**    | Subscription tier definition (named `PricingTier`, not `Plan`, to avoid collision with "Story Plan" and "Phase Plan"). Fields: id, name, paddleProductId, priceMonthly, pagesPerMonth, regenerationsPerMonth, childrenLimit, retentionDays, watermark.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **Subscription**   | Paddle-backed. Fields: id, userId, pricingTierId, paddleSubscriptionId, status, currentPeriodEnd, pagesUsed, regenerationsUsed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **PricingTier**    | Subscription tier definition (named `PricingTier`, not `Plan`, to avoid collision with "Story Plan" and "Phase Plan"). Fields: id, name, paddleProductId, paddlePriceId (Paddle.js checkout opens with a price id), priceMonthly (euro cents), pagesPerMonth, regenerationsPerMonth, childrenLimit (null = unlimited), retentionDays (null = forever), watermark, order.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Subscription**   | Paddle-backed. Fields: id, userId (unique — every user owns exactly one row, free tier by default), pricingTierId, paddleSubscriptionId, paddleCustomerId (kept after cancel for portal/invoices), status (ACTIVE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | PAST_DUE | CANCELED), cancelAtPeriodEnd, currentPeriodEnd, pagesUsed, regenerationsUsed. |
 | **Rating**         | Belongs to Story + User. Fields: score (1–5), comment (optional). One per user per story (upsert).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | **Job**            | Tracks generation pipeline state and progress for SSE. One BullMQ job per story; per-page image generation fans out inside the job (capped concurrency). `stage` field drives the progress UI.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | **Notification**   | In-app notification per User. Fields: id, userId, type, payload (JSON), readAt?, createdAt.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -188,7 +188,7 @@ Privacy · Contact _(both static pages)_
 | --- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
 | 1   | Refresh tokens + server-side logout                                | httpOnly + SameSite:lax sufficient for MVP; Google re-login is frictionless; current logout is client-side only (JWT stays valid up to 7d after cookie deletion). Refresh tokens require DB/Redis storage, rotation endpoint, and frontend handling — complexity not justified at MVP.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Post-MVP                   |
 | 2   | Magic email link auth                                              | Requires email provider (already decided: Resend in Phase 5). Added as Post-MVP auth option alongside Apple OAuth.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Post-MVP                   |
-| 3   | Exact comic credit rate                                            | Design confirms 2 credits/page. Final business confirmation during Phase 9 (Subscriptions) Paddle setup.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Phase 9                    |
+| 3   | ~~Exact comic credit rate~~ ✅ Phase 9                             | Confirmed: 2 credits/page (`CREDITS_PER_PAGE` in `subscriptions.constants.ts`); comics still post-MVP.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Phase 9                    |
 | 4   | ~~Contact form backend (`POST /contact`)~~ ✅ Phase 5 Increment 7b | Backend `ContactModule` sends submissions to `CONTACT_INBOX_EMAIL` via Resend. Frontend Server Action wired in `actions.ts`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | _Resolved_                 |
 | 5   | Static page copy finalization                                      | All four public pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) use placeholder copy. Copy is a content/copywriting concern, not a code concern. Will be addressed in a dedicated content pass before launch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Pre-launch content phase   |
 | 6   | Comic generation                                                   | **Moved to Post-MVP.** Phase 5 ships **book** generation end-to-end. Comics are genuinely heavier (multi-panel pages, speech bubbles + positioning, multiple image-gen calls per page, harder panel-to-panel consistency). The Phase 5 engine (queue, renderer, validator, contract) is built comic-ready so comics slot in additively — add `comic-*` templates + a panel contract (`panels: [{ imagePrompt, dialogue, speaker }]`). Existing comic scaffolding (`Story.type`, comic blueprint seed, "coming soon" toggle) is **kept as-is**. Keep this constraint in mind during Phase 5 architecture/code so the seams stay clean.                                                                                                                                                                                                                                                                                                                                        | Post-MVP                   |
@@ -197,18 +197,19 @@ Privacy · Contact _(both static pages)_
 | 9   | ~~Story reader: iframe-based page preview~~ ✅ Phase 8             | `GET /stories/:id/pages/:order/html` returns the Handlebars-rendered page HTML; `StoryPageIframe` replaces `StoryPage` — fetches HTML on demand, caches visited pages, scales a fixed A5 stage via `ResizeObserver`. Fonts served from `GET /static/fonts/*` with `ACAO: *`. One renderer, two consumers (Puppeteer + browser), zero drift.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | _Resolved_                 |
 | 10  | Photo-based character creation                                     | Parents could upload a photo of their child as a visual reference: a vision LLM extracts appearance traits and pre-fills `Character.description`. Technically feasible via OpenRouter vision models. Blocked on legal review before any implementation: children's photos are biometric/sensitive data under GDPR Art. 9 and COPPA, requiring explicit parental consent, strict retention limits, and guaranteed deletion. Generating synthetic images from real children's likenesses raises additional right-of-publicity concerns and misuse risk. Requires a dedicated privacy policy section and legal sign-off. Connected to Open Question: "GDPR launch readiness — child/reference-image handling".                                                                                                                                                                                                                                                                  | Post-MVP                   |
 | 11  | Character preview image as visual reference in image generation    | `Character.previewKey` is generated and stored but not currently used in the pipeline — only `Character.description` (text) flows into illustration prompts via `styleAnchor`. Using the preview image as a visual reference input to the image model would give stronger cross-page character consistency than text alone. **Blocker:** not all image models support image-as-reference input; passing an unsupported input silently breaks or is ignored depending on the model. **Agreed approach when revisited:** query the OpenRouter model metadata (or maintain a local capability map keyed by `OPENROUTER_IMAGE_MODEL`) to detect whether the active model accepts image reference inputs; if yes, fetch `Character.previewKey` and pass it alongside the prompt; if no, fall back to text-only (current behaviour). `IGenerateImageInput` would grow an optional `referenceImageBuffer?: Buffer` field, and `AiClient.generateImage()` conditionally includes it. | Post-MVP                   |
+| 12  | Reconsider paid tier names ("Story Hour", "Family Workshop")       | Current names feel functional rather than emotionally resonant with the product. Consider a naming pass before launch — names propagate to `PricingTier.name` (DB unique key used for seeding and plan copy lookup), Paddle catalog product names, and all marketing copy, so a rename requires a migration + re-seed + Paddle catalog update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Pre-launch                 |
 
 ### In-code TODO cross-reference
 
 > Quick lookup: every `// TODO` comment in the frontend codebase, mapped to its ROADMAP resolution.
 
-| File                                                    | TODO summary                                                                      | Resolves in |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------- | ----------- |
-| ~~`contact/_components/ContactSection/actions.ts`~~     | ~~Wire `submitContact` to real `POST /contact` endpoint~~ ✅ Phase 5 Increment 7b | _Resolved_  |
-| `pricing/page.tsx`                                      | Replace hardcoded plan data with `GET /pricing` (real PricingTier records)        | Phase 9     |
-| `(public)/_components/TalesSection/TalesSection.tsx`    | Replace `MOCK_TALES` with `GET /stories?featured=true`                            | Phase 11    |
-| `(public)/_components/TalesSection/TalesSection.tsx`    | Add link to `/tales` (public story library page)                                  | Post-MVP    |
-| `privacy/_components/PrivacyContent/PrivacyContent.tsx` | Extract privacy copy to CMS if non-dev editing is needed                          | Post-MVP    |
+| File                                                    | TODO summary                                                                              | Resolves in |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------- |
+| ~~`contact/_components/ContactSection/actions.ts`~~     | ~~Wire `submitContact` to real `POST /contact` endpoint~~ ✅ Phase 5 Increment 7b         | _Resolved_  |
+| ~~`pricing/page.tsx`~~                                  | ~~Replace hardcoded plan data with `GET /pricing` (real PricingTier records)~~ ✅ Phase 9 | _Resolved_  |
+| `(public)/_components/TalesSection/TalesSection.tsx`    | Replace `MOCK_TALES` with `GET /stories?featured=true`                                    | Phase 11    |
+| `(public)/_components/TalesSection/TalesSection.tsx`    | Add link to `/tales` (public story library page)                                          | Post-MVP    |
+| `privacy/_components/PrivacyContent/PrivacyContent.tsx` | Extract privacy copy to CMS if non-dev editing is needed                                  | Post-MVP    |
 
 ---
 
@@ -689,37 +690,37 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 
 ---
 
-### Phase 9 — Subscriptions (Paddle)
+### Phase 9 — Subscriptions (Paddle) 🟡
 
 **Goal:** users can subscribe, quotas are enforced per plan, billing details visible in account settings, account deletion supported.
 
 **Sub-tasks:**
 
-- [ ] Prisma `PricingTier` model: `id`, `name`, `paddleProductId`, `priceMonthly`, `pagesPerMonth`, `regenerationsPerMonth`, `childrenLimit`, `retentionDays`, `watermark (bool)`
-- [ ] Prisma `Subscription` model: `id`, `userId`, `pricingTierId`, `paddleSubscriptionId`, `status`, `currentPeriodEnd`, `pagesUsed`, `regenerationsUsed`
-- [ ] Prisma migrations
-- [ ] Paddle integration: checkout link generation, webhook handler (created, updated, canceled, payment_failed)
-- [ ] Quota service: validate pages + regenerations against subscription before allowing operations
-- [ ] Quota service: deduct page credits on generation completion (1 per book page, 2 per comic page)
-- [ ] Migrate regeneration quota from `User` MVP fields to `Subscription`: replace `User.regenerationsInWindow` + `User.regenerationWindowStartedAt` + `FREE_TIER_REGENERATION_LIMIT` with `Subscription.regenerationsUsed` + `PricingTier.regenerationsPerMonth`; window-reset logic in `RegenerationService` disappears — Paddle webhook owns the cycle. Drop the two `User` columns in a migration.
-- [ ] Children limit enforcement: `childrenLimit` from PricingTier enforced in children endpoint (backfills Phase 2's uncapped endpoint)
-- [ ] GDPR data export endpoint: `GET /me/export` returns user profile, children, characters, stories metadata, pages, ratings, notifications, subscription state, and signed links to generated PDFs/images that still exist
-- [ ] `DELETE /me`: cancel active Paddle subscription (if any), delete DB rows, and delete all owned S3 objects (`coverImageKey`, `pdfKey`, page illustrations, Character previews/reference images when present)
-- [ ] Storage cleanup audit: hard-delete orphaned generated assets when a Story/Child/User is deleted; log expected vs actual object delete counts
-- [ ] Retention cleanup job (cron): delete PDFs and generated images past tier `retentionDays`; preserve metadata only when legally/operationally needed and documented
-- [ ] Privacy & data copy: state what personal/child data is collected, why it is processed, sub-processors, retention, export/delete rights, and reference-image handling policy before the feature exists
-- [ ] Frontend: `/account` → Subscription section wired:
+- [x] Prisma `PricingTier` model: `id`, `name`, `paddleProductId`, `priceMonthly`, `pagesPerMonth`, `regenerationsPerMonth`, `childrenLimit`, `retentionDays`, `watermark (bool)`
+- [x] Prisma `Subscription` model: `id`, `userId`, `pricingTierId`, `paddleSubscriptionId`, `status`, `currentPeriodEnd`, `pagesUsed`, `regenerationsUsed`
+- [x] Prisma migrations
+- [x] Paddle integration: checkout link generation, webhook handler (created, updated, canceled, payment_failed)
+- [x] Quota service: validate pages + regenerations against subscription before allowing operations
+- [x] Quota service: deduct page credits on generation completion (1 per book page, 2 per comic page)
+- [x] Migrate regeneration quota from `User` MVP fields to `Subscription`: replace `User.regenerationsInWindow` + `User.regenerationWindowStartedAt` + `FREE_TIER_REGENERATION_LIMIT` with `Subscription.regenerationsUsed` + `PricingTier.regenerationsPerMonth`; window-reset logic in `RegenerationService` disappears — Paddle webhook owns the cycle. Drop the two `User` columns in a migration.
+- [x] Children limit enforcement: `childrenLimit` from PricingTier enforced in children endpoint (backfills Phase 2's uncapped endpoint)
+- [x] GDPR data export endpoint: `GET /me/export` returns user profile, children, characters, stories metadata, pages, ratings, notifications, subscription state, and signed links to generated PDFs/images that still exist
+- [x] `DELETE /me`: cancel active Paddle subscription (if any), delete DB rows, and delete all owned S3 objects (`coverImageKey`, `pdfKey`, page illustrations, Character previews/reference images when present)
+- [x] Storage cleanup audit: hard-delete orphaned generated assets when a Story/Child/User is deleted; log expected vs actual object delete counts
+- [x] Retention cleanup job (cron): delete PDFs and generated images past tier `retentionDays`; preserve metadata only when legally/operationally needed and documented
+- [x] Privacy & data copy: state what personal/child data is collected, why it is processed, sub-processors, retention, export/delete rights, and reference-image handling policy before the feature exists
+- [x] Frontend: `/account` → Subscription section wired:
     - Current plan card (name, billing, description, next renewal, VAT breakdown)
     - Usage bars: pages painted X/Y · regenerations X/Y · children profiles X/Y
     - Payment details section (card "Change" → Paddle billing portal; billing email / address / Tax ID displayed from Paddle API)
     - Past parcels list (invoice history from Paddle API)
     - Upgrade / Cancel subscription actions
-- [ ] Frontend: `/account` → Privacy & data section: GDPR info, "Export my data", and "Delete account" flow with explicit irreversible-delete confirmation
-- [ ] Frontend: stats bar on `/library` dashboard wired (pages this month / left / regenerations / tales count)
-- [ ] Frontend: regeneration quota count wired in story reader (was stubbed in Phase 8)
-- [ ] Frontend: workshop length section helper text wired ("N pages will use N of your N remaining credits this month." — depends on subscription quota API; currently absent from UI)
-- [ ] Frontend: `/pricing` page wired to real PricingTier data (replaces Phase 3 static hardcoded data — ships in Phase 9)
-- [ ] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account export, account deletion DB + S3 cleanup flow
+- [x] Frontend: `/account` → Privacy & data section: GDPR info, "Export my data", and "Delete account" flow with explicit irreversible-delete confirmation
+- [x] Frontend: stats bar on `/library` dashboard wired (pages this month / left / regenerations / tales count)
+- [x] Frontend: regeneration quota count wired in story reader (was stubbed in Phase 8)
+- [x] Frontend: workshop length section helper text wired ("N pages will use N of your N remaining credits this month." — depends on subscription quota API; currently absent from UI)
+- [x] Frontend: `/pricing` page wired to real PricingTier data (replaces Phase 3 static hardcoded data — ships in Phase 9)
+- [x] Tests: webhook handling, quota enforcement, children limit, retention cleanup, account export, account deletion DB + S3 cleanup flow
 
 **Acceptance Check:**
 
@@ -842,6 +843,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [ ] Backend: localized error messages via Accept-Language header
 - [ ] Generation: `language` param drives LLM output language (already passed in `customization` JSON — ensure prompts are language-aware)
 - [ ] Translate all existing UI strings to RU
+- [ ] Paddle checkout: pass `locale` to `PADDLE_CHECKOUT_SETTINGS` (`frontend/src/lib/paddle.ts`) from the active UI language — Paddle overlay supports localized checkout UI
 - [ ] Tests: language switching, localized errors, generated content in correct language
 
 **Acceptance Check:**
@@ -882,31 +884,161 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ---
 
-### Phase 15 — Production Deploy
+### Phase 15 — Environments & Production Deploy
 
-**Goal:** app runs in production via dokploy.
+**Goal:** three environments (dev / UAT / prod) fully configured and documented; app live on production domain via dokploy.
 
-**Sub-tasks:**
+---
 
-- [ ] Production env variables documented
-- [ ] Production Dockerfiles tested end-to-end
-- [ ] AWS S3 bucket provisioned
-- [ ] Production Postgres + Redis provisioned
-- [ ] Paddle production credentials wired
-- [ ] OpenRouter production key wired (text + image)
-- [ ] Resend production credentials wired
-- [ ] Domain + HTTPS (handled by dokploy)
-- [ ] dokploy deployment pipeline configured
-- [ ] Smoke tests in production env (login → generate one story → download)
-- [ ] Backup strategy for Postgres + S3 documented
+#### Environment model
+
+Three environments, but **four runtime profiles** — dev has two modes (stubs vs live-sandbox) so prod-like flows are testable locally without a deploy:
+
+```
+dev (stubs)   →  localhost, everything stubbed — default daily work, offline, €0
+dev (live)    →  localhost + real sandbox services (Paddle sandbox, OpenRouter, Resend)
+UAT           →  uat.tailortales.app, prod-like on sandbox/cheap services
+prod          →  tailortales.app, live everything
+```
+
+**Env var sources — no manual `.env` retargeting:**
+
+| Profile     | Source                              | Run command                                                      |
+| ----------- | ----------------------------------- | ---------------------------------------------------------------- |
+| dev (stubs) | `.env` (default, stubs on)          | `pnpm dev`                                                       |
+| dev (live)  | `.env.live` (gitignored overlay)    | `pnpm dev:live` (loads `.env.live` via dotenv-cli or equivalent) |
+| UAT         | dokploy env panel — no file in repo | deploy                                                           |
+| prod        | dokploy env panel — no file in repo | deploy                                                           |
+
+**Paddle — one sandbox account serves both dev (live) and UAT:**
+
+- Paddle supports **multiple webhook destinations** per account — register one per environment, each with its own signing secret (`PADDLE_WEBHOOK_SECRET` differs per env).
+- Every event is pushed to **all** destinations; the cross-env noise is harmless — our handler matches by `customData.userId`, and a foreign userId (different DB) logs "cannot match a user" and returns 200.
+- Prod uses a separate **live** Paddle account (sandbox/live are hard-separated by Paddle anyway).
+
+**Dev webhook URL — Cloudflare named tunnel (static):** once the domain is on Cloudflare (free plan), create a named tunnel `dev-api.tailortales.app → localhost:3001` — permanent URL, configured in Paddle once. Until the domain exists, quick tunnels (`cloudflared tunnel --url …`) work but the URL must be re-pasted into Paddle after each restart.
+
+**Resend — one account, no env constraints:** outbound-only (no webhooks, no domain callback), so a single account with the domain verified once covers all envs; environments differ only by `RESEND_FROM` (`dev@` / `uat@` / `stories@`) and optionally separate API keys for usage tracking.
+
+**DB & schema sync — Prisma migrations are the mechanism, no manual syncing:**
+
+```mermaid
+flowchart LR
+  A["dev: prisma migrate dev<br/>(generates migration file)"] --> B[git commit / PR / merge]
+  B --> C["UAT deploy:<br/>prisma migrate deploy"]
+  B --> D["prod deploy:<br/>prisma migrate deploy"]
+```
+
+- `migrate dev` (generate + apply) runs **only** locally; `migrate deploy` (apply-only, non-interactive) runs as a deploy step on UAT/prod.
+- Seed scripts (`seed:art-styles`, `seed:pricing-tiers`) are idempotent upserts — run once per environment after first deploy, re-run safely after seed changes.
+- **Data never syncs between environments** (by design): UAT holds test users + Paddle sandbox subscriptions, prod holds real ones. UAT DB is droppable/recreatable at any time.
+- UAT/prod DBs are managed Postgres (Neon / Supabase / dokploy-hosted — free tier is fine for UAT); dev stays local docker. A hosted UAT backend cannot reach a laptop DB anyway — separation is forced, not optional.
+
+---
+
+#### Environment matrix
+
+| Variable                          | dev (stubs)             | dev (live)                                                  | UAT                                                               | prod                                                      |
+| --------------------------------- | ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
+| `NODE_ENV`                        | `development`           | `development`                                               | `production`                                                      | `production`                                              |
+| `BACKEND_URL` / `FRONTEND_URL`    | localhost               | localhost (+ `dev-api.tailortales.app` tunnel for webhooks) | `https://api-uat.tailortales.app` / `https://uat.tailortales.app` | `https://api.tailortales.app` / `https://tailortales.app` |
+| `DATABASE_URL`                    | local docker postgres   | same local postgres                                         | dedicated managed UAT DB                                          | dedicated managed prod DB                                 |
+| `REDIS_URL`                       | local docker redis      | same local redis                                            | managed redis                                                     | managed redis                                             |
+| `GOOGLE_CLIENT_ID/SECRET`         | dev OAuth app           | dev OAuth app                                               | UAT OAuth app                                                     | prod OAuth app (isolated)                                 |
+| `JWT_SECRET`                      | any local value         | any local value                                             | strong random secret                                              | strong random secret (different from UAT)                 |
+| `USE_AI_STUBS`                    | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
+| `OPENROUTER_TEXT_MODEL`           | — (stubs)               | cheap/fast model                                            | cheap/fast model (e.g. `google/gemini-flash-1.5-8b`)              | quality model (e.g. `google/gemini-2.0-flash`)            |
+| `OPENROUTER_IMAGE_MODEL`          | — (stubs)               | cheap model                                                 | cheap model                                                       | quality model                                             |
+| `USE_EMAIL_STUBS`                 | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
+| `RESEND_API_KEY`                  | — (stubs)               | real key                                                    | real key                                                          | real key (separate for tracking)                          |
+| `RESEND_FROM`                     | —                       | `TailorTales Dev <dev@tailortales.app>`                     | `TailorTales UAT <uat@tailortales.app>`                           | `TailorTales <stories@tailortales.app>`                   |
+| `USE_PADDLE_STUBS`                | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
+| `PADDLE_ENVIRONMENT`              | —                       | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
+| `PADDLE_API_KEY`                  | —                       | `_sdbx_…` (shared sandbox)                                  | `_sdbx_…` (same sandbox)                                          | `_live_…`                                                 |
+| `PADDLE_WEBHOOK_SECRET`           | —                       | secret of dev destination                                   | secret of UAT destination                                         | secret of live destination                                |
+| `PADDLE_PRICE_ID_*`               | —                       | sandbox price IDs                                           | sandbox price IDs (same)                                          | live price IDs                                            |
+| `STORAGE_ENDPOINT`                | `http://localhost:9000` | `http://localhost:9000`                                     | —                                                                 | —                                                         |
+| `STORAGE_FORCE_PATH_STYLE`        | `true`                  | `true`                                                      | `false`                                                           | `false`                                                   |
+| `STORAGE_BUCKET`                  | `tailortales`           | `tailortales`                                               | `tailortales-uat`                                                 | `tailortales-prod`                                        |
+| `STORAGE_ACCESS_KEY/SECRET`       | `minioadmin`            | `minioadmin`                                                | AWS IAM credentials                                               | AWS IAM credentials (separate user)                       |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | —                       | sandbox client token                                        | sandbox client token                                              | live client token                                         |
+| `NEXT_PUBLIC_PADDLE_ENV`          | `sandbox`               | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
+| `NEXT_PUBLIC_BACKEND_URL`         | `http://localhost:3001` | `http://localhost:3001`                                     | `https://api-uat.tailortales.app`                                 | `https://api.tailortales.app`                             |
+| `NEXT_PUBLIC_STORAGE_URL`         | `http://localhost:9000` | `http://localhost:9000`                                     | CloudFront or S3 URL                                              | CloudFront or S3 URL                                      |
+
+---
+
+#### Sub-tasks
+
+**Infrastructure**
+
+- [ ] Buy domain (`tailortales.app` or similar) and put DNS on Cloudflare (free plan)
+- [ ] Cloudflare **named tunnel** `dev-api.<domain> → localhost:3001` — static dev webhook URL (replaces quick tunnels)
+- [ ] Provision UAT server (dokploy app) — separate from prod
+- [ ] Provision prod server (dokploy app)
+- [ ] Domain + HTTPS for both (handled by dokploy / Cloudflare)
+- [ ] AWS S3 buckets: `tailortales-uat` + `tailortales-prod` (separate IAM users per bucket)
+- [ ] Managed Postgres + Redis for UAT; separate for prod
+- [ ] Backup strategy for prod Postgres + S3 documented and configured
+
+**Local env profiles**
+
+- [ ] Create `.env.live` overlay (gitignored) + `.env.live.example` committed
+- [ ] Add `pnpm dev:live` script loading `.env.live` (dotenv-cli or equivalent) — no manual `.env` editing to switch profiles
+
+**Google OAuth**
+
+- [ ] Create UAT Google OAuth app (authorized redirect: UAT domain)
+- [ ] Create prod Google OAuth app (authorized redirect: prod domain; isolated from dev/UAT)
+
+**Paddle**
+
+- [ ] Complete Paddle sandbox setup from `_docs/phase-9-subscriptions.md` (sandbox account already started in Phase 9)
+- [ ] Sandbox: register **two webhook destinations** — dev (`dev-api.<domain>/webhooks/paddle`) + UAT (`api-uat.<domain>/webhooks/paddle`); each env gets its own destination's signing secret
+- [ ] Register Paddle live/production vendor account — start early, business verification takes days
+- [ ] Create live catalog (2 products + monthly prices matching sandbox)
+- [ ] **Request website approval** for `tailortales.app` in Paddle Dashboard → Checkout → Default payment link — Paddle must approve the domain before live checkout works; submit as soon as the domain is live
+- [ ] Configure live webhook destination (prod domain); note live uses `PADDLE_ENVIRONMENT=production`
+- [ ] Run `pnpm seed:pricing-tiers` on each env with correct Paddle IDs from env vars
+
+**Resend**
+
+- [ ] Verify domain in Resend (once — covers all envs; Resend is outbound-only, no per-env setup)
+- [ ] Per-env `RESEND_FROM` (`dev@` / `uat@` / `stories@`); optionally separate API keys for usage tracking
+
+**OpenRouter**
+
+- [ ] Confirm single OpenRouter account is sufficient (no env isolation needed — model names differ per env)
+- [ ] Set cheaper models for UAT (`OPENROUTER_TEXT_MODEL` / `OPENROUTER_IMAGE_MODEL`) to keep UAT generation cost low
+
+**Deployment pipeline (dokploy)**
+
+- [ ] Dockerfiles tested end-to-end for both backend and frontend
+- [ ] Graceful shutdown verified — BullMQ worker drains in-flight jobs on SIGTERM before process exit (prevents mid-generation kills on deploy)
+- [ ] dokploy env var injection configured per environment (no secrets in repo)
+- [ ] `prisma migrate deploy` wired as automatic pre-start/release step on UAT and prod (schema sync = git + deploy, never manual)
+- [ ] Zero-downtime deploy strategy confirmed (dokploy rolling or blue-green)
+
+**First-deploy runbook** _(per environment, in order)_
+
+- [ ] Run DB migrations (`prisma migrate deploy`)
+- [ ] Run `pnpm seed:pricing-tiers` with env-specific Paddle IDs
+- [ ] Verify `BACKEND_URL` is correct — used for self-hosted PDF fonts; wrong URL = broken fonts in all PDFs
+- [ ] Smoke test: login → generate 1 story → download PDF → check watermark (free tier)
+- [ ] Verify Paddle webhook round-trip: sandbox/live checkout → `subscription.activated` → tier flip in DB
 
 **Acceptance Check:**
 
-- App reachable on production domain
-- End-to-end flow works (login → generate → download)
-- Backups configured
+- UAT and prod reachable on their domains
+- End-to-end flow works on prod (login → generate → download)
+- Paddle live checkout completes and tier flips
+- PDF fonts render correctly (not fallback system fonts)
+- Backups configured and tested with a restore drill
+- All `USE_*_STUBS` flags are `false` on prod
 
-**Deliverables:** `_docs/phase-15-deploy.md` + ROADMAP progress.
+- [ ] Audit and expand `package.json` scripts for each environment — ensure `dev`, `build`, `start`, `migrate`, `seed`, and any CI scripts are correct and complete for UAT and prod contexts; add missing scripts (e.g. `migrate:prod`, `seed:prod`) if needed
+
+**Deliverables:** `_docs/phase-15-deploy.md` (ops runbook + env var reference) + ROADMAP progress.
 
 ---
 
