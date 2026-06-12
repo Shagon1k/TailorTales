@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { NotificationEmitterService } from '../notifications/notification-emitter.service.js';
 import { PricingTiersService } from '../pricing-tiers/pricing-tiers.service.js';
 import type { IPaddleEvent } from './billing.types.js';
 
@@ -16,6 +17,7 @@ export class BillingWebhookService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly pricingTiers: PricingTiersService,
+        private readonly notifications: NotificationEmitterService,
     ) {}
 
     async handleEvent(event: IPaddleEvent): Promise<void> {
@@ -103,6 +105,10 @@ export class BillingWebhookService {
         this.logger.log(
             `Subscription ${event.data.id} updated (tier ${tier.name}, newCycle=${isNewBillingCycle})`,
         );
+
+        if (isNewBillingCycle && tier.id === subscription.pricingTierId) {
+            await this.notifications.subscriptionRenewed(subscription.userId, tier.name);
+        }
     }
 
     /** Period ended after a scheduled cancel — revert to the free tier. */
@@ -134,28 +140,43 @@ export class BillingWebhookService {
         });
 
         this.logger.log(`Subscription ${event.data.id} canceled — user reverted to free tier`);
+
+        await this.notifications.subscriptionCanceled(subscription.userId);
     }
 
-    /** Payment failed / dunning — keep tier access, flag the status (Phase 10 emails react to it). */
+    /** Payment failed / dunning — keep tier access, flag the status, notify the user. */
     private async handlePaymentTrouble(event: IPaddleEvent): Promise<void> {
         // subscription.past_due carries the subscription id as data.id;
         // transaction.payment_failed carries it as data.subscriptionId (data.id is the txn).
         const paddleSubscriptionId = event.data.subscriptionId ?? event.data.id;
 
-        const result = await this.prisma.subscription.updateMany({
+        const subscription = await this.prisma.subscription.findUnique({
             where: { paddleSubscriptionId },
-            data: { status: 'PAST_DUE' },
         });
-
-        if (result.count === 0) {
+        if (!subscription) {
             this.logger.warn(
                 `${event.eventType} for unknown Paddle subscription ${paddleSubscriptionId} — ignoring`,
             );
             return;
         }
+
+        // Already flagged — a retried/duplicate dunning event must not re-notify.
+        if (subscription.status === 'PAST_DUE') {
+            this.logger.log(
+                `Subscription ${paddleSubscriptionId} already PAST_DUE — skipping duplicate ${event.eventType}`,
+            );
+            return;
+        }
+
+        await this.prisma.subscription.update({
+            where: { id: subscription.id },
+            data: { status: 'PAST_DUE' },
+        });
         this.logger.warn(
             `Subscription ${paddleSubscriptionId} marked PAST_DUE (${event.eventType})`,
         );
+
+        await this.notifications.paymentFailed(subscription.userId);
     }
 
     private async resolveTier(event: IPaddleEvent) {

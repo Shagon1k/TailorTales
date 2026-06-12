@@ -1,11 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EMAIL_CLIENT, type IEmailClient } from '../email/email.types.js';
-import {
-    contactFormHtml,
-    contactFormSubject,
-    contactFormText,
-} from '../email/templates/contact-form.template.js';
+import { contactFormEmail } from '../email/templates/contact-form.template.js';
 import { ContactDto } from './dto/contact.dto.js';
 
 @Injectable()
@@ -23,13 +19,7 @@ export class ContactService {
 
         await this.email.send({
             to: inbox,
-            subject: contactFormSubject(dto.name),
-            html: contactFormHtml({
-                senderName: dto.name,
-                senderEmail: dto.email,
-                message: dto.message,
-            }),
-            text: contactFormText({
+            ...contactFormEmail({
                 senderName: dto.name,
                 senderEmail: dto.email,
                 message: dto.message,

@@ -50,6 +50,8 @@ enum JobStatus {
 enum NotificationType {
   STORY_COMPLETED
   STORY_FAILED
+  PAYMENT_FAILED
+  SUBSCRIPTION_CANCELED
 }
 
 enum SubscriptionStatus {
@@ -65,6 +67,8 @@ model User {
   name      String
   avatarUrl String?
   role      Role     @default(USER)
+  /** Partial per-event channel toggles — null means all defaults (everything on). */
+  notificationPreferences Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

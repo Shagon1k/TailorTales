@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaModule } from '../../prisma/prisma.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 import { PricingTiersModule } from '../pricing-tiers/pricing-tiers.module.js';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module.js';
 import { BillingController } from './billing.controller.js';
@@ -11,7 +12,7 @@ import { PaddleStubClient } from './paddle-stub.client.js';
 import { WebhookController } from './webhook.controller.js';
 
 @Module({
-    imports: [PrismaModule, PricingTiersModule, SubscriptionsModule],
+    imports: [PrismaModule, PricingTiersModule, SubscriptionsModule, NotificationsModule],
     controllers: [WebhookController, BillingController],
     providers: [
         PaddleStubClient,

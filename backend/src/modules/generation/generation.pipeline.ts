@@ -14,7 +14,7 @@ import { StorageKeys } from '../storage/storage.keys.js';
 import { PdfBindingService } from '../rendering/pdf-binding.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import { AI_CLIENT, type IAiClient, type IStoryPlan } from '../ai/ai.types.js';
-import { NotificationsService } from '../notifications/notifications.service.js';
+import { NotificationEmitterService } from '../notifications/notification-emitter.service.js';
 import { QuotaService } from '../subscriptions/quota.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
@@ -35,7 +35,7 @@ export class GenerationPipeline {
         private readonly pdfBinding: PdfBindingService,
         private readonly promptBuilder: StoryPromptBuilder,
         private readonly validator: StoryPlanValidator,
-        private readonly notifications: NotificationsService,
+        private readonly notifications: NotificationEmitterService,
         private readonly quotaService: QuotaService,
         @Inject(AI_CLIENT) private readonly ai: IAiClient,
     ) {}
@@ -73,7 +73,7 @@ export class GenerationPipeline {
             });
 
             // Notification (DB bell record + email) — failure here must not undo
-            // the successful generation, so notifications.service swallows email errors.
+            // the successful generation, so the notification emitter swallows email errors.
             await this.notifications.storyCompleted(story.userId, {
                 storyId: story.id,
                 title: storyPlan.title,

@@ -5,7 +5,7 @@ import { StoryPlanValidator } from '../story-plan.validator.js';
 import { PdfBindingService } from '../../rendering/pdf-binding.service.js';
 import { AI_CLIENT } from '../../ai/ai.types.js';
 import { AiStubClient } from '../../ai/ai-stub.client.js';
-import { NotificationsService } from '../../notifications/notifications.service.js';
+import { NotificationEmitterService } from '../../notifications/notification-emitter.service.js';
 import { QuotaService } from '../../subscriptions/quota.service.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { StorageService } from '../../storage/storage.service.js';
@@ -122,7 +122,7 @@ describe('GenerationPipeline', () => {
                 { provide: PrismaService, useValue: mockPrisma },
                 { provide: StorageService, useValue: mockStorage },
                 { provide: PdfBindingService, useValue: mockPdfBinding },
-                { provide: NotificationsService, useValue: mockNotifications },
+                { provide: NotificationEmitterService, useValue: mockNotifications },
                 { provide: QuotaService, useValue: mockQuota },
             ],
         }).compile();
@@ -190,7 +190,7 @@ describe('GenerationPipeline', () => {
                     { provide: PrismaService, useValue: mockPrisma },
                     { provide: StorageService, useValue: mockStorage },
                     { provide: PdfBindingService, useValue: mockPdfBinding },
-                    { provide: NotificationsService, useValue: mockNotifications },
+                    { provide: NotificationEmitterService, useValue: mockNotifications },
                     { provide: QuotaService, useValue: mockQuota },
                 ],
             }).compile();
