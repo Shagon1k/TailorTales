@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 enum Gender {
@@ -67,6 +68,8 @@ model User {
   name      String
   avatarUrl String?
   role      Role     @default(USER)
+  /** Set when an admin suspends the account; blocks auth while non-null. */
+  suspendedAt DateTime?
   /** Partial per-event channel toggles — null means all defaults (everything on). */
   notificationPreferences Json?
   createdAt DateTime @default(now())
