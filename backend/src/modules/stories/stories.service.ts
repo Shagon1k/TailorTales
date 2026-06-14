@@ -6,11 +6,11 @@ import { PdfRendererService } from '../rendering/pdf-renderer.service.js';
 import { QuotaService } from '../subscriptions/quota.service.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
 import { PUBLIC_STORIES_LIMIT } from './stories.constants.js';
-import type { IStoryDetail, IStorySummary } from './stories.types.js';
+import type { IStoryArtStyle, IStoryDetail, IStorySummary } from './stories.types.js';
 
 type StoryWithRelations = Story & {
     child: Pick<Child, 'id' | 'name' | 'birthdate'>;
-    artStyle: Pick<ArtStyle, 'id' | 'name' | 'slug' | 'thumbnailUrl'>;
+    artStyle: Pick<ArtStyle, 'id' | 'name' | 'slug' | 'thumbnailKey'>;
     // At most one rating per story — only the owner can rate it.
     ratings: { score: number; comment: string | null }[];
 };
@@ -19,7 +19,7 @@ type StoryWithRelationsAndPages = StoryWithRelations & { pages: Page[] };
 
 const STORY_LIST_INCLUDE = {
     child: { select: { id: true, name: true, birthdate: true } },
-    artStyle: { select: { id: true, name: true, slug: true, thumbnailUrl: true } },
+    artStyle: { select: { id: true, name: true, slug: true, thumbnailKey: true } },
     ratings: { select: { score: true, comment: true } },
 } as const;
 
@@ -159,17 +159,28 @@ export class StoriesService {
 
     private async toSummary(story: StoryWithRelations): Promise<IStorySummary> {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { coverImageKey, pdfKey: _pdfKey, ratings, ...rest } = story;
+        const { coverImageKey, pdfKey: _pdfKey, ratings, artStyle, ...rest } = story;
 
         return {
             ...rest,
+            artStyle: await this.toArtStyleEmbed(artStyle),
             coverImageUrl: coverImageKey ? await this.storage.getSignedUrl(coverImageKey) : null,
             rating: ratings[0]?.score ?? null,
         };
     }
 
+    private async toArtStyleEmbed(
+        artStyle: StoryWithRelations['artStyle'],
+    ): Promise<IStoryArtStyle> {
+        const { thumbnailKey, ...rest } = artStyle;
+        return {
+            ...rest,
+            thumbnailUrl: thumbnailKey ? await this.storage.getSignedUrl(thumbnailKey) : null,
+        };
+    }
+
     private async toDetail(story: StoryWithRelationsAndPages): Promise<IStoryDetail> {
-        const { coverImageKey, pdfKey, pages, ratings, ...rest } = story;
+        const { coverImageKey, pdfKey, pages, ratings, artStyle, ...rest } = story;
 
         const resolvedPages = await Promise.all(
             pages.map(async (page) => {
@@ -193,6 +204,7 @@ export class StoriesService {
 
         return {
             ...rest,
+            artStyle: await this.toArtStyleEmbed(artStyle),
             pages: resolvedPages,
             coverImageUrl: coverImageKey ? await this.storage.getSignedUrl(coverImageKey) : null,
             pdfUrl: pdfKey ? await this.storage.getSignedUrl(pdfKey) : null,

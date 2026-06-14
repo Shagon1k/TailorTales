@@ -14,11 +14,11 @@ const MOCK_CHILD: Pick<Child, 'id' | 'name' | 'birthdate'> = {
     birthdate: new Date('2020-03-10'),
 };
 
-const MOCK_ART_STYLE: Pick<ArtStyle, 'id' | 'name' | 'slug' | 'thumbnailUrl'> = {
+const MOCK_ART_STYLE: Pick<ArtStyle, 'id' | 'name' | 'slug' | 'thumbnailKey'> = {
     id: 'style-1',
     name: 'Storybook',
     slug: 'storybook',
-    thumbnailUrl: 'https://example.com/thumb.jpg',
+    thumbnailKey: null,
 };
 
 const MOCK_STORY: Story = {

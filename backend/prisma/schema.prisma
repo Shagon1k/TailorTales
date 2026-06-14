@@ -151,7 +151,8 @@ model ArtStyle {
   id           String   @id @default(cuid())
   name         String
   slug         String   @unique
-  thumbnailUrl String?
+  /** S3 key of the generated sample thumbnail. Signed at serve time — DB never stores URLs. */
+  thumbnailKey String?
   promptPrefix String
   isActive     Boolean  @default(true)
   order        Int

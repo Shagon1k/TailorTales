@@ -27,4 +27,7 @@ export const StorageKeys = {
     /** AI-generated preview image for a Character. Private — signed URL after ownership check. */
     characterPreview: (userId: string, characterId: string): string =>
         `users/${userId}/characters/${characterId}/preview`,
+
+    /** AI-generated sample thumbnail for an ArtStyle. Admin-generated; signed at serve time. */
+    artStyleThumbnail: (artStyleId: string): string => `art-styles/${artStyleId}/thumbnail`,
 };
