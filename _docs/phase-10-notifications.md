@@ -1,80 +1,112 @@
 # Phase 10 — Notifications
 
-> Status: 🚧 In progress (plan approved, implementing increment by increment)
+> Status: ✅ Completed on 2026-06-14
 > Related ROADMAP section: Phase 10
-> This file is a staging doc — converts to the TEMPLATE.md format on phase completion.
 
-## Plan
+## Summary
 
-### Current state (investigation, 2026-06-12)
+Phase 10 turns the notification stub (Phase 5 created the `Notification` model and
+story-event records; Phase 6 added an unread-count polling shim) into the full feature:
+a real-time in-app bell, subscription-event notifications driven by Paddle webhooks,
+and a user-facing preferences screen. The bell now updates instantly over SSE instead
+of polling, and every event honours per-user, per-channel toggles.
+
+## What Was Added
+
+- **Entities:** no new model. Added `User.notificationPreferences` (`Json?`) and two
+  `NotificationType` enum values — `PAYMENT_FAILED`, `SUBSCRIPTION_CANCELED`.
+- **Modules / services:**
+    - `NotificationsService` — the inbox: list, unread count, mark-(all-)read,
+      `createBellRecord`, SSE stream, get/update preferences.
+    - `NotificationEmitterService` — turns app events into notifications (load user →
+      check prefs → bell record → email). Consumed by the generation pipeline and the
+      billing webhook handler.
+- **Endpoints (all under `JwtAuthGuard`):**
+    - `GET /notifications` — last 20, newest first
+    - `PATCH /notifications/:id/read` — ownership-checked
+    - `PATCH /notifications/read-all`
+    - `GET /notifications/unread-count` — REST fallback for first paint
+    - `GET /notifications/stream` — SSE, pushes `{ type: 'unread-count', count }`
+    - `GET` / `PATCH /notifications/preferences`
+- **Emails:** Resend templates for `payment-failed`, `subscription-canceled`,
+  `subscription-renewed`; all templates refactored to single `xxxEmail(): IEmailContent`
+  builders sharing one `escapeHtml` helper.
+- **Frontend pages / components:**
+    - `NotificationCenter` (bell + dropdown, live via `EventSource`) with presentational
+      `NotificationList`; replaced the Phase 6 polling shim in `Header.tsx`.
+    - `HeaderUserChip` became a `Popover` account menu (My account / Subscription /
+      Children + set-apart Sign out).
+    - `/account/notifications` preferences page — per-event email/in-app toggles with
+      optimistic updates.
+    - New UI atoms: `Popover` (styled dropdown surface) and `Switch`.
+
+## Resulting Structure
 
 ```
-ALREADY EXISTS (Phase 5/6/9)
-├─ Prisma: Notification model (id, userId, type, payload Json, readAt?, createdAt)
-│    NotificationType enum = STORY_COMPLETED | STORY_FAILED
-├─ backend/modules/notifications/
-│    NotificationsService.storyCompleted/.storyFailed  → bell record + email
-│    GET /notifications/unread-count, PATCH /notifications/read-all
-├─ backend/modules/email/  → IEmailClient (Resend + stub), 3 templates
-├─ backend/modules/billing/billing-webhook.service.ts
-│    handleUpdated (renewal = isNewBillingCycle), handleCanceled,
-│    handlePaymentTrouble — Phase 10 emails hook in here
-├─ SSE reference: @Sse(':id/progress') in stories.controller + generation.service
-│    (Observable<MessageEvent>); FE: new EventSource(url, { withCredentials: true })
-│    Auth: JWT read from access_token cookie → EventSource works as-is
-├─ FE: Header.tsx — 30s polling shim (REMOVE), bell click = mark-all-read (REPLACE)
-│    NotificationBell — visual shell with count badge (KEEP, wrap with dropdown)
-└─ FE: /account/notifications — "coming soon" placeholder
+backend/src/modules/
+  notifications/
+    notifications.service.ts            # inbox + SSE + preferences
+    notification-emitter.service.ts     # event → notification
+    notification-preferences.ts         # mergePreferences (defaults)
+    notifications.constants.ts
+    dto/update-notification-preferences.dto.ts
+  email/templates/
+    escape-html.ts
+    payment-failed.template.ts
+    subscription-canceled.template.ts
+    subscription-renewed.template.ts
+frontend/src/
+  components/ui/Popover/                 # new atom
+  components/ui/Switch/                  # new atom
+  components/shared/Header/components/
+    NotificationCenter/                  # bell + dropdown + NotificationList
+  app/(private)/account/notifications/   # preferences page + NotificationPreferences
+  api/notifications.ts · hooks/notifications.ts · types/notification.types.ts
 ```
 
-### Decisions
+## Database Migrations
 
-| Decision             | Choice                                                      | Why                                                                                             |
-| -------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Preferences storage  | `notificationPreferences Json` column on `User`             | No joins/seeding; defaults merged in code; matches existing `Notification.payload Json` pattern |
-| payment_failed email | Always sent — no email toggle (in-app toggle still offered) | Billing-critical: user risks losing the plan without knowing                                    |
-| Real-time bell       | SSE `GET /notifications/stream` per ROADMAP                 | Polling shim was explicitly temporary                                                           |
+- `20260612090000_add_subscription_notification_types` — adds `PAYMENT_FAILED`,
+  `SUBSCRIPTION_CANCELED` to the `NotificationType` enum.
+- `20260612091000_add_user_notification_preferences` — adds `User.notificationPreferences`
+  (`JSONB`, nullable; null = all defaults on).
 
-### Preference shape (defaults in code, all `true`)
+## Configuration / Environment Variables
 
-```json
-// User.notificationPreferences — partial overrides merged over defaults
-{
-    "storyCompleted": { "email": true, "inApp": true },
-    "storyFailed": { "email": true, "inApp": true },
-    "paymentFailed": { "inApp": true }, // email not toggleable
-    "subscriptionCanceled": { "email": true, "inApp": true },
-    "subscriptionRenewed": { "email": true } // email-only event, no bell record
-}
-```
+None new. Emails use the existing `EMAIL_CLIENT` (Resend / stub); SSE auth reuses the
+`access_token` cookie consumed by `JwtAuthGuard`.
 
-### Increments (implement → human approve → commit → next)
+## Key Decisions
 
-1. **BE: notifications REST API** — `GET /notifications` (last 20, newest first),
-   `PATCH /notifications/:id/read` (ownership-checked). Service + controller + tests.
-2. **BE: SSE stream** — `GET /notifications/stream`; in-memory `Map<userId, Subject>` in
-   `NotificationsService`; push `{ type: 'unread-count', count }` on every create /
-   mark-read / mark-all-read. Tests.
-3. **BE: subscription event notifications** — migration adds `PAYMENT_FAILED`,
-   `SUBSCRIPTION_CANCELED` to `NotificationType`; 3 email templates (payment-failed,
-   subscription-canceled, subscription-renewed); emit from `BillingWebhookService`
-   (renewed = `handleUpdated` with `isNewBillingCycle`; canceled = `handleCanceled`;
-   payment failed = `handlePaymentTrouble`). Tests with stub email client.
-4. **BE: preferences** — `notificationPreferences Json` migration; `GET/PATCH
-/notifications/preferences`; enforcement inside `NotificationsService` send paths
-   (all event types, incl. Phase 5 story events). Tests.
-5. **FE: bell dropdown** — dropdown with last 20 notifications, unread badge,
-   mark-as-read on open + individual + "mark all as read"; replace polling `useEffect`
-   with `EventSource('/notifications/stream')` (REST unread-count stays for initial
-   load). Removes the Phase 6 shim behavior. Component tests. _(ask for design
-   screenshot before building)_
-6. **FE: /account/notifications page** — per-event email/in-app toggles wired to
-   preferences endpoints. Component tests. _(ask for design screenshot before building)_
-7. **Docs** — finalize this file per TEMPLATE.md, tick ROADMAP Phase 10 boxes,
-   propose CLAUDE.md/rules updates if any pattern emerged.
+- **Preferences storage:** `User.notificationPreferences` JSON column over a separate
+  model — no joins/seeding, defaults merged in code, survives adding event types.
+- **`payment_failed` email is always sent** — billing-critical, no email toggle (the
+  in-app bell is still toggleable).
+- **`subscription_renewed`** is email-only (no bell record), and only fires on a _new
+  billing cycle on the same tier_ (a tier change is a plan change, not a renewal).
+- **Real-time via SSE**, mirroring `StoriesModule`'s progress stream: an in-memory
+  `Map<userId, Subject>` fans out the unread count to a user's open tabs.
 
-### Out of scope
+## Gotchas & Known Limitations
 
-- Notification pagination beyond last 20 (YAGNI — ROADMAP asks for 20)
-- Push/web-push channels; email digest batching
-- Admin notification views (Phase 12)
+- SSE state is in-memory per process: a missed push only delays the bell until the next
+  page load (the REST unread-count covers first paint, and `EventSource` auto-reconnects).
+  Multi-instance deployments would need a shared pub/sub (e.g. Redis) — out of scope.
+- Subscription-event delivery is covered by unit tests with the stub email/Paddle clients;
+  a live end-to-end Paddle webhook → email was not exercised.
+- The `/account` layout (sidebar) and the header are not yet mobile-responsive — flagged
+  separately, not part of this phase.
+
+## Tests
+
+- Backend (`pnpm --filter backend test`): `notifications.service`, `notification-emitter.service`,
+  `notification-preferences`, and extended `billing-webhook.service` specs (event emission,
+  dunning idempotency, renewal-vs-plan-change).
+- Frontend (`pnpm --filter frontend test`): `NotificationCenter`, `NotificationList`,
+  `HeaderUserChip`, `NotificationPreferences`, plus `Popover` and `Switch` atoms.
+
+## Follow-ups / Open Items
+
+- Mobile-responsive header + account layout (separate task).
+- Shared pub/sub for SSE if/when the backend runs multi-instance.
+- Live Paddle webhook verification before production.

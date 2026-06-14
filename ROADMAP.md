@@ -217,7 +217,7 @@ Privacy · Contact _(both static pages)_
 
 - Image moderation provider — OpenRouter image-model safety flags are the default; an explicit image-moderation provider is TBD if coverage proves insufficient.
 - Backup strategy specifics for Postgres + S3 — confirm in Phase 15.
-- Notification preferences storage — `User` JSON field vs separate `NotificationPreference` model — decide in Phase 10.
+- ~~Notification preferences storage — `User` JSON field vs separate `NotificationPreference` model — decide in Phase 10.~~ **Resolved (Phase 10):** `User.notificationPreferences` JSON column; defaults merged in code.
 - Static page copy — all four static pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) contain placeholder copy. Deferred to a dedicated content pass before launch. See Deferred Decision #5.
 - GDPR launch readiness — confirm privacy policy copy, sub-processor list, data export/delete behavior, retention periods, and child/reference-image handling before production deploy.
 
@@ -750,18 +750,18 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **Sub-tasks:**
 
-- [ ] `Notification` model — **created in Phase 5** (story_completed / story_failed bell records). This phase builds the module (endpoints), the bell UI, and preferences on top of it; no new model.
-- [ ] Notifications module: list (`GET /notifications`), mark-as-read (`PATCH /notifications/:id/read`), mark-all-read endpoints, `GET /notifications/stream` (SSE — real-time bell updates)
-- [ ] Subscription event notifications (emit on Paddle webhook events): payment_failed (bell + email), subscription_canceled (bell + email), subscription_renewed (email only)
-- [ ] Resend email templates for all remaining event types
-- [ ] Frontend: private header — wire notification bell (was shell in Phase 3):
+- [x] `Notification` model — **created in Phase 5** (story_completed / story_failed bell records). This phase builds the module (endpoints), the bell UI, and preferences on top of it; no new model.
+- [x] Notifications module: list (`GET /notifications`), mark-as-read (`PATCH /notifications/:id/read`), mark-all-read endpoints, `GET /notifications/stream` (SSE — real-time bell updates)
+- [x] Subscription event notifications (emit on Paddle webhook events): payment_failed (bell + email), subscription_canceled (bell + email), subscription_renewed (email only)
+- [x] Resend email templates for all remaining event types
+- [x] Frontend: private header — wire notification bell (was shell in Phase 3):
     - Dropdown showing last 20 notifications
     - Unread badge count
     - Mark-as-read on open / individual mark-as-read
     - "Mark all as read" action
-- [ ] Frontend: `/account` → Notifications section wired: per-event toggles (email vs in-app on/off)
-- [ ] User notification preferences stored on `User` or separate `NotificationPreference` model (decide at implementation)
-- [ ] Tests: notification creation, email sending (mocked), mark-as-read, preferences respected
+- [x] Frontend: `/account` → Notifications section wired: per-event toggles (email vs in-app on/off)
+- [x] User notification preferences stored on `User` or separate `NotificationPreference` model (decide at implementation) — chose `User.notificationPreferences` JSON column
+- [x] Tests: notification creation, email sending (mocked), mark-as-read, preferences respected
 
 **Acceptance Check:**
 

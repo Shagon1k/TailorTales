@@ -22,6 +22,11 @@ every route unless it has `@Public()`. The generation pipeline (BullMQ) has its 
 - `@nestjs/mapped-types` is not installed. Write `UpdateDto` fields manually with `@IsOptional()`.
 - Extract business-rule constants to `<module>.constants.ts`. Derived values (e.g. `MAX_AGE_MS`) stay local, computed from the exported constant.
 
+## Real-time (SSE)
+
+- Push with `@Sse()` returning `Observable<MessageEvent>` (see `StoriesModule` progress and `NotificationsService` unread-count). For per-user fan-out, hold an in-memory `Map<userId, Subject>`: create on first subscribe, `subject.next(...)` on writes, drop when the last connection closes (`!subject.observed`).
+- In-memory by design — pair with a REST fallback for first paint (`EventSource` auto-reconnects). A missed push only delays until the next load. Needs shared pub/sub (e.g. Redis) only if the backend runs multi-instance.
+
 ## Storage
 
 - The DB stores S3 **keys, never URLs** (`pdfKey`, `coverImageKey`, `Page.illustrations[].key`). Sign at serve time with `StorageService.getSignedUrl()` after an ownership check. Key patterns live in `storage.keys.ts` — add new ones there, don't build key strings inline.
