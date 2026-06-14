@@ -1,5 +1,9 @@
 import { apiFetch, getApiBaseUrl } from '@/lib/api';
-import type { INotification } from '@/types/notification.types';
+import type {
+    INotification,
+    INotificationPreferences,
+    INotificationPreferencesUpdate,
+} from '@/types/notification.types';
 
 export const notificationsApi = {
     /** Last 20 notifications, newest first. */
@@ -14,6 +18,17 @@ export const notificationsApi = {
         apiFetch(`/notifications/${id}/read`, { method: 'PATCH' }),
 
     markAllRead: (): Promise<void> => apiFetch('/notifications/read-all', { method: 'PATCH' }),
+
+    getPreferences: (): Promise<INotificationPreferences> =>
+        apiFetch<INotificationPreferences>('/notifications/preferences'),
+
+    updatePreferences: (
+        payload: INotificationPreferencesUpdate,
+    ): Promise<INotificationPreferences> =>
+        apiFetch<INotificationPreferences>('/notifications/preferences', {
+            method: 'PATCH',
+            body: JSON.stringify(payload),
+        }),
 
     /**
      * SSE stream pushing `{ type: 'unread-count', count }` on connect and on
