@@ -22,6 +22,7 @@ import { BillingModule } from './modules/billing/billing.module.js';
 import { PricingTiersModule } from './modules/pricing-tiers/pricing-tiers.module.js';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module.js';
 import { RatingsModule } from './modules/ratings/ratings.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -56,6 +57,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
         SubscriptionsModule,
         BillingModule,
         RatingsModule,
+        AdminModule,
     ],
     controllers: [AppController],
     providers: [
