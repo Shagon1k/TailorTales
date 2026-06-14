@@ -12,6 +12,7 @@ const MOCK_ADMIN: User = {
     email: 'admin@example.com',
     name: 'Admin',
     avatarUrl: null,
+    notificationPreferences: null,
     role: 'ADMIN',
     createdAt: new Date(),
     updatedAt: new Date(),

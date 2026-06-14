@@ -1,3 +1,9 @@
+export interface IEmailContent {
+    subject: string;
+    html: string;
+    text: string;
+}
+
 export interface ISendEmailInput {
     to: string;
     subject: string;

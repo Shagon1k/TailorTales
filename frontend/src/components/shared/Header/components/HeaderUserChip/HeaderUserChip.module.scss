@@ -3,17 +3,57 @@
 .chip {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-5) var(--space-1) var(--space-2);
     border-radius: var(--radius-pill);
+    border: 1px solid var(--border-strong);
     text-decoration: none;
     color: var(--text-primary);
     background: var(--bg-elevated);
-    transition: background var(--duration-base) var(--ease-out);
+    font: inherit;
+    cursor: pointer;
+    transition:
+        background var(--duration-base) var(--ease-out),
+        border-color var(--duration-base) var(--ease-out);
     min-height: var(--hit-min);
+
+    &:hover,
+    &[aria-expanded='true'] {
+        background: var(--bg-elevated-hover);
+        border-color: var(--text-muted);
+    }
+}
+
+.menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    @include t-body-base;
+    transition: background var(--duration-base) var(--ease-out);
 
     &:hover {
         background: var(--bg-elevated-hover);
+    }
+
+    /* >3 items: sign-out is set apart with a small gap and a mild-caution tint. */
+    &.m-sign-out {
+        margin-top: var(--space-1);
+        color: var(--accent-warm);
     }
 }
 

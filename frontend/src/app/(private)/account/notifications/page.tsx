@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = { title: 'Notifications' };
+import NotificationPreferences from './_components/NotificationPreferences/NotificationPreferences';
 
 export default function NotificationsPage(): React.ReactElement {
-    return <div>Notifications — coming soon</div>;
+    return <NotificationPreferences />;
 }

@@ -1,98 +1,166 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { NotificationsService } from '../notifications.service.js';
-import { EMAIL_CLIENT } from '../../email/email.types.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 
 const USER_ID = 'user-1';
-const mockUser = { id: USER_ID, email: 'parent@example.com', name: 'Hannah' };
 
-function buildMocks() {
+function buildPrismaMock() {
     return {
-        prisma: {
-            notification: { create: vi.fn().mockResolvedValue({}) },
-            user: { findUnique: vi.fn().mockResolvedValue(mockUser) },
+        notification: {
+            create: vi.fn().mockResolvedValue({}),
+            findMany: vi.fn().mockResolvedValue([]),
+            updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+            count: vi.fn().mockResolvedValue(0),
         },
-        email: {
-            send: vi.fn().mockResolvedValue({ id: 'email-1' }),
-        },
-        config: {
-            getOrThrow: vi.fn().mockReturnValue('https://app.test'),
+        user: {
+            findUnique: vi.fn().mockResolvedValue({ id: USER_ID, notificationPreferences: null }),
+            update: vi.fn().mockResolvedValue({}),
         },
     };
 }
 
 describe('NotificationsService', () => {
     let service: NotificationsService;
-    let mocks: ReturnType<typeof buildMocks>;
+    let prisma: ReturnType<typeof buildPrismaMock>;
 
     beforeEach(async () => {
-        mocks = buildMocks();
+        prisma = buildPrismaMock();
         const module = await Test.createTestingModule({
-            providers: [
-                NotificationsService,
-                { provide: PrismaService, useValue: mocks.prisma },
-                { provide: ConfigService, useValue: mocks.config },
-                { provide: EMAIL_CLIENT, useValue: mocks.email },
-            ],
+            providers: [NotificationsService, { provide: PrismaService, useValue: prisma }],
         }).compile();
         service = module.get(NotificationsService);
     });
 
-    describe('storyCompleted', () => {
-        it('should create a Notification row and send an email', async () => {
-            await service.storyCompleted(USER_ID, {
-                storyId: 'story-1',
-                title: 'Why Mountains Breathe Smoke',
-                childName: 'Maya',
+    describe('list', () => {
+        it('should return the latest 20 notifications, newest first', async () => {
+            await service.list(USER_ID);
+
+            expect(prisma.notification.findMany).toHaveBeenCalledWith({
+                where: { userId: USER_ID },
+                orderBy: { createdAt: 'desc' },
+                take: 20,
             });
-
-            expect(mocks.prisma.notification.create).toHaveBeenCalledWith({
-                data: expect.objectContaining({ userId: USER_ID, type: 'STORY_COMPLETED' }),
-            });
-            expect(mocks.email.send).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    to: mockUser.email,
-                    subject: expect.stringContaining('Maya'),
-                    html: expect.stringContaining('Why Mountains Breathe Smoke'),
-                }),
-            );
-        });
-
-        it('should swallow email errors so generation success is preserved', async () => {
-            mocks.email.send.mockRejectedValue(new Error('Resend down'));
-
-            await expect(
-                service.storyCompleted(USER_ID, {
-                    storyId: 'story-1',
-                    title: 'X',
-                    childName: 'Y',
-                }),
-            ).resolves.toBeUndefined();
-
-            // Bell record must still have been created
-            expect(mocks.prisma.notification.create).toHaveBeenCalled();
         });
     });
 
-    describe('storyFailed', () => {
-        it('should create a Notification row and send an email with workshop link', async () => {
-            await service.storyFailed(USER_ID, {
-                storyId: 'story-2',
-                childName: 'Maya',
-                question: 'Why is the sky blue?',
-                error: 'Moderation failed',
+    describe('markRead', () => {
+        it('should set readAt on the user-owned notification', async () => {
+            await service.markRead(USER_ID, 'notif-1');
+
+            expect(prisma.notification.updateMany).toHaveBeenCalledWith({
+                where: { id: 'notif-1', userId: USER_ID },
+                data: { readAt: expect.any(Date) },
+            });
+        });
+
+        it('should throw NotFoundException when the notification is missing or not owned', async () => {
+            prisma.notification.updateMany.mockResolvedValue({ count: 0 });
+
+            await expect(service.markRead(USER_ID, 'notif-x')).rejects.toThrow(NotFoundException);
+        });
+    });
+
+    describe('createBellRecord', () => {
+        it('should create the record with the given type and payload', async () => {
+            await service.createBellRecord(USER_ID, 'STORY_COMPLETED', { storyId: 'story-1' });
+
+            expect(prisma.notification.create).toHaveBeenCalledWith({
+                data: {
+                    userId: USER_ID,
+                    type: 'STORY_COMPLETED',
+                    payload: { storyId: 'story-1' },
+                },
+            });
+        });
+    });
+
+    describe('streamUnreadCount', () => {
+        it('should emit the current count on connect and push again on changes', async () => {
+            prisma.notification.count.mockResolvedValue(3);
+            const events: unknown[] = [];
+
+            const subscription = service
+                .streamUnreadCount(USER_ID)
+                .subscribe((event) => events.push(event.data));
+            await vi.waitFor(() => expect(events).toHaveLength(1));
+            expect(events[0]).toEqual({ type: 'unread-count', count: 3 });
+
+            prisma.notification.count.mockResolvedValue(0);
+            await service.markAllRead(USER_ID);
+
+            expect(events[1]).toEqual({ type: 'unread-count', count: 0 });
+            subscription.unsubscribe();
+        });
+
+        it('should not push to other users’ streams', async () => {
+            const events: unknown[] = [];
+            const subscription = service
+                .streamUnreadCount('other-user')
+                .subscribe((event) => events.push(event.data));
+            await vi.waitFor(() => expect(events).toHaveLength(1));
+
+            await service.markAllRead(USER_ID);
+
+            expect(events).toHaveLength(1);
+            subscription.unsubscribe();
+        });
+
+        it('should push the new count after createBellRecord', async () => {
+            const events: unknown[] = [];
+            const subscription = service
+                .streamUnreadCount(USER_ID)
+                .subscribe((event) => events.push(event.data));
+            await vi.waitFor(() => expect(events).toHaveLength(1));
+
+            prisma.notification.count.mockResolvedValue(1);
+            await service.createBellRecord(USER_ID, 'STORY_COMPLETED', {});
+
+            expect(events[1]).toEqual({ type: 'unread-count', count: 1 });
+            subscription.unsubscribe();
+        });
+    });
+
+    describe('getPreferences', () => {
+        it('should return all toggles on when nothing is stored', async () => {
+            const prefs = await service.getPreferences(USER_ID);
+
+            expect(prefs).toEqual({
+                storyCompleted: { email: true, inApp: true },
+                storyFailed: { email: true, inApp: true },
+                paymentFailed: { inApp: true },
+                subscriptionCanceled: { email: true, inApp: true },
+                subscriptionRenewed: { email: true },
+            });
+        });
+
+        it('should throw NotFoundException for an unknown user', async () => {
+            prisma.user.findUnique.mockResolvedValue(null);
+
+            await expect(service.getPreferences(USER_ID)).rejects.toThrow(NotFoundException);
+        });
+    });
+
+    describe('updatePreferences', () => {
+        it('should apply the patch over current preferences and persist the full set', async () => {
+            prisma.user.findUnique.mockResolvedValue({
+                id: USER_ID,
+                notificationPreferences: { storyFailed: { email: false } },
             });
 
-            expect(mocks.prisma.notification.create).toHaveBeenCalledWith({
-                data: expect.objectContaining({ userId: USER_ID, type: 'STORY_FAILED' }),
+            const prefs = await service.updatePreferences(USER_ID, {
+                storyCompleted: { inApp: false },
             });
-            expect(mocks.email.send).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    to: mockUser.email,
-                    html: expect.stringContaining('https://app.test/workshop'),
-                }),
-            );
+
+            // Patched toggle off, previously stored toggle preserved, rest defaulted.
+            expect(prefs.storyCompleted).toEqual({ email: true, inApp: false });
+            expect(prefs.storyFailed).toEqual({ email: false, inApp: true });
+            expect(prefs.paymentFailed).toEqual({ inApp: true });
+
+            expect(prisma.user.update).toHaveBeenCalledWith({
+                where: { id: USER_ID },
+                data: { notificationPreferences: prefs },
+            });
         });
     });
 });

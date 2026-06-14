@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "NotificationType" ADD VALUE 'PAYMENT_FAILED';
+ALTER TYPE "NotificationType" ADD VALUE 'SUBSCRIPTION_CANCELED';

@@ -1,0 +1,77 @@
+@use 'styles/typography' as *;
+
+.prefs__copy {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.prefs__error {
+    @include t-body-sm;
+    color: var(--accent-warm);
+    margin: 0;
+}
+
+.prefs__rows {
+    list-style: none;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.prefs__row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--border-subtle);
+
+    &:first-child {
+        border-top: none;
+    }
+}
+
+.prefs__row-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.prefs__row-label {
+    @include t-body-base;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.prefs__row-desc {
+    @include t-body-sm;
+    color: var(--text-muted);
+}
+
+.prefs__row-note {
+    @include t-body-sm;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.prefs__row-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+/* Stack the row vertically on narrow screens. */
+@media (max-width: 540px) {
+    .prefs__row {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .prefs__row-toggles {
+        flex-direction: row;
+        gap: var(--space-6);
+    }
+}
