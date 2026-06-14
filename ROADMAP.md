@@ -203,13 +203,13 @@ Privacy · Contact _(both static pages)_
 
 > Quick lookup: every `// TODO` comment in the frontend codebase, mapped to its ROADMAP resolution.
 
-| File                                                    | TODO summary                                                                              | Resolves in |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------- |
-| ~~`contact/_components/ContactSection/actions.ts`~~     | ~~Wire `submitContact` to real `POST /contact` endpoint~~ ✅ Phase 5 Increment 7b         | _Resolved_  |
-| ~~`pricing/page.tsx`~~                                  | ~~Replace hardcoded plan data with `GET /pricing` (real PricingTier records)~~ ✅ Phase 9 | _Resolved_  |
-| `(public)/_components/TalesSection/TalesSection.tsx`    | Replace `MOCK_TALES` with `GET /stories?featured=true`                                    | Phase 11    |
-| `(public)/_components/TalesSection/TalesSection.tsx`    | Add link to `/tales` (public story library page)                                          | Post-MVP    |
-| `privacy/_components/PrivacyContent/PrivacyContent.tsx` | Extract privacy copy to CMS if non-dev editing is needed                                  | Post-MVP    |
+| File                                                     | TODO summary                                                                              | Resolves in |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------- |
+| ~~`contact/_components/ContactSection/actions.ts`~~      | ~~Wire `submitContact` to real `POST /contact` endpoint~~ ✅ Phase 5 Increment 7b         | _Resolved_  |
+| ~~`pricing/page.tsx`~~                                   | ~~Replace hardcoded plan data with `GET /pricing` (real PricingTier records)~~ ✅ Phase 9 | _Resolved_  |
+| ~~`(public)/_components/TalesSection/TalesSection.tsx`~~ | ~~Replace `MOCK_TALES` with public stories from `GET /stories/public`~~ ✅ Phase 11       | _Resolved_  |
+| `(public)/_components/TalesSection/TalesSection.tsx`     | Add link to `/tales` (public story library page)                                          | Post-MVP    |
+| `privacy/_components/PrivacyContent/PrivacyContent.tsx`  | Extract privacy copy to CMS if non-dev editing is needed                                  | Post-MVP    |
 
 ---
 
@@ -774,26 +774,26 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ---
 
-### Phase 11 — Ratings & Public Sharing
+### Phase 11 — Ratings & Public Sharing ✅
 
 **Goal:** users can rate completed stories; opt-in public stories appear on the landing page.
 
 **Sub-tasks:**
 
-- [ ] Prisma `Rating` model: `id`, `storyId`, `userId`, `score (1-5)`, `comment?`, `createdAt`
-- [ ] Endpoint: `POST /stories/:id/rating` (upsert — one per user per story); accepts `{ score, comment?, isPublic? }`
-- [ ] When `isPublic = true` in rating payload: set `Story.isPublic = true`
-- [ ] `GET /stories/public` — paginated list of public stories (for landing page "Tales lit recently")
-- [ ] `GET /admin/ratings` (admin only)
-- [ ] Frontend: wire rating panel in story reader right panel (was inactive in Phase 4):
+- [x] Prisma `Rating` model: `id`, `storyId`, `userId`, `score (1-5)`, `comment?`, `createdAt` (+ `updatedAt`, unique `[storyId, userId]`)
+- [x] Endpoint: `POST /stories/:id/rating` (upsert — one per user per story); accepts `{ score, comment?, isPublic? }`
+- [x] `isPublic` in rating payload mirrors onto `Story.isPublic` (set true **or** false — allows retract); left untouched when omitted
+- [x] `GET /stories/public` — list of public stories (already shipped earlier; now includes owner `rating` score)
+- [x] `GET /admin/ratings` (admin only)
+- [x] Frontend: wire rating panel in story reader right panel (was inactive in Phase 4):
     - 1–5 star input
     - Optional comment textarea
     - "Share this story as an example for other families" opt-in toggle
-    - "Save rating" button
-- [ ] Frontend: `/` landing page — wire public stories grid (was empty in Phase 3)
-- [ ] Frontend: custom `not-found.tsx` page (currently shows Next.js default 404)
-- [ ] Admin: manage `Story.isPublic` visibility (override/retract public status)
-- [ ] Tests: rating CRUD, upsert behavior, isPublic propagation, public story list, admin rating view
+    - "Save rating" button (pre-fills from existing rating; inline saved/error status)
+- [x] Frontend: `/` landing page — wire public stories grid (was empty in Phase 3); hidden when no public stories
+- [x] Frontend: custom `not-found.tsx` page (already shipped in an earlier phase)
+- [x] Admin: manage `Story.isPublic` visibility (override/retract) — `PATCH /stories/:id/public` (AdminGuard); admin UI in Phase 12
+- [x] Tests: rating upsert behavior, isPublic propagation, public story list, admin rating view
 
 **Acceptance Check:**
 
@@ -802,7 +802,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Admin can view all ratings and manage public visibility
 - Tests pass
 
-**Deliverables:** `_docs/phase-11-ratings.md` + ROADMAP progress.
+**Deliverables:** `_docs/phase-11-ratings.md` ✅ + ROADMAP progress.
 
 ---
 

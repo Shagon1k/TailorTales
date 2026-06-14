@@ -1,45 +1,22 @@
 import CapsLink from '@/components/ui/CapsLink/CapsLink';
-import StoryCard from './components/StoryCard/StoryCard';
+import type { IStorySummary } from '@/types/story.types';
+import { getAge } from '@/utils/date.utils';
+import StoryCard, { type TStoryCardTone } from './components/StoryCard/StoryCard';
 import styles from './TalesSection.module.scss';
 
-// TODO: Replace MOCK_TALES with real data from GET /stories?featured=true once
-// the backend stories endpoint is wired. Show this section only when
-// at least one published story exists (condition: stories.length > 0).
+// Decorative card accents — cycled by position, not tied to story data.
+const TONES: TStoryCardTone[] = ['rose', 'fox', 'plum'];
 
-const MOCK_TALES = [
-    {
-        id: '1',
-        quote: 'Why does the moon follow me home?',
-        childName: 'Lila',
-        age: 5,
-        pages: 12,
-        format: 'book' as const,
-        rating: 5,
-        tone: 'rose' as const,
-    },
-    {
-        id: '2',
-        quote: 'How do bees know which flower is mine?',
-        childName: 'Otis',
-        age: 4,
-        pages: 8,
-        format: 'book' as const,
-        rating: 5,
-        tone: 'fox' as const,
-    },
-    {
-        id: '3',
-        quote: 'Where does the river end?',
-        childName: 'Sasha',
-        age: 8,
-        pages: 16,
-        format: 'comic' as const,
-        rating: 4,
-        tone: 'plum' as const,
-    },
-] as const;
+export interface ITalesSectionProps {
+    tales: IStorySummary[];
+}
 
-export default function TalesSection(): React.ReactElement {
+export default function TalesSection({
+    tales,
+}: Readonly<ITalesSectionProps>): React.ReactElement | null {
+    // Show the section only once at least one family has opted a story in.
+    if (tales.length === 0) return null;
+
     return (
         <section className={styles.tales}>
             <div className={styles.tales__inner}>
@@ -49,8 +26,17 @@ export default function TalesSection(): React.ReactElement {
                     <CapsLink href="#">Browse the library →</CapsLink>
                 </div>
                 <div className={styles.tales__grid}>
-                    {MOCK_TALES.map((tale) => (
-                        <StoryCard key={tale.id} {...tale} />
+                    {tales.map((tale, index) => (
+                        <StoryCard
+                            key={tale.id}
+                            quote={tale.question}
+                            childName={tale.child.name}
+                            age={getAge(tale.child.birthdate)}
+                            pages={tale.pageCount}
+                            format={tale.type === 'COMIC' ? 'comic' : 'book'}
+                            rating={tale.rating ?? 0}
+                            tone={TONES[index % TONES.length]}
+                        />
                     ))}
                 </div>
             </div>

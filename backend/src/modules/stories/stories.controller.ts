@@ -7,19 +7,25 @@ import {
     MessageEvent,
     Param,
     ParseIntPipe,
+    Patch,
     Post,
     Res,
     Sse,
+    UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import type { Story, User } from '../../generated/prisma/client.js';
+import type { Rating, Story, User } from '../../generated/prisma/client.js';
 import type { Observable } from 'rxjs';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Public } from '../auth/decorators/public.decorator.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { GenerationService } from '../generation/generation.service.js';
+import { RatingsService } from '../ratings/ratings.service.js';
+import { CreateRatingDto } from '../ratings/dto/create-rating.dto.js';
 import { RegenerationService } from '../regeneration/regeneration.service.js';
 import { RegeneratePageDto } from '../regeneration/dto/regenerate-page.dto.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
+import { UpdateVisibilityDto } from './dto/update-visibility.dto.js';
 import {
     ALLOWED_PAGE_COUNTS,
     QUESTION_SUGGESTIONS,
@@ -35,6 +41,7 @@ export class StoriesController {
         private readonly storiesService: StoriesService,
         private readonly generationService: GenerationService,
         private readonly regenerationService: RegenerationService,
+        private readonly ratingsService: RatingsService,
     ) {}
 
     // Static routes must be declared before :id to avoid being matched as an id param.
@@ -112,6 +119,25 @@ export class StoriesController {
         @Body() dto: RegeneratePageDto,
     ): Promise<void> {
         return this.regenerationService.regeneratePage(storyId, pageOrder, user.id, dto);
+    }
+
+    /** Upsert the user's rating for their own completed story (one per user per story). */
+    @Post(':id/rating')
+    @HttpCode(200)
+    rate(
+        @Param('id') id: string,
+        @CurrentUser() user: User,
+        @Body() dto: CreateRatingDto,
+    ): Promise<Rating> {
+        return this.ratingsService.upsert(id, user.id, dto);
+    }
+
+    /** Admin-only override of a story's public visibility (override or retract). */
+    @Patch(':id/public')
+    @UseGuards(AdminGuard)
+    @HttpCode(204)
+    async setVisibility(@Param('id') id: string, @Body() dto: UpdateVisibilityDto): Promise<void> {
+        await this.storiesService.setPublicVisibility(id, dto.isPublic);
     }
 
     @Delete(':id')

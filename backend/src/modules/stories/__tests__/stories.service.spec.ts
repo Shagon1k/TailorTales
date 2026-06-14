@@ -46,6 +46,7 @@ const MOCK_STORY_WITH_RELATIONS = {
     ...MOCK_STORY,
     child: MOCK_CHILD,
     artStyle: MOCK_ART_STYLE,
+    ratings: [],
 };
 
 const MOCK_STORY_WITH_PAGES = {

@@ -6,6 +6,10 @@ vi.mock('@/api/user.server', () => ({
     getServerUser: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock('@/api/stories.server', () => ({
+    storiesServerApi: { getPublic: vi.fn().mockResolvedValue([]) },
+}));
+
 // CtaSection is an async server component (reads the session) — stub it for sync render.
 vi.mock('@/app/(public)/_components/CtaSection/CtaSection', () => ({
     default: () => null,
