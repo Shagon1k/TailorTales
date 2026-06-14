@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { IUserContext } from '@/context/UserContext';
 import type { IUser } from '@/types/user.types';
 import Header from '../Header';
@@ -12,6 +13,17 @@ vi.mock('@/context/UserContext', () => ({
 
 vi.mock('@/hooks/subscription', () => ({
     useSubscription: () => ({ data: undefined }),
+}));
+
+// NotificationCenter (inside Header) opens an SSE stream — stub the whole API module.
+vi.mock('@/api/notifications', () => ({
+    notificationsApi: {
+        getAll: vi.fn().mockResolvedValue([]),
+        getUnreadCount: vi.fn().mockResolvedValue(0),
+        markRead: vi.fn(),
+        markAllRead: vi.fn(),
+        openUnreadCountStream: vi.fn().mockReturnValue({ onmessage: null, close: vi.fn() }),
+    },
 }));
 
 const TEST_USER: IUser = {
@@ -29,7 +41,12 @@ function makeContext(overrides: Partial<IUserContext> = {}): IUserContext {
 }
 
 function renderWithMantine(ui: React.ReactElement): ReturnType<typeof render> {
-    return render(<MantineProvider>{ui}</MantineProvider>);
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    return render(
+        <MantineProvider env="test">
+            <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+        </MantineProvider>,
+    );
 }
 
 describe('Header', () => {
@@ -96,9 +113,9 @@ describe('Header', () => {
             expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
         });
 
-        it('should render Account settings link', () => {
+        it('should render the account menu trigger', () => {
             renderWithMantine(<Header variant="private" />);
-            expect(screen.getByRole('link', { name: /account settings/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /account menu/i })).toBeInTheDocument();
         });
 
         it('should not render unauthenticated-only navigation links', () => {

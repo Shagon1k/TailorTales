@@ -8,6 +8,8 @@ export interface INotificationBellProps {
     onClick?: () => void;
     /** Set to true when the dropdown is open. */
     active?: boolean;
+    /** Forwarded to the button — Popover.Target needs it for positioning. */
+    ref?: React.Ref<HTMLButtonElement>;
 }
 
 function BellIcon(): React.ReactElement {
@@ -40,11 +42,13 @@ export default function NotificationBell({
     count = 0,
     onClick,
     active = false,
+    ref,
 }: Readonly<INotificationBellProps>): React.ReactElement {
     const hasUnread = count > 0;
 
     return (
         <button
+            ref={ref}
             type="button"
             aria-label={hasUnread ? `Notifications, ${count} unread` : 'Notifications'}
             aria-expanded={active}
