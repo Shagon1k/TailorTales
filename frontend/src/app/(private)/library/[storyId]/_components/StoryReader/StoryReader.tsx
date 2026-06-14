@@ -55,7 +55,12 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
 
                 <aside className={styles.reader__panels}>
                     {currentPage && <RegenerationPanel storyId={story.id} page={currentPage} />}
-                    <RatingPanel childName={story.child.name} />
+                    <RatingPanel
+                        storyId={story.id}
+                        childName={story.child.name}
+                        initialRating={story.myRating}
+                        initialIsPublic={story.isPublic}
+                    />
                     <DetailsPanel story={story} />
                 </aside>
             </div>

@@ -1,9 +1,11 @@
 import { apiFetch, getApiBaseUrl } from '@/lib/api';
 import type {
     ICreateStoryPayload,
+    IMyRating,
     IRegeneratePagePayload,
     IStoryDetail,
     IStorySummary,
+    ISubmitRatingPayload,
 } from '@/types/story.types';
 
 export interface IActiveJob {
@@ -41,6 +43,12 @@ export const storiesApi = {
     generate: (id: string): Promise<{ jobId: string; storyId: string }> =>
         apiFetch<{ jobId: string; storyId: string }>(`/stories/${id}/generate`, {
             method: 'POST',
+        }),
+
+    submitRating: (id: string, payload: ISubmitRatingPayload): Promise<IMyRating> =>
+        apiFetch<IMyRating>(`/stories/${id}/rating`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
         }),
 
     remove: (id: string): Promise<void> => apiFetch<void>(`/stories/${id}`, { method: 'DELETE' }),

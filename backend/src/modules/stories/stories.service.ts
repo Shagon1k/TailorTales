@@ -11,6 +11,8 @@ import type { IStoryDetail, IStorySummary } from './stories.types.js';
 type StoryWithRelations = Story & {
     child: Pick<Child, 'id' | 'name' | 'birthdate'>;
     artStyle: Pick<ArtStyle, 'id' | 'name' | 'slug' | 'thumbnailUrl'>;
+    // At most one rating per story — only the owner can rate it.
+    ratings: { score: number; comment: string | null }[];
 };
 
 type StoryWithRelationsAndPages = StoryWithRelations & { pages: Page[] };
@@ -18,6 +20,7 @@ type StoryWithRelationsAndPages = StoryWithRelations & { pages: Page[] };
 const STORY_LIST_INCLUDE = {
     child: { select: { id: true, name: true, birthdate: true } },
     artStyle: { select: { id: true, name: true, slug: true, thumbnailUrl: true } },
+    ratings: { select: { score: true, comment: true } },
 } as const;
 
 @Injectable()
@@ -77,6 +80,14 @@ export class StoriesService {
                 language: dto.language,
             },
         });
+    }
+
+    /** Admin override of a story's public visibility — no ownership scope. */
+    async setPublicVisibility(id: string, isPublic: boolean): Promise<void> {
+        const story = await this.prisma.story.findUnique({ where: { id }, select: { id: true } });
+        if (!story) throw new NotFoundException(`Story ${id} not found`);
+
+        await this.prisma.story.update({ where: { id }, data: { isPublic } });
     }
 
     async remove(id: string, userId: string): Promise<void> {
@@ -148,16 +159,17 @@ export class StoriesService {
 
     private async toSummary(story: StoryWithRelations): Promise<IStorySummary> {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { coverImageKey, pdfKey: _pdfKey, ...rest } = story;
+        const { coverImageKey, pdfKey: _pdfKey, ratings, ...rest } = story;
 
         return {
             ...rest,
             coverImageUrl: coverImageKey ? await this.storage.getSignedUrl(coverImageKey) : null,
+            rating: ratings[0]?.score ?? null,
         };
     }
 
     private async toDetail(story: StoryWithRelationsAndPages): Promise<IStoryDetail> {
-        const { coverImageKey, pdfKey, pages, ...rest } = story;
+        const { coverImageKey, pdfKey, pages, ratings, ...rest } = story;
 
         const resolvedPages = await Promise.all(
             pages.map(async (page) => {
@@ -177,11 +189,15 @@ export class StoriesService {
             }),
         );
 
+        const rating = ratings[0] ?? null;
+
         return {
             ...rest,
             pages: resolvedPages,
             coverImageUrl: coverImageKey ? await this.storage.getSignedUrl(coverImageKey) : null,
             pdfUrl: pdfKey ? await this.storage.getSignedUrl(pdfKey) : null,
+            rating: rating?.score ?? null,
+            myRating: rating ? { score: rating.score, comment: rating.comment } : null,
         };
     }
 }

@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import type { User } from '../../../generated/prisma/client.js';
 import { GenerationService } from '../../generation/generation.service.js';
+import { RatingsService } from '../../ratings/ratings.service.js';
 import { RegenerationService } from '../../regeneration/regeneration.service.js';
 import { StoriesController } from '../stories.controller.js';
 import { StoriesService } from '../stories.service.js';
@@ -49,9 +50,10 @@ const MOCK_SUMMARY: IStorySummary = {
         thumbnailUrl: 'https://example.com/thumb.jpg',
     },
     coverImageUrl: null,
+    rating: null,
 };
 
-const MOCK_DETAIL: IStoryDetail = { ...MOCK_SUMMARY, pages: [], pdfUrl: null };
+const MOCK_DETAIL: IStoryDetail = { ...MOCK_SUMMARY, pages: [], pdfUrl: null, myRating: null };
 
 describe('StoriesController', () => {
     let controller: StoriesController;
@@ -60,6 +62,8 @@ describe('StoriesController', () => {
     let findOneByUser: ReturnType<typeof vi.fn>;
     let create: ReturnType<typeof vi.fn>;
     let remove: ReturnType<typeof vi.fn>;
+    let setPublicVisibility: ReturnType<typeof vi.fn>;
+    let upsertRating: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         findPublic = vi.fn();
@@ -67,13 +71,22 @@ describe('StoriesController', () => {
         findOneByUser = vi.fn();
         create = vi.fn();
         remove = vi.fn();
+        setPublicVisibility = vi.fn();
+        upsertRating = vi.fn();
 
         const module = await Test.createTestingModule({
             controllers: [StoriesController],
             providers: [
                 {
                     provide: StoriesService,
-                    useValue: { findPublic, findAllByUser, findOneByUser, create, remove },
+                    useValue: {
+                        findPublic,
+                        findAllByUser,
+                        findOneByUser,
+                        create,
+                        remove,
+                        setPublicVisibility,
+                    },
                 },
                 {
                     provide: GenerationService,
@@ -82,6 +95,10 @@ describe('StoriesController', () => {
                 {
                     provide: RegenerationService,
                     useValue: { regeneratePage: vi.fn() },
+                },
+                {
+                    provide: RatingsService,
+                    useValue: { upsert: upsertRating },
                 },
             ],
         }).compile();
@@ -174,6 +191,29 @@ describe('StoriesController', () => {
             await controller.remove('story-1', MOCK_USER);
 
             expect(remove).toHaveBeenCalledWith('story-1', 'user-123');
+        });
+    });
+
+    describe('rate', () => {
+        it('should upsert the rating for the current user and story', async () => {
+            const dto = { score: 5, comment: 'Loved it', isPublic: true };
+            const rating = { id: 'rating-1', storyId: 'story-1', userId: 'user-123', ...dto };
+            upsertRating.mockResolvedValue(rating);
+
+            const result = await controller.rate('story-1', MOCK_USER, dto);
+
+            expect(upsertRating).toHaveBeenCalledWith('story-1', 'user-123', dto);
+            expect(result).toBe(rating);
+        });
+    });
+
+    describe('setVisibility', () => {
+        it('should delegate to the service to override public visibility', async () => {
+            setPublicVisibility.mockResolvedValue(undefined);
+
+            await controller.setVisibility('story-1', { isPublic: false });
+
+            expect(setPublicVisibility).toHaveBeenCalledWith('story-1', false);
         });
     });
 });

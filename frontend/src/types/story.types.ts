@@ -61,11 +61,27 @@ export interface IStorySummary {
     child: IStoryChild;
     artStyle: IStoryArtStyle;
     coverImageUrl: string | null;
+    /** The owner's rating score (1-5), or null if unrated. Only the owner can rate a story. */
+    rating: number | null;
+}
+
+/** The current user's own rating, embedded in their story detail so the panel pre-fills. */
+export interface IMyRating {
+    score: number;
+    comment: string | null;
 }
 
 export interface IStoryDetail extends IStorySummary {
     pages: IPage[];
     pdfUrl: string | null;
+    myRating: IMyRating | null;
+}
+
+export interface ISubmitRatingPayload {
+    score: number;
+    comment?: string;
+    /** Opt-in to feature the story on the public landing page. Mirrors isPublic. */
+    isPublic?: boolean;
 }
 
 export interface IStoryConfig {
