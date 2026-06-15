@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader } from '@mantine/core';
+import Loader from '@/components/ui/Loader/Loader';
 import Modal from '@/components/ui/Modal/Modal';
 import Button from '@/components/ui/Button/Button';
 import ChildCard from './_components/ChildCard/ChildCard';
@@ -68,7 +68,7 @@ export default function ChildrenPage(): React.ReactElement {
     if (isLoading) {
         return (
             <div className={styles.page}>
-                <Loader />
+                <Loader label="Loading children" />
             </div>
         );
     }

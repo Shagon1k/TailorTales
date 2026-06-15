@@ -1,0 +1,64 @@
+@use 'styles/typography' as *;
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table__th {
+    @include t-caps-xs;
+
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.table__row {
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--duration-base) var(--ease-out);
+
+    &:hover {
+        background: var(--bg-elevated);
+    }
+}
+
+.table__td {
+    @include t-body-sm;
+
+    padding: var(--space-4);
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+
+.table__name {
+    @include t-body-base;
+
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.table__email {
+    display: block;
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+.table__role {
+    font-variant-numeric: tabular-nums;
+}
+
+.table__status {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    white-space: nowrap;
+
+    &.m-suspended {
+        color: var(--accent-warm);
+        border-color: var(--accent-warm);
+    }
+}

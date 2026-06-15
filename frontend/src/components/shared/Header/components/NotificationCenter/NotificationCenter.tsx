@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Loader } from '@mantine/core';
 import Popover from '@/components/ui/Popover/Popover';
+import Loader from '@/components/ui/Loader/Loader';
 import { notificationsApi } from '@/api/notifications';
 import {
     useMarkAllNotificationsRead,
@@ -87,7 +87,7 @@ export default function NotificationCenter(): React.ReactElement {
                 <NotificationList notifications={notifications} onItemClick={handleItemClick} />
             ) : (
                 <div className={styles.center__loading}>
-                    <Loader size="sm" aria-label="Loading notifications" />
+                    <Loader size="sm" centered={false} label="Loading notifications" />
                 </div>
             )}
         </Popover>
