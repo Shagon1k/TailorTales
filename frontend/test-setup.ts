@@ -1,6 +1,19 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
+vi.mock('@/i18n/navigation', async () => {
+    const { default: React } = await import('react');
+    return {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Link: ({ href, children, ...rest }: any) =>
+            React.createElement('a', { href, ...rest }, children),
+        useRouter: vi.fn().mockReturnValue({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+        usePathname: vi.fn().mockReturnValue('/'),
+        redirect: vi.fn(),
+        getPathname: vi.fn(),
+    };
+});
+
 // jsdom doesn't implement ResizeObserver — required by Mantine's ScrollArea (used in Combobox dropdown)
 globalThis.ResizeObserver = class ResizeObserver {
     observe(): void {

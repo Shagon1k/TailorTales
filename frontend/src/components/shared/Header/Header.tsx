@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
 import HeaderUserChip from './components/HeaderUserChip/HeaderUserChip';
