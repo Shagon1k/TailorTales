@@ -21,6 +21,7 @@ enum Gender {
 enum Language {
   EN
   RU
+  DE
 }
 
 enum StoryType {

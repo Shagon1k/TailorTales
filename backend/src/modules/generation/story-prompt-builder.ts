@@ -17,6 +17,7 @@ import {
     STORY_SYSTEM_PROMPT_SUFFIX,
     buildCharacterPromptSection,
 } from './generation.prompts.js';
+import { LANGUAGE_NAMES } from '../../common/languages.constants.js';
 
 interface IPromptContext {
     child: Pick<Child, 'name' | 'birthdate'>;
@@ -38,6 +39,7 @@ export class StoryPromptBuilder {
     buildUserPrompt(ctx: IPromptContext): string {
         const age = this.computeAge(ctx.child.birthdate);
         const interiorTemplates = BOOK_INTERIOR_TEMPLATE_NAMES;
+        const languageName = LANGUAGE_NAMES[ctx.language];
 
         const templateGuide = interiorTemplates
             .map((name) => {
@@ -50,7 +52,7 @@ export class StoryPromptBuilder {
             .join('\n');
 
         return [
-            `Write a ${ctx.pageCount}-page children's book in ${ctx.language} for ${ctx.child.name}, age ${age}.`,
+            `Write a ${ctx.pageCount}-page children's book in ${languageName} for ${ctx.child.name}, age ${age}.`,
             '',
             `QUESTION TO ANSWER: "${ctx.question}"`,
             '',

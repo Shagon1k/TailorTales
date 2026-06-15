@@ -123,7 +123,7 @@ export class RegenerationService {
         const charsPerToken = CHARS_PER_TOKEN[story.language];
         const maxTokens = Math.min(Math.ceil((maxChars / charsPerToken) * 2), 500);
 
-        const systemPrompt = buildPageTextSystemPrompt();
+        const systemPrompt = buildPageTextSystemPrompt(story.language);
         const userPrompt = buildPageTextUserPrompt({
             storyTitle: story.title,
             childName: story.child.name,
@@ -131,6 +131,7 @@ export class RegenerationService {
             layout: page.layout,
             chapterTitle: page.chapterTitle,
             currentText: page.text,
+            language: story.language,
             authorNote,
         });
 

@@ -8,16 +8,12 @@ import type { IChild } from '@/types/child.types';
 import type { ICharacter } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryType, ILanguage } from '@/types/story.types';
+import { LANGUAGES } from '@/constants/languages';
 import styles from './WorkshopSummary.module.scss';
 
 const FORMAT_LABEL: Record<IStoryType, string> = {
     BOOK: 'Book',
     COMIC: 'Comic',
-};
-
-const LANGUAGE_LABEL: Record<ILanguage, string> = {
-    EN: 'English',
-    RU: 'Russian',
 };
 
 // 1 book page = 1 credit (comics — post-MVP — cost 2 per page).
@@ -89,7 +85,10 @@ export default function WorkshopSummary({
                 />
                 <SummaryRow label="Format" value={storyType ? FORMAT_LABEL[storyType] : null} />
                 <SummaryRow label="Length" value={pageCount ? `${pageCount} pages` : null} />
-                <SummaryRow label="Language" value={language ? LANGUAGE_LABEL[language] : null} />
+                <SummaryRow
+                    label="Language"
+                    value={language ? LANGUAGES[language].nativeName : null}
+                />
                 <SummaryRow label="Style" value={artStyle?.name ?? null} />
             </ul>
 

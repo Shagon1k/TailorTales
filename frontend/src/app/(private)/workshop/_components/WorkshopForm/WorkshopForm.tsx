@@ -15,6 +15,7 @@ import type { IChild } from '@/types/child.types';
 import type { ICharacter } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig, IStoryType, ILanguage } from '@/types/story.types';
+import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
 import ReaderChip from './components/ReaderChip/ReaderChip';
 import ReaderSelector from './components/ReaderSelector/ReaderSelector';
 import ArtStyleGrid from './components/ArtStyleGrid/ArtStyleGrid';
@@ -281,10 +282,11 @@ export default function WorkshopForm({
                         onChange={(v) => setLanguage(v as ILanguage)}
                         label="Story language"
                     >
-                        <OptionPill value="EN">English</OptionPill>
-                        <OptionPill value="RU">Русский</OptionPill>
-                        <OptionPill disabled>Français · soon</OptionPill>
-                        <OptionPill disabled>Eesti · soon</OptionPill>
+                        {LANGUAGE_CODES.map((code) => (
+                            <OptionPill key={code} value={code}>
+                                {LANGUAGES[code].nativeName}
+                            </OptionPill>
+                        ))}
                     </OptionPillGroup>
                 </section>
                 {submitError !== null && (

@@ -1,6 +1,6 @@
 export type IStoryType = 'BOOK' | 'COMIC';
 export type IStoryStatus = 'DRAFT' | 'QUEUED' | 'GENERATING' | 'COMPLETED' | 'FAILED';
-export type ILanguage = 'EN' | 'RU';
+export type ILanguage = 'EN' | 'RU' | 'DE';
 
 /** Illustration entry on a Page. Structure is extended in Phase 5 (generation pipeline). */
 export interface IIllustration {
