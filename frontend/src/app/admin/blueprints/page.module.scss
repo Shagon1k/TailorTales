@@ -3,42 +3,38 @@
 .page {
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
-    padding: var(--space-10) var(--space-8) var(--space-16);
-    max-width: 960px;
-    margin: 0 auto;
+    gap: var(--space-5);
 }
 
 .page__header {
     display: flex;
-    align-items: baseline;
+    align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-6);
+    flex-wrap: wrap;
 }
 
 .page__title {
     @include t-heading-2xl;
 
-    margin: 0;
     color: var(--text-primary);
+    margin: 0;
 }
 
-.page__sub {
-    @include t-body-sm;
-
-    margin: var(--space-1) 0 0;
-    color: var(--text-muted);
-}
-
-.page__new {
+.page__action {
     @include t-body-base;
 
-    color: var(--text-accent);
-    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-5);
+    background: var(--gradient-fox-bevel);
+    color: var(--text-on-card);
+    border-radius: var(--radius-pill);
     font-weight: 600;
+    text-decoration: none;
     white-space: nowrap;
 
     &:hover {
-        text-decoration: underline;
+        box-shadow: 0 6px 9px rgba(0, 0, 0, 0.35);
     }
 }
