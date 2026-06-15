@@ -58,16 +58,20 @@ describe('StoriesService', () => {
     let service: StoriesService;
     let storyFindMany: ReturnType<typeof vi.fn>;
     let storyFindFirst: ReturnType<typeof vi.fn>;
+    let storyFindUnique: ReturnType<typeof vi.fn>;
     let storyCreate: ReturnType<typeof vi.fn>;
     let storyDelete: ReturnType<typeof vi.fn>;
+    let storyCount: ReturnType<typeof vi.fn>;
     let getSignedUrl: ReturnType<typeof vi.fn>;
     let storageDeleteMany: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         storyFindMany = vi.fn();
         storyFindFirst = vi.fn();
+        storyFindUnique = vi.fn();
         storyCreate = vi.fn();
         storyDelete = vi.fn();
+        storyCount = vi.fn();
         getSignedUrl = vi.fn();
         storageDeleteMany = vi.fn().mockResolvedValue({ requested: 3, deleted: 3 });
 
@@ -80,9 +84,12 @@ describe('StoriesService', () => {
                         story: {
                             findMany: storyFindMany,
                             findFirst: storyFindFirst,
+                            findUnique: storyFindUnique,
                             create: storyCreate,
                             delete: storyDelete,
+                            count: storyCount,
                         },
+                        $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
                     },
                 },
                 {
@@ -249,6 +256,81 @@ describe('StoriesService', () => {
                 NotFoundException,
             );
             expect(storyDelete).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('removeAsAdmin', () => {
+        it('should delete any story by id without an ownership scope', async () => {
+            storyFindUnique.mockResolvedValue({ ...MOCK_STORY, pages: [] });
+            storyDelete.mockResolvedValue(MOCK_STORY);
+
+            await service.removeAsAdmin('story-1');
+
+            expect(storyFindUnique).toHaveBeenCalledWith(
+                expect.objectContaining({ where: { id: 'story-1' } }),
+            );
+            expect(storyDelete).toHaveBeenCalledWith({ where: { id: 'story-1' } });
+        });
+
+        it('should throw NotFoundException when the story does not exist', async () => {
+            storyFindUnique.mockResolvedValue(null);
+
+            await expect(service.removeAsAdmin('ghost')).rejects.toThrow(NotFoundException);
+            expect(storyDelete).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('findAllForAdmin', () => {
+        const adminRow = {
+            ...MOCK_STORY,
+            user: { id: 'user-123', name: 'Owner', email: 'owner@b.com' },
+            child: { name: 'Maya' },
+            artStyle: { name: 'Storybook' },
+        };
+
+        it('should map rows to admin summaries with owner context', async () => {
+            storyFindMany.mockResolvedValue([adminRow]);
+            storyCount.mockResolvedValue(1);
+
+            const result = await service.findAllForAdmin(undefined, 1, 20);
+
+            expect(result.total).toBe(1);
+            expect(result.items[0]).toMatchObject({
+                id: 'story-1',
+                owner: { email: 'owner@b.com' },
+                childName: 'Maya',
+                artStyleName: 'Storybook',
+            });
+        });
+
+        it('should search across title, question, and owner email', async () => {
+            storyFindMany.mockResolvedValue([]);
+            storyCount.mockResolvedValue(0);
+
+            await service.findAllForAdmin('sky', 1, 20);
+
+            expect(storyFindMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: {
+                        OR: [
+                            { title: { contains: 'sky', mode: 'insensitive' } },
+                            { question: { contains: 'sky', mode: 'insensitive' } },
+                            { user: { email: { contains: 'sky', mode: 'insensitive' } } },
+                        ],
+                    },
+                }),
+            );
+        });
+
+        it('should apply pagination via skip/take', async () => {
+            storyFindMany.mockResolvedValue([]);
+            storyCount.mockResolvedValue(0);
+
+            await service.findAllForAdmin(undefined, 2, 10);
+
+            expect(storyFindMany).toHaveBeenCalledWith(
+                expect.objectContaining({ skip: 10, take: 10 }),
+            );
         });
     });
 });
