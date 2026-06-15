@@ -1,0 +1,55 @@
+@use 'styles/typography' as *;
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.page__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.page__title {
+    @include t-heading-2xl;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.page__search {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+}
+
+.page__table-wrap {
+    overflow-x: auto;
+    transition: opacity var(--duration-base) var(--ease-out);
+
+    &[data-fetching='true'] {
+        opacity: 0.55;
+    }
+}
+
+.page__empty {
+    @include t-body-md;
+    color: var(--text-muted);
+    padding: var(--space-12) 0;
+    margin: 0;
+}
+
+.page__confirm {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-5);
+}
+
+.page__confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}

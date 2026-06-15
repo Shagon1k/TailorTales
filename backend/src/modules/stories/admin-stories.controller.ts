@@ -12,7 +12,7 @@ import {
 import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { ADMIN_STORIES_LIST_DEFAULT_PAGE_SIZE } from './stories.constants.js';
 import { StoriesService } from './stories.service.js';
-import type { IAdminStoryList } from './stories.types.js';
+import type { IAdminStoryListPage } from './stories.types.js';
 
 /**
  * Story moderation. Visibility toggling lives on `PATCH stories/:id/public` (also AdminGuard);
@@ -29,7 +29,7 @@ export class AdminStoriesController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('pageSize', new DefaultValuePipe(ADMIN_STORIES_LIST_DEFAULT_PAGE_SIZE), ParseIntPipe)
         pageSize: number,
-    ): Promise<IAdminStoryList> {
+    ): Promise<IAdminStoryListPage> {
         return this.storiesService.findAllForAdmin(search, page, pageSize);
     }
 

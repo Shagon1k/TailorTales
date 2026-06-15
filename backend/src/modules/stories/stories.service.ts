@@ -13,7 +13,7 @@ import { QuotaService } from '../subscriptions/quota.service.js';
 import { CreateStoryDto } from './dto/create-story.dto.js';
 import { PUBLIC_STORIES_LIMIT } from './stories.constants.js';
 import type {
-    IAdminStoryList,
+    IAdminStoryListPage,
     IAdminStorySummary,
     IStoryArtStyle,
     IStoryDetail,
@@ -161,7 +161,7 @@ export class StoriesService {
         search: string | undefined,
         page: number,
         pageSize: number,
-    ): Promise<IAdminStoryList> {
+    ): Promise<IAdminStoryListPage> {
         const where: Prisma.StoryWhereInput = search
             ? {
                   OR: [

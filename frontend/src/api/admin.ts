@@ -1,5 +1,10 @@
 import { apiFetch } from '@/lib/api';
-import type { IAdminUserListPage, IAdminUsersFilter } from '@/types/admin.types';
+import type {
+    IAdminStoriesFilter,
+    IAdminStoryListPage,
+    IAdminUserListPage,
+    IAdminUsersFilter,
+} from '@/types/admin.types';
 import type { TUserRole } from '@/types/user.types';
 
 export const adminApi = {
@@ -20,4 +25,13 @@ export const adminApi = {
             method: 'PATCH',
             body: JSON.stringify({ suspended }),
         }),
+
+    getStories: ({ search, page }: IAdminStoriesFilter): Promise<IAdminStoryListPage> => {
+        const params = new URLSearchParams({ page: String(page) });
+        if (search) params.set('search', search);
+        return apiFetch<IAdminStoryListPage>(`/admin/stories?${params.toString()}`);
+    },
+
+    deleteStory: (id: string): Promise<void> =>
+        apiFetch<void>(`/admin/stories/${id}`, { method: 'DELETE' }),
 };

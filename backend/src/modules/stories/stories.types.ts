@@ -53,7 +53,7 @@ export interface IAdminStorySummary {
 }
 
 /** One page of admin stories plus the total count for pagination controls. */
-export interface IAdminStoryList {
+export interface IAdminStoryListPage {
     items: IAdminStorySummary[];
     total: number;
     page: number;
