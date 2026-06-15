@@ -1,0 +1,63 @@
+@use 'styles/typography' as *;
+
+.table__name {
+    @include t-body-sm;
+
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.table__email {
+    @include t-body-sm;
+
+    display: block;
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+.table__title {
+    @include t-body-sm;
+
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table__question {
+    @include t-body-sm;
+
+    display: block;
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table__stars {
+    @include t-body-sm;
+
+    color: var(--accent-primary);
+    letter-spacing: 2px;
+}
+
+.table__comment {
+    @include t-body-sm;
+
+    color: var(--text-secondary);
+    max-width: 260px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.table__comment-empty {
+    color: var(--text-muted);
+}

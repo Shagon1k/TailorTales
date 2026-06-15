@@ -812,15 +812,15 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **Sub-tasks:**
 
-- [ ] Admin-only frontend route group with auth guard
-- [ ] User management: list, suspend, change role
-- [ ] Story moderation queue: list flagged/reported stories, mark as reviewed, force-delete, toggle `isPublic`
-- [ ] StoryBlueprints UI (polish Phase 4 implementation)
-- [ ] ArtStyle management UI: list, create, edit (name, slug, thumbnail, promptPrefix), activate/deactivate, reorder
-- [ ] **Art style sample thumbnails:** "Generate thumbnail" action per style in the admin UI — calls the image model with `{promptPrefix} + fixed mascot prompt` ("a friendly fox character, full body, white background"), stores result as a public S3 object (no signing needed — same image for all users), saves URL to `ArtStyle.thumbnailUrl`. Seed all 8 styles on first run. Thumbnails are static per style; re-generate only when `promptPrefix` changes.
-- [ ] Ratings + feedback view (list all ratings from Phase 10)
-- [ ] Stats dashboard: counts (users, stories, active subs), revenue from Paddle API
-- [ ] Tests: admin auth guard, all admin endpoints
+- [x] Admin-only frontend route group with auth guard
+- [x] User management: list, suspend, change role
+- [x] Story moderation queue: list flagged/reported stories, mark as reviewed, force-delete, toggle `isPublic`
+- [x] StoryBlueprints UI (polish Phase 4 implementation)
+- [x] ArtStyle management UI: list, create, edit (name, slug, thumbnail, promptPrefix), activate/deactivate, reorder
+- [x] **Art style sample thumbnails:** "Generate thumbnail" action per style in the admin UI — calls the image model with `{promptPrefix} + fixed mascot prompt` ("a friendly fox character, full body, white background"), stores result as a public S3 object (no signing needed — same image for all users), saves URL to `ArtStyle.thumbnailUrl`. Seed all 8 styles on first run. Thumbnails are static per style; re-generate only when `promptPrefix` changes.
+- [x] Ratings + feedback view (list all ratings from Phase 10)
+- [x] Stats dashboard: counts (users, stories, active subs), revenue from Paddle API
+- [x] Tests: admin auth guard, all admin endpoints
 
 **Acceptance Check:**
 
@@ -828,7 +828,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Non-admins blocked from admin routes
 - Tests pass
 
-**Deliverables:** `_docs/phase-12-admin.md` + ROADMAP progress.
+**Deliverables:** `_docs/phase-12-admin.md` ✅ + ROADMAP progress.
 
 ---
 

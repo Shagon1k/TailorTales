@@ -1,26 +1,26 @@
 @use 'styles/typography' as *;
 
-.account {
+.layout {
     display: flex;
     flex-direction: column;
     min-height: 100%;
 }
 
-.account__hero {
+.layout__hero {
     position: relative;
     z-index: 1;
     border-bottom: 1px solid var(--border-subtle);
     padding: var(--space-12) 0 var(--space-10);
 }
 
-.account__hero-mascot {
+.layout__hero-mascot {
     position: absolute;
     bottom: -21px;
     right: var(--space-6);
     pointer-events: none;
 }
 
-.account__hero-inner {
+.layout__hero-inner {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-6);
@@ -30,24 +30,24 @@
     gap: var(--space-3);
 }
 
-.account__heading {
+.layout__heading {
     @include t-heading-3xl-italic;
     color: var(--text-primary);
     margin: 0;
 }
 
-.account__subtitle {
+.layout__subtitle {
     @include t-body-md;
     color: var(--text-secondary);
     margin: 0;
 }
 
-.account__body {
+.layout__body {
     flex: 1;
     padding: var(--space-8) 0 var(--space-16);
 }
 
-.account__body-inner {
+.layout__body-inner {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-6);
@@ -56,7 +56,7 @@
     gap: var(--space-8);
 }
 
-.account__content {
+.layout__content {
     flex: 1;
     min-width: 0;
 }

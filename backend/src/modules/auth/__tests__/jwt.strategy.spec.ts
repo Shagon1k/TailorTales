@@ -44,5 +44,14 @@ describe('JwtStrategy', () => {
                 UnauthorizedException,
             );
         });
+
+        it('should throw UnauthorizedException when the account is suspended', async () => {
+            const user = { id: 'user-123', suspendedAt: new Date() } as User;
+            findById.mockResolvedValue(user);
+
+            await expect(strategy.validate({ sub: 'user-123' })).rejects.toThrow(
+                UnauthorizedException,
+            );
+        });
     });
 });

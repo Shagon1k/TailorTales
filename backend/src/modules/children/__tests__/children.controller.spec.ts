@@ -11,6 +11,7 @@ const MOCK_USER: User = {
     avatarUrl: null,
     notificationPreferences: null,
     role: 'USER',
+    suspendedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
 };

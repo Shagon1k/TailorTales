@@ -4,13 +4,14 @@ import { MantineProvider } from '@mantine/core';
 import HeaderUserChip from '../HeaderUserChip';
 
 const mockLogout = vi.hoisted(() => vi.fn());
+const mockUser = vi.hoisted(() => ({ current: { name: 'Alice Wonderland', role: 'USER' } }));
 
 vi.mock('@/api/auth', () => ({
     authApi: { logout: mockLogout },
 }));
 
 vi.mock('@/context/UserContext', () => ({
-    useCurrentUser: () => ({ user: { name: 'Alice Wonderland' } }),
+    useCurrentUser: () => ({ user: mockUser.current }),
 }));
 
 vi.mock('@/hooks/subscription', () => ({
@@ -29,6 +30,7 @@ describe('HeaderUserChip', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockLogout.mockResolvedValue(undefined);
+        mockUser.current = { name: 'Alice Wonderland', role: 'USER' };
     });
 
     describe('trigger', () => {
@@ -64,6 +66,27 @@ describe('HeaderUserChip', () => {
                 '/account/children',
             );
             expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+        });
+
+        it('should not show the admin panel link for a non-admin', async () => {
+            renderChip();
+
+            await userEvent.click(screen.getByRole('button', { name: /account menu/i }));
+
+            await screen.findByRole('link', { name: 'My account' });
+            expect(screen.queryByRole('link', { name: 'Admin panel' })).not.toBeInTheDocument();
+        });
+
+        it('should show the admin panel link for an admin', async () => {
+            mockUser.current = { name: 'Alice Wonderland', role: 'SUPER_ADMIN' };
+            renderChip();
+
+            await userEvent.click(screen.getByRole('button', { name: /account menu/i }));
+
+            expect(await screen.findByRole('link', { name: 'Admin panel' })).toHaveAttribute(
+                'href',
+                '/admin',
+            );
         });
     });
 

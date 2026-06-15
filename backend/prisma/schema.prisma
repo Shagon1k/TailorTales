@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 enum Gender {
@@ -67,6 +68,8 @@ model User {
   name      String
   avatarUrl String?
   role      Role     @default(USER)
+  /** Set when an admin suspends the account; blocks auth while non-null. */
+  suspendedAt DateTime?
   /** Partial per-event channel toggles — null means all defaults (everything on). */
   notificationPreferences Json?
   createdAt DateTime @default(now())
@@ -148,7 +151,8 @@ model ArtStyle {
   id           String   @id @default(cuid())
   name         String
   slug         String   @unique
-  thumbnailUrl String?
+  /** S3 key of the generated sample thumbnail. Signed at serve time — DB never stores URLs. */
+  thumbnailKey String?
   promptPrefix String
   isActive     Boolean  @default(true)
   order        Int

@@ -1,0 +1,14 @@
+@use 'styles/typography' as *;
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+}
+
+.pagination__status {
+    @include t-body-sm;
+    color: var(--text-muted);
+}

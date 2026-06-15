@@ -14,6 +14,7 @@ const MOCK_ADMIN: User = {
     avatarUrl: null,
     notificationPreferences: null,
     role: 'ADMIN',
+    suspendedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
 };

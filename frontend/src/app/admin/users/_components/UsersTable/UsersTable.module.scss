@@ -1,0 +1,33 @@
+@use 'styles/typography' as *;
+
+.table__name {
+    @include t-body-base;
+
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.table__email {
+    display: block;
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+.table__role {
+    font-variant-numeric: tabular-nums;
+}
+
+.table__status {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    white-space: nowrap;
+
+    &.m-suspended {
+        color: var(--accent-warm);
+        border-color: var(--accent-warm);
+    }
+}

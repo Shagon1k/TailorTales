@@ -1,5 +1,13 @@
-import type { ArtStyle, Child, Page, Story } from '../../generated/prisma/client.js';
+import type { Child, Page, Story, StoryStatus, StoryType } from '../../generated/prisma/client.js';
 import type { IMyRating } from '../ratings/ratings.types.js';
+
+/** Art style as embedded in a story response — thumbnailKey signed into a URL. */
+export interface IStoryArtStyle {
+    id: string;
+    name: string;
+    slug: string;
+    thumbnailUrl: string | null;
+}
 
 export interface IStoryConfig {
     allowedPageCounts: readonly number[];
@@ -13,7 +21,7 @@ type StoryWithoutKeys = Omit<Story, 'coverImageKey' | 'pdfKey'>;
 
 export interface IStorySummary extends StoryWithoutKeys {
     child: Pick<Child, 'id' | 'name' | 'birthdate'>;
-    artStyle: Pick<ArtStyle, 'id' | 'name' | 'slug' | 'thumbnailUrl'>;
+    artStyle: IStoryArtStyle;
     /** Pre-signed S3 URL valid for 1 hour. Null until generation completes (Phase 5). */
     coverImageUrl: string | null;
     /** The owner's rating score (1-5), or null if unrated. Only the owner can rate a story. */
@@ -26,4 +34,28 @@ export interface IStoryDetail extends IStorySummary {
     pdfUrl: string | null;
     /** The current user's full rating, so the rating panel pre-fills. Null if unrated. */
     myRating: IMyRating | null;
+}
+
+/** A story row enriched with owner context for the admin moderation table. */
+export interface IAdminStorySummary {
+    id: string;
+    title: string | null;
+    question: string;
+    type: StoryType;
+    status: StoryStatus;
+    isPublic: boolean;
+    pageCount: number;
+    createdAt: Date;
+    coverImageUrl: string | null;
+    owner: { id: string; name: string; email: string };
+    childName: string;
+    artStyleName: string;
+}
+
+/** One page of admin stories plus the total count for pagination controls. */
+export interface IAdminStoryListPage {
+    items: IAdminStorySummary[];
+    total: number;
+    page: number;
+    pageSize: number;
 }

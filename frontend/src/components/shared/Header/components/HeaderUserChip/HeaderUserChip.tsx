@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { authApi } from '@/api/auth';
 import { useCurrentUser } from '@/context/UserContext';
 import { useSubscription } from '@/hooks/subscription';
+import { isAdmin } from '@/utils/role.utils';
 import Avatar from '@/components/ui/Avatar/Avatar';
 import Popover from '@/components/ui/Popover/Popover';
 import styles from './HeaderUserChip.module.scss';
@@ -26,6 +27,12 @@ export default function HeaderUserChip(): React.ReactElement {
     const { data: subscription } = useSubscription();
     const [opened, setOpened] = useState(false);
     const firstName = user?.name?.split(' ')[0] ?? '';
+
+    // Admins get a shortcut into the admin panel; everyone else sees only the account links.
+    const menuLinks =
+        user && isAdmin(user.role)
+            ? [{ href: '/admin', label: 'Admin panel' }, ...MENU_LINKS]
+            : MENU_LINKS;
 
     async function handleSignOut(): Promise<void> {
         setOpened(false);
@@ -60,7 +67,7 @@ export default function HeaderUserChip(): React.ReactElement {
             }
         >
             <ul className={styles.menu}>
-                {MENU_LINKS.map((link) => (
+                {menuLinks.map((link) => (
                     <li key={link.href}>
                         <Link
                             href={link.href}

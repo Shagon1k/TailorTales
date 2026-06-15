@@ -1,36 +1,5 @@
 @use 'styles/typography' as *;
 
-.blueprint-list {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.blueprint-list__th {
-    @include t-caps-xs;
-
-    text-align: left;
-    padding: var(--space-3) var(--space-4);
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border-subtle);
-}
-
-.blueprint-list__row {
-    border-bottom: 1px solid var(--border-subtle);
-    transition: background var(--duration-base) var(--ease-out);
-
-    &:hover {
-        background: var(--bg-elevated);
-    }
-}
-
-.blueprint-list__td {
-    @include t-body-sm;
-
-    padding: var(--space-4);
-    color: var(--text-secondary);
-    vertical-align: top;
-}
-
 .blueprint-list__name {
     @include t-body-base;
 

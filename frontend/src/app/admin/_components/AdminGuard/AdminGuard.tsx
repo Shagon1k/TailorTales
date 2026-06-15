@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/context/UserContext';
+import { isAdmin } from '@/utils/role.utils';
 
 interface IAdminGuardProps {
     children: React.ReactNode;
@@ -16,10 +17,10 @@ export default function AdminGuard({
 
     useEffect(() => {
         if (!isLoading && !user) router.replace('/login');
-        if (!isLoading && user && user.role !== 'ADMIN') router.replace('/library');
+        if (!isLoading && user && !isAdmin(user.role)) router.replace('/library');
     }, [user, isLoading, router]);
 
-    if (isLoading || user?.role !== 'ADMIN') return null;
+    if (isLoading || !user || !isAdmin(user.role)) return null;
 
     return <>{children}</>;
 }

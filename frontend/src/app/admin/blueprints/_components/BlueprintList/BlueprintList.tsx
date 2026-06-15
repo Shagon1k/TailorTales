@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Table from '@/components/ui/Table/Table';
 import type { IStoryBlueprintSummary } from '@/types/story-blueprint.types';
 import styles from './BlueprintList.module.scss';
 
@@ -24,45 +25,45 @@ export default function BlueprintList({
     }
 
     return (
-        <table className={styles['blueprint-list']}>
-            <thead>
-                <tr>
-                    <th className={styles['blueprint-list__th']}>Name</th>
-                    <th className={styles['blueprint-list__th']}>Type</th>
-                    <th className={styles['blueprint-list__th']}>Created</th>
-                    <th className={styles['blueprint-list__th']}>
+        <Table>
+            <Table.Head>
+                <Table.Row>
+                    <Table.HeaderCell>Name</Table.HeaderCell>
+                    <Table.HeaderCell>Type</Table.HeaderCell>
+                    <Table.HeaderCell>Created</Table.HeaderCell>
+                    <Table.HeaderCell>
                         <span className="sr-only">Actions</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
+                    </Table.HeaderCell>
+                </Table.Row>
+            </Table.Head>
+            <Table.Body>
                 {blueprints.map((bp) => (
-                    <tr key={bp.id} className={styles['blueprint-list__row']}>
-                        <td className={styles['blueprint-list__td']}>
+                    <Table.Row key={bp.id}>
+                        <Table.Cell>
                             <span className={styles['blueprint-list__name']}>{bp.name}</span>
                             <span className={styles['blueprint-list__desc']}>{bp.description}</span>
-                        </td>
-                        <td className={styles['blueprint-list__td']}>
+                        </Table.Cell>
+                        <Table.Cell>
                             <span className={styles['blueprint-list__badge']}>{bp.type}</span>
-                        </td>
-                        <td className={styles['blueprint-list__td']}>
+                        </Table.Cell>
+                        <Table.Cell>
                             {new Date(bp.createdAt).toLocaleDateString('en-US', {
                                 day: 'numeric',
                                 month: 'short',
                                 year: 'numeric',
                             })}
-                        </td>
-                        <td className={styles['blueprint-list__td']}>
+                        </Table.Cell>
+                        <Table.Cell>
                             <Link
                                 href={`/admin/blueprints/${bp.id}`}
                                 className={styles['blueprint-list__edit-link']}
                             >
                                 Edit →
                             </Link>
-                        </td>
-                    </tr>
+                        </Table.Cell>
+                    </Table.Row>
                 ))}
-            </tbody>
-        </table>
+            </Table.Body>
+        </Table>
     );
 }
