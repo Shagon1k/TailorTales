@@ -15,7 +15,7 @@ export interface IAdminUserSummary {
 }
 
 /** One page of admin users plus the total count for pagination controls. */
-export interface IAdminUserList {
+export interface IAdminUserListPage {
     items: IAdminUserSummary[];
     total: number;
     page: number;

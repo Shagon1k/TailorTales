@@ -14,7 +14,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { SuperAdminGuard } from '../auth/guards/super-admin.guard.js';
 import { USERS_LIST_DEFAULT_PAGE_SIZE } from './admin.constants.js';
-import type { IAdminUserList } from './admin.types.js';
+import type { IAdminUserListPage } from './admin.types.js';
 import { AdminUsersService } from './admin-users.service.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { UpdateSuspensionDto } from './dto/update-suspension.dto.js';
@@ -30,7 +30,7 @@ export class AdminUsersController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('pageSize', new DefaultValuePipe(USERS_LIST_DEFAULT_PAGE_SIZE), ParseIntPipe)
         pageSize: number,
-    ): Promise<IAdminUserList> {
+    ): Promise<IAdminUserListPage> {
         return this.adminUsersService.list(search, page, pageSize);
     }
 

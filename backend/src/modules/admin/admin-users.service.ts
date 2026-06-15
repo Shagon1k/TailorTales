@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { type User, type Role, Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
-import type { IAdminUserList, IAdminUserSummary } from './admin.types.js';
+import type { IAdminUserListPage, IAdminUserSummary } from './admin.types.js';
 
 /** User row shape returned by the list query — drives IAdminUserSummary mapping. */
 type TUserRow = User & {
@@ -32,7 +32,7 @@ export class AdminUsersService {
         search: string | undefined,
         page: number,
         pageSize: number,
-    ): Promise<IAdminUserList> {
+    ): Promise<IAdminUserListPage> {
         const where: Prisma.UserWhereInput = search
             ? {
                   OR: [
