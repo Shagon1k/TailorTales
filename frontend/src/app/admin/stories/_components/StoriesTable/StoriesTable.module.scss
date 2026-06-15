@@ -1,36 +1,5 @@
 @use 'styles/typography' as *;
 
-.table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.table__th {
-    @include t-caps-xs;
-
-    text-align: left;
-    padding: var(--space-3) var(--space-4);
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border-subtle);
-}
-
-.table__row {
-    border-bottom: 1px solid var(--border-subtle);
-    transition: background var(--duration-base) var(--ease-out);
-
-    &:hover {
-        background: var(--bg-elevated);
-    }
-}
-
-.table__td {
-    @include t-body-sm;
-
-    padding: var(--space-4);
-    color: var(--text-secondary);
-    vertical-align: middle;
-}
-
 .table__story {
     display: flex;
     align-items: center;

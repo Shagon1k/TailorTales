@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import Button from '@/components/ui/Button/Button';
+import Table from '@/components/ui/Table/Table';
 import type { IAdminStorySummary } from '@/types/admin.types';
 import type { IStoryStatus } from '@/types/story.types';
 import styles from './StoriesTable.module.scss';
@@ -32,24 +33,24 @@ export default function StoriesTable({
     isMutating,
 }: Readonly<IStoriesTableProps>): React.ReactElement {
     return (
-        <table className={styles.table}>
-            <thead>
-                <tr>
-                    <th className={styles.table__th}>Story</th>
-                    <th className={styles.table__th}>Status</th>
-                    <th className={styles.table__th}>Owner</th>
-                    <th className={styles.table__th}>Child</th>
-                    <th className={styles.table__th}>Pages</th>
-                    <th className={styles.table__th}>Created</th>
-                    <th className={styles.table__th}>
+        <Table>
+            <Table.Head>
+                <Table.Row>
+                    <Table.HeaderCell>Story</Table.HeaderCell>
+                    <Table.HeaderCell>Status</Table.HeaderCell>
+                    <Table.HeaderCell>Owner</Table.HeaderCell>
+                    <Table.HeaderCell>Child</Table.HeaderCell>
+                    <Table.HeaderCell>Pages</Table.HeaderCell>
+                    <Table.HeaderCell>Created</Table.HeaderCell>
+                    <Table.HeaderCell>
                         <span className="sr-only">Actions</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
+                    </Table.HeaderCell>
+                </Table.Row>
+            </Table.Head>
+            <Table.Body>
                 {stories.map((story) => (
-                    <tr key={story.id} className={styles.table__row}>
-                        <td className={styles.table__td}>
+                    <Table.Row key={story.id}>
+                        <Table.Cell>
                             <div className={styles.table__story}>
                                 {story.coverImageUrl ? (
                                     <img
@@ -69,8 +70,8 @@ export default function StoriesTable({
                                     </span>
                                 </div>
                             </div>
-                        </td>
-                        <td className={styles.table__td}>
+                        </Table.Cell>
+                        <Table.Cell>
                             <span
                                 className={clsx(
                                     styles.table__status,
@@ -79,15 +80,15 @@ export default function StoriesTable({
                             >
                                 {STATUS_LABEL[story.status]}
                             </span>
-                        </td>
-                        <td className={styles.table__td}>
+                        </Table.Cell>
+                        <Table.Cell>
                             <span className={styles.table__name}>{story.owner.name}</span>
                             <span className={styles.table__email}>{story.owner.email}</span>
-                        </td>
-                        <td className={styles.table__td}>{story.childName}</td>
-                        <td className={styles.table__td}>{story.pageCount}</td>
-                        <td className={styles.table__td}>{formatDate(story.createdAt)}</td>
-                        <td className={styles.table__td}>
+                        </Table.Cell>
+                        <Table.Cell>{story.childName}</Table.Cell>
+                        <Table.Cell>{story.pageCount}</Table.Cell>
+                        <Table.Cell>{formatDate(story.createdAt)}</Table.Cell>
+                        <Table.Cell>
                             <Button
                                 variant="quiet"
                                 disabled={isMutating}
@@ -95,10 +96,10 @@ export default function StoriesTable({
                             >
                                 Delete
                             </Button>
-                        </td>
-                    </tr>
+                        </Table.Cell>
+                    </Table.Row>
                 ))}
-            </tbody>
-        </table>
+            </Table.Body>
+        </Table>
     );
 }

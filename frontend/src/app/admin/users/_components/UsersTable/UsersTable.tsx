@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import Button from '@/components/ui/Button/Button';
 import Select from '@/components/ui/Select/Select';
+import Table from '@/components/ui/Table/Table';
 import type { IAdminUserSummary } from '@/types/admin.types';
 import type { TUserRole } from '@/types/user.types';
 import styles from './UsersTable.module.scss';
@@ -37,32 +38,32 @@ export default function UsersTable({
     isMutating,
 }: Readonly<IUsersTableProps>): React.ReactElement {
     return (
-        <table className={styles.table}>
-            <thead>
-                <tr>
-                    <th className={styles.table__th}>User</th>
-                    <th className={styles.table__th}>Role</th>
-                    <th className={styles.table__th}>Tier</th>
-                    <th className={styles.table__th}>Stories</th>
-                    <th className={styles.table__th}>Joined</th>
-                    <th className={styles.table__th}>Status</th>
-                    <th className={styles.table__th}>
+        <Table>
+            <Table.Head>
+                <Table.Row>
+                    <Table.HeaderCell>User</Table.HeaderCell>
+                    <Table.HeaderCell>Role</Table.HeaderCell>
+                    <Table.HeaderCell>Tier</Table.HeaderCell>
+                    <Table.HeaderCell>Stories</Table.HeaderCell>
+                    <Table.HeaderCell>Joined</Table.HeaderCell>
+                    <Table.HeaderCell>Status</Table.HeaderCell>
+                    <Table.HeaderCell>
                         <span className="sr-only">Actions</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
+                    </Table.HeaderCell>
+                </Table.Row>
+            </Table.Head>
+            <Table.Body>
                 {users.map((user) => {
                     const isSelf = user.id === currentUserId;
                     const isSuspended = user.suspendedAt !== null;
 
                     return (
-                        <tr key={user.id} className={styles.table__row}>
-                            <td className={styles.table__td}>
+                        <Table.Row key={user.id}>
+                            <Table.Cell>
                                 <span className={styles.table__name}>{user.name}</span>
                                 <span className={styles.table__email}>{user.email}</span>
-                            </td>
-                            <td className={styles.table__td}>
+                            </Table.Cell>
+                            <Table.Cell>
                                 {canChangeRoles ? (
                                     <Select
                                         data={ROLE_OPTIONS}
@@ -77,11 +78,11 @@ export default function UsersTable({
                                 ) : (
                                     <span className={styles.table__role}>{user.role}</span>
                                 )}
-                            </td>
-                            <td className={styles.table__td}>{user.subscriptionTier ?? '—'}</td>
-                            <td className={styles.table__td}>{user.storiesCount}</td>
-                            <td className={styles.table__td}>{formatDate(user.createdAt)}</td>
-                            <td className={styles.table__td}>
+                            </Table.Cell>
+                            <Table.Cell>{user.subscriptionTier ?? '—'}</Table.Cell>
+                            <Table.Cell>{user.storiesCount}</Table.Cell>
+                            <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
+                            <Table.Cell>
                                 <span
                                     className={clsx(styles.table__status, {
                                         [styles['m-suspended']]: isSuspended,
@@ -89,8 +90,8 @@ export default function UsersTable({
                                 >
                                     {isSuspended ? 'Suspended' : 'Active'}
                                 </span>
-                            </td>
-                            <td className={styles.table__td}>
+                            </Table.Cell>
+                            <Table.Cell>
                                 <Button
                                     variant={isSuspended ? 'secondary' : 'quiet'}
                                     disabled={isSelf || isMutating}
@@ -98,11 +99,11 @@ export default function UsersTable({
                                 >
                                     {isSuspended ? 'Reinstate' : 'Suspend'}
                                 </Button>
-                            </td>
-                        </tr>
+                            </Table.Cell>
+                        </Table.Row>
                     );
                 })}
-            </tbody>
-        </table>
+            </Table.Body>
+        </Table>
     );
 }
