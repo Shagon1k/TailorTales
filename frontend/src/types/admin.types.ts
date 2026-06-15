@@ -63,3 +63,18 @@ export interface IAdminStoriesFilter {
     search?: string;
     page: number;
 }
+
+export interface ICreateArtStylePayload {
+    name: string;
+    slug: string;
+    promptPrefix: string;
+    order: number;
+    isActive?: boolean;
+}
+
+export interface IUpdateArtStylePayload {
+    name?: string;
+    slug?: string;
+    promptPrefix?: string;
+    isActive?: boolean;
+}

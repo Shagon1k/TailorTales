@@ -4,7 +4,10 @@ import type {
     IAdminStoryListPage,
     IAdminUserListPage,
     IAdminUsersFilter,
+    ICreateArtStylePayload,
+    IUpdateArtStylePayload,
 } from '@/types/admin.types';
+import type { IArtStyle } from '@/types/art-style.types';
 import type { TUserRole } from '@/types/user.types';
 
 export const adminApi = {
@@ -34,4 +37,27 @@ export const adminApi = {
 
     deleteStory: (id: string): Promise<void> =>
         apiFetch<void>(`/admin/stories/${id}`, { method: 'DELETE' }),
+
+    getArtStyles: (): Promise<IArtStyle[]> => apiFetch<IArtStyle[]>('/admin/art-styles'),
+
+    createArtStyle: (payload: ICreateArtStylePayload): Promise<IArtStyle> =>
+        apiFetch<IArtStyle>('/admin/art-styles', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+        }),
+
+    updateArtStyle: (id: string, payload: IUpdateArtStylePayload): Promise<IArtStyle> =>
+        apiFetch<IArtStyle>(`/admin/art-styles/${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify(payload),
+        }),
+
+    reorderArtStyles: (orderedIds: string[]): Promise<IArtStyle[]> =>
+        apiFetch<IArtStyle[]>('/admin/art-styles/reorder', {
+            method: 'PATCH',
+            body: JSON.stringify({ orderedIds }),
+        }),
+
+    generateArtStyleThumbnail: (id: string): Promise<IArtStyle> =>
+        apiFetch<IArtStyle>(`/admin/art-styles/${id}/thumbnail`, { method: 'POST' }),
 };

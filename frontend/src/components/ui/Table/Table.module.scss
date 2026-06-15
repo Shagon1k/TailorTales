@@ -16,7 +16,6 @@
 
 .table__row {
     border-bottom: 1px solid var(--border-subtle);
-    transition: background var(--duration-base) var(--ease-out);
 
     &:hover {
         background: var(--bg-elevated);
