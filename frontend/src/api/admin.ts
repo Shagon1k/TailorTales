@@ -1,5 +1,6 @@
 import { apiFetch } from '@/lib/api';
 import type {
+    IAdminStoryRating,
     IAdminStoriesFilter,
     IAdminStoryListPage,
     IAdminUserListPage,
@@ -60,4 +61,6 @@ export const adminApi = {
 
     generateArtStyleThumbnail: (id: string): Promise<IArtStyle> =>
         apiFetch<IArtStyle>(`/admin/art-styles/${id}/thumbnail`, { method: 'POST' }),
+
+    getRatings: (): Promise<IAdminStoryRating[]> => apiFetch<IAdminStoryRating[]>('/admin/ratings'),
 };

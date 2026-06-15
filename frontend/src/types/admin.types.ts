@@ -78,3 +78,15 @@ export interface IUpdateArtStylePayload {
     promptPrefix?: string;
     isActive?: boolean;
 }
+
+export interface IAdminStoryRating {
+    id: string;
+    storyId: string;
+    userId: string;
+    score: number;
+    comment: string | null;
+    createdAt: string;
+    updatedAt: string;
+    story: { id: string; title: string | null; question: string; isPublic: boolean };
+    user: { id: string; name: string; email: string };
+}

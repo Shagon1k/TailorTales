@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin';
 import type {
+    IAdminStoryRating,
     IAdminStoriesFilter,
     IAdminStoryListPage,
     IAdminUserListPage,
@@ -127,5 +128,14 @@ export function useGenerateArtStyleThumbnail(): ReturnType<
     return useMutation({
         mutationFn: (id) => adminApi.generateArtStyleThumbnail(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ADMIN_ART_STYLES_QUERY_KEY }),
+    });
+}
+
+export const ADMIN_RATINGS_QUERY_KEY = ['admin', 'ratings'] as const;
+
+export function useAdminRatings(): ReturnType<typeof useQuery<IAdminStoryRating[]>> {
+    return useQuery({
+        queryKey: ADMIN_RATINGS_QUERY_KEY,
+        queryFn: () => adminApi.getRatings(),
     });
 }

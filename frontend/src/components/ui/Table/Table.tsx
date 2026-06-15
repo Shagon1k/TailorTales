@@ -4,11 +4,11 @@ function TableRoot({ children }: { children: React.ReactNode }): React.ReactElem
     return <table className={styles.table}>{children}</table>;
 }
 
-function TableHead({ children }: { children: React.ReactNode }): React.ReactElement {
+function TableHead({ children }: { children?: React.ReactNode }): React.ReactElement {
     return <thead>{children}</thead>;
 }
 
-function TableBody({ children }: { children: React.ReactNode }): React.ReactElement {
+function TableBody({ children }: { children?: React.ReactNode }): React.ReactElement {
     return <tbody>{children}</tbody>;
 }
 
