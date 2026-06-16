@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
 import HeaderUserChip from './components/HeaderUserChip/HeaderUserChip';
+import LocaleSwitcher from './components/LocaleSwitcher/LocaleSwitcher';
 import NotificationCenter from './components/NotificationCenter/NotificationCenter';
 import styles from './Header.module.scss';
 
@@ -43,6 +44,7 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                             <Link href="/login" className={styles.header__link}>
                                 {t('nav.signIn')}
                             </Link>
+                            <LocaleSwitcher />
                             <ButtonLink href="/login">{t('nav.cta')}</ButtonLink>
                         </>
                     ) : (
@@ -57,8 +59,11 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                                 {t('nav.pricing')}
                             </Link>
                             <span className={styles['header__nav-divider']} aria-hidden="true" />
-                            <NotificationCenter />
-                            <HeaderUserChip />
+                            <div className={styles['header__icon-cluster']}>
+                                <LocaleSwitcher />
+                                <NotificationCenter />
+                                <HeaderUserChip />
+                            </div>
                         </>
                     )}
                 </nav>

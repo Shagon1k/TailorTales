@@ -1,0 +1,100 @@
+@use 'styles/typography' as *;
+
+.trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    transition: border-color 100ms ease;
+
+    &:hover {
+        border-color: var(--text-muted);
+    }
+
+    &[aria-expanded='true'] {
+        border-color: var(--accent-primary);
+    }
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    text-align: left;
+    transition: background var(--duration-base) var(--ease-out);
+
+    &:hover {
+        background: var(--bg-elevated-hover);
+    }
+
+    &[data-active='true'] {
+        background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+    }
+}
+
+.option__badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 22px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+
+    .option[data-active='true'] & {
+        background: var(--accent-primary);
+        border-color: transparent;
+        color: var(--text-inverse);
+    }
+}
+
+.option__name {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+}
+
+.option__dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+}

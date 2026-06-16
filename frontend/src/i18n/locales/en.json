@@ -32,6 +32,12 @@
                 "empty": "All quiet for now — new tales will land here.",
                 "unreadLabel": " (unread)"
             }
+        },
+        "localeSwitcher": {
+            "ariaLabel": "Switch language",
+            "en": "English",
+            "de": "Deutsch",
+            "ru": "Русский"
         }
     },
     "footer": {
@@ -161,6 +167,19 @@
                 "name": "Family Workshop",
                 "tagline": "For voracious little readers.",
                 "cta": "Open the workshop →"
+            },
+            "features": {
+                "tale": "1 tale per month (up to {pages} pages)",
+                "watermarkedPdf": "Watermarked PDF",
+                "regenerations": "{count} page regenerations / month",
+                "childProfile": "1 child profile",
+                "starterArtStyles": "All starter art styles",
+                "pagesPerMonth": "Up to {pages} pages a month",
+                "booksAndComics": "Books and comics",
+                "childrenUnlimited": "Unlimited children",
+                "childrenCount": "Up to {count} children",
+                "noWatermark": "No watermark · print-ready",
+                "storiesForever": "Stories kept forever"
             }
         },
         "comparison": {
@@ -175,6 +194,31 @@
                 "cell": {
                     "included": "Included",
                     "notIncluded": "Not included"
+                },
+                "groups": {
+                    "talesAndPages": "Tales & pages",
+                    "delivery": "Delivery",
+                    "workshop": "Workshop"
+                },
+                "rows": {
+                    "pagesPerMonth": "Pages per month",
+                    "booksAndComics": "Books and comics",
+                    "childrenSupported": "Children supported",
+                    "pageRegenerations": "Page regenerations",
+                    "watermark": "Watermark",
+                    "printReadyPdf": "Print-ready PDF",
+                    "priorityQueue": "Priority queue",
+                    "storiesRetained": "Stories retained",
+                    "contentLanguages": "EN + RU + DE content"
+                },
+                "values": {
+                    "booksOnly": "Books only",
+                    "unlimited": "Unlimited",
+                    "onEveryPage": "On every page",
+                    "none": "None",
+                    "forever": "Forever",
+                    "days": "{days} days",
+                    "perMonth": "{count} / mo"
                 }
             }
         },
@@ -791,5 +835,189 @@
         "heading": "Lost in the woods?",
         "subheading": "This page doesn't exist — but your next story does.",
         "homeLink": "Take me home"
+    },
+    "admin": {
+        "nav": {
+            "ariaLabel": "Admin navigation",
+            "dashboard": "Dashboard",
+            "users": "Users",
+            "stories": "Stories",
+            "artStyles": "Art styles",
+            "ratings": "Ratings",
+            "blueprints": "Blueprints"
+        },
+        "dashboard": {
+            "heading": "Overview",
+            "users": "Users",
+            "stories": "Stories",
+            "activeSubscriptions": "Active subscriptions",
+            "activeSubscriptionsInfo": "Paid tiers only",
+            "mrr": "MRR",
+            "mrrInfo": "Monthly recurring revenue"
+        },
+        "pagination": {
+            "prev": "← Prev",
+            "next": "Next →",
+            "status": "Page {page} of {total}"
+        },
+        "users": {
+            "heading": "Users",
+            "searchPlaceholder": "Search name or email",
+            "searchAriaLabel": "Search users",
+            "loading": "Loading users",
+            "empty": "No users match this search.",
+            "suspendModal": {
+                "title": "Suspend user",
+                "body": "Suspend {name}? They will be signed out everywhere and blocked from signing in until reinstated.",
+                "cancel": "Cancel",
+                "confirm": "Suspend"
+            },
+            "table": {
+                "user": "User",
+                "role": "Role",
+                "tier": "Tier",
+                "stories": "Stories",
+                "joined": "Joined",
+                "status": "Status",
+                "actions": "Actions",
+                "roleAriaLabel": "Role for {name}",
+                "roles": {
+                    "user": "User",
+                    "admin": "Admin",
+                    "superAdmin": "Super admin"
+                },
+                "statusActive": "Active",
+                "statusSuspended": "Suspended",
+                "reinstate": "Reinstate",
+                "suspend": "Suspend"
+            }
+        },
+        "stories": {
+            "heading": "Stories",
+            "searchPlaceholder": "Search title, question or owner",
+            "searchAriaLabel": "Search stories",
+            "loading": "Loading stories",
+            "empty": "No stories match this search.",
+            "deleteModal": {
+                "title": "Delete story",
+                "body": "Permanently delete {title}? This cannot be undone.",
+                "cancel": "Cancel",
+                "confirm": "Delete"
+            },
+            "table": {
+                "story": "Story",
+                "status": "Status",
+                "owner": "Owner",
+                "child": "Child",
+                "pages": "Pages",
+                "created": "Created",
+                "actions": "Actions",
+                "delete": "Delete",
+                "statuses": {
+                    "pending": "Pending",
+                    "generating": "Generating",
+                    "ready": "Ready",
+                    "failed": "Failed"
+                }
+            }
+        },
+        "artStyles": {
+            "heading": "Art styles",
+            "add": "+ Add art style",
+            "loading": "Loading art styles",
+            "empty": "No art styles yet.",
+            "createModalTitle": "Add art style",
+            "editModalTitle": "Edit art style",
+            "table": {
+                "thumbnail": "Thumbnail",
+                "nameSlug": "Name / Slug",
+                "promptPrefix": "Prompt prefix",
+                "active": "Active",
+                "order": "Order",
+                "actions": "Actions",
+                "activeLabel": "Active",
+                "moveUp": "Move {name} up",
+                "moveDown": "Move {name} down",
+                "edit": "Edit",
+                "generateThumbnail": "Generate thumbnail",
+                "regenerateThumbnail": "Regenerate",
+                "generating": "Generating…",
+                "noThumbnail": "none"
+            },
+            "form": {
+                "nameLabel": "Name",
+                "namePlaceholder": "Watercolor",
+                "slugLabel": "Slug",
+                "slugPlaceholder": "watercolor",
+                "slugDescription": "Lowercase, hyphen-separated (e.g. watercolor-style)",
+                "promptPrefixLabel": "Prompt prefix",
+                "promptPrefixPlaceholder": "in a soft watercolor style with…",
+                "promptPrefixDescription": "Prepended to every story generation prompt",
+                "cancel": "Cancel",
+                "save": "Save",
+                "errors": {
+                    "nameRequired": "Name is required",
+                    "slugRequired": "Slug is required",
+                    "slugFormat": "Slug must be kebab-case (e.g. watercolor)",
+                    "promptPrefixRequired": "Prompt prefix is required"
+                }
+            }
+        },
+        "ratings": {
+            "heading": "Ratings",
+            "loading": "Loading ratings",
+            "empty": "No ratings yet.",
+            "table": {
+                "user": "User",
+                "story": "Story",
+                "score": "Score",
+                "comment": "Comment",
+                "date": "Date",
+                "untitled": "(untitled)",
+                "scoreAriaLabel": "{score} out of 5"
+            }
+        },
+        "blueprints": {
+            "heading": "Story blueprints",
+            "add": "+ New blueprint",
+            "backLink": "← Blueprints",
+            "newHeading": "New blueprint",
+            "editHeading": "Edit:",
+            "list": {
+                "empty": "No blueprints yet.",
+                "createFirst": "Create the first one →",
+                "name": "Name",
+                "type": "Type",
+                "created": "Created",
+                "actions": "Actions",
+                "edit": "Edit →"
+            },
+            "form": {
+                "saveChanges": "Save changes",
+                "create": "Create blueprint",
+                "saving": "Saving…",
+                "saveError": "Could not save the blueprint. Please try again.",
+                "deleteConfirm": "Delete \"{name}\"? This cannot be undone.",
+                "nameLabel": "Blueprint name",
+                "namePlaceholder": "My blueprint",
+                "descriptionLabel": "Description",
+                "descriptionPlaceholder": "What this blueprint produces",
+                "typeLabel": "Story type",
+                "systemPromptLabel": "System prompt",
+                "systemPromptPlaceholder": "You are a children's story author…",
+                "cancel": "Cancel",
+                "delete": "Delete blueprint",
+                "deleting": "Deleting…",
+                "deleteError": "Could not delete the blueprint. Please try again.",
+                "typeBook": {
+                    "title": "Book",
+                    "description": "Prose pages with one illustration per spread."
+                },
+                "typeComic": {
+                    "title": "Comic",
+                    "description": "Panels and speech bubbles."
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,7 @@
+'use client';
+
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import Table from '@/components/ui/Table/Table';
 import type { IAdminStorySummary } from '@/types/admin.types';
@@ -10,14 +13,6 @@ export interface IStoriesTableProps {
     onDelete: (story: IAdminStorySummary) => void;
     isMutating: boolean;
 }
-
-const STATUS_LABEL: Record<IStoryStatus, string> = {
-    DRAFT: 'Draft',
-    QUEUED: 'Queued',
-    GENERATING: 'Generating',
-    COMPLETED: 'Completed',
-    FAILED: 'Failed',
-};
 
 function formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString('en-US', {
@@ -32,18 +27,28 @@ export default function StoriesTable({
     onDelete,
     isMutating,
 }: Readonly<IStoriesTableProps>): React.ReactElement {
+    const t = useTranslations('admin.stories.table');
+
+    const statusLabel: Record<IStoryStatus, string> = {
+        DRAFT: t('statuses.pending'),
+        QUEUED: t('statuses.pending'),
+        GENERATING: t('statuses.generating'),
+        COMPLETED: t('statuses.ready'),
+        FAILED: t('statuses.failed'),
+    };
+
     return (
         <Table>
             <Table.Head>
                 <Table.Row>
-                    <Table.HeaderCell>Story</Table.HeaderCell>
-                    <Table.HeaderCell>Status</Table.HeaderCell>
-                    <Table.HeaderCell>Owner</Table.HeaderCell>
-                    <Table.HeaderCell>Child</Table.HeaderCell>
-                    <Table.HeaderCell>Pages</Table.HeaderCell>
-                    <Table.HeaderCell>Created</Table.HeaderCell>
+                    <Table.HeaderCell>{t('story')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('status')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('owner')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('child')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('pages')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('created')}</Table.HeaderCell>
                     <Table.HeaderCell>
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{t('actions')}</span>
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Head>
@@ -78,7 +83,7 @@ export default function StoriesTable({
                                     styles[`m-${story.status.toLowerCase()}`],
                                 )}
                             >
-                                {STATUS_LABEL[story.status]}
+                                {statusLabel[story.status]}
                             </span>
                         </Table.Cell>
                         <Table.Cell>
@@ -94,7 +99,7 @@ export default function StoriesTable({
                                 disabled={isMutating}
                                 onClick={() => onDelete(story)}
                             >
-                                Delete
+                                {t('delete')}
                             </Button>
                         </Table.Cell>
                     </Table.Row>

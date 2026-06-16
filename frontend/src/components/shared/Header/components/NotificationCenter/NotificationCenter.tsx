@@ -64,6 +64,7 @@ export default function NotificationCenter(): React.ReactElement {
         <Popover
             opened={opened}
             onChange={setOpened}
+            trapFocus
             target={
                 <NotificationBell
                     count={unreadCount}

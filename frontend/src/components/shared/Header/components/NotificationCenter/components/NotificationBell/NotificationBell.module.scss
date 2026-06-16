@@ -6,15 +6,15 @@
     width: var(--hit-min);
     height: var(--hit-min);
     border-radius: 50%;
-    border: 1px solid var(--border-strong);
+    border: none;
     background: transparent;
-    color: var(--text-primary);
+    color: var(--text-muted);
     cursor: pointer;
     flex-shrink: 0;
-    transition: border-color 100ms ease;
+    transition: color 100ms ease;
 
     &:hover {
-        border-color: var(--text-muted);
+        color: var(--text-primary);
     }
 
     &__badge {

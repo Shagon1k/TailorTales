@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
 import Button from '@/components/ui/Button/Button';
 import Input from '@/components/ui/Input/Input';
@@ -16,6 +17,7 @@ import UsersTable from './_components/UsersTable/UsersTable';
 import styles from './page.module.scss';
 
 export default function UsersPage(): React.ReactElement {
+    const t = useTranslations('admin.users');
     const { user } = useCurrentUser();
     const canChangeRoles = user ? isSuperAdmin(user.role) : false;
 
@@ -53,24 +55,24 @@ export default function UsersPage(): React.ReactElement {
     return (
         <div className={styles.page}>
             <div className={styles.page__header}>
-                <h2 className={styles.page__title}>Users</h2>
+                <h2 className={styles.page__title}>{t('heading')}</h2>
                 <div className={styles.page__search}>
                     <Input
-                        placeholder="Search name or email"
+                        placeholder={t('searchPlaceholder')}
                         value={searchInput}
                         onChange={(event) => {
                             setSearchInput(event.currentTarget.value);
                             setPage(1);
                         }}
-                        aria-label="Search users"
+                        aria-label={t('searchAriaLabel')}
                     />
                 </div>
             </div>
 
             {isLoading || !data ? (
-                <Loader label="Loading users" />
+                <Loader label={t('loading')} />
             ) : data.items.length === 0 ? (
-                <p className={styles.page__empty}>No users match this search.</p>
+                <p className={styles.page__empty}>{t('empty')}</p>
             ) : (
                 <>
                     <div
@@ -99,19 +101,18 @@ export default function UsersPage(): React.ReactElement {
             <Modal
                 opened={pendingSuspend !== null}
                 onClose={() => setPendingSuspend(null)}
-                title="Suspend user"
+                title={t('suspendModal.title')}
                 size="sm"
             >
                 <p className={styles.page__confirm}>
-                    Suspend <strong>{pendingSuspend?.name}</strong>? They will be signed out
-                    everywhere and blocked from signing in until reinstated.
+                    {t('suspendModal.body', { name: pendingSuspend?.name ?? '' })}
                 </p>
                 <div className={styles['page__confirm-actions']}>
                     <Button variant="secondary" onClick={() => setPendingSuspend(null)}>
-                        Cancel
+                        {t('suspendModal.cancel')}
                     </Button>
                     <Button onClick={confirmSuspend} disabled={isSuspending}>
-                        Suspend
+                        {t('suspendModal.confirm')}
                     </Button>
                 </div>
             </Modal>

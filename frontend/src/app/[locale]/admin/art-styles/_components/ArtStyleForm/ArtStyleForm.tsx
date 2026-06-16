@@ -1,5 +1,8 @@
+'use client';
+
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
@@ -31,42 +34,48 @@ export default function ArtStyleForm({
     onCancel,
     isSubmitting = false,
 }: Readonly<IArtStyleFormProps>): React.ReactElement {
+    const t = useTranslations('admin.artStyles.form');
+
     const form = useForm<IArtStyleFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
         validate: {
-            name: (v) => (v.trim().length < 1 ? 'Name is required' : null),
+            name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
             slug: (v) => {
-                if (!v.trim()) return 'Slug is required';
-                if (!SLUG_PATTERN.test(v)) return 'Slug must be kebab-case (e.g. watercolor)';
+                if (!v.trim()) return t('errors.slugRequired');
+                if (!SLUG_PATTERN.test(v)) return t('errors.slugFormat');
                 return null;
             },
-            promptPrefix: (v) => (v.trim().length < 1 ? 'Prompt prefix is required' : null),
+            promptPrefix: (v) => (v.trim().length < 1 ? t('errors.promptPrefixRequired') : null),
         },
     });
 
     return (
         <form onSubmit={form.onSubmit(onSubmit)}>
             <Stack gap="md">
-                <Input label="Name" placeholder="Watercolor" {...form.getInputProps('name')} />
                 <Input
-                    label="Slug"
-                    placeholder="watercolor"
-                    description="Lowercase, hyphen-separated (e.g. watercolor-style)"
+                    label={t('nameLabel')}
+                    placeholder={t('namePlaceholder')}
+                    {...form.getInputProps('name')}
+                />
+                <Input
+                    label={t('slugLabel')}
+                    placeholder={t('slugPlaceholder')}
+                    description={t('slugDescription')}
                     {...form.getInputProps('slug')}
                 />
                 <Textarea
-                    label="Prompt prefix"
-                    placeholder="in a soft watercolor style with..."
-                    description="Prepended to every story generation prompt"
+                    label={t('promptPrefixLabel')}
+                    placeholder={t('promptPrefixPlaceholder')}
+                    description={t('promptPrefixDescription')}
                     rows={4}
                     {...form.getInputProps('promptPrefix')}
                 />
                 <Stack gap="xs" align="flex-end">
                     <Button variant="secondary" type="button" onClick={onCancel}>
-                        Cancel
+                        {t('cancel')}
                     </Button>
                     <Button type="submit" loading={isSubmitting}>
-                        Save
+                        {t('save')}
                     </Button>
                 </Stack>
             </Stack>

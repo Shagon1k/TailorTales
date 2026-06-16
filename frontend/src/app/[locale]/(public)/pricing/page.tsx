@@ -14,13 +14,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PricingPage(): Promise<React.ReactElement> {
-    const tiers = await pricingServerApi.getAll();
+    const [tiers, tPlans, tTable] = await Promise.all([
+        pricingServerApi.getAll(),
+        getTranslations('pricing.plans'),
+        getTranslations('pricing.comparison.table'),
+    ]);
 
     return (
         <>
             <PricingHero />
-            <PlansSection plans={tiers.map(toPlan)} />
-            <ComparisonTable groups={buildComparisonGroups(tiers)} />
+            <PlansSection plans={tiers.map((tier) => toPlan(tier, tPlans))} />
+            <ComparisonTable groups={buildComparisonGroups(tiers, tTable, tTable)} />
             <FaqSection />
             <CtaSection />
         </>

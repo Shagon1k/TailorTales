@@ -58,6 +58,7 @@ async function makeNextIntlModule(): Promise<object> {
         getTranslations: async (namespace?: string) => makeT(namespace),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         NextIntlClientProvider: ({ children }: { children: any }) => children,
+        useLocale: () => 'en',
     };
 }
 

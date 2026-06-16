@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import Loader from '@/components/ui/Loader/Loader';
 import Modal from '@/components/ui/Modal/Modal';
@@ -19,6 +20,7 @@ import styles from './page.module.scss';
 type TModalState = { kind: 'closed' } | { kind: 'create' } | { kind: 'edit'; style: IArtStyle };
 
 export default function ArtStylesPage(): React.ReactElement {
+    const t = useTranslations('admin.artStyles');
     const { data, isLoading } = useAdminArtStyles();
     const { mutate: createStyle, isPending: isCreating } = useCreateArtStyle();
     const {
@@ -77,14 +79,14 @@ export default function ArtStylesPage(): React.ReactElement {
     return (
         <div className={styles.page}>
             <div className={styles.page__header}>
-                <h2 className={styles.page__title}>Art styles</h2>
-                <Button onClick={() => setModal({ kind: 'create' })}>+ Add art style</Button>
+                <h2 className={styles.page__title}>{t('heading')}</h2>
+                <Button onClick={() => setModal({ kind: 'create' })}>{t('add')}</Button>
             </div>
 
             {isLoading || !data ? (
-                <Loader label="Loading art styles" />
+                <Loader label={t('loading')} />
             ) : sorted.length === 0 ? (
-                <p className={styles.page__empty}>No art styles yet.</p>
+                <p className={styles.page__empty}>{t('empty')}</p>
             ) : (
                 <div className={styles['page__table-wrap']}>
                     <ArtStylesTable
@@ -104,7 +106,7 @@ export default function ArtStylesPage(): React.ReactElement {
             <Modal
                 opened={modal.kind !== 'closed'}
                 onClose={() => setModal({ kind: 'closed' })}
-                title={modal.kind === 'edit' ? 'Edit art style' : 'Add art style'}
+                title={modal.kind === 'edit' ? t('editModalTitle') : t('createModalTitle')}
             >
                 {modal.kind === 'create' && (
                     <ArtStyleForm

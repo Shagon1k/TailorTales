@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import Table from '@/components/ui/Table/Table';
 import type { IAdminStoryRating } from '@/types/admin.types';
 import styles from './RatingsTable.module.scss';
@@ -13,15 +16,17 @@ function renderStars(score: number): string {
 export default function RatingsTable({
     ratings,
 }: Readonly<IRatingsTableProps>): React.ReactElement {
+    const t = useTranslations('admin.ratings.table');
+
     return (
         <Table>
             <Table.Head>
                 <Table.Row>
-                    <Table.HeaderCell>User</Table.HeaderCell>
-                    <Table.HeaderCell>Story</Table.HeaderCell>
-                    <Table.HeaderCell>Score</Table.HeaderCell>
-                    <Table.HeaderCell>Comment</Table.HeaderCell>
-                    <Table.HeaderCell>Date</Table.HeaderCell>
+                    <Table.HeaderCell>{t('user')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('story')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('score')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('comment')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('date')}</Table.HeaderCell>
                 </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -33,14 +38,14 @@ export default function RatingsTable({
                         </Table.Cell>
                         <Table.Cell>
                             <span className={styles.table__title}>
-                                {rating.story.title ?? '(untitled)'}
+                                {rating.story.title ?? t('untitled')}
                             </span>
                             <span className={styles.table__question}>{rating.story.question}</span>
                         </Table.Cell>
                         <Table.Cell>
                             <span
                                 className={styles.table__stars}
-                                aria-label={`${rating.score} out of 5`}
+                                aria-label={t('scoreAriaLabel', { score: rating.score })}
                             >
                                 {renderStars(rating.score)}
                             </span>

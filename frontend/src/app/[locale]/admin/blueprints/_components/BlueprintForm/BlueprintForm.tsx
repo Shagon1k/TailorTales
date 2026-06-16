@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
@@ -24,6 +25,7 @@ export interface IBlueprintFormProps {
 export default function BlueprintForm({
     blueprint,
 }: Readonly<IBlueprintFormProps>): React.ReactElement {
+    const t = useTranslations('admin.blueprints.form');
     const router = useRouter();
     const isEdit = Boolean(blueprint);
 
@@ -40,8 +42,7 @@ export default function BlueprintForm({
         type !== null &&
         systemPrompt.trim().length > 0;
 
-    const submitReadyLabel = isEdit ? 'Save changes' : 'Create blueprint';
-    const submitLabel = isPending ? 'Saving…' : submitReadyLabel;
+    const submitLabel = isPending ? t('saving') : isEdit ? t('saveChanges') : t('create');
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>): Promise<void> {
         e.preventDefault();
@@ -68,7 +69,7 @@ export default function BlueprintForm({
             router.refresh();
         } catch (err: unknown) {
             console.error('Failed to save blueprint', err);
-            setError('Could not save the blueprint. Please try again.');
+            setError(t('saveError'));
         } finally {
             setIsPending(false);
         }
@@ -76,7 +77,7 @@ export default function BlueprintForm({
 
     async function handleDelete(): Promise<void> {
         if (!isEdit || isPending) return;
-        if (!confirm(`Delete "${blueprint!.name}"? This cannot be undone.`)) return;
+        if (!confirm(t('deleteConfirm', { name: blueprint!.name }))) return;
 
         setIsPending(true);
         try {
@@ -85,7 +86,7 @@ export default function BlueprintForm({
             router.refresh();
         } catch (err: unknown) {
             console.error('Failed to delete blueprint', err);
-            setError('Could not delete the blueprint. Please try again.');
+            setError(t('deleteError'));
             setIsPending(false);
         }
     }
@@ -94,13 +95,13 @@ export default function BlueprintForm({
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.form__field}>
                 <label htmlFor="bp-name" className={styles.form__label}>
-                    Name
+                    {t('nameLabel')}
                 </label>
                 <Input
                     id="bp-name"
                     value={name}
                     onChange={(e) => setName(e.currentTarget.value)}
-                    placeholder="e.g. Storybook — gentle adventure"
+                    placeholder={t('namePlaceholder')}
                     maxLength={NAME_MAX}
                     required
                     aria-required="true"
@@ -112,13 +113,13 @@ export default function BlueprintForm({
 
             <div className={styles.form__field}>
                 <label htmlFor="bp-description" className={styles.form__label}>
-                    Description
+                    {t('descriptionLabel')}
                 </label>
                 <Textarea
                     id="bp-description"
                     value={description}
                     onChange={(e) => setDescription(e.currentTarget.value)}
-                    placeholder="Short summary of what this blueprint produces"
+                    placeholder={t('descriptionPlaceholder')}
                     minRows={3}
                     maxRows={6}
                     maxLength={DESCRIPTION_MAX}
@@ -131,35 +132,35 @@ export default function BlueprintForm({
 
             <div className={styles.form__field}>
                 <p className={styles.form__label} id="bp-type-label">
-                    Story type
+                    {t('typeLabel')}
                 </p>
                 <RadioCardGroup
                     value={type}
                     onChange={(v) => setType(v as IStoryType)}
-                    label="Story type"
+                    label={t('typeLabel')}
                 >
                     <RadioCard
                         value="BOOK"
-                        title="Book"
-                        description="Prose pages with one illustration per spread."
+                        title={t('typeBook.title')}
+                        description={t('typeBook.description')}
                     />
                     <RadioCard
                         value="COMIC"
-                        title="Comic"
-                        description="Panels and speech bubbles."
+                        title={t('typeComic.title')}
+                        description={t('typeComic.description')}
                     />
                 </RadioCardGroup>
             </div>
 
             <div className={styles.form__field}>
                 <label htmlFor="bp-prompt" className={styles.form__label}>
-                    System prompt
+                    {t('systemPromptLabel')}
                 </label>
                 <Textarea
                     id="bp-prompt"
                     value={systemPrompt}
                     onChange={(e) => setSystemPrompt(e.currentTarget.value)}
-                    placeholder="Use XML markers: <intro_prompt>…</intro_prompt>"
+                    placeholder={t('systemPromptPlaceholder')}
                     minRows={12}
                     maxRows={30}
                     maxLength={SYSTEM_PROMPT_MAX}
@@ -191,7 +192,7 @@ export default function BlueprintForm({
                     onClick={() => router.push('/admin/blueprints')}
                     disabled={isPending}
                 >
-                    Cancel
+                    {t('cancel')}
                 </Button>
                 {isEdit && (
                     <div className={styles['form__delete-wrap']}>
@@ -201,7 +202,7 @@ export default function BlueprintForm({
                             onClick={handleDelete}
                             disabled={isPending}
                         >
-                            Delete blueprint
+                            {t('delete')}
                         </Button>
                     </div>
                 )}

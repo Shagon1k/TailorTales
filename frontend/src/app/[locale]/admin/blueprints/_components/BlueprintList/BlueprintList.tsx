@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import Table from '@/components/ui/Table/Table';
 import type { IStoryBlueprintSummary } from '@/types/story-blueprint.types';
@@ -7,18 +8,20 @@ export interface IBlueprintListProps {
     blueprints: IStoryBlueprintSummary[];
 }
 
-export default function BlueprintList({
+export default async function BlueprintList({
     blueprints,
-}: Readonly<IBlueprintListProps>): React.ReactElement {
+}: Readonly<IBlueprintListProps>): Promise<React.ReactElement> {
+    const t = await getTranslations('admin.blueprints.list');
+
     if (blueprints.length === 0) {
         return (
             <p className={styles['blueprint-list__empty']}>
-                No blueprints yet.{' '}
+                {t('empty')}{' '}
                 <Link
                     href="/admin/blueprints/new"
                     className={styles['blueprint-list__create-link']}
                 >
-                    Create the first one →
+                    {t('createFirst')}
                 </Link>
             </p>
         );
@@ -28,11 +31,11 @@ export default function BlueprintList({
         <Table>
             <Table.Head>
                 <Table.Row>
-                    <Table.HeaderCell>Name</Table.HeaderCell>
-                    <Table.HeaderCell>Type</Table.HeaderCell>
-                    <Table.HeaderCell>Created</Table.HeaderCell>
+                    <Table.HeaderCell>{t('name')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('type')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('created')}</Table.HeaderCell>
                     <Table.HeaderCell>
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{t('actions')}</span>
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Head>
@@ -58,7 +61,7 @@ export default function BlueprintList({
                                 href={`/admin/blueprints/${bp.id}`}
                                 className={styles['blueprint-list__edit-link']}
                             >
-                                Edit →
+                                {t('edit')}
                             </Link>
                         </Table.Cell>
                     </Table.Row>

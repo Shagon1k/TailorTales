@@ -1,32 +1,28 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import clsx from 'clsx';
 import styles from './AdminSidebar.module.scss';
 
-interface INavItem {
-    href: string;
-    label: string;
-}
-
-const NAV_ITEMS: INavItem[] = [
-    { href: '/admin', label: 'Dashboard' },
-    { href: '/admin/users', label: 'Users' },
-    { href: '/admin/stories', label: 'Stories' },
-    { href: '/admin/art-styles', label: 'Art styles' },
-    { href: '/admin/ratings', label: 'Ratings' },
-    { href: '/admin/blueprints', label: 'Blueprints' },
-];
-
 export default function AdminSidebar(): React.ReactElement {
+    const t = useTranslations('admin.nav');
     const pathname = usePathname();
+
+    const navItems = [
+        { href: '/admin', label: t('dashboard') },
+        { href: '/admin/users', label: t('users') },
+        { href: '/admin/stories', label: t('stories') },
+        { href: '/admin/art-styles', label: t('artStyles') },
+        { href: '/admin/ratings', label: t('ratings') },
+        { href: '/admin/blueprints', label: t('blueprints') },
+    ];
 
     return (
         <aside className={styles.sidebar}>
-            <nav aria-label="Admin navigation">
+            <nav aria-label={t('ariaLabel')}>
                 <ul className={styles.sidebar__nav}>
-                    {NAV_ITEMS.map((item) => {
-                        // Dashboard is an exact match; sections also match their nested routes.
+                    {navItems.map((item) => {
                         const isActive =
                             item.href === '/admin'
                                 ? pathname === '/admin'

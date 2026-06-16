@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
 import Button from '@/components/ui/Button/Button';
 import Input from '@/components/ui/Input/Input';
@@ -13,6 +14,7 @@ import StoriesTable from './_components/StoriesTable/StoriesTable';
 import styles from './page.module.scss';
 
 export default function StoriesPage(): React.ReactElement {
+    const t = useTranslations('admin.stories');
     const [searchInput, setSearchInput] = useState('');
     const [debouncedSearch] = useDebouncedValue(searchInput, 500);
     const [page, setPage] = useState(1);
@@ -36,24 +38,24 @@ export default function StoriesPage(): React.ReactElement {
     return (
         <div className={styles.page}>
             <div className={styles.page__header}>
-                <h2 className={styles.page__title}>Stories</h2>
+                <h2 className={styles.page__title}>{t('heading')}</h2>
                 <div className={styles.page__search}>
                     <Input
-                        placeholder="Search title, question or owner"
+                        placeholder={t('searchPlaceholder')}
                         value={searchInput}
                         onChange={(event) => {
                             setSearchInput(event.currentTarget.value);
                             setPage(1);
                         }}
-                        aria-label="Search stories"
+                        aria-label={t('searchAriaLabel')}
                     />
                 </div>
             </div>
 
             {isLoading || !data ? (
-                <Loader label="Loading stories" />
+                <Loader label={t('loading')} />
             ) : data.items.length === 0 ? (
-                <p className={styles.page__empty}>No stories match this search.</p>
+                <p className={styles.page__empty}>{t('empty')}</p>
             ) : (
                 <>
                     <div
@@ -79,18 +81,18 @@ export default function StoriesPage(): React.ReactElement {
             <Modal
                 opened={pendingDelete !== null}
                 onClose={() => setPendingDelete(null)}
-                title="Delete story"
+                title={t('deleteModal.title')}
                 size="sm"
             >
                 <p className={styles.page__confirm}>
-                    Permanently delete <strong>{storyLabel}</strong>? This cannot be undone.
+                    {t('deleteModal.body', { title: storyLabel })}
                 </p>
                 <div className={styles['page__confirm-actions']}>
                     <Button variant="secondary" onClick={() => setPendingDelete(null)}>
-                        Cancel
+                        {t('deleteModal.cancel')}
                     </Button>
                     <Button onClick={confirmDelete} disabled={isDeleting}>
-                        Delete
+                        {t('deleteModal.confirm')}
                     </Button>
                 </div>
             </Modal>

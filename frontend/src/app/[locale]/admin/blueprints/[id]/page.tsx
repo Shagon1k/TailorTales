@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { notFound } from 'next/navigation';
 import { storyBlueprintsServerApi } from '@/api/story-blueprints.server';
@@ -23,13 +24,15 @@ export default async function EditBlueprintPage({
         notFound();
     }
 
+    const t = await getTranslations('admin.blueprints');
+
     return (
         <div className={styles.page}>
             <Link href="/admin/blueprints" className={styles.page__back}>
-                ← Blueprints
+                {t('backLink')}
             </Link>
             <h2 className={styles.page__title}>
-                Edit: <span className={styles.page__name}>{blueprint.name}</span>
+                {t('editHeading')} <span className={styles.page__name}>{blueprint.name}</span>
             </h2>
             <BlueprintForm blueprint={blueprint} />
         </div>

@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import '@mantine/core/styles.css';
 import '../../styles/globals.scss';
+import { getServerSubscription } from '@/api/subscription.server';
 import { getServerUser } from '@/api/user.server';
 import StarField from '@/components/shared/StarField/StarField';
 import type { ILocale } from '@/i18n/config';
@@ -53,8 +54,9 @@ export default async function LocaleLayout({
     params,
 }: Readonly<ILocaleLayoutProps>): Promise<React.ReactElement> {
     const { locale } = await params;
-    const initialUser = await getServerUser();
-    const messages = await getMessages();
+    const [initialUser, messages] = await Promise.all([getServerUser(), getMessages()]);
+    // Sequential: subscription requires auth, so we fetch only when user exists.
+    const initialSubscription = initialUser ? await getServerSubscription() : null;
     const fontClasses = `${newsreader.variable} ${jakarta.variable} ${caveat.variable} ${geistMono.variable}`;
 
     return (
@@ -65,7 +67,9 @@ export default async function LocaleLayout({
             <body>
                 <StarField />
                 <NextIntlClientProvider messages={messages}>
-                    <Providers initialUser={initialUser}>{children}</Providers>
+                    <Providers initialUser={initialUser} initialSubscription={initialSubscription}>
+                        {children}
+                    </Providers>
                 </NextIntlClientProvider>
             </body>
         </html>

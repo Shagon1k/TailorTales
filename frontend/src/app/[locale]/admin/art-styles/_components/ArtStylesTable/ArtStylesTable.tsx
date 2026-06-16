@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import Switch from '@/components/ui/Switch/Switch';
 import Table from '@/components/ui/Table/Table';
@@ -29,17 +32,19 @@ export default function ArtStylesTable({
     updatingId,
     generatingId,
 }: Readonly<IArtStylesTableProps>): React.ReactElement {
+    const t = useTranslations('admin.artStyles.table');
+
     return (
         <Table>
             <Table.Head>
                 <Table.Row>
-                    <Table.HeaderCell>Thumbnail</Table.HeaderCell>
-                    <Table.HeaderCell>Name / Slug</Table.HeaderCell>
-                    <Table.HeaderCell>Prompt prefix</Table.HeaderCell>
-                    <Table.HeaderCell>Active</Table.HeaderCell>
-                    <Table.HeaderCell>Order</Table.HeaderCell>
+                    <Table.HeaderCell>{t('thumbnail')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('nameSlug')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('promptPrefix')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('active')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('order')}</Table.HeaderCell>
                     <Table.HeaderCell>
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{t('actions')}</span>
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Head>
@@ -54,7 +59,9 @@ export default function ArtStylesTable({
                                     className={styles.table__thumbnail}
                                 />
                             ) : (
-                                <div className={styles['table__thumbnail-placeholder']}>none</div>
+                                <div className={styles['table__thumbnail-placeholder']}>
+                                    {t('noThumbnail')}
+                                </div>
                             )}
                         </Table.Cell>
                         <Table.Cell>
@@ -68,7 +75,7 @@ export default function ArtStylesTable({
                             <Switch
                                 checked={artStyle.isActive}
                                 onChange={() => onToggleActive(artStyle)}
-                                label="Active"
+                                label={t('activeLabel')}
                                 disabled={updatingId === artStyle.id}
                             />
                         </Table.Cell>
@@ -78,7 +85,7 @@ export default function ArtStylesTable({
                                     variant="quiet"
                                     disabled={idx === 0 || isMutating}
                                     onClick={() => onMoveUp(artStyle)}
-                                    aria-label={`Move ${artStyle.name} up`}
+                                    aria-label={t('moveUp', { name: artStyle.name })}
                                 >
                                     ↑
                                 </Button>
@@ -86,7 +93,7 @@ export default function ArtStylesTable({
                                     variant="quiet"
                                     disabled={idx === artStyles.length - 1 || isMutating}
                                     onClick={() => onMoveDown(artStyle)}
-                                    aria-label={`Move ${artStyle.name} down`}
+                                    aria-label={t('moveDown', { name: artStyle.name })}
                                 >
                                     ↓
                                 </Button>
@@ -99,7 +106,7 @@ export default function ArtStylesTable({
                                     disabled={isMutating}
                                     onClick={() => onEdit(artStyle)}
                                 >
-                                    Edit
+                                    {t('edit')}
                                 </Button>
                                 <Button
                                     variant="quiet"
@@ -107,7 +114,9 @@ export default function ArtStylesTable({
                                     loading={generatingId === artStyle.id}
                                     onClick={() => onGenerateThumbnail(artStyle)}
                                 >
-                                    {artStyle.thumbnailUrl ? 'Regenerate' : 'Generate thumbnail'}
+                                    {artStyle.thumbnailUrl
+                                        ? t('regenerateThumbnail')
+                                        : t('generateThumbnail')}
                                 </Button>
                             </div>
                         </Table.Cell>

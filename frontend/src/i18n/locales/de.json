@@ -32,6 +32,12 @@
                 "empty": "Alles ruhig — neue Geschichten erscheinen hier.",
                 "unreadLabel": " (ungelesen)"
             }
+        },
+        "localeSwitcher": {
+            "ariaLabel": "Sprache wechseln",
+            "en": "English",
+            "de": "Deutsch",
+            "ru": "Русский"
         }
     },
     "footer": {
@@ -161,6 +167,19 @@
                 "name": "Family Workshop",
                 "tagline": "Für begeisterte kleine Leser.",
                 "cta": "Werkstatt öffnen →"
+            },
+            "features": {
+                "tale": "1 Geschichte pro Monat (bis zu {pages} Seiten)",
+                "watermarkedPdf": "PDF mit Wasserzeichen",
+                "regenerations": "{count} Seiten-Regenerierungen / Monat",
+                "childProfile": "1 Kindprofil",
+                "starterArtStyles": "Alle Starter-Kunststile",
+                "pagesPerMonth": "Bis zu {pages} Seiten pro Monat",
+                "booksAndComics": "Bücher und Comics",
+                "childrenUnlimited": "Unbegrenzte Kinder",
+                "childrenCount": "Bis zu {count} Kinder",
+                "noWatermark": "Kein Wasserzeichen · druckfertig",
+                "storiesForever": "Geschichten für immer gespeichert"
             }
         },
         "comparison": {
@@ -175,6 +194,31 @@
                 "cell": {
                     "included": "Enthalten",
                     "notIncluded": "Nicht enthalten"
+                },
+                "groups": {
+                    "talesAndPages": "Geschichten & Seiten",
+                    "delivery": "Lieferung",
+                    "workshop": "Werkstatt"
+                },
+                "rows": {
+                    "pagesPerMonth": "Seiten pro Monat",
+                    "booksAndComics": "Bücher und Comics",
+                    "childrenSupported": "Unterstützte Kinder",
+                    "pageRegenerations": "Seiten-Regenerierungen",
+                    "watermark": "Wasserzeichen",
+                    "printReadyPdf": "Druckfertiges PDF",
+                    "priorityQueue": "Prioritätswarteschlange",
+                    "storiesRetained": "Gespeicherte Geschichten",
+                    "contentLanguages": "EN + RU + DE Inhalt"
+                },
+                "values": {
+                    "booksOnly": "Nur Bücher",
+                    "unlimited": "Unbegrenzt",
+                    "onEveryPage": "Auf jeder Seite",
+                    "none": "Kein",
+                    "forever": "Für immer",
+                    "days": "{days} Tage",
+                    "perMonth": "{count} / Mo."
                 }
             }
         },
@@ -791,5 +835,189 @@
         "heading": "Im Wald verloren?",
         "subheading": "Diese Seite existiert nicht — aber deine nächste Geschichte schon.",
         "homeLink": "Bring mich nach Hause"
+    },
+    "admin": {
+        "nav": {
+            "ariaLabel": "Admin-Navigation",
+            "dashboard": "Dashboard",
+            "users": "Benutzer",
+            "stories": "Geschichten",
+            "artStyles": "Kunststile",
+            "ratings": "Bewertungen",
+            "blueprints": "Vorlagen"
+        },
+        "dashboard": {
+            "heading": "Übersicht",
+            "users": "Benutzer",
+            "stories": "Geschichten",
+            "activeSubscriptions": "Aktive Abonnements",
+            "activeSubscriptionsInfo": "Nur bezahlte Tarife",
+            "mrr": "MRR",
+            "mrrInfo": "Monatlich wiederkehrender Umsatz"
+        },
+        "pagination": {
+            "prev": "← Zurück",
+            "next": "Weiter →",
+            "status": "Seite {page} von {total}"
+        },
+        "users": {
+            "heading": "Benutzer",
+            "searchPlaceholder": "Name oder E-Mail suchen",
+            "searchAriaLabel": "Benutzer suchen",
+            "loading": "Benutzer werden geladen",
+            "empty": "Keine Benutzer gefunden.",
+            "suspendModal": {
+                "title": "Benutzer sperren",
+                "body": "{name} sperren? Sie werden überall abgemeldet und können sich erst nach Freischaltung wieder anmelden.",
+                "cancel": "Abbrechen",
+                "confirm": "Sperren"
+            },
+            "table": {
+                "user": "Benutzer",
+                "role": "Rolle",
+                "tier": "Tarif",
+                "stories": "Geschichten",
+                "joined": "Beigetreten",
+                "status": "Status",
+                "actions": "Aktionen",
+                "roleAriaLabel": "Rolle für {name}",
+                "roles": {
+                    "user": "Benutzer",
+                    "admin": "Admin",
+                    "superAdmin": "Super-Admin"
+                },
+                "statusActive": "Aktiv",
+                "statusSuspended": "Gesperrt",
+                "reinstate": "Freischalten",
+                "suspend": "Sperren"
+            }
+        },
+        "stories": {
+            "heading": "Geschichten",
+            "searchPlaceholder": "Titel, Frage oder Besitzer suchen",
+            "searchAriaLabel": "Geschichten suchen",
+            "loading": "Geschichten werden geladen",
+            "empty": "Keine Geschichten gefunden.",
+            "deleteModal": {
+                "title": "Geschichte löschen",
+                "body": "{title} dauerhaft löschen? Dies kann nicht rückgängig gemacht werden.",
+                "cancel": "Abbrechen",
+                "confirm": "Löschen"
+            },
+            "table": {
+                "story": "Geschichte",
+                "status": "Status",
+                "owner": "Besitzer",
+                "child": "Kind",
+                "pages": "Seiten",
+                "created": "Erstellt",
+                "actions": "Aktionen",
+                "delete": "Löschen",
+                "statuses": {
+                    "pending": "Ausstehend",
+                    "generating": "Wird erstellt",
+                    "ready": "Fertig",
+                    "failed": "Fehlgeschlagen"
+                }
+            }
+        },
+        "artStyles": {
+            "heading": "Kunststile",
+            "add": "+ Kunststil hinzufügen",
+            "loading": "Kunststile werden geladen",
+            "empty": "Noch keine Kunststile.",
+            "createModalTitle": "Kunststil hinzufügen",
+            "editModalTitle": "Kunststil bearbeiten",
+            "table": {
+                "thumbnail": "Vorschaubild",
+                "nameSlug": "Name / Slug",
+                "promptPrefix": "Prompt-Präfix",
+                "active": "Aktiv",
+                "order": "Reihenfolge",
+                "actions": "Aktionen",
+                "activeLabel": "Aktiv",
+                "moveUp": "{name} nach oben",
+                "moveDown": "{name} nach unten",
+                "edit": "Bearbeiten",
+                "generateThumbnail": "Vorschaubild erstellen",
+                "regenerateThumbnail": "Neu generieren",
+                "generating": "Wird erstellt…",
+                "noThumbnail": "keins"
+            },
+            "form": {
+                "nameLabel": "Name",
+                "namePlaceholder": "Aquarell",
+                "slugLabel": "Slug",
+                "slugPlaceholder": "aquarell",
+                "slugDescription": "Kleinbuchstaben, bindestrichgetrennt (z.B. aquarell-stil)",
+                "promptPrefixLabel": "Prompt-Präfix",
+                "promptPrefixPlaceholder": "in einem weichen Aquarellstil mit…",
+                "promptPrefixDescription": "Wird jedem Story-Generierungsprompt vorangestellt",
+                "cancel": "Abbrechen",
+                "save": "Speichern",
+                "errors": {
+                    "nameRequired": "Name ist erforderlich",
+                    "slugRequired": "Slug ist erforderlich",
+                    "slugFormat": "Slug muss kebab-case sein (z.B. aquarell)",
+                    "promptPrefixRequired": "Prompt-Präfix ist erforderlich"
+                }
+            }
+        },
+        "ratings": {
+            "heading": "Bewertungen",
+            "loading": "Bewertungen werden geladen",
+            "empty": "Noch keine Bewertungen.",
+            "table": {
+                "user": "Benutzer",
+                "story": "Geschichte",
+                "score": "Bewertung",
+                "comment": "Kommentar",
+                "date": "Datum",
+                "untitled": "(ohne Titel)",
+                "scoreAriaLabel": "{score} von 5"
+            }
+        },
+        "blueprints": {
+            "heading": "Story-Vorlagen",
+            "add": "+ Neue Vorlage",
+            "backLink": "← Vorlagen",
+            "newHeading": "Neue Vorlage",
+            "editHeading": "Bearbeiten:",
+            "list": {
+                "empty": "Noch keine Vorlagen.",
+                "createFirst": "Erste erstellen →",
+                "name": "Name",
+                "type": "Typ",
+                "created": "Erstellt",
+                "actions": "Aktionen",
+                "edit": "Bearbeiten →"
+            },
+            "form": {
+                "saveChanges": "Änderungen speichern",
+                "create": "Vorlage erstellen",
+                "saving": "Wird gespeichert…",
+                "saveError": "Vorlage konnte nicht gespeichert werden. Bitte erneut versuchen.",
+                "deleteConfirm": "\"{name}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+                "nameLabel": "Vorlagenname",
+                "namePlaceholder": "Meine Vorlage",
+                "descriptionLabel": "Beschreibung",
+                "descriptionPlaceholder": "Was diese Vorlage erzeugt",
+                "typeLabel": "Story-Typ",
+                "systemPromptLabel": "System-Prompt",
+                "systemPromptPlaceholder": "Du bist ein Kinderbuchautor…",
+                "cancel": "Abbrechen",
+                "delete": "Vorlage löschen",
+                "deleting": "Wird gelöscht…",
+                "deleteError": "Vorlage konnte nicht gelöscht werden. Bitte erneut versuchen.",
+                "typeBook": {
+                    "title": "Buch",
+                    "description": "Prosatext mit einer Illustration pro Seite."
+                },
+                "typeComic": {
+                    "title": "Comic",
+                    "description": "Panels und Sprechblasen."
+                }
+            }
+        }
     }
 }

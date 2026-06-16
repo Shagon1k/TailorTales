@@ -1,16 +1,13 @@
+'use client';
+
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import Select from '@/components/ui/Select/Select';
 import Table from '@/components/ui/Table/Table';
 import type { IAdminUserSummary } from '@/types/admin.types';
 import type { TUserRole } from '@/types/user.types';
 import styles from './UsersTable.module.scss';
-
-const ROLE_OPTIONS: { value: TUserRole; label: string }[] = [
-    { value: 'USER', label: 'User' },
-    { value: 'ADMIN', label: 'Admin' },
-    { value: 'SUPER_ADMIN', label: 'Super admin' },
-];
 
 export interface IUsersTableProps {
     users: IAdminUserSummary[];
@@ -37,18 +34,26 @@ export default function UsersTable({
     onToggleSuspend,
     isMutating,
 }: Readonly<IUsersTableProps>): React.ReactElement {
+    const t = useTranslations('admin.users.table');
+
+    const roleOptions: { value: TUserRole; label: string }[] = [
+        { value: 'USER', label: t('roles.user') },
+        { value: 'ADMIN', label: t('roles.admin') },
+        { value: 'SUPER_ADMIN', label: t('roles.superAdmin') },
+    ];
+
     return (
         <Table>
             <Table.Head>
                 <Table.Row>
-                    <Table.HeaderCell>User</Table.HeaderCell>
-                    <Table.HeaderCell>Role</Table.HeaderCell>
-                    <Table.HeaderCell>Tier</Table.HeaderCell>
-                    <Table.HeaderCell>Stories</Table.HeaderCell>
-                    <Table.HeaderCell>Joined</Table.HeaderCell>
-                    <Table.HeaderCell>Status</Table.HeaderCell>
+                    <Table.HeaderCell>{t('user')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('role')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('tier')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('stories')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('joined')}</Table.HeaderCell>
+                    <Table.HeaderCell>{t('status')}</Table.HeaderCell>
                     <Table.HeaderCell>
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{t('actions')}</span>
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Head>
@@ -66,14 +71,14 @@ export default function UsersTable({
                             <Table.Cell>
                                 {canChangeRoles ? (
                                     <Select
-                                        data={ROLE_OPTIONS}
+                                        data={roleOptions}
                                         value={user.role}
                                         onChange={(value) =>
                                             value && onRoleChange(user.id, value as TUserRole)
                                         }
                                         disabled={isSelf || isMutating}
                                         allowDeselect={false}
-                                        aria-label={`Role for ${user.name}`}
+                                        aria-label={t('roleAriaLabel', { name: user.name })}
                                     />
                                 ) : (
                                     <span className={styles.table__role}>{user.role}</span>
@@ -88,7 +93,7 @@ export default function UsersTable({
                                         [styles['m-suspended']]: isSuspended,
                                     })}
                                 >
-                                    {isSuspended ? 'Suspended' : 'Active'}
+                                    {isSuspended ? t('statusSuspended') : t('statusActive')}
                                 </span>
                             </Table.Cell>
                             <Table.Cell>
@@ -97,7 +102,7 @@ export default function UsersTable({
                                     disabled={isSelf || isMutating}
                                     onClick={() => onToggleSuspend(user)}
                                 >
-                                    {isSuspended ? 'Reinstate' : 'Suspend'}
+                                    {isSuspended ? t('reinstate') : t('suspend')}
                                 </Button>
                             </Table.Cell>
                         </Table.Row>

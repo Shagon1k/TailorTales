@@ -32,6 +32,12 @@
                 "empty": "Пока всё тихо — новые сказки появятся здесь.",
                 "unreadLabel": " (непрочитанное)"
             }
+        },
+        "localeSwitcher": {
+            "ariaLabel": "Сменить язык",
+            "en": "English",
+            "de": "Deutsch",
+            "ru": "Русский"
         }
     },
     "footer": {
@@ -161,6 +167,19 @@
                 "name": "Family Workshop",
                 "tagline": "Для маленьких книголюбов.",
                 "cta": "Открыть мастерскую →"
+            },
+            "features": {
+                "tale": "1 сказка в месяц (до {pages} страниц)",
+                "watermarkedPdf": "PDF с водяным знаком",
+                "regenerations": "{count} регенерации страниц / месяц",
+                "childProfile": "1 профиль ребёнка",
+                "starterArtStyles": "Все начальные стили оформления",
+                "pagesPerMonth": "До {pages} страниц в месяц",
+                "booksAndComics": "Книги и комиксы",
+                "childrenUnlimited": "Неограниченное число детей",
+                "childrenCount": "До {count} детей",
+                "noWatermark": "Без водяного знака · для печати",
+                "storiesForever": "Сказки хранятся навсегда"
             }
         },
         "comparison": {
@@ -175,6 +194,31 @@
                 "cell": {
                     "included": "Включено",
                     "notIncluded": "Не включено"
+                },
+                "groups": {
+                    "talesAndPages": "Сказки и страницы",
+                    "delivery": "Доставка",
+                    "workshop": "Мастерская"
+                },
+                "rows": {
+                    "pagesPerMonth": "Страниц в месяц",
+                    "booksAndComics": "Книги и комиксы",
+                    "childrenSupported": "Поддерживаемые дети",
+                    "pageRegenerations": "Регенерации страниц",
+                    "watermark": "Водяной знак",
+                    "printReadyPdf": "PDF для печати",
+                    "priorityQueue": "Приоритетная очередь",
+                    "storiesRetained": "Хранение сказок",
+                    "contentLanguages": "Контент на EN + RU + DE"
+                },
+                "values": {
+                    "booksOnly": "Только книги",
+                    "unlimited": "Неограниченно",
+                    "onEveryPage": "На каждой странице",
+                    "none": "Нет",
+                    "forever": "Навсегда",
+                    "days": "{days} дней",
+                    "perMonth": "{count} / мес."
                 }
             }
         },
@@ -444,7 +488,7 @@
         },
         "readers": {
             "heading": "Ваши читатели",
-            "manageLink": "Управлять детьми →",
+            "manageLink": "Профили детей →",
             "addLabel": "Добавить ещё одного маленького читателя",
             "ariaLabel": "Читатели"
         },
@@ -791,5 +835,189 @@
         "heading": "Заблудились в лесу?",
         "subheading": "Этой страницы нет — но ваша следующая сказка есть.",
         "homeLink": "Вернуться домой"
+    },
+    "admin": {
+        "nav": {
+            "ariaLabel": "Навигация администратора",
+            "dashboard": "Обзор",
+            "users": "Пользователи",
+            "stories": "Сказки",
+            "artStyles": "Стили оформления",
+            "ratings": "Оценки",
+            "blueprints": "Шаблоны"
+        },
+        "dashboard": {
+            "heading": "Обзор",
+            "users": "Пользователи",
+            "stories": "Сказки",
+            "activeSubscriptions": "Активные подписки",
+            "activeSubscriptionsInfo": "Только платные тарифы",
+            "mrr": "MRR",
+            "mrrInfo": "Ежемесячный регулярный доход"
+        },
+        "pagination": {
+            "prev": "← Назад",
+            "next": "Далее →",
+            "status": "Страница {page} из {total}"
+        },
+        "users": {
+            "heading": "Пользователи",
+            "searchPlaceholder": "Поиск по имени или email",
+            "searchAriaLabel": "Поиск пользователей",
+            "loading": "Загрузка пользователей",
+            "empty": "Пользователи не найдены.",
+            "suspendModal": {
+                "title": "Заблокировать пользователя",
+                "body": "Заблокировать {name}? Они будут выходят из системы везде и не смогут войти до разблокировки.",
+                "cancel": "Отмена",
+                "confirm": "Заблокировать"
+            },
+            "table": {
+                "user": "Пользователь",
+                "role": "Роль",
+                "tier": "Тариф",
+                "stories": "Сказки",
+                "joined": "Дата входа",
+                "status": "Статус",
+                "actions": "Действия",
+                "roleAriaLabel": "Роль для {name}",
+                "roles": {
+                    "user": "Пользователь",
+                    "admin": "Администратор",
+                    "superAdmin": "Суперадмин"
+                },
+                "statusActive": "Активен",
+                "statusSuspended": "Заблокирован",
+                "reinstate": "Разблокировать",
+                "suspend": "Заблокировать"
+            }
+        },
+        "stories": {
+            "heading": "Сказки",
+            "searchPlaceholder": "Поиск по названию, вопросу или владельцу",
+            "searchAriaLabel": "Поиск сказок",
+            "loading": "Загрузка сказок",
+            "empty": "Сказки не найдены.",
+            "deleteModal": {
+                "title": "Удалить сказку",
+                "body": "Удалить «{title}» навсегда? Это действие нельзя отменить.",
+                "cancel": "Отмена",
+                "confirm": "Удалить"
+            },
+            "table": {
+                "story": "Сказка",
+                "status": "Статус",
+                "owner": "Владелец",
+                "child": "Ребёнок",
+                "pages": "Страницы",
+                "created": "Создана",
+                "actions": "Действия",
+                "delete": "Удалить",
+                "statuses": {
+                    "pending": "В очереди",
+                    "generating": "Создаётся",
+                    "ready": "Готова",
+                    "failed": "Ошибка"
+                }
+            }
+        },
+        "artStyles": {
+            "heading": "Стили оформления",
+            "add": "+ Добавить стиль",
+            "loading": "Загрузка стилей",
+            "empty": "Стилей пока нет.",
+            "createModalTitle": "Добавить стиль",
+            "editModalTitle": "Редактировать стиль",
+            "table": {
+                "thumbnail": "Миниатюра",
+                "nameSlug": "Название / Slug",
+                "promptPrefix": "Префикс промпта",
+                "active": "Активен",
+                "order": "Порядок",
+                "actions": "Действия",
+                "activeLabel": "Активен",
+                "moveUp": "Переместить {name} вверх",
+                "moveDown": "Переместить {name} вниз",
+                "edit": "Изменить",
+                "generateThumbnail": "Создать миниатюру",
+                "regenerateThumbnail": "Обновить",
+                "generating": "Создаётся…",
+                "noThumbnail": "нет"
+            },
+            "form": {
+                "nameLabel": "Название",
+                "namePlaceholder": "Акварель",
+                "slugLabel": "Slug",
+                "slugPlaceholder": "akvarel",
+                "slugDescription": "Строчные буквы, через дефис (напр. watercolor-style)",
+                "promptPrefixLabel": "Префикс промпта",
+                "promptPrefixPlaceholder": "в мягком акварельном стиле с…",
+                "promptPrefixDescription": "Добавляется в начало каждого промпта генерации",
+                "cancel": "Отмена",
+                "save": "Сохранить",
+                "errors": {
+                    "nameRequired": "Название обязательно",
+                    "slugRequired": "Slug обязателен",
+                    "slugFormat": "Slug должен быть в формате kebab-case (напр. watercolor)",
+                    "promptPrefixRequired": "Префикс промпта обязателен"
+                }
+            }
+        },
+        "ratings": {
+            "heading": "Оценки",
+            "loading": "Загрузка оценок",
+            "empty": "Оценок пока нет.",
+            "table": {
+                "user": "Пользователь",
+                "story": "Сказка",
+                "score": "Оценка",
+                "comment": "Комментарий",
+                "date": "Дата",
+                "untitled": "(без названия)",
+                "scoreAriaLabel": "{score} из 5"
+            }
+        },
+        "blueprints": {
+            "heading": "Шаблоны сказок",
+            "add": "+ Новый шаблон",
+            "backLink": "← Шаблоны",
+            "newHeading": "Новый шаблон",
+            "editHeading": "Редактировать:",
+            "list": {
+                "empty": "Шаблонов пока нет.",
+                "createFirst": "Создать первый →",
+                "name": "Название",
+                "type": "Тип",
+                "created": "Создан",
+                "actions": "Действия",
+                "edit": "Изменить →"
+            },
+            "form": {
+                "saveChanges": "Сохранить изменения",
+                "create": "Создать шаблон",
+                "saving": "Сохраняется…",
+                "saveError": "Не удалось сохранить шаблон. Попробуйте ещё раз.",
+                "deleteConfirm": "Удалить «{name}»? Это действие нельзя отменить.",
+                "nameLabel": "Название шаблона",
+                "namePlaceholder": "Мой шаблон",
+                "descriptionLabel": "Описание",
+                "descriptionPlaceholder": "Что производит этот шаблон",
+                "typeLabel": "Тип сказки",
+                "systemPromptLabel": "Системный промпт",
+                "systemPromptPlaceholder": "Ты — автор детских сказок…",
+                "cancel": "Отмена",
+                "delete": "Удалить шаблон",
+                "deleting": "Удаляется…",
+                "deleteError": "Не удалось удалить шаблон. Попробуйте ещё раз.",
+                "typeBook": {
+                    "title": "Книга",
+                    "description": "Прозаические страницы с одной иллюстрацией на разворот."
+                },
+                "typeComic": {
+                    "title": "Комикс",
+                    "description": "Панели и речевые пузыри."
+                }
+            }
+        }
     }
 }
