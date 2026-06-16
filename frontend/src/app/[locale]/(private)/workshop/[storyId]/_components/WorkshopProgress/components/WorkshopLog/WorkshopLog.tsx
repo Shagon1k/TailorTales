@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import type { ILogEntry } from '../../hooks/useGenerationStream';
 import styles from './WorkshopLog.module.scss';
 
@@ -10,11 +13,13 @@ export default function WorkshopLog({
     entries,
     isLive,
 }: Readonly<IWorkshopLogProps>): React.ReactElement {
+    const t = useTranslations('workshopProgress.log');
+
     return (
         <div className={styles.log}>
             <div className={styles.log__header}>
-                <span>The workshop log</span>
-                {isLive && <span className={styles.log__live}>● LIVE</span>}
+                <span>{t('header')}</span>
+                {isLive && <span className={styles.log__live}>{t('live')}</span>}
             </div>
             <div className={styles.log__entries}>
                 {entries.map((entry) => (

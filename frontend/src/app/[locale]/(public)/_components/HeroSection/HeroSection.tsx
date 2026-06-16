@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
@@ -7,29 +8,27 @@ interface IHeroSectionProps {
     isLoggedIn: boolean;
 }
 
-export default function HeroSection({
+export default async function HeroSection({
     isLoggedIn,
-}: Readonly<IHeroSectionProps>): React.ReactElement {
+}: Readonly<IHeroSectionProps>): Promise<React.ReactElement> {
+    const t = await getTranslations('home.hero');
+
     return (
         <PageHero
-            eyebrow="A small light at bedtime"
-            heading={
-                <>
-                    Where their <HeroHighlight>questions</HeroHighlight>
-                    <br />
-                    become their <HeroHighlight>stories</HeroHighlight>.
-                </>
-            }
-            sub="A small workshop that takes your child's name, age and curiosity, and stitches them into a tiny book or comic — five to twenty pages, theirs to keep forever."
+            eyebrow={t('eyebrow')}
+            heading={t.rich('heading', {
+                highlight: (chunks) => <HeroHighlight>{chunks}</HeroHighlight>,
+            })}
+            sub={t('subheading')}
         >
             <div className={styles.hero__actions}>
                 {isLoggedIn ? (
-                    <ButtonLink href="/workshop">Open workshop →</ButtonLink>
+                    <ButtonLink href="/workshop">{t('cta.loggedIn')}</ButtonLink>
                 ) : (
                     <>
-                        <ButtonLink href="/login">Begin your first tale →</ButtonLink>
+                        <ButtonLink href="/login">{t('cta.signUp')}</ButtonLink>
                         <ButtonLink href="/how-it-works" variant="secondary">
-                            How it works
+                            {t('cta.howItWorksButton')}
                         </ButtonLink>
                     </>
                 )}

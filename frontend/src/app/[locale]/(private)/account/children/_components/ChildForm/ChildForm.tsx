@@ -1,5 +1,8 @@
+'use client';
+
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
 import Select from '@/components/ui/Select/Select';
 import TagsInput from '@/components/ui/TagsInput/TagsInput';
@@ -21,11 +24,6 @@ interface IChildFormProps {
     isSubmitting?: boolean;
 }
 
-const GENDER_OPTIONS = [
-    { value: 'MALE', label: 'Boy' },
-    { value: 'FEMALE', label: 'Girl' },
-];
-
 const TODAY = new Date().toISOString().split('T')[0];
 
 const DEFAULT_VALUES: IChildFormValues = {
@@ -41,43 +39,58 @@ export default function ChildForm({
     onCancel,
     isSubmitting = false,
 }: Readonly<IChildFormProps>): React.ReactElement {
+    const t = useTranslations('account.childForm');
+
+    const genderOptions = [
+        { value: 'MALE', label: t('genderOptions.male') },
+        { value: 'FEMALE', label: t('genderOptions.female') },
+    ];
+
     const form = useForm<IChildFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
         validate: {
-            name: (v) => (v.trim().length < 1 ? 'Name is required' : null),
+            name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
             birthdate: (v) => {
-                if (!v) return 'Birthdate is required';
+                if (!v) return t('errors.birthdateRequired');
                 const date = new Date(v);
-                if (Number.isNaN(date.getTime())) return 'Invalid date';
-                if (date > new Date()) return 'Birthdate must be in the past';
+                if (Number.isNaN(date.getTime())) return t('errors.invalidDate');
+                if (date > new Date()) return t('errors.birthDateFuture');
                 return null;
             },
-            gender: (v) => (v ? null : 'Gender is required'),
+            gender: (v) => (v ? null : t('errors.genderRequired')),
         },
     });
 
     return (
         <form onSubmit={form.onSubmit(onSubmit)}>
             <Stack gap="sm">
-                <Input label="Name" placeholder="Child's name" {...form.getInputProps('name')} />
                 <Input
-                    label="Birthdate"
+                    label={t('nameLabel')}
+                    placeholder={t('namePlaceholder')}
+                    {...form.getInputProps('name')}
+                />
+                <Input
+                    label={t('birthdateLabel')}
                     type="date"
                     max={TODAY}
                     {...form.getInputProps('birthdate')}
                 />
-                <Select label="Gender" data={GENDER_OPTIONS} {...form.getInputProps('gender')} />
+                <Select
+                    label={t('genderLabel')}
+                    data={genderOptions}
+                    {...form.getInputProps('gender')}
+                />
                 <TagsInput
-                    label="Interests"
-                    placeholder="Add interest and press Enter"
+                    label={t('interestsLabel')}
+                    placeholder={t('interestsPlaceholder')}
                     {...form.getInputProps('interests')}
                 />
                 <div className={styles.actions}>
                     <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
-                        Cancel
+                        {t('cancelButton')}
                     </Button>
                     <Button type="submit" variant="primary" loading={isSubmitting}>
-                        Save
+                        {t('saveButton')}
                     </Button>
                 </div>
             </Stack>

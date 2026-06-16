@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Loader from '@/components/ui/Loader/Loader';
 import Modal from '@/components/ui/Modal/Modal';
 import Button from '@/components/ui/Button/Button';
@@ -24,6 +25,8 @@ type TModalState =
     | { kind: 'character'; child: IChild; character: ICharacter | null };
 
 export default function ChildrenPage(): React.ReactElement {
+    const t = useTranslations('account.children');
+    const tCharModal = useTranslations('workshop.form.characterModal');
     const { data: children = [], isLoading } = useChildren();
     const { data: characters = [] } = useCharacters();
     const { data: subscription } = useSubscription();
@@ -68,24 +71,24 @@ export default function ChildrenPage(): React.ReactElement {
     if (isLoading) {
         return (
             <div className={styles.page}>
-                <Loader label="Loading children" />
+                <Loader label={t('loading')} />
             </div>
         );
     }
 
     return (
         <div className={styles.page}>
-            <h2 className={styles.heading}>Children</h2>
+            <h2 className={styles.heading}>{t('heading')}</h2>
 
             {children.length === 0 ? (
                 <div className={styles.empty}>
-                    <p className={styles['empty__text']}>No children yet.</p>
+                    <p className={styles['empty__text']}>{t('empty')}</p>
                     <Button
                         variant="primary"
                         onClick={() => setModal({ kind: 'add' })}
                         disabled={atChildrenLimit}
                     >
-                        Add your first child
+                        {t('addFirstButton')}
                     </Button>
                 </div>
             ) : (
@@ -96,13 +99,10 @@ export default function ChildrenPage(): React.ReactElement {
                             onClick={() => setModal({ kind: 'add' })}
                             disabled={atChildrenLimit}
                         >
-                            Add child
+                            {t('addButton')}
                         </Button>
                         {atChildrenLimit && (
-                            <p className={styles['add-row__limit-hint']}>
-                                You&apos;ve reached the child limit for your plan.{' '}
-                                <a href="/pricing">Upgrade</a> to add more.
-                            </p>
+                            <p className={styles['add-row__limit-hint']}>{t('limitHint')}</p>
                         )}
                     </div>
                     <div className={styles.grid}>
@@ -129,7 +129,7 @@ export default function ChildrenPage(): React.ReactElement {
             <Modal
                 opened={isFormOpen}
                 onClose={close}
-                title={modal.kind === 'edit' ? 'Edit child' : 'Add child'}
+                title={modal.kind === 'edit' ? t('editModal.title') : t('addModal.title')}
             >
                 {isFormOpen && (
                     <ChildForm
@@ -155,8 +155,8 @@ export default function ChildrenPage(): React.ReactElement {
                 onClose={close}
                 title={
                     modal.kind === 'character' && modal.character
-                        ? 'Edit character'
-                        : 'Add character'
+                        ? tCharModal('editTitle')
+                        : tCharModal('addTitle')
                 }
             >
                 {isCharacterFormOpen && (
@@ -180,23 +180,27 @@ export default function ChildrenPage(): React.ReactElement {
                 )}
             </Modal>
 
-            <Modal opened={modal.kind === 'delete'} onClose={close} title="Delete child" size="sm">
+            <Modal
+                opened={modal.kind === 'delete'}
+                onClose={close}
+                title={t('deleteModal.title')}
+                size="sm"
+            >
                 {modal.kind === 'delete' && (
                     <div className={styles['delete-confirm']}>
                         <p className={styles['delete-confirm__text']}>
-                            Are you sure you want to delete <strong>{modal.child.name}</strong>?
-                            This cannot be undone.
+                            {t('deleteConfirm', { childName: modal.child.name })}
                         </p>
                         <div className={styles['delete-confirm__actions']}>
                             <Button variant="quiet" onClick={close} disabled={isDeleting}>
-                                Cancel
+                                {t('deleteModal.cancelButton')}
                             </Button>
                             <Button
                                 variant="primary"
                                 loading={isDeleting}
                                 onClick={() => deleteChild(modal.child.id, { onSuccess: close })}
                             >
-                                Delete
+                                {t('deleteModal.deleteButton')}
                             </Button>
                         </div>
                     </div>

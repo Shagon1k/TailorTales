@@ -3,8 +3,34 @@ import { MantineProvider } from '@mantine/core';
 import type { IPricingTier } from '@/types/pricing.types';
 import PricingPage from '../page';
 
-// CtaSection is an async server component (reads the session) — stub it for sync render.
+// async server components — stub them for sync render.
 vi.mock('@/app/[locale]/(public)/_components/CtaSection/CtaSection', () => ({
+    default: () => null,
+}));
+
+vi.mock('@/app/[locale]/(public)/pricing/_components/PricingHero/PricingHero', () => ({
+    default: () => <h1>Priced like a small workshop.</h1>,
+}));
+
+vi.mock('@/app/[locale]/(public)/pricing/_components/PlansSection/PlansSection', async () => {
+    const { default: PriceCard } =
+        await import('@/app/[locale]/(public)/pricing/_components/PlansSection/components/PriceCard/PriceCard');
+    return {
+        default: ({ plans }: { plans: import('../_components/types').IPricingPlan[] }) => (
+            <>
+                {plans.map((plan) => (
+                    <PriceCard key={plan.id} plan={plan} />
+                ))}
+            </>
+        ),
+    };
+});
+
+vi.mock('@/app/[locale]/(public)/pricing/_components/ComparisonTable/ComparisonTable', () => ({
+    default: () => null,
+}));
+
+vi.mock('@/app/[locale]/(public)/pricing/_components/FaqSection/FaqSection', () => ({
     default: () => null,
 }));
 

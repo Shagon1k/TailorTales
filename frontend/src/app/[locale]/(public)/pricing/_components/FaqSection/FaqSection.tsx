@@ -1,14 +1,21 @@
-import type { IFaqItem } from '../types';
+import { getTranslations } from 'next-intl/server';
 import styles from './FaqSection.module.scss';
 
-interface IFaqSectionProps {
-    items: IFaqItem[];
-}
+export default async function FaqSection(): Promise<React.ReactElement> {
+    const t = await getTranslations('pricing.faq');
 
-export default function FaqSection({ items }: Readonly<IFaqSectionProps>): React.ReactElement {
+    const items = [
+        { q: t('cancelAnyTime.question'), a: t('cancelAnyTime.answer') },
+        { q: t('unusedCredits.question'), a: t('unusedCredits.answer') },
+        { q: t('contentSafety.question'), a: t('contentSafety.answer') },
+        { q: t('childData.question'), a: t('childData.answer') },
+        { q: t('giftingTale.question'), a: t('giftingTale.answer') },
+        { q: t('languages.question'), a: t('languages.answer') },
+    ];
+
     return (
         <section className={styles.faq}>
-            <h2 className={styles.faq__heading}>A few things worth knowing.</h2>
+            <h2 className={styles.faq__heading}>{t('heading')}</h2>
             <div className={styles.faq__grid}>
                 {items.map(({ q, a }) => (
                     <div key={q} className={styles.faq__card}>

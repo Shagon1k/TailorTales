@@ -1,10 +1,11 @@
+import { getTranslations } from 'next-intl/server';
 import { getServerUser } from '@/api/user.server';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
 import styles from './CtaSection.module.scss';
 
 export default async function CtaSection(): Promise<React.ReactElement | null> {
     // Redundant for signed-in users — the "begin a free tale" prompt only makes sense logged out.
-    const user = await getServerUser();
+    const [user, t] = await Promise.all([getServerUser(), getTranslations('home.cta')]);
     if (user) return null;
 
     return (
@@ -13,12 +14,9 @@ export default async function CtaSection(): Promise<React.ReactElement | null> {
                 <span className={styles.cta__dot} aria-hidden="true">
                     ♥
                 </span>
-                <h2 className={styles.cta__heading}>One small tale, tonight.</h2>
-                <p className={styles.cta__sub}>
-                    Free first chapter. No card, no clock. Just a name, a question, and ten quiet
-                    minutes.
-                </p>
-                <ButtonLink href="/login">Begin a tale for free →</ButtonLink>
+                <h2 className={styles.cta__heading}>{t('heading')}</h2>
+                <p className={styles.cta__sub}>{t('subheading')}</p>
+                <ButtonLink href="/login">{t('button')}</ButtonLink>
             </div>
         </section>
     );

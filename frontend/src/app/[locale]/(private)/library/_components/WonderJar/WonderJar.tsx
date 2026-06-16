@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { IChild } from '@/types/child.types';
 import styles from './WonderJar.module.scss';
@@ -7,31 +8,30 @@ export interface IWonderJarProps {
     suggestions: string[];
 }
 
-export default function WonderJar({
+export default async function WonderJar({
     readers,
     suggestions,
-}: Readonly<IWonderJarProps>): React.ReactElement {
+}: Readonly<IWonderJarProps>): Promise<React.ReactElement> {
+    const t = await getTranslations('library.wonderJar');
     const readerNames = readers.map((r) => r.name);
     const namesPhrase =
         readerNames.length === 0
-            ? 'your little reader'
+            ? t('namesPhraseNone')
             : readerNames.length === 1
               ? readerNames[0]
-              : `${readerNames.slice(0, -1).join(', ')} and ${readerNames[readerNames.length - 1]}`;
+              : `${readerNames.slice(0, -1).join(', ')} ${t('namesAnd')} ${readerNames[readerNames.length - 1]}`;
 
     return (
         <section className={styles['wonder-jar']} aria-labelledby="wonder-jar-heading">
             <div className={styles['wonder-jar__intro']}>
-                <p className={styles['wonder-jar__eyebrow']}>· From the wonder jar ·</p>
+                <p className={styles['wonder-jar__eyebrow']}>{t('eyebrow')}</p>
                 <h2 id="wonder-jar-heading" className={styles['wonder-jar__heading']}>
-                    Some quiet questions for tonight.
+                    {t('heading')}
                 </h2>
-                <p className={styles['wonder-jar__sub']}>
-                    Picked because {namesPhrase} might love them. Tap one to start a tale.
-                </p>
+                <p className={styles['wonder-jar__sub']}>{t('subheading', { namesPhrase })}</p>
             </div>
 
-            <ul className={styles['wonder-jar__list']} aria-label="Question suggestions">
+            <ul className={styles['wonder-jar__list']} aria-label={t('suggestionsAriaLabel')}>
                 {suggestions.map((question) => (
                     <li key={question}>
                         <Link

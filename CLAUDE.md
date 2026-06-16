@@ -55,6 +55,10 @@ narrative that resists above →  prose (last resort)
 - NEVER hardcode secrets — API keys, tokens, and credentials go in environment variables.
 - NEVER add a new dependency without developer approval.
 
+## i18n
+
+- Locale key naming follows the convention in `i18n.md` (`.claude/rules/i18n.md`).
+
 ## Git
 
 - GitHub Flow, `TT-<type>-<descriptor>` branches, Conventional Commits, squash merge (full spec auto-loads from `git.md`).

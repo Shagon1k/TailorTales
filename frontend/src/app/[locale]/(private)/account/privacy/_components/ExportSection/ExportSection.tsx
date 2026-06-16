@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Group, Stack } from '@mantine/core';
 import { accountApi } from '@/api/account';
 import Button from '@/components/ui/Button/Button';
@@ -9,6 +10,7 @@ import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import styles from './ExportSection.module.scss';
 
 export default function ExportSection(): React.ReactElement {
+    const t = useTranslations('account.privacy.export');
     const [isExporting, setIsExporting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +20,7 @@ export default function ExportSection(): React.ReactElement {
         try {
             await accountApi.exportData();
         } catch {
-            setError('Export failed — please try again.');
+            setError(t('error'));
         } finally {
             setIsExporting(false);
         }
@@ -27,18 +29,15 @@ export default function ExportSection(): React.ReactElement {
     return (
         <Card variant="default" size="md">
             <Stack gap="sm">
-                <CapsLabel>Export my data</CapsLabel>
-                <p className={styles['export-section__copy']}>
-                    Download everything we hold about you — profile, readers, characters, stories
-                    (with download links for files that still exist) — as a single JSON file.
-                </p>
+                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <p className={styles['export-section__copy']}>{t('body')}</p>
                 <Group>
                     <Button
                         variant="secondary"
                         onClick={() => handleExport()}
                         loading={isExporting}
                     >
-                        Export my data
+                        {t('button')}
                     </Button>
                 </Group>
                 {error && <p className={styles['export-section__error']}>{error}</p>}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import Card from '@/components/ui/Card/Card';
@@ -41,6 +42,7 @@ function GoogleIcon(): React.ReactElement {
 export default function LoginPage(): React.ReactElement {
     const { user } = useCurrentUser();
     const router = useRouter();
+    const t = useTranslations('auth.login');
 
     useEffect(() => {
         if (user) router.replace('/account');
@@ -51,9 +53,9 @@ export default function LoginPage(): React.ReactElement {
             <header className={styles.header}>
                 <BrandMark />
                 <div className={styles['header__cta']}>
-                    <span className={styles['header__cta-hint']}>New here?</span>
+                    <span className={styles['header__cta-hint']}>{t('headerHint')}</span>
                     <Link href="/" variant="default">
-                        Begin a free tale →
+                        {t('headerCta')}
                     </Link>
                 </div>
             </header>
@@ -65,14 +67,11 @@ export default function LoginPage(): React.ReactElement {
 
                 <Card variant="dark" size="hero">
                     <div className={styles['card-content']}>
-                        <CapsLabel variant="gold">· Sign in ·</CapsLabel>
+                        <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
 
                         <div className={styles['card-head']}>
-                            <h1 className={styles['card-heading']}>Step back into the workshop.</h1>
-                            <p className={styles['card-sub']}>
-                                Sign in to find your library, your children&apos;s profiles, and any
-                                tales you began but didn&apos;t finish.
-                            </p>
+                            <h1 className={styles['card-heading']}>{t('heading')}</h1>
+                            <p className={styles['card-sub']}>{t('subheading')}</p>
                         </div>
 
                         <Button
@@ -82,22 +81,12 @@ export default function LoginPage(): React.ReactElement {
                             fullWidth
                             leftSection={<GoogleIcon />}
                         >
-                            Continue with Google
+                            {t('googleButton')}
                         </Button>
 
                         <Divider variant="needle" />
 
-                        <p className={styles.legal}>
-                            By continuing you agree to our{' '}
-                            <Link href="#" variant="gold">
-                                terms
-                            </Link>{' '}
-                            and{' '}
-                            <Link href="/privacy" variant="gold">
-                                privacy
-                            </Link>{' '}
-                            policy. We will never sell your child&apos;s data. We promise.
-                        </p>
+                        <p className={styles.legal}>{t('legal')}</p>
                     </div>
                 </Card>
             </main>

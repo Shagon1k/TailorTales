@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Avatar from '@/components/ui/Avatar/Avatar';
 import type { IChild } from '@/types/child.types';
@@ -27,12 +28,14 @@ export default function ReaderChip({
     hasChildren,
     onToggle,
 }: Readonly<IReaderChipProps>): React.ReactElement {
+    const t = useTranslations('workshop.form.reader');
+
     if (!hasChildren) {
         return (
             <div className={styles['reader-chip']}>
-                <p className={styles['reader-chip__empty']}>No readers yet —</p>
+                <p className={styles['reader-chip__empty']}>{t('empty')}</p>
                 <Link href="/account/children" className={styles['reader-chip__add-link']}>
-                    Add a reader first →
+                    {t('addFirst')}
                 </Link>
             </div>
         );
@@ -43,7 +46,7 @@ export default function ReaderChip({
             <div className={styles['reader-chip__left']}>
                 <Avatar size="md" name={child?.name} />
                 <div className={styles['reader-chip__info']}>
-                    <span className={styles['reader-chip__for']}>For</span>
+                    <span className={styles['reader-chip__for']}>{t('label')}</span>
                     {child ? (
                         <>
                             <span className={styles['reader-chip__name']}>
@@ -51,12 +54,14 @@ export default function ReaderChip({
                             </span>
                             {child.interests.length > 0 && (
                                 <span className={styles['reader-chip__interests']}>
-                                    loves: {child.interests.join(', ')}
+                                    {t('loves')} {child.interests.join(', ')}
                                 </span>
                             )}
                         </>
                     ) : (
-                        <span className={styles['reader-chip__placeholder']}>Choose a reader</span>
+                        <span className={styles['reader-chip__placeholder']}>
+                            {t('placeholder')}
+                        </span>
                     )}
                 </div>
             </div>
@@ -67,7 +72,7 @@ export default function ReaderChip({
                 aria-expanded={isOpen}
                 className={styles['reader-chip__toggle']}
             >
-                {isOpen ? 'Close ×' : 'Change reader →'}
+                {isOpen ? t('closeButton') : t('changeButton')}
             </button>
         </div>
     );

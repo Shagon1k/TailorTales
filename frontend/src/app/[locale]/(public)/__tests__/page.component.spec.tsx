@@ -10,8 +10,29 @@ vi.mock('@/api/stories.server', () => ({
     storiesServerApi: { getPublic: vi.fn().mockResolvedValue([]) },
 }));
 
-// CtaSection is an async server component (reads the session) — stub it for sync render.
+// async server components — stub them for sync render.
 vi.mock('@/app/[locale]/(public)/_components/CtaSection/CtaSection', () => ({
+    default: () => null,
+}));
+
+vi.mock('@/app/[locale]/(public)/_components/HeroSection/HeroSection', () => ({
+    default: () => (
+        <>
+            <h1>Where their questions become their stories.</h1>
+            <p>
+                A small workshop that takes your child&apos;s name, age and curiosity, and stitches
+                them into a tiny book or comic — five to twenty pages, theirs to keep forever.
+            </p>
+            <a href="/login">Begin your first tale →</a>
+        </>
+    ),
+}));
+
+vi.mock('@/app/[locale]/(public)/_components/LanternsSection/LanternsSection', () => ({
+    default: () => null,
+}));
+
+vi.mock('@/app/[locale]/(public)/_components/TalesSection/TalesSection', () => ({
     default: () => null,
 }));
 

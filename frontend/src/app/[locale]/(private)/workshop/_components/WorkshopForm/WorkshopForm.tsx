@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import RadioCardGroup from '@/components/ui/RadioCard/RadioCardGroup';
 import RadioCard from '@/components/ui/RadioCard/RadioCard';
@@ -25,15 +26,6 @@ import CharacterForm, {
 } from '../../../_components/CharacterForm/CharacterForm';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './WorkshopForm.module.scss';
-
-// Display labels for page count pills — matches backend ALLOWED_PAGE_COUNTS order.
-const PAGE_COUNT_LABELS: Record<number, string> = {
-    5: 'Short · 5 pp',
-    8: 'Medium · 8 pp',
-    12: 'Long · 12 pp',
-    16: 'Big · 16 pp',
-    20: 'Bedtime saga · 20 pp',
-};
 
 export interface IWorkshopFormProps {
     readers: IChild[];
@@ -64,7 +56,16 @@ export default function WorkshopForm({
     initialArtStyleId = null,
     initialLanguage = null,
 }: Readonly<IWorkshopFormProps>): React.ReactElement {
+    const t = useTranslations('workshop.form');
     const router = useRouter();
+
+    const pageCountLabels: Record<number, string> = {
+        5: t('pageCount.option5'),
+        8: t('pageCount.option8'),
+        12: t('pageCount.option12'),
+        16: t('pageCount.option16'),
+        20: t('pageCount.option20'),
+    };
 
     const [selectedChildId, setSelectedChildId] = useState<string | null>(
         initialChildId ?? (readers.length === 1 ? readers[0].id : null),
@@ -146,7 +147,7 @@ export default function WorkshopForm({
             router.push(`/workshop/${story.id}`);
         } catch (err: unknown) {
             console.error('Failed to start generation', err);
-            setSubmitError('Could not start generation. Please try again.');
+            setSubmitError(t('submitError'));
         } finally {
             setIsPending(false);
         }
@@ -173,13 +174,15 @@ export default function WorkshopForm({
 
                 <section className={styles.workshop__section} aria-labelledby="section-question">
                     <div className={styles['workshop__section-header']}>
-                        <span className={styles['workshop__section-number']}>1.</span>
+                        <span className={styles['workshop__section-number']}>
+                            {t('questionInput.number')}
+                        </span>
                         <div>
                             <h2 id="section-question" className={styles['workshop__section-title']}>
-                                A question to begin with
+                                {t('questionInput.title')}
                             </h2>
                             <p className={styles['workshop__section-sub']}>
-                                Type their question, or pluck one from the jar below.
+                                {t('questionInput.subheading')}
                             </p>
                         </div>
                     </div>
@@ -187,7 +190,7 @@ export default function WorkshopForm({
                     <Textarea
                         value={question}
                         onChange={(e) => setQuestion(e.currentTarget.value)}
-                        placeholder="e.g. Why do mountains breathe smoke?"
+                        placeholder={t('questionInput.placeholder')}
                         minRows={3}
                         maxRows={6}
                         maxLength={config.questionMaxLength}
@@ -196,7 +199,7 @@ export default function WorkshopForm({
                     />
 
                     <div className={styles.workshop__jar}>
-                        <CapsLabel>Or pluck one from the jar</CapsLabel>
+                        <CapsLabel>{t('questionInput.jarLabel')}</CapsLabel>
                         <div className={styles.workshop__chips}>
                             {config.questionSuggestions.map((suggestion) => (
                                 <SuggestionChip
@@ -212,25 +215,27 @@ export default function WorkshopForm({
 
                 <section className={styles.workshop__section} aria-labelledby="section-format">
                     <div className={styles['workshop__section-header']}>
-                        <span className={styles['workshop__section-number']}>2.</span>
+                        <span className={styles['workshop__section-number']}>
+                            {t('formatPicker.number')}
+                        </span>
                         <h2 id="section-format" className={styles['workshop__section-title']}>
-                            A book, or a comic
+                            {t('formatPicker.title')}
                         </h2>
                     </div>
                     <RadioCardGroup
                         value={storyType}
                         onChange={(v) => setStoryType(v as IStoryType)}
-                        label="Story format"
+                        label={t('formatPicker.label')}
                     >
                         <RadioCard
                             value="BOOK"
-                            title="Book"
-                            description="One illustration per page, gentle prose, the slow kind. 1 credit / page."
+                            title={t('formatPicker.book.title')}
+                            description={t('formatPicker.book.description')}
                         />
                         <RadioCard
                             value="COMIC"
-                            title="Comic — coming soon"
-                            description="Panels, speech bubbles, more zip. Great for readers 6+. 2 credits / page"
+                            title={t('formatPicker.comic.title')}
+                            description={t('formatPicker.comic.description')}
                             disabled
                         />
                     </RadioCardGroup>
@@ -238,15 +243,21 @@ export default function WorkshopForm({
 
                 <section className={styles.workshop__section} aria-labelledby="section-length">
                     <div className={styles['workshop__section-header']}>
-                        <span className={styles['workshop__section-number']}>3.</span>
+                        <span className={styles['workshop__section-number']}>
+                            {t('pageCount.number')}
+                        </span>
                         <h2 id="section-length" className={styles['workshop__section-title']}>
-                            How long the tale should be
+                            {t('pageCount.title')}
                         </h2>
                     </div>
-                    <OptionPillGroup value={pageCount} onChange={setPageCount} label="Page count">
+                    <OptionPillGroup
+                        value={pageCount}
+                        onChange={setPageCount}
+                        label={t('pageCount.label')}
+                    >
                         {config.allowedPageCounts.map((count) => (
                             <OptionPill key={count} value={String(count)}>
-                                {PAGE_COUNT_LABELS[count] ?? `${count} pp`}
+                                {pageCountLabels[count] ?? `${count} pp`}
                             </OptionPill>
                         ))}
                     </OptionPillGroup>
@@ -254,9 +265,11 @@ export default function WorkshopForm({
 
                 <section className={styles.workshop__section} aria-labelledby="section-style">
                     <div className={styles['workshop__section-header']}>
-                        <span className={styles['workshop__section-number']}>4.</span>
+                        <span className={styles['workshop__section-number']}>
+                            {t('artStylePicker.number')}
+                        </span>
                         <h2 id="section-style" className={styles['workshop__section-title']}>
-                            A look for the pictures
+                            {t('artStylePicker.title')}
                         </h2>
                     </div>
                     <ArtStyleGrid
@@ -264,23 +277,22 @@ export default function WorkshopForm({
                         selectedId={artStyleId}
                         onSelect={setArtStyleId}
                     />
-                    <p className={styles['workshop__section-note']}>
-                        All styles are consistent across the book — the fox in chapter 1 is the same
-                        fox in chapter 12.
-                    </p>
+                    <p className={styles['workshop__section-note']}>{t('artStylePicker.note')}</p>
                 </section>
 
                 <section className={styles.workshop__section} aria-labelledby="section-language">
                     <div className={styles['workshop__section-header']}>
-                        <span className={styles['workshop__section-number']}>5.</span>
+                        <span className={styles['workshop__section-number']}>
+                            {t('languagePicker.number')}
+                        </span>
                         <h2 id="section-language" className={styles['workshop__section-title']}>
-                            The language of the tale
+                            {t('languagePicker.title')}
                         </h2>
                     </div>
                     <OptionPillGroup
                         value={language}
                         onChange={(v) => setLanguage(v as ILanguage)}
-                        label="Story language"
+                        label={t('languagePicker.label')}
                     >
                         {LANGUAGE_CODES.map((code) => (
                             <OptionPill key={code} value={code}>
@@ -313,7 +325,9 @@ export default function WorkshopForm({
             <Modal
                 opened={isCharacterModalOpen}
                 onClose={() => setIsCharacterModalOpen(false)}
-                title={selectedCharacter ? 'Edit character' : 'Add character'}
+                title={
+                    selectedCharacter ? t('characterModal.editTitle') : t('characterModal.addTitle')
+                }
             >
                 {isCharacterModalOpen && (
                     <CharacterForm

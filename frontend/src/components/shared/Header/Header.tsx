@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
@@ -14,6 +15,7 @@ interface IHeaderProps {
 
 export default function Header({ variant }: Readonly<IHeaderProps>): React.ReactElement {
     const [scrolled, setScrolled] = useState(false);
+    const t = useTranslations('header');
 
     useEffect(() => {
         const onScroll = (): void => setScrolled(window.scrollY > 10);
@@ -29,30 +31,30 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
         <header className={styles.header} data-scrolled={scrolled}>
             <div className={styles.header__inner}>
                 <BrandMark size="lg" />
-                <nav className={styles.header__nav} aria-label="Main navigation">
+                <nav className={styles.header__nav} aria-label={t('nav.ariaLabel')}>
                     {variant === 'public' ? (
                         <>
                             <Link href="/how-it-works" className={styles.header__link}>
-                                How it works
+                                {t('nav.howItWorks')}
                             </Link>
                             <Link href="/pricing" className={styles.header__link}>
-                                Pricing
+                                {t('nav.pricing')}
                             </Link>
                             <Link href="/login" className={styles.header__link}>
-                                Sign in
+                                {t('nav.signIn')}
                             </Link>
-                            <ButtonLink href="/login">Begin a tale →</ButtonLink>
+                            <ButtonLink href="/login">{t('nav.cta')}</ButtonLink>
                         </>
                     ) : (
                         <>
                             <Link href="/library" className={styles.header__link}>
-                                Library
+                                {t('nav.library')}
                             </Link>
                             <Link href="/workshop" className={styles.header__link}>
-                                Workshop
+                                {t('nav.workshop')}
                             </Link>
                             <Link href="/pricing" className={styles.header__link}>
-                                Pricing
+                                {t('nav.pricing')}
                             </Link>
                             <span className={styles['header__nav-divider']} aria-hidden="true" />
                             <NotificationCenter />

@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import Card from '@/components/ui/Card/Card';
 import Tag from '@/components/ui/Tag/Tag';
 import Button from '@/components/ui/Button/Button';
@@ -13,15 +16,14 @@ interface IChildCardProps {
     onCharacterEdit: (child: IChild) => void;
 }
 
-function getAgeLabel(birthdate: string): string {
+function getAge(birthdate: string): number {
     const birth = new Date(birthdate);
     const now = new Date();
     const years = now.getFullYear() - birth.getFullYear();
     const hasBirthdayPassed =
         now.getMonth() > birth.getMonth() ||
         (now.getMonth() === birth.getMonth() && now.getDate() >= birth.getDate());
-    const age = hasBirthdayPassed ? years : years - 1;
-    return age === 0 ? 'Under 1 year' : `${age} year${age === 1 ? '' : 's'} old`;
+    return hasBirthdayPassed ? years : years - 1;
 }
 
 export default function ChildCard({
@@ -31,13 +33,18 @@ export default function ChildCard({
     onDelete,
     onCharacterEdit,
 }: Readonly<IChildCardProps>): React.ReactElement {
+    const t = useTranslations('account.childCard');
+    const age = getAge(child.birthdate);
+    const ageLabel = age === 0 ? t('ageLabel.infant') : t('ageLabel.years', { age });
+    const genderLabel = child.gender === 'MALE' ? t('gender.male') : t('gender.female');
+
     return (
         <Card variant="dark" size="md">
             <div className={styles.body}>
                 <div className={styles.info}>
                     <h4 className={styles.name}>{child.name}</h4>
                     <p className={styles.meta}>
-                        {getAgeLabel(child.birthdate)} · {child.gender === 'MALE' ? 'Boy' : 'Girl'}
+                        {ageLabel} · {genderLabel}
                     </p>
                 </div>
 
@@ -52,7 +59,7 @@ export default function ChildCard({
                 )}
 
                 <div className={styles.character}>
-                    <span className={styles['character__label']}>Character</span>
+                    <span className={styles['character__label']}>{t('characterLabel')}</span>
                     {character ? (
                         <>
                             <p className={styles['character__name']}>{character.name}</p>
@@ -61,18 +68,18 @@ export default function ChildCard({
                             </p>
                         </>
                     ) : (
-                        <p className={styles['character__empty']}>No character yet.</p>
+                        <p className={styles['character__empty']}>{t('noCharacter')}</p>
                     )}
                     <Button
                         variant="quiet"
                         onClick={() => onCharacterEdit(child)}
                         aria-label={
                             character
-                                ? `Edit character for ${child.name}`
-                                : `Add character for ${child.name}`
+                                ? t('editCharacterAriaLabel', { childName: child.name })
+                                : t('addCharacterAriaLabel', { childName: child.name })
                         }
                     >
-                        {character ? 'Edit character' : 'Add character'}
+                        {character ? t('editCharacterButton') : t('addCharacterButton')}
                     </Button>
                 </div>
 
@@ -80,16 +87,16 @@ export default function ChildCard({
                     <Button
                         variant="quiet"
                         onClick={() => onEdit(child)}
-                        aria-label={`Edit ${child.name}`}
+                        aria-label={t('editAriaLabel', { childName: child.name })}
                     >
-                        Edit
+                        {t('editButton')}
                     </Button>
                     <Button
                         variant="secondary"
                         onClick={() => onDelete(child)}
-                        aria-label={`Delete ${child.name}`}
+                        aria-label={t('deleteAriaLabel', { childName: child.name })}
                     >
-                        Delete
+                        {t('deleteButton')}
                     </Button>
                 </div>
             </div>

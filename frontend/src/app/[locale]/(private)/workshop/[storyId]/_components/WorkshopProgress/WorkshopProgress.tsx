@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { getAge } from '@/utils/date.utils';
 import type { IStoryDetail } from '@/types/story.types';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
@@ -19,6 +20,7 @@ export interface IWorkshopProgressProps {
 export default function WorkshopProgress({
     story,
 }: Readonly<IWorkshopProgressProps>): React.ReactElement {
+    const t = useTranslations('workshopProgress');
     const { snapshot, completedPageOrders, activePageOrder, log, isCompleted, isFailed } =
         useGenerationStream(story.id, story.pageCount);
 
@@ -28,11 +30,15 @@ export default function WorkshopProgress({
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <p className={styles.header__eyebrow}>· IN THE WORKSHOP ·</p>
+                <p className={styles.header__eyebrow}>{t('header.eyebrow')}</p>
                 <h1 className={styles.header__question}>&ldquo;{story.question}&rdquo;</h1>
                 <p className={styles.header__meta}>
-                    for {story.child.name} · age {age} · {story.pageCount}-page book ·{' '}
-                    {story.artStyle.name.toLowerCase()} style
+                    {t('header.meta', {
+                        childName: story.child.name,
+                        age,
+                        pageCount: story.pageCount,
+                        styleName: story.artStyle.name.toLowerCase(),
+                    })}
                 </p>
             </div>
 
@@ -59,10 +65,10 @@ export default function WorkshopProgress({
             {isFailed && (
                 <div className={styles.failureActions}>
                     <ButtonLink href="/library" variant="secondary">
-                        Back to library
+                        {t('failureActions.library')}
                     </ButtonLink>
                     <ButtonLink href="/workshop" variant="quiet">
-                        Start a new tale
+                        {t('failureActions.newTale')}
                     </ButtonLink>
                 </div>
             )}

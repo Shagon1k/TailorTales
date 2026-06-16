@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Container, Group, Stack } from '@mantine/core';
 import Avatar from '@/components/ui/Avatar/Avatar';
 import Button from '@/components/ui/Button/Button';
@@ -10,6 +11,7 @@ import { useUpdateUser } from '@/hooks/user';
 import styles from './page.module.scss';
 
 export default function ProfilePage(): React.ReactElement {
+    const t = useTranslations('account.profile');
     const { user } = useCurrentUser();
     const { mutate: updateUser, isPending: isSaving } = useUpdateUser();
 
@@ -33,25 +35,25 @@ export default function ProfilePage(): React.ReactElement {
 
                 {editedName === null ? (
                     <Button variant="quiet" onClick={startEditing}>
-                        Edit name
+                        {t('editButton')}
                     </Button>
                 ) : (
                     <Stack w="100%" gap="sm">
                         <Input
-                            label="Name"
+                            label={t('nameLabel')}
                             value={editedName}
                             onChange={(e) => setEditedName(e.currentTarget.value)}
                         />
                         <Group>
                             <Button variant="primary" onClick={handleSave} loading={isSaving}>
-                                Save
+                                {t('saveButton')}
                             </Button>
                             <Button
                                 variant="quiet"
                                 onClick={() => setEditedName(null)}
                                 disabled={isSaving}
                             >
-                                Cancel
+                                {t('cancelButton')}
                             </Button>
                         </Group>
                     </Stack>

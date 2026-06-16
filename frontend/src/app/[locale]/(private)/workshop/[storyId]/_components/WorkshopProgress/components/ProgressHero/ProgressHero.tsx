@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import styles from './ProgressHero.module.scss';
 
@@ -16,11 +19,13 @@ export default function ProgressHero({
     isCompleted,
     isFailed,
 }: Readonly<IProgressHeroProps>): React.ReactElement {
+    const t = useTranslations('workshopProgress.hero');
+
     const label = isFailed
-        ? 'Generation failed'
+        ? t('failed')
         : isCompleted
-          ? 'Your tale is ready!'
-          : `page ${completedPages} of ${totalPages} · ${stage ?? 'starting'}`;
+          ? t('completed')
+          : t('inProgress', { completedPages, totalPages, stage: stage ?? t('startingStage') });
 
     return (
         <div className={styles.hero}>
@@ -29,7 +34,7 @@ export default function ProgressHero({
                 className={styles.hero__progress}
                 value={completedPages}
                 max={totalPages}
-                aria-label={`Generation progress: ${completedPages} of ${totalPages} pages`}
+                aria-label={t('ariaLabel', { completedPages, totalPages })}
             >
                 {completedPages} / {totalPages}
             </progress>

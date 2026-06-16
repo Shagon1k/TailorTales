@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { IPage, IRegenerateWhat } from '@/types/story.types';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import Button from '@/components/ui/Button/Button';
@@ -17,6 +18,7 @@ export default function RegenerationPanel({
     storyId,
     page,
 }: Readonly<IRegenerationPanelProps>): React.ReactElement {
+    const t = useTranslations('storyReader.regeneration');
     const [modalWhat, setModalWhat] = useState<IRegenerateWhat | null>(null);
     const { data: subscription } = useSubscription();
 
@@ -25,12 +27,11 @@ export default function RegenerationPanel({
         ? Math.max(subscription.tier.regenerationsPerMonth - subscription.regenerationsUsed, 0)
         : null;
     const quotaExhausted = regenerationsLeft === 0;
-    const regenerationsPluralSuffix = regenerationsLeft === 1 ? '' : 's';
 
     return (
-        <section className={styles.panel} aria-label="Remake this page">
+        <section className={styles.panel} aria-label={t('ariaLabel')}>
             <div className={styles.panel__header}>
-                <CapsLabel>· Remake this page ·</CapsLabel>
+                <CapsLabel>{t('eyebrow')}</CapsLabel>
             </div>
 
             <div className={styles.panel__actions}>
@@ -39,29 +40,29 @@ export default function RegenerationPanel({
                     disabled={quotaExhausted}
                     onClick={() => setModalWhat('text')}
                 >
-                    Regenerate text
+                    {t('textButton')}
                 </Button>
                 <Button
                     variant="secondary"
                     disabled={!hasIllustrationPrompt || quotaExhausted}
                     onClick={() => setModalWhat('illustration')}
                 >
-                    Repaint illustration
+                    {t('illustrationButton')}
                 </Button>
                 <Button
                     variant="secondary"
                     disabled={!hasIllustrationPrompt || quotaExhausted}
                     onClick={() => setModalWhat('both')}
                 >
-                    Remake everything
+                    {t('bothButton')}
                 </Button>
             </div>
 
             {regenerationsLeft !== null && (
                 <p className={styles.panel__quota} data-exhausted={quotaExhausted || undefined}>
                     {quotaExhausted
-                        ? 'No regenerations left this cycle — they refresh when your plan renews.'
-                        : `${regenerationsLeft} regeneration${regenerationsPluralSuffix} left this cycle.`}
+                        ? t('quotaExhausted')
+                        : t('quotaInfo', { count: regenerationsLeft })}
                 </p>
             )}
 

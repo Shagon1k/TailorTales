@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import { useSubscription } from '@/hooks/subscription';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
@@ -10,11 +11,6 @@ import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryType, ILanguage } from '@/types/story.types';
 import { LANGUAGES } from '@/constants/languages';
 import styles from './WorkshopSummary.module.scss';
-
-const FORMAT_LABEL: Record<IStoryType, string> = {
-    BOOK: 'Book',
-    COMIC: 'Comic',
-};
 
 // 1 book page = 1 credit (comics — post-MVP — cost 2 per page).
 const CREDITS_PER_BOOK_PAGE = 1;
@@ -46,7 +42,11 @@ export default function WorkshopSummary({
     onSubmit,
     onCharacterEdit,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
+    const t = useTranslations('workshop.summary');
     const hasQuestion = question.trim().length > 0;
+
+    const storyTypeLabel =
+        storyType === 'BOOK' ? t('format.book') : storyType === 'COMIC' ? t('format.comic') : null;
 
     const { data: subscription } = useSubscription();
     const creditCost = pageCount ? Number(pageCount) * CREDITS_PER_BOOK_PAGE : 0;
@@ -60,58 +60,61 @@ export default function WorkshopSummary({
             <div className={styles['summary__mascot']} aria-hidden="true">
                 <MascotImage image="fox-write" size={120} glow="outline" />
             </div>
-            <CapsLabel variant="gold">Your tale so far</CapsLabel>
+            <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
 
             <blockquote className={styles.summary__question}>
                 {hasQuestion ? (
                     <span className={styles['summary__question-text']}>{question.trim()}</span>
                 ) : (
                     <span className={styles['summary__question-placeholder']}>
-                        Your question will appear here…
+                        {t('questionPlaceholder')}
                     </span>
                 )}
             </blockquote>
 
             <ul className={styles.summary__rows}>
-                <SummaryRow label="Reader" value={child?.name ?? null} />
+                <SummaryRow label={t('labels.reader')} value={child?.name ?? null} />
                 <SummaryRow
-                    label="Character"
+                    label={t('labels.character')}
                     value={character?.name ?? null}
                     action={{
-                        label: character ? 'Edit' : 'Add',
+                        label: character ? t('characterAction.edit') : t('characterAction.add'),
                         onClick: onCharacterEdit,
                         disabled: child === null,
                     }}
                 />
-                <SummaryRow label="Format" value={storyType ? FORMAT_LABEL[storyType] : null} />
-                <SummaryRow label="Length" value={pageCount ? `${pageCount} pages` : null} />
+                <SummaryRow label={t('labels.format')} value={storyTypeLabel} />
                 <SummaryRow
-                    label="Language"
+                    label={t('labels.length')}
+                    value={pageCount ? t('lengthValue', { pageCount }) : null}
+                />
+                <SummaryRow
+                    label={t('labels.language')}
                     value={language ? LANGUAGES[language].nativeName : null}
                 />
-                <SummaryRow label="Style" value={artStyle?.name ?? null} />
+                <SummaryRow label={t('labels.style')} value={artStyle?.name ?? null} />
             </ul>
 
             <hr className={styles.summary__divider} aria-hidden="true" />
 
             <p className={styles.summary__credits}>
-                <span className={styles['summary__credits-cost']}>{creditCost} credits</span>
+                <span className={styles['summary__credits-cost']}>
+                    {t('creditCost', { creditCost })}
+                </span>
                 <span className={styles['summary__credits-remaining']}>
-                    {' '}
-                    · {creditsRemaining ?? '--'} remaining
+                    {t('creditsRemaining', { creditsRemaining: creditsRemaining ?? '--' })}
                 </span>
             </p>
 
             {pageCount && creditsRemaining !== null && (
                 <p className={styles.summary__quota} data-over={overBudget || undefined}>
                     {overBudget
-                        ? `This tale needs ${creditCost} credits but only ${creditsRemaining} remain this cycle — pick a shorter length or upgrade your plan.`
-                        : `${pageCount} pages will use ${creditCost} of your ${creditsRemaining} remaining credits this cycle.`}
+                        ? t('quotaExhausted', { creditCost, creditsRemaining })
+                        : t('quotaInfo', { pageCount, creditCost, creditsRemaining })}
                 </p>
             )}
 
             <div className={styles.summary__actions}>
-                {/* Phase 4: both buttons create a DRAFT. Phase 5: "Light the lantern" triggers generation. */}
                 <Button
                     variant="primary"
                     size="lg"
@@ -120,7 +123,7 @@ export default function WorkshopSummary({
                     loading={isPending}
                     onClick={onSubmit}
                 >
-                    Light the lantern →
+                    {t('generateButton')}
                 </Button>
                 <Button
                     variant="quiet"
@@ -128,7 +131,7 @@ export default function WorkshopSummary({
                     disabled={!isValid || isPending}
                     onClick={onSubmit}
                 >
-                    Save as draft
+                    {t('draftButton')}
                 </Button>
             </div>
         </aside>

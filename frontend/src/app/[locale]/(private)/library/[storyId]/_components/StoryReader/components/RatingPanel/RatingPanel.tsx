@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import Rating from '@/components/ui/Rating/Rating';
@@ -27,6 +28,7 @@ export default function RatingPanel({
     initialRating,
     initialIsPublic,
 }: Readonly<IRatingPanelProps>): React.ReactElement {
+    const t = useTranslations('storyReader.rating');
     const router = useRouter();
     const [score, setScore] = useState(initialRating?.score ?? 0);
     const [note, setNote] = useState(initialRating?.comment ?? '');
@@ -54,8 +56,7 @@ export default function RatingPanel({
             // Refresh so the detail (myRating, isPublic) reflects the saved state.
             router.refresh();
         } catch (err) {
-            const message =
-                err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+            const message = err instanceof Error ? err.message : t('defaultError');
             setError(message);
         } finally {
             setIsSaving(false);
@@ -65,11 +66,11 @@ export default function RatingPanel({
     return (
         <section className={styles.rating} aria-labelledby="rating-heading">
             <div className={styles.rating__header}>
-                <CapsLabel>· Rate this tale ·</CapsLabel>
+                <CapsLabel>{t('eyebrow')}</CapsLabel>
             </div>
 
             <p id="rating-heading" className={styles.rating__sub}>
-                {`How did ${childName} like it? It helps the workshop write the next one.`}
+                {t('subheading', { childName })}
             </p>
 
             <Rating
@@ -78,7 +79,7 @@ export default function RatingPanel({
                     setScore(value);
                     clearStatus();
                 }}
-                aria-label="Story rating"
+                aria-label={t('ariaLabel')}
             />
 
             <Textarea
@@ -87,10 +88,10 @@ export default function RatingPanel({
                     setNote(e.currentTarget.value);
                     clearStatus();
                 }}
-                placeholder="Write a small note (optional)…"
+                placeholder={t('notePlaceholder')}
                 minRows={3}
                 maxRows={5}
-                aria-label="Rating note"
+                aria-label={t('noteAriaLabel')}
             />
 
             <Switch
@@ -99,7 +100,7 @@ export default function RatingPanel({
                     setIsPublic(checked);
                     clearStatus();
                 }}
-                label="Share this story as an example for other families"
+                label={t('shareLabel')}
             />
 
             <Button
@@ -108,12 +109,12 @@ export default function RatingPanel({
                 loading={isSaving}
                 disabled={score === 0}
             >
-                Save rating
+                {t('saveButton')}
             </Button>
 
             {saved && (
                 <p className={styles.rating__status} role="status">
-                    Saved — thank you!
+                    {t('savedStatus')}
                 </p>
             )}
             {error && (

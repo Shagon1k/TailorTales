@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { getAge } from '@/utils/date.utils';
@@ -22,13 +25,14 @@ export interface ITaleCardProps {
 }
 
 export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.ReactElement {
+    const t = useTranslations('library.taleCard');
     const displayTitle = story.title ?? `"${story.question}"`;
     const coverColor = getCoverColor(story.id);
     const age = getAge(story.child.birthdate);
 
     const isFailed = story.status === 'FAILED';
     const href = isFailed ? `/workshop?storyId=${story.id}` : `/library/${story.id}`;
-    const ariaLabel = isFailed ? `${displayTitle} — generation failed, try again` : displayTitle;
+    const ariaLabel = isFailed ? t('failedAriaLabel', { displayTitle }) : displayTitle;
 
     return (
         <Link href={href} className={styles['tale-card']} aria-label={ariaLabel}>
@@ -51,19 +55,19 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
 
                 {isFailed && (
                     <div className={styles['tale-card__failed-overlay']} aria-hidden="true">
-                        Generation failed
+                        {t('failedOverlay')}
                     </div>
                 )}
             </div>
 
             <div className={styles['tale-card__meta']}>
                 {isFailed ? (
-                    <span className={styles['tale-card__retry-cta']}>Try again →</span>
+                    <span className={styles['tale-card__retry-cta']}>{t('retryLabel')}</span>
                 ) : (
                     <>
-                        <span>age {age}</span>
+                        <span>{t('age', { age })}</span>
                         <span>·</span>
-                        <span>{story.pageCount}pp</span>
+                        <span>{t('pageCount', { pageCount: story.pageCount })}</span>
                         <span>·</span>
                         <span>{story.type.toLowerCase()}</span>
                     </>

@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import CapsLink from '@/components/ui/CapsLink/CapsLink';
 import type { IStorySummary } from '@/types/story.types';
 import { getAge } from '@/utils/date.utils';
@@ -11,19 +12,21 @@ export interface ITalesSectionProps {
     tales: IStorySummary[];
 }
 
-export default function TalesSection({
+export default async function TalesSection({
     tales,
-}: Readonly<ITalesSectionProps>): React.ReactElement | null {
+}: Readonly<ITalesSectionProps>): Promise<React.ReactElement | null> {
     // Show the section only once at least one family has opted a story in.
     if (tales.length === 0) return null;
+
+    const t = await getTranslations('home.tales');
 
     return (
         <section className={styles.tales}>
             <div className={styles.tales__inner}>
                 <div className={styles.tales__header}>
-                    <h2 className={styles.tales__heading}>Tales lit recently.</h2>
+                    <h2 className={styles.tales__heading}>{t('heading')}</h2>
                     {/* TODO: link to /tales once the public library page is built */}
-                    <CapsLink href="#">Browse the library →</CapsLink>
+                    <CapsLink href="#">{t('browseLink')}</CapsLink>
                 </div>
                 <div className={styles.tales__grid}>
                     {tales.map((tale, index) => (

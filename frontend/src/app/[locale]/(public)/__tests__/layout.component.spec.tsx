@@ -8,6 +8,11 @@ vi.mock('@/api/user.server', () => ({
     getServerUser: mockGetServerUser,
 }));
 
+// async server component — stub it for sync render
+vi.mock('@/components/shared/Footer/Footer', () => ({
+    default: () => <footer />,
+}));
+
 function renderWithMantine(ui: React.ReactElement): ReturnType<typeof render> {
     return render(<MantineProvider>{ui}</MantineProvider>);
 }

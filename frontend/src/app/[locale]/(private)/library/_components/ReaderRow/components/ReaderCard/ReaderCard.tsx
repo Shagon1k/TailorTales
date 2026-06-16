@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import Avatar from '@/components/ui/Avatar/Avatar';
 import type { IChild } from '@/types/child.types';
@@ -10,17 +11,21 @@ export interface IReaderCardProps {
     stories: IStorySummary[];
 }
 
-export default function ReaderCard({
+export default async function ReaderCard({
     child,
     stories,
-}: Readonly<IReaderCardProps>): React.ReactElement {
+}: Readonly<IReaderCardProps>): Promise<React.ReactElement> {
+    const t = await getTranslations('library.readerCard');
     const childStories = stories.filter((s) => s.childId === child.id);
     const lastStory = childStories.toSorted(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )[0];
 
     return (
-        <article className={styles['reader-card']} aria-label={`${child.name}'s reader card`}>
+        <article
+            className={styles['reader-card']}
+            aria-label={t('ariaLabel', { childName: child.name })}
+        >
             <div className={styles['reader-card__top']}>
                 <Avatar size="lg" name={child.name} />
                 <div className={styles['reader-card__info']}>
@@ -29,14 +34,14 @@ export default function ReaderCard({
                     </p>
                     {lastStory ? (
                         <p className={styles['reader-card__last-tale']}>
-                            last tale {getRelativeTime(lastStory.createdAt)}
+                            {t('lastTale', { relativeTime: getRelativeTime(lastStory.createdAt) })}
                         </p>
                     ) : (
-                        <p className={styles['reader-card__last-tale']}>no tales yet</p>
+                        <p className={styles['reader-card__last-tale']}>{t('noTales')}</p>
                     )}
                     {child.interests.length > 0 && (
                         <p className={styles['reader-card__interests']}>
-                            loves: {child.interests.join(', ')}
+                            {t('loves')} {child.interests.join(', ')}
                         </p>
                     )}
                 </div>
@@ -47,10 +52,10 @@ export default function ReaderCard({
                     href={`/workshop?childId=${child.id}`}
                     className={styles['reader-card__new-tale']}
                 >
-                    + New tale
+                    {t('newTaleButton')}
                 </Link>
                 <span className={styles['reader-card__count']}>
-                    {childStories.length} {childStories.length === 1 ? 'tale' : 'tales'}
+                    {t('taleCount', { count: childStories.length })}
                 </span>
             </div>
         </article>

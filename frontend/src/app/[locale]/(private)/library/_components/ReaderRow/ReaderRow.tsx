@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import CapsLink from '@/components/ui/CapsLink/CapsLink';
 import type { IChild } from '@/types/child.types';
@@ -10,20 +11,22 @@ export interface IReaderRowProps {
     stories: IStorySummary[];
 }
 
-export default function ReaderRow({
+export default async function ReaderRow({
     readers,
     stories,
-}: Readonly<IReaderRowProps>): React.ReactElement {
+}: Readonly<IReaderRowProps>): Promise<React.ReactElement> {
+    const t = await getTranslations('library.readers');
+
     return (
         <section className={styles['reader-row']} aria-labelledby="readers-heading">
             <div className={styles['reader-row__header']}>
                 <h2 id="readers-heading" className={styles['reader-row__title']}>
-                    Your readers
+                    {t('heading')}
                 </h2>
-                <CapsLink href="/account/children">Manage children →</CapsLink>
+                <CapsLink href="/account/children">{t('manageLink')}</CapsLink>
             </div>
 
-            <div className={styles['reader-row__track']} role="list" aria-label="Readers">
+            <div className={styles['reader-row__track']} role="list" aria-label={t('ariaLabel')}>
                 {readers.map((child) => (
                     <div key={child.id} role="listitem">
                         <ReaderCard child={child} stories={stories} />
@@ -35,9 +38,7 @@ export default function ReaderRow({
                         <span className={styles['reader-row__add-icon']} aria-hidden="true">
                             +
                         </span>
-                        <span className={styles['reader-row__add-label']}>
-                            Add another little reader
-                        </span>
+                        <span className={styles['reader-row__add-label']}>{t('addLabel')}</span>
                     </Link>
                 </div>
             </div>

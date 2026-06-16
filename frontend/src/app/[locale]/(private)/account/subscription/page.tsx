@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Stack } from '@mantine/core';
 import { useSubscription } from '@/hooks/subscription';
 import PlanCard from './_components/PlanCard/PlanCard';
@@ -36,8 +37,10 @@ export default function SubscriptionPage(): React.ReactElement {
         return () => clearInterval(timer);
     }, [checkoutSucceeded, isPaid, refetch]);
 
+    const t = useTranslations('account.subscription');
+
     if (!subscription) {
-        return <p>Loading your subscription…</p>;
+        return <p>{t('loading')}</p>;
     }
 
     return (

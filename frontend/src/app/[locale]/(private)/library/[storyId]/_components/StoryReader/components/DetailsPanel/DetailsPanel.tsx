@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import { getAge } from '@/utils/date.utils';
 import type { IStoryDetail } from '@/types/story.types';
@@ -5,16 +8,12 @@ import { LANGUAGES } from '@/constants/languages';
 import PdfFileSize from './components/PdfFileSize/PdfFileSize';
 import styles from './DetailsPanel.module.scss';
 
-const FORMAT_LABELS: Record<string, string> = {
-    BOOK: 'Book',
-    COMIC: 'Comic',
-};
-
 export interface IDetailsPanelProps {
     story: IStoryDetail;
 }
 
 export default function DetailsPanel({ story }: Readonly<IDetailsPanelProps>): React.ReactElement {
+    const t = useTranslations('storyReader.details');
     const age = getAge(story.child.birthdate);
     const createdDate = new Date(story.createdAt).toLocaleDateString('en-US', {
         day: 'numeric',
@@ -23,13 +22,24 @@ export default function DetailsPanel({ story }: Readonly<IDetailsPanelProps>): R
     });
 
     const rows: { label: string; value: React.ReactNode }[] = [
-        { label: 'Created', value: createdDate },
-        { label: 'Reader', value: `${story.child.name}, age ${age}` },
-        { label: 'Format', value: FORMAT_LABELS[story.type] ?? story.type },
-        { label: 'Style', value: story.artStyle.name },
-        { label: 'Language', value: LANGUAGES[story.language]?.nativeName ?? story.language },
+        { label: t('labels.created'), value: createdDate },
+        { label: t('labels.reader'), value: `${story.child.name}, age ${age}` },
         {
-            label: 'File size',
+            label: t('labels.format'),
+            value:
+                story.type === 'BOOK'
+                    ? t('format.book')
+                    : story.type === 'COMIC'
+                      ? t('format.comic')
+                      : story.type,
+        },
+        { label: t('labels.style'), value: story.artStyle.name },
+        {
+            label: t('labels.language'),
+            value: LANGUAGES[story.language]?.nativeName ?? story.language,
+        },
+        {
+            label: t('labels.fileSize'),
             value: story.pdfUrl ? <PdfFileSize url={story.pdfUrl} /> : '—',
         },
     ];
@@ -37,7 +47,7 @@ export default function DetailsPanel({ story }: Readonly<IDetailsPanelProps>): R
     return (
         <section className={styles.details} aria-labelledby="details-heading">
             <div className={styles.details__header}>
-                <CapsLabel>· Details ·</CapsLabel>
+                <CapsLabel>{t('eyebrow')}</CapsLabel>
             </div>
 
             <dl className={styles.details__list}>

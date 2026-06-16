@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import type { IPage } from '@/types/story.types';
 import StoryPageIframe from './components/StoryPageIframe/StoryPageIframe';
@@ -22,15 +25,16 @@ export default function SpreadViewer({
     onPrev,
     onNext,
 }: Readonly<ISpreadViewerProps>): React.ReactElement {
+    const t = useTranslations('storyReader.spread');
     const currentNumber = pageIndex + 1;
     const isFirst = pageIndex === 0;
     const isLast = pageIndex === totalPages - 1;
 
     const chapterSuffix = page.chapterTitle ? ` — ${page.chapterTitle}` : '';
-    const liveAnnouncement = `Page ${currentNumber} of ${totalPages}${chapterSuffix}`;
+    const liveAnnouncement = `${t('pageAriaLabel', { current: currentNumber, total: totalPages })}${chapterSuffix}`;
 
     return (
-        <section className={styles.viewer} aria-roledescription="book" aria-label="Story pages">
+        <section className={styles.viewer} aria-roledescription="book" aria-label={t('ariaLabel')}>
             <p className={styles['viewer__live']} aria-live="polite" aria-atomic="true">
                 {liveAnnouncement}
             </p>
@@ -38,12 +42,12 @@ export default function SpreadViewer({
             <div
                 id={PAGE_REGION_ID}
                 className={styles.viewer__page}
-                aria-label={`Page ${currentNumber} of ${totalPages}`}
+                aria-label={t('pageAriaLabel', { current: currentNumber, total: totalPages })}
             >
                 <StoryPageIframe storyId={storyId} pageOrder={page.order} />
             </div>
 
-            <div className={styles.viewer__nav} role="group" aria-label="Page navigation">
+            <div className={styles.viewer__nav} role="group" aria-label={t('navGroupLabel')}>
                 <Button
                     variant="secondary"
                     onClick={onPrev}
@@ -51,15 +55,15 @@ export default function SpreadViewer({
                     aria-controls={PAGE_REGION_ID}
                     aria-label={
                         isFirst
-                            ? 'Previous page (already at first)'
-                            : `Go to page ${currentNumber - 1}`
+                            ? t('prevAriaFirst')
+                            : t('prevAriaPage', { page: currentNumber - 1 })
                     }
                 >
-                    ← Previous
+                    {t('prevButton')}
                 </Button>
 
                 <span className={styles['viewer__nav-counter']} aria-hidden="true">
-                    {`${currentNumber} of ${totalPages}`}
+                    {t('counter', { current: currentNumber, total: totalPages })}
                 </span>
 
                 <Button
@@ -68,10 +72,10 @@ export default function SpreadViewer({
                     disabled={isLast}
                     aria-controls={PAGE_REGION_ID}
                     aria-label={
-                        isLast ? 'Next page (already at last)' : `Go to page ${currentNumber + 1}`
+                        isLast ? t('nextAriaLast') : t('nextAriaPage', { page: currentNumber + 1 })
                     }
                 >
-                    Next →
+                    {t('nextButton')}
                 </Button>
             </div>
         </section>

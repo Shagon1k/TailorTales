@@ -4,6 +4,11 @@ import LoginPage from './page';
 
 const mockRouterReplace = vi.hoisted(() => vi.fn());
 
+// async server component — stub it for sync render
+vi.mock('@/components/shared/Footer/Footer', () => ({
+    default: () => null,
+}));
+
 vi.mock('@/context/UserContext', () => ({
     useCurrentUser: vi.fn().mockReturnValue({ user: null, isLoading: false, refetch: vi.fn() }),
 }));

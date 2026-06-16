@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Stack } from '@mantine/core';
 import Card from '@/components/ui/Card/Card';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
@@ -14,18 +15,17 @@ interface IInvoiceListProps {
 }
 
 export default function InvoiceList({ isPaid }: Readonly<IInvoiceListProps>): React.ReactElement {
+    const t = useTranslations('account.subscription.invoices');
     const { data: invoices } = useInvoices();
 
     return (
         <Card variant="default" size="md">
             <Stack gap="sm">
-                <CapsLabel>Past parcels</CapsLabel>
+                <CapsLabel>{t('eyebrow')}</CapsLabel>
 
                 {!invoices || invoices.length === 0 ? (
                     <p className={styles['invoice-list__empty']}>
-                        {isPaid
-                            ? 'No invoices yet — your first one arrives with the next renewal.'
-                            : 'No invoices — the Free Chapter never bills you.'}
+                        {isPaid ? t('emptyPaid') : t('emptyFree')}
                     </p>
                 ) : (
                     <ul className={styles['invoice-list__items']}>
@@ -48,7 +48,7 @@ export default function InvoiceList({ isPaid }: Readonly<IInvoiceListProps>): Re
                                 </span>
                                 {invoice.invoicePdfUrl && (
                                     <Link href={invoice.invoicePdfUrl} variant="quiet">
-                                        PDF
+                                        {t('pdfLink')}
                                     </Link>
                                 )}
                             </li>

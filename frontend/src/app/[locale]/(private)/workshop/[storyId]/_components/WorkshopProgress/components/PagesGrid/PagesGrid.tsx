@@ -1,4 +1,7 @@
+'use client';
+
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import styles from './PagesGrid.module.scss';
 
 export interface IPagesGridProps {
@@ -12,12 +15,14 @@ export default function PagesGrid({
     completedPageOrders,
     activePageOrder,
 }: Readonly<IPagesGridProps>): React.ReactElement {
+    const t = useTranslations('workshopProgress.pages');
+
     return (
         <div className={styles.pages}>
             <div className={styles.pages__header}>
-                <span>Pages so far</span>
+                <span>{t('header')}</span>
                 <span className={styles.pages__count}>
-                    {completedPageOrders.size} OF {totalPages} PAINTED
+                    {t('count', { done: completedPageOrders.size, total: totalPages })}
                 </span>
             </div>
             <div className={styles.pages__grid}>

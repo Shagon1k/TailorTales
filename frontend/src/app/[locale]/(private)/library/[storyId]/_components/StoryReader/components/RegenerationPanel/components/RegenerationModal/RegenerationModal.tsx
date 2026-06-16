@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import type { IRegenerateWhat } from '@/types/story.types';
 import Modal from '@/components/ui/Modal/Modal';
@@ -8,18 +9,6 @@ import Button from '@/components/ui/Button/Button';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import { storiesApi } from '@/api/stories';
 import styles from './RegenerationModal.module.scss';
-
-const TITLE: Record<IRegenerateWhat, string> = {
-    text: 'Regenerate text',
-    illustration: 'Repaint illustration',
-    both: 'Regenerate page',
-};
-
-const DESCRIPTION: Record<IRegenerateWhat, string> = {
-    text: 'The story text on this page will be rewritten. The illustration stays.',
-    illustration: 'The picture will be repainted. The text stays.',
-    both: 'Both the text and the illustration on this page will be remade.',
-};
 
 export interface IRegenerationModalProps {
     storyId: string;
@@ -36,6 +25,7 @@ export default function RegenerationModal({
     opened,
     onClose,
 }: Readonly<IRegenerationModalProps>): React.ReactElement {
+    const t = useTranslations('storyReader.regeneration');
     const router = useRouter();
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -52,8 +42,7 @@ export default function RegenerationModal({
             router.refresh();
             onClose();
         } catch (err) {
-            const message =
-                err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+            const message = err instanceof Error ? err.message : t('modal.defaultError');
             setError(message);
         } finally {
             setIsLoading(false);
@@ -62,22 +51,36 @@ export default function RegenerationModal({
 
     const errorDescriptionId = 'regen-modal-error';
 
+    const title =
+        what === 'text'
+            ? t('modal.titles.text')
+            : what === 'illustration'
+              ? t('modal.titles.illustration')
+              : t('modal.titles.both');
+
+    const description =
+        what === 'text'
+            ? t('modal.descriptions.text')
+            : what === 'illustration'
+              ? t('modal.descriptions.illustration')
+              : t('modal.descriptions.both');
+
     return (
         <Modal
             opened={opened}
             onClose={onClose}
-            title={TITLE[what]}
+            title={title}
             size="sm"
             closeOnClickOutside={!isLoading}
             closeOnEscape={!isLoading}
         >
             <div className={styles.body}>
-                <p className={styles.body__description}>{DESCRIPTION[what]}</p>
+                <p className={styles.body__description}>{description}</p>
 
                 <Textarea
-                    label="Author note (optional)"
-                    description='Guide the AI — e.g. "make it funnier" or "add a dragon".'
-                    placeholder="Leave blank to let the AI decide…"
+                    label={t('modal.authorNoteLabel')}
+                    description={t('modal.authorNoteDescription')}
+                    placeholder={t('modal.authorNotePlaceholder')}
                     value={prompt}
                     onChange={(e) => setPrompt(e.currentTarget.value)}
                     minRows={3}
@@ -93,7 +96,7 @@ export default function RegenerationModal({
 
                 <div className={styles.body__actions}>
                     <Button variant="secondary" onClick={onClose} disabled={isLoading}>
-                        Cancel
+                        {t('modal.cancelButton')}
                     </Button>
                     <Button
                         variant="primary"
@@ -101,7 +104,7 @@ export default function RegenerationModal({
                         loading={isLoading}
                         aria-busy={isLoading}
                     >
-                        Confirm
+                        {t('modal.confirmButton')}
                     </Button>
                 </div>
             </div>

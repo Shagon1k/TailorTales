@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import clsx from 'clsx';
 import Rating from '@/components/ui/Rating/Rating';
 import styles from './StoryCard.module.scss';
@@ -14,7 +15,7 @@ interface IStoryCardProps {
     tone: TStoryCardTone;
 }
 
-export default function StoryCard({
+export default async function StoryCard({
     quote,
     childName,
     age,
@@ -22,7 +23,13 @@ export default function StoryCard({
     format = 'book',
     rating,
     tone,
-}: Readonly<IStoryCardProps>): React.ReactElement {
+}: Readonly<IStoryCardProps>): Promise<React.ReactElement> {
+    const t = await getTranslations('home.tales');
+
+    const meta =
+        t('card.meta', { childName, age, pages }) +
+        (format === 'comic' ? t('card.comicSuffix') : '');
+
     return (
         <article className={clsx(styles['story-card'], styles[`m-${tone}`])}>
             <div className={styles['story-card__panel']}>
@@ -35,9 +42,7 @@ export default function StoryCard({
                 </blockquote>
             </div>
             <footer className={styles['story-card__footer']}>
-                <p className={styles['story-card__meta']}>
-                    for {childName}, {age} · {pages} pages{format === 'comic' ? ' · comic' : ''}
-                </p>
+                <p className={styles['story-card__meta']}>{meta}</p>
                 <Rating value={rating} readOnly />
             </footer>
         </article>

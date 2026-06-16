@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import clsx from 'clsx';
 import type { IChild } from '@/types/child.types';
 import type { IStorySummary } from '@/types/story.types';
@@ -24,12 +25,16 @@ export default function TaleGrid({
 }: Readonly<ITaleGridProps>): React.ReactElement {
     const [filter, setFilter] = useState<TFilter>('ALL');
     const filtered = applyFilter(stories, filter);
+    const t = useTranslations('library');
 
     const filterOptions: IFilterOption[] = [
-        { value: 'ALL', label: 'All' },
-        ...readers.map((r) => ({ value: r.id, label: `For ${r.name}` })),
-        { value: 'BOOK', label: 'Books' },
-        { value: 'COMIC', label: 'Comics' },
+        { value: 'ALL', label: t('grid.filterOption.all') },
+        ...readers.map((r) => ({
+            value: r.id,
+            label: t('grid.filterOption.child', { childName: r.name }),
+        })),
+        { value: 'BOOK', label: t('grid.filterOption.books') },
+        { value: 'COMIC', label: t('grid.filterOption.comics') },
     ];
 
     return (
@@ -37,10 +42,10 @@ export default function TaleGrid({
             <div className={styles['tale-grid__header']}>
                 <div className={styles['tale-grid__heading-group']}>
                     <h2 id="library-heading" className={styles['tale-grid__title']}>
-                        Your library
+                        {t('grid.heading')}
                     </h2>
                     <span className={styles['tale-grid__count']}>
-                        {stories.length} {stories.length === 1 ? 'tale' : 'tales'}
+                        {t('grid.count', { count: stories.length })}
                     </span>
                 </div>
 
@@ -50,7 +55,7 @@ export default function TaleGrid({
                     className={styles['tale-grid__filters']}
                 >
                     <span id="tale-grid-filter-label" className={styles['tale-grid__filter-label']}>
-                        Filter
+                        {t('grid.filterLabel')}
                     </span>
                     {filterOptions.map(({ value, label }) => (
                         <button
@@ -70,9 +75,9 @@ export default function TaleGrid({
             </div>
 
             {filtered.length === 0 ? (
-                <p className={styles['tale-grid__empty']}>No tales match this filter.</p>
+                <p className={styles['tale-grid__empty']}>{t('grid.empty')}</p>
             ) : (
-                <ul className={styles['tale-grid__list']} aria-label="Tales">
+                <ul className={styles['tale-grid__list']} aria-label={t('grid.ariaLabel')}>
                     {filtered.map((story) => (
                         <li key={story.id}>
                             <TaleCard story={story} />

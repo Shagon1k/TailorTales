@@ -1,23 +1,25 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import CtaSection from '../_components/CtaSection/CtaSection';
 import DetailedStepsSection from './_components/DetailedStepsSection/DetailedStepsSection';
 
-export const metadata: Metadata = { title: 'How It Works' };
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('howItWorks.page');
+    return { title: t('title') };
+}
 
-export default function HowItWorksPage(): React.ReactElement {
+export default async function HowItWorksPage(): Promise<React.ReactElement> {
+    const t = await getTranslations('howItWorks.hero');
+
     return (
         <>
             <PageHero
-                eyebrow="How it works"
-                heading={
-                    <>
-                        Three <HeroHighlight>small steps</HeroHighlight>,
-                        <br />
-                        one <HeroHighlight>lasting tale</HeroHighlight>.
-                    </>
-                }
-                sub="No accounts to configure, no prompts to engineer. You answer three questions and the workshop does the rest."
+                eyebrow={t('eyebrow')}
+                heading={t.rich('heading', {
+                    highlight: (chunks) => <HeroHighlight>{chunks}</HeroHighlight>,
+                })}
+                sub={t('subheading')}
             />
             <DetailedStepsSection />
             <CtaSection />

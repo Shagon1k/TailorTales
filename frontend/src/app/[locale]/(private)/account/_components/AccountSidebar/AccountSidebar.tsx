@@ -2,6 +2,7 @@
 
 import { Link, usePathname } from '@/i18n/navigation';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { authApi } from '@/api/auth';
 import { useCurrentUser } from '@/context/UserContext';
 import styles from './AccountSidebar.module.scss';
@@ -11,19 +12,20 @@ interface INavItem {
     label: string;
 }
 
-const NAV_ITEMS: INavItem[] = [
-    { href: '/account/profile', label: 'Profile' },
-    { href: '/account/children', label: 'Children' },
-    { href: '/account/subscription', label: 'Subscription' },
-    { href: '/account/notifications', label: 'Notifications' },
-    { href: '/account/language', label: 'Language' },
-    { href: '/account/privacy', label: 'Privacy & data' },
-];
-
 export default function AccountSidebar(): React.ReactElement {
+    const t = useTranslations('account.sidebar');
     const { user } = useCurrentUser();
     const pathname = usePathname();
     const initial = user?.name?.charAt(0).toUpperCase() ?? '?';
+
+    const navItems: INavItem[] = [
+        { href: '/account/profile', label: t('nav.profile') },
+        { href: '/account/children', label: t('nav.children') },
+        { href: '/account/subscription', label: t('nav.subscription') },
+        { href: '/account/notifications', label: t('nav.notifications') },
+        { href: '/account/language', label: t('nav.language') },
+        { href: '/account/privacy', label: t('nav.privacy') },
+    ];
 
     async function handleSignOut(): Promise<void> {
         try {
@@ -46,9 +48,9 @@ export default function AccountSidebar(): React.ReactElement {
                 </div>
             </div>
 
-            <nav aria-label="Account navigation">
+            <nav aria-label={t('nav.ariaLabel')}>
                 <ul className={styles.sidebar__nav}>
-                    {NAV_ITEMS.map((item) => (
+                    {navItems.map((item) => (
                         <li key={item.href}>
                             <Link
                                 href={item.href}
@@ -64,7 +66,7 @@ export default function AccountSidebar(): React.ReactElement {
                     <li>
                         <button type="button" className={styles['sidebar__nav-item']}>
                             <span className={styles['sidebar__nav-icon']} aria-hidden="true" />
-                            Export library
+                            {t('nav.export')}
                         </button>
                     </li>
                 </ul>
@@ -76,10 +78,10 @@ export default function AccountSidebar(): React.ReactElement {
                     className={styles['sidebar__sign-out']}
                     onClick={() => void handleSignOut()}
                 >
-                    Sign out
+                    {t('signOut')}
                 </button>
                 <Link href="/account/privacy" className={styles['sidebar__delete']}>
-                    Delete account
+                    {t('deleteAccount')}
                 </Link>
             </div>
         </aside>

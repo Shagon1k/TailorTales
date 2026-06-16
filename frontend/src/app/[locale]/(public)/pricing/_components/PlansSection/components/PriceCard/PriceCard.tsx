@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Card from '@/components/ui/Card/Card';
 import Button from '@/components/ui/Button/Button';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
@@ -18,6 +19,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
     const { name, tagline, priceMonthly, features, ctaLabel, paddlePriceId, mostLoved } = plan;
     const isFree = priceMonthly === 0;
     const buttonVariant = mostLoved ? 'primary' : 'secondary';
+    const t = useTranslations('pricing.plans');
 
     const { user } = useCurrentUser();
     const { data: subscription } = useSubscription();
@@ -52,7 +54,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
         if (isCurrentPlan) {
             return (
                 <Button variant={buttonVariant} disabled>
-                    Your current plan
+                    {t('currentPlan')}
                 </Button>
             );
         }
@@ -63,7 +65,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
         if (hasPaidSubscription || isFree) {
             return (
                 <ButtonLink href="/account/subscription" variant={buttonVariant}>
-                    Manage in account →
+                    {t('manageInAccount')}
                 </ButtonLink>
             );
         }
@@ -78,7 +80,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
                 disabled={!checkoutAvailable}
                 onClick={() => openCheckout()}
             >
-                {checkoutAvailable ? ctaLabel : 'Checkout coming soon'}
+                {checkoutAvailable ? ctaLabel : t('checkoutSoon')}
             </Button>
         );
     };
@@ -87,7 +89,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
         <Card variant={mostLoved ? 'featured' : 'dark'} size="hero">
             {mostLoved && (
                 <div className={styles.badge}>
-                    <span className={styles['badge-pill']}>Most loved</span>
+                    <span className={styles['badge-pill']}>{t('mostLoved')}</span>
                 </div>
             )}
             <div className={styles.body}>
@@ -97,7 +99,9 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
                 </div>
                 <div className={styles.price}>
                     <span className={styles['price-amount']}>{formatMoney(priceMonthly)}</span>
-                    <span className={styles['price-period']}>{isFree ? 'forever' : '/ month'}</span>
+                    <span className={styles['price-period']}>
+                        {isFree ? t('priceForever') : t('pricePerMonth')}
+                    </span>
                 </div>
                 <ul className={styles.features}>
                     {features.map((f) => (

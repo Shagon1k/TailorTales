@@ -16,6 +16,11 @@ vi.mock('@/hooks/subscription', () => ({
     useSubscription: () => ({ data: undefined }),
 }));
 
+// async server component — stub it for sync render
+vi.mock('@/components/shared/Footer/Footer', () => ({
+    default: () => <footer />,
+}));
+
 // NotificationCenter (inside Header) opens an SSE stream — stub the whole API module.
 vi.mock('@/api/notifications', () => ({
     notificationsApi: {
