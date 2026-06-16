@@ -11,8 +11,6 @@ import Input from '@/components/ui/Input/Input';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './DeleteAccountSection.module.scss';
 
-const CONFIRM_WORD = 'DELETE';
-
 interface IDeleteAccountSectionProps {
     hasPaidSubscription: boolean;
 }
@@ -21,6 +19,7 @@ export default function DeleteAccountSection({
     hasPaidSubscription,
 }: Readonly<IDeleteAccountSectionProps>): React.ReactElement {
     const t = useTranslations('account.privacy.delete');
+    const confirmWord = t('modal.confirmWord');
     const [modalOpen, setModalOpen] = useState(false);
     const [confirmText, setConfirmText] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -78,7 +77,7 @@ export default function DeleteAccountSection({
                         </Button>
                         <Button
                             variant="primary"
-                            disabled={confirmText !== CONFIRM_WORD}
+                            disabled={confirmText !== confirmWord}
                             loading={isDeleting}
                             onClick={() => void handleDelete()}
                         >

@@ -1,1 +1,795 @@
-{}
+{
+    "common": {
+        "nav": {
+            "howItWorks": "So funktioniert's"
+        }
+    },
+    "header": {
+        "nav": {
+            "ariaLabel": "Hauptnavigation",
+            "howItWorks": "So funktioniert's",
+            "pricing": "Preise",
+            "signIn": "Anmelden",
+            "cta": "Geschichte beginnen →",
+            "library": "Bibliothek",
+            "workshop": "Werkstatt"
+        },
+        "userChip": {
+            "ariaLabel": "Kontomenü"
+        },
+        "userMenu": {
+            "myAccount": "Mein Konto",
+            "subscription": "Abonnement",
+            "children": "Kinder",
+            "adminPanel": "Adminbereich",
+            "signOut": "Abmelden"
+        },
+        "notifications": {
+            "title": "Benachrichtigungen",
+            "markAllRead": "Alle als gelesen markieren",
+            "loading": "Benachrichtigungen werden geladen",
+            "list": {
+                "empty": "Alles ruhig — neue Geschichten erscheinen hier.",
+                "unreadLabel": " (ungelesen)"
+            }
+        }
+    },
+    "footer": {
+        "brandName": "TailorTales",
+        "tagline": "Eine kleine Werkstatt für die Fragen eines Kindes.",
+        "nav": {
+            "ariaLabel": "Fußzeilennavigation",
+            "howItWorks": "So funktioniert's",
+            "privacy": "Datenschutz",
+            "contact": "Kontakt"
+        }
+    },
+    "notifications": {
+        "storyCompleted": "Die Geschichte \"{title}\" für {childName} ist fertig",
+        "storyFailed": "Wir konnten {childName}s Geschichte nicht fertigstellen — keine Credits wurden verwendet",
+        "paymentFailed": "Die Zahlung konnte nicht verarbeitet werden — bitte Zahlungsmethode überprüfen",
+        "subscriptionCanceled": "Dein Abonnement ist beendet — du bist jetzt im kostenlosen Plan"
+    },
+    "home": {
+        "hero": {
+            "eyebrow": "Ein kleines Licht zur Schlafenszeit",
+            "heading": "Wo ihre <highlight>Fragen</highlight> ihre <highlight>Geschichten</highlight> werden.",
+            "subheading": "Eine kleine Werkstatt, die den Namen, das Alter und die Neugier deines Kindes nimmt und zu einem kleinen Buch oder Comic zusammennäht — fünf bis zwanzig Seiten, für immer ihr Eigen.",
+            "cta": {
+                "loggedIn": "Werkstatt öffnen →",
+                "signUp": "Erste Geschichte beginnen →",
+                "howItWorksButton": "So funktioniert's"
+            }
+        },
+        "cta": {
+            "heading": "Eine kleine Geschichte, heute Abend.",
+            "subheading": "Erstes Kapitel kostenlos. Keine Karte, kein Zeitdruck. Nur ein Name, eine Frage und zehn ruhige Minuten.",
+            "button": "Kostenlos eine Geschichte beginnen →"
+        },
+        "lanterns": {
+            "label": "· So funktioniert die Werkstatt ·",
+            "heading": "Drei Schritte, dann ihr Buch.",
+            "lightAName": {
+                "numeral": "i.",
+                "title": "Einen Namen erhellen",
+                "body": "Sag uns, für wen die Geschichte ist. Nur ein Name, ein Alter, ein paar Dinge, die sie lieben."
+            },
+            "whisperAWhy": {
+                "numeral": "ii.",
+                "title": "Ein Warum flüstern",
+                "body": "Wähle eine Frage, die sie immer wieder stellen. Oder eine von unseren. Die Geschichte wird darum herum aufgebaut."
+            },
+            "carryItHome": {
+                "numeral": "iii.",
+                "title": "Nach Hause tragen",
+                "body": "Ein druckbares PDF in Minuten. Fünf bis zwanzig Seiten, altersgerecht, für immer ihr Eigen."
+            }
+        },
+        "tales": {
+            "heading": "Zuletzt entstandene Geschichten.",
+            "browseLink": "Bibliothek durchstöbern →",
+            "card": {
+                "meta": "für {childName}, {age} · {pages} Seiten",
+                "comicSuffix": " · Comic"
+            }
+        }
+    },
+    "howItWorks": {
+        "page": {
+            "title": "So funktioniert's"
+        },
+        "hero": {
+            "eyebrow": "So funktioniert's",
+            "heading": "Drei <highlight>kleine Schritte</highlight>, eine <highlight>bleibende Geschichte</highlight>.",
+            "subheading": "Keine Konten einzurichten, keine Prompts zu schreiben. Du beantwortest drei Fragen und die Werkstatt erledigt den Rest."
+        },
+        "steps": {
+            "lightAName": {
+                "numeral": "i.",
+                "title": "Einen Namen erhellen",
+                "body": "Sag uns, für wen die Geschichte ist — ein Vorname, ein Alter und zwei oder drei Dinge, die sie gerade lieben. Dinosaurier, Pfützen, ihr Hund. Wir verwenden das, um die Geschichte in ihrer Welt zu verankern, nicht in einer generischen.",
+                "detail1": "Dauert etwa eine Minute",
+                "detail2": "Ein Kind pro Geschichte",
+                "detail3": "Du kannst Profile für das nächste Mal speichern"
+            },
+            "whisperAWhy": {
+                "numeral": "ii.",
+                "title": "Ein Warum flüstern",
+                "body": "Wähle die Frage oder das Thema, das sie zuletzt beschäftigt hat. Warum ist der Himmel dunkel? Wohin gehen verlorene Dinge? Wähle aus unserer kuratierten Liste oder schreib deine eigene. Die Geschichte wird um diesen Funken herum aufgebaut, nicht um eine generische Handlung.",
+                "detail1": "40+ Einstiegsfragen",
+                "detail2": "Oder schreib deine eigene in einfachen Worten",
+                "detail3": "Der Ton passt sich automatisch dem Alter an"
+            },
+            "carryItHome": {
+                "numeral": "iii.",
+                "title": "Nach Hause tragen",
+                "body": "In wenigen Minuten landet ein druckbares PDF in deiner Bibliothek. Fünf bis zwanzig Seiten — die Länge passt zum Alter. Ein Bilderbuch für Vierjährige, ein längerer Comic für Achtjährige. Für immer ihr Eigen, zum Wiederlesen und Drucken.",
+                "detail1": "PDF in weniger als 5 Minuten fertig",
+                "detail2": "Buch- oder Comicformat",
+                "detail3": "Zu Hause oder in jedem Copyshop drucken"
+            }
+        }
+    },
+    "pricing": {
+        "page": {
+            "title": "Preise"
+        },
+        "hero": {
+            "eyebrow": "Pro Geschichte zahlen oder der Story Hour beitreten",
+            "heading": "Bepreist wie eine <highlight>kleine Werkstatt</highlight>.",
+            "subheading": "Geschichten werden seitenweise oder in einem kleinen monatlichen Paket verkauft. Keine Tricks, keine Buchzuschläge, keine versteckten Plätze. Jederzeit kündigen — dein Regal bleibt deins."
+        },
+        "plans": {
+            "creditNote": "Seitenguthaben: 1 Buchseite = 1 Credit · 1 Comicseite = 2 Credits.",
+            "currentPlan": "Dein aktueller Plan",
+            "manageInAccount": "Im Konto verwalten →",
+            "checkoutSoon": "Checkout folgt demnächst",
+            "priceForever": "für immer",
+            "pricePerMonth": "/ Monat",
+            "mostLoved": "Am beliebtesten",
+            "free": {
+                "name": "Free Chapter",
+                "tagline": "Eine erste Geschichte, kostenlos.",
+                "cta": "Kostenlos beginnen →"
+            },
+            "storyHour": {
+                "name": "Story Hour",
+                "tagline": "Das gemütliche Schlafenszeit-Paket.",
+                "cta": "Story Hour beitreten →"
+            },
+            "family": {
+                "name": "Family Workshop",
+                "tagline": "Für begeisterte kleine Leser.",
+                "cta": "Werkstatt öffnen →"
+            }
+        },
+        "comparison": {
+            "heading": "Was ist in jeder Stufe?",
+            "table": {
+                "header": {
+                    "feature": "Funktion",
+                    "free": "Kostenlos",
+                    "storyHour": "Story Hour",
+                    "family": "Familie"
+                },
+                "cell": {
+                    "included": "Enthalten",
+                    "notIncluded": "Nicht enthalten"
+                }
+            }
+        },
+        "faq": {
+            "heading": "Ein paar wissenswerte Dinge.",
+            "cancelAnyTime": {
+                "question": "Kann ich jederzeit kündigen?",
+                "answer": "Ja — per Knopfdruck. Du behältst deinen Plan bis zum Ende des bezahlten Zeitraums, und deine fertigen Geschichten bleiben in deiner Bibliothek."
+            },
+            "unusedCredits": {
+                "question": "Was, wenn ich meine Credits nicht nutze?",
+                "answer": "Ungenutzte Credits verfallen am Ende jedes Abrechnungsmonats — dein volles Guthaben kehrt mit jedem neuen Zyklus zurück."
+            },
+            "contentSafety": {
+                "question": "Sind die Inhalte für mein Kind sicher?",
+                "answer": "Jede Geschichte wird vor der Auslieferung durch mehrschichtige Text- und Bildmoderation gefiltert. Wir sind streng — nur kinderfreundliche Inhalte."
+            },
+            "childData": {
+                "question": "Speichert ihr Daten meines Kindes?",
+                "answer": "Nur das, was für die Geschichten notwendig ist. Namen und Fotos verlassen dein Konto nie. Vollständiger Export und Löschung jederzeit möglich."
+            },
+            "giftingTale": {
+                "question": "Kann ich eine Geschichte verschenken?",
+                "answer": "Ja. Beide bezahlten Pläne erlauben das Teilen fertiger Geschichten — perfekt für Nichten, Neffen und kleine Freunde."
+            },
+            "languages": {
+                "question": "Welche Sprachen?",
+                "answer": "Heute Englisch, Russisch und Deutsch."
+            }
+        }
+    },
+    "contact": {
+        "page": {
+            "title": "Kontakt"
+        },
+        "hero": {
+            "eyebrow": "Hallo sagen",
+            "heading": "Schreib <highlight>uns</highlight>.",
+            "subheading": "Eine Frage, ein Vorschlag oder einfach ein Hallo — wir lesen jede Nachricht."
+        },
+        "section": {
+            "heading": "Schreib uns",
+            "body": "Wir sind ein kleines Team, daher kann es ein bis zwei Tage dauern. Wir antworten immer."
+        },
+        "form": {
+            "nameLabel": "Dein Name",
+            "namePlaceholder": "Ada",
+            "emailLabel": "Deine E-Mail",
+            "emailPlaceholder": "ada@beispiel.de",
+            "messageLabel": "Nachricht",
+            "messagePlaceholder": "Was liegt dir auf dem Herzen?",
+            "sendingButton": "Wird gesendet…",
+            "sendButton": "Nachricht senden →",
+            "successHeading": "Nachricht gesendet.",
+            "successBody": "Wir lesen jede einzelne. Wir melden uns bald."
+        }
+    },
+    "privacy": {
+        "page": {
+            "title": "Datenschutz"
+        },
+        "hero": {
+            "eyebrow": "Stille ist wichtig",
+            "heading": "Die Daten deiner Familie <highlight>gehören</highlight> dir.",
+            "subheading": "Kurzfassung: Wir sammeln nur, was wir für die Geschichten brauchen, verkaufen es nie und du kannst alles jederzeit löschen."
+        },
+        "whatWeCollect": {
+            "title": "Was wir sammeln",
+            "body": "Wir sammeln deine E-Mail-Adresse, den Vornamen und das Alter jedes Kindprofils, das du erstellst, und die gewählten Geschichtspräferenzen (Themen, Kunststil, Format). Außerdem erfassen wir Standard-Serverlogs (IP-Adresse, Browsertyp) für Sicherheit und Fehlersuche. Nichts anderes."
+        },
+        "howWeUseIt": {
+            "title": "Wie wir es verwenden",
+            "body": "Der Name und das Alter deines Kindes werden nur zur Personalisierung der angeforderten Geschichte verwendet — sie werden nie für Werbung, Profilerstellung oder Weitergabe an Dritte genutzt. Deine E-Mail wird verwendet, um Geschichten zuzustellen und gelegentliche Updates über neue Funktionen zu senden, wenn du zustimmst. Du kannst dich jederzeit abmelden."
+        },
+        "whoWeShareWith": {
+            "title": "Mit wem wir teilen",
+            "body": "Wir nutzen eine kleine Anzahl vertrauenswürdiger Unterauftragsverarbeiter: einen Cloud-Hosting-Anbieter, einen Zahlungsanbieter (für kostenpflichtige Pläne) und einen KI-Bildgenerierungsdienst. Jeder erhält nur die minimal notwendigen Daten. Wir verkaufen, vermieten oder handeln deine Daten nicht. Nie."
+        },
+        "yourRights": {
+            "title": "Deine Rechte",
+            "body": "Du kannst alle deine Daten jederzeit unter Konto → Datenschutz exportieren oder dein Konto löschen. Löschung ist dauerhaft und wird innerhalb von 30 Tagen verarbeitet. Bei Fragen schreib uns an hello@tailortales.app und wir antworten innerhalb von 5 Werktagen."
+        },
+        "cookies": {
+            "title": "Cookies",
+            "body": "Wir verwenden ein eigenes Sitzungs-Cookie, um dich angemeldet zu halten, und ein Cookie zum Speichern deiner Einstellungen (Sprache, Theme). Wir verwenden keine Tracking-Cookies oder Werbe-Cookies von Drittanbietern."
+        },
+        "lastUpdated": "Zuletzt aktualisiert: Mai 2026."
+    },
+    "auth": {
+        "login": {
+            "headerHint": "Neu hier?",
+            "headerCta": "Kostenlose Geschichte beginnen →",
+            "eyebrow": "· Anmelden ·",
+            "heading": "Zurück in die Werkstatt.",
+            "subheading": "Melde dich an, um deine Bibliothek, die Profile deiner Kinder und begonnene Geschichten zu finden.",
+            "googleButton": "Mit Google fortfahren",
+            "legal": "Durch das Fortfahren stimmst du unseren Nutzungsbedingungen und Datenschutzrichtlinien zu. Wir verkaufen die Daten deines Kindes nie. Versprochen."
+        }
+    },
+    "workshop": {
+        "page": {
+            "title": "Werkstatt"
+        },
+        "hero": {
+            "eyebrow": "Die Werkstatt",
+            "heading": "Lass uns eine kleine Geschichte machen."
+        },
+        "form": {
+            "reader": {
+                "empty": "Noch keine Leser —",
+                "addFirst": "Zuerst einen Leser hinzufügen →",
+                "label": "Für",
+                "placeholder": "Leser auswählen",
+                "loves": "liebt:",
+                "closeButton": "Schließen ×",
+                "changeButton": "Leser wechseln →"
+            },
+            "questionInput": {
+                "number": "1.",
+                "title": "Eine Frage zum Anfangen",
+                "subheading": "Schreib ihre Frage, oder nimm eine aus dem Glas unten.",
+                "placeholder": "z.B. Warum atmen Berge Rauch?",
+                "jarLabel": "Oder eine aus dem Glas nehmen"
+            },
+            "formatPicker": {
+                "number": "2.",
+                "title": "Ein Buch oder ein Comic",
+                "label": "Geschichtsformat",
+                "book": {
+                    "title": "Buch",
+                    "description": "Eine Illustration pro Seite, sanfte Prosa, die ruhige Art. 1 Credit / Seite."
+                },
+                "comic": {
+                    "title": "Comic — kommt bald",
+                    "description": "Panels, Sprechblasen, mehr Schwung. Toll für Leser ab 6 Jahren. 2 Credits / Seite"
+                }
+            },
+            "pageCount": {
+                "number": "3.",
+                "title": "Wie lang die Geschichte sein soll",
+                "label": "Seitenanzahl",
+                "option5": "Kurz · 5 S.",
+                "option8": "Mittel · 8 S.",
+                "option12": "Lang · 12 S.",
+                "option16": "Groß · 16 S.",
+                "option20": "Schlafenszeit-Saga · 20 S."
+            },
+            "artStylePicker": {
+                "number": "4.",
+                "title": "Ein Look für die Bilder",
+                "note": "Alle Stile sind durchgehend konsistent — der Fuchs in Kapitel 1 ist derselbe Fuchs in Kapitel 12."
+            },
+            "languagePicker": {
+                "number": "5.",
+                "title": "Die Sprache der Geschichte",
+                "label": "Geschichtssprache"
+            },
+            "submitError": "Generierung konnte nicht gestartet werden. Bitte erneut versuchen.",
+            "artStyleLabel": "Kunststil",
+            "characterModal": {
+                "editTitle": "Charakter bearbeiten",
+                "addTitle": "Charakter hinzufügen"
+            }
+        },
+        "summary": {
+            "eyebrow": "Deine Geschichte bisher",
+            "questionPlaceholder": "Deine Frage erscheint hier…",
+            "labels": {
+                "reader": "Leser",
+                "character": "Charakter",
+                "format": "Format",
+                "length": "Länge",
+                "language": "Sprache",
+                "style": "Stil"
+            },
+            "characterAction": {
+                "add": "Hinzufügen",
+                "edit": "Bearbeiten"
+            },
+            "lengthValue": "{pageCount} Seiten",
+            "creditCost": "{creditCost} Credits",
+            "creditsRemaining": " · {creditsRemaining} verbleibend",
+            "quotaExhausted": "Diese Geschichte benötigt {creditCost} Credits, aber nur {creditsRemaining} verbleiben in diesem Zyklus — wähle eine kürzere Länge oder upgrade deinen Plan.",
+            "quotaInfo": "{pageCount} Seiten verwenden {creditCost} deiner {creditsRemaining} verbleibenden Credits in diesem Zyklus.",
+            "generateButton": "Die Laterne anzünden →",
+            "draftButton": "Als Entwurf speichern",
+            "format": {
+                "book": "Buch",
+                "comic": "Comic"
+            }
+        },
+        "characterForm": {
+            "nameLabel": "Name",
+            "namePlaceholder": "z.B. Prinzessin Mia",
+            "descriptionLabel": "Beschreibung",
+            "descriptionPlaceholder": "Beschreibe das Aussehen des Charakters detailliert — Haarfarbe, Augenfarbe, Kleidung, besondere Merkmale…",
+            "cancelButton": "Abbrechen",
+            "saveButton": "Speichern",
+            "errors": {
+                "nameRequired": "Name ist erforderlich",
+                "descriptionRequired": "Beschreibung ist erforderlich"
+            }
+        }
+    },
+    "workshopProgress": {
+        "header": {
+            "eyebrow": "· IN DER WERKSTATT ·",
+            "meta": "für {childName} · Alter {age} · {pageCount}-seitiges Buch · {styleName}-Stil"
+        },
+        "failureActions": {
+            "library": "Zurück zur Bibliothek",
+            "newTale": "Neue Geschichte starten"
+        },
+        "hero": {
+            "failed": "Generierung fehlgeschlagen",
+            "completed": "Deine Geschichte ist fertig!",
+            "inProgress": "Seite {completedPages} von {totalPages} · {stage}",
+            "startingStage": "wird gestartet",
+            "ariaLabel": "Generierungsfortschritt: {completedPages} von {totalPages} Seiten"
+        },
+        "stages": {
+            "planning": {
+                "label": "Entwurf",
+                "subheading": "Kapitel skizzieren"
+            },
+            "words": {
+                "label": "Wörter",
+                "subheading": "altersgerecht schreiben"
+            },
+            "pictures": {
+                "label": "Bilder",
+                "subheading": "jede Seite malen"
+            },
+            "binding": {
+                "label": "Bindung",
+                "subheading": "Spreads gestalten"
+            },
+            "ready": {
+                "label": "Fertig",
+                "subheading": "ein kleines Paket"
+            }
+        },
+        "pages": {
+            "header": "Seiten bisher",
+            "count": "{done} VON {total} GEMALT"
+        },
+        "log": {
+            "header": "Das Werkstatt-Protokoll",
+            "live": "● LIVE"
+        },
+        "safety": "Du kannst dieses Fenster ruhig schließen — wir senden {childName}s Geschichte per E-Mail, wenn sie fertig ist."
+    },
+    "library": {
+        "page": {
+            "title": "Bibliothek"
+        },
+        "greeting": {
+            "morning": "Guten Morgen",
+            "afternoon": "Guten Tag",
+            "evening": "Guten Abend",
+            "stat": {
+                "talesCount": "Geschichten in der Bibliothek",
+                "pagesThisCycle": "Seiten in diesem Zyklus",
+                "pagesLeft": "Seiten übrig",
+                "regenerationsUsed": "Regenerierungen verwendet"
+            }
+        },
+        "readers": {
+            "heading": "Deine Leser",
+            "manageLink": "Kinder verwalten →",
+            "addLabel": "Einen weiteren kleinen Leser hinzufügen",
+            "ariaLabel": "Leser"
+        },
+        "readerCard": {
+            "ariaLabel": "Leserkarte von {childName}",
+            "lastTale": "letzte Geschichte {relativeTime}",
+            "noTales": "noch keine Geschichten",
+            "loves": "liebt:",
+            "newTaleButton": "+ Neue Geschichte",
+            "taleCount": "{count, plural, one {# Geschichte} other {# Geschichten}}"
+        },
+        "grid": {
+            "heading": "Deine Bibliothek",
+            "count": "{count, plural, one {# Geschichte} other {# Geschichten}}",
+            "filterLabel": "Filtern",
+            "filterOption": {
+                "all": "Alle",
+                "child": "Für {childName}",
+                "books": "Bücher",
+                "comics": "Comics"
+            },
+            "empty": "Keine Geschichten entsprechen diesem Filter.",
+            "ariaLabel": "Geschichten"
+        },
+        "taleCard": {
+            "failedAriaLabel": "{displayTitle} — Generierung fehlgeschlagen, erneut versuchen",
+            "failedOverlay": "Generierung fehlgeschlagen",
+            "retryLabel": "Erneut versuchen →",
+            "age": "Alter {age}",
+            "pageCount": "{pageCount} S."
+        },
+        "wonderJar": {
+            "eyebrow": "· Aus dem Wunderglas ·",
+            "heading": "Ein paar ruhige Fragen für heute Abend.",
+            "subheading": "Ausgewählt, weil {namesPhrase} sie vielleicht lieben wird. Tippe eine an, um eine Geschichte zu starten.",
+            "namesPhraseNone": "dein kleiner Leser",
+            "namesAnd": "und",
+            "suggestionsAriaLabel": "Fragenvorschläge"
+        }
+    },
+    "storyReader": {
+        "header": {
+            "breadcrumb": {
+                "ariaLabel": "Brotkrümel",
+                "library": "Bibliothek",
+                "for": "Für {childName}"
+            },
+            "shareButton": "+ Mit Familie teilen",
+            "downloadButton": "↓ PDF herunterladen",
+            "meta": {
+                "prefix": "eine Geschichte für ",
+                "suffix": ", Alter {age} · {pageCount} Seiten · {formatLabel} · {finishedLabel}"
+            },
+            "format": {
+                "book": "Bilderbuch",
+                "comic": "Comic"
+            }
+        },
+        "chapters": {
+            "ariaLabel": "Kapitel",
+            "eyebrow": "· Kapitel ·",
+            "pageFallback": "Seite {order}"
+        },
+        "spread": {
+            "ariaLabel": "Geschichtsseiten",
+            "pageAriaLabel": "Seite {current} von {total}",
+            "navGroupLabel": "Seitennavigation",
+            "prevButton": "← Zurück",
+            "nextButton": "Weiter →",
+            "prevAriaFirst": "Vorherige Seite (bereits auf der ersten Seite)",
+            "prevAriaPage": "Zu Seite {page} gehen",
+            "nextAriaLast": "Nächste Seite (bereits auf der letzten Seite)",
+            "nextAriaPage": "Zu Seite {page} gehen",
+            "counter": "{current} von {total}"
+        },
+        "details": {
+            "eyebrow": "· Details ·",
+            "labels": {
+                "created": "Erstellt",
+                "reader": "Leser",
+                "format": "Format",
+                "style": "Stil",
+                "language": "Sprache",
+                "fileSize": "Dateigröße"
+            },
+            "format": {
+                "book": "Buch",
+                "comic": "Comic"
+            }
+        },
+        "rating": {
+            "eyebrow": "· Diese Geschichte bewerten ·",
+            "subheading": "Wie hat {childName} sie gemocht? Es hilft der Werkstatt beim Schreiben der nächsten.",
+            "ariaLabel": "Geschichtsbewertung",
+            "noteAriaLabel": "Bewertungsnotiz",
+            "notePlaceholder": "Eine kleine Notiz schreiben (optional)…",
+            "shareLabel": "Diese Geschichte als Beispiel für andere Familien teilen",
+            "saveButton": "Bewertung speichern",
+            "savedStatus": "Gespeichert — danke!",
+            "defaultError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+        },
+        "regeneration": {
+            "eyebrow": "· Diese Seite neu machen ·",
+            "ariaLabel": "Diese Seite neu machen",
+            "textButton": "Text neu generieren",
+            "illustrationButton": "Illustration neu malen",
+            "bothButton": "Alles neu machen",
+            "quotaExhausted": "Keine Regenerierungen mehr in diesem Zyklus — sie erneuern sich, wenn dein Plan verlängert wird.",
+            "quotaInfo": "{count, plural, one {# Regenerierung verbleibt in diesem Zyklus.} other {# Regenerierungen verbleiben in diesem Zyklus.}}",
+            "modal": {
+                "titles": {
+                    "text": "Text neu generieren",
+                    "illustration": "Illustration neu malen",
+                    "both": "Seite neu generieren"
+                },
+                "descriptions": {
+                    "text": "Der Geschichtstext auf dieser Seite wird neu geschrieben. Die Illustration bleibt.",
+                    "illustration": "Das Bild wird neu gemalt. Der Text bleibt.",
+                    "both": "Sowohl Text als auch Illustration auf dieser Seite werden neu erstellt."
+                },
+                "authorNoteLabel": "Autorennotiz (optional)",
+                "authorNoteDescription": "Führe die KI — z.B. \"lustiger machen\" oder \"einen Drachen hinzufügen\".",
+                "authorNotePlaceholder": "Leer lassen, damit die KI entscheidet…",
+                "cancelButton": "Abbrechen",
+                "confirmButton": "Bestätigen",
+                "defaultError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+            }
+        }
+    },
+    "account": {
+        "sidebar": {
+            "nav": {
+                "ariaLabel": "Kontonavigation",
+                "profile": "Profil",
+                "children": "Kinder",
+                "subscription": "Abonnement",
+                "notifications": "Benachrichtigungen",
+                "language": "Sprache",
+                "privacy": "Datenschutz & Daten",
+                "export": "Bibliothek exportieren"
+            },
+            "signOut": "Abmelden",
+            "deleteAccount": "Konto löschen"
+        },
+        "profile": {
+            "editButton": "Name bearbeiten",
+            "nameLabel": "Name",
+            "saveButton": "Speichern",
+            "cancelButton": "Abbrechen"
+        },
+        "children": {
+            "heading": "Kinder",
+            "loading": "Kinder werden geladen",
+            "empty": "Noch keine Kinder.",
+            "addFirstButton": "Erstes Kind hinzufügen",
+            "addButton": "Kind hinzufügen",
+            "limitHint": "Du hast das Kinderlimit für deinen Plan erreicht. Upgrade, um mehr hinzuzufügen.",
+            "editModal": {
+                "title": "Kind bearbeiten"
+            },
+            "addModal": {
+                "title": "Kind hinzufügen"
+            },
+            "editCharacterModal": {
+                "title": "Charakter bearbeiten"
+            },
+            "addCharacterModal": {
+                "title": "Charakter hinzufügen"
+            },
+            "deleteModal": {
+                "title": "Kind löschen",
+                "cancelButton": "Abbrechen",
+                "deleteButton": "Löschen"
+            },
+            "deleteConfirm": "Bist du sicher, dass du {childName} löschen möchtest? Dies kann nicht rückgängig gemacht werden."
+        },
+        "childForm": {
+            "nameLabel": "Name",
+            "namePlaceholder": "Name des Kindes",
+            "birthdateLabel": "Geburtsdatum",
+            "genderLabel": "Geschlecht",
+            "genderOptions": {
+                "male": "Junge",
+                "female": "Mädchen"
+            },
+            "interestsLabel": "Interessen",
+            "interestsPlaceholder": "Interesse hinzufügen und Enter drücken",
+            "cancelButton": "Abbrechen",
+            "saveButton": "Speichern",
+            "errors": {
+                "nameRequired": "Name ist erforderlich",
+                "birthdateRequired": "Geburtsdatum ist erforderlich",
+                "invalidDate": "Ungültiges Datum",
+                "birthDateFuture": "Geburtsdatum muss in der Vergangenheit liegen",
+                "genderRequired": "Geschlecht ist erforderlich"
+            }
+        },
+        "childCard": {
+            "ageLabel": {
+                "infant": "Unter 1 Jahr",
+                "years": "{age, plural, one {# Jahr alt} other {# Jahre alt}}"
+            },
+            "gender": {
+                "male": "Junge",
+                "female": "Mädchen"
+            },
+            "characterLabel": "Charakter",
+            "noCharacter": "Noch kein Charakter.",
+            "editCharacterAriaLabel": "Charakter für {childName} bearbeiten",
+            "addCharacterAriaLabel": "Charakter für {childName} hinzufügen",
+            "editCharacterButton": "Charakter bearbeiten",
+            "addCharacterButton": "Charakter hinzufügen",
+            "editAriaLabel": "{childName} bearbeiten",
+            "editButton": "Bearbeiten",
+            "deleteAriaLabel": "{childName} löschen",
+            "deleteButton": "Löschen"
+        },
+        "subscription": {
+            "loading": "Abonnement wird geladen…",
+            "planCard": {
+                "eyebrow": "Aktueller Plan",
+                "pastDueWarning": "Deine letzte Zahlung wurde nicht verarbeitet — wir werden es automatisch erneut versuchen. Bitte überprüfe deine Zahlungsmethode, um die Werkstatt offen zu halten.",
+                "pricePerMonth": "{price} / Monat",
+                "priceFree": "Für immer kostenlos",
+                "cancelsOn": "Kündigt am {date}",
+                "renewsOnPaid": "Erneuert am {date} · MwSt. wird von Paddle beim Checkout berechnet",
+                "resetsOn": "Setzt sich am {date} zurück",
+                "upgradeButton": "Upgrade →",
+                "cancelButton": "Abonnement kündigen",
+                "cancelModal": {
+                    "title": "Abonnement kündigen?",
+                    "body": "Du behältst {tierName} bis {date} — danach kehrt dein Konto zum kostenlosen Plan zurück. Fertige Geschichten bleiben in deiner Bibliothek.",
+                    "keepButton": "Meinen Plan behalten",
+                    "confirmButton": "Abonnement kündigen"
+                }
+            },
+            "usage": {
+                "eyebrow": "Dieser Zyklus",
+                "labels": {
+                    "pages": "Gemalte Seiten",
+                    "regenerations": "Regenerierungen",
+                    "children": "Kinderprofile"
+                },
+                "ariaLabel": "Nutzung von {label}"
+            },
+            "payment": {
+                "eyebrow": "Zahlungsdetails",
+                "body": "Deine Karte, Rechnungsadresse und Steuer-ID werden sicher von Paddle verwaltet — wir speichern sie nie. Planänderungen erfolgen ebenfalls im Paddle-Portal.",
+                "portalButton": "Abrechnungsportal öffnen →",
+                "error": "Das Abrechnungsportal konnte nicht geöffnet werden — bitte erneut versuchen."
+            },
+            "invoices": {
+                "eyebrow": "Vergangene Pakete",
+                "emptyPaid": "Noch keine Rechnungen — deine erste kommt mit der nächsten Verlängerung.",
+                "emptyFree": "Keine Rechnungen — das kostenlose Kapitel stellt dir nie etwas in Rechnung.",
+                "pdfLink": "PDF"
+            }
+        },
+        "notifications": {
+            "eyebrow": "Benachrichtigungseinstellungen",
+            "body": "Wähle, wie du von uns hörst. E-Mail geht in dein Postfach; In-App erscheint in der Glocke oben auf der Seite.",
+            "loadError": "Wir konnten deine Einstellungen nicht laden — bitte die Seite aktualisieren.",
+            "events": {
+                "storyCompleted": {
+                    "label": "Geschichte ist fertig",
+                    "description": "Wenn eine neue Geschichte fertig generiert wurde."
+                },
+                "storyFailed": {
+                    "label": "Geschichte nicht abgeschlossen",
+                    "description": "Wenn eine Geschichte nicht generiert werden konnte. Keine Credits werden verwendet."
+                },
+                "paymentFailed": {
+                    "label": "Zahlung fehlgeschlagen",
+                    "description": "Wenn eine Abonnementzahlung nicht verarbeitet werden konnte.",
+                    "note": "Bei Abrechnungsproblemen wird immer eine E-Mail gesendet."
+                },
+                "subscriptionRenewed": {
+                    "label": "Plan erneuert",
+                    "description": "Wenn dein Abonnement für einen weiteren Monat erneuert wird."
+                },
+                "subscriptionCanceled": {
+                    "label": "Abonnement beendet",
+                    "description": "Wenn dein Abonnement endet und du zum kostenlosen Plan zurückkehrst."
+                }
+            },
+            "channels": {
+                "email": "E-Mail",
+                "inApp": "In-App"
+            }
+        },
+        "language": {
+            "comingSoon": "Sprache — kommt bald"
+        },
+        "privacy": {
+            "info": {
+                "eyebrow": "Datenschutz & Daten",
+                "whatWeCollect": {
+                    "title": "Was wir sammeln",
+                    "body": "Deine Google-Kontodaten (Name, E-Mail, Avatar), die von dir erstellten Kinderprofile (Name, Geburtsdatum, Interessen), Charakterbeschreibungen und die für dich generierten Geschichten. Wir fragen nie nach Zahlungskartendaten und speichern diese auch nicht."
+                },
+                "whyWeProcessIt": {
+                    "title": "Warum wir es verarbeiten",
+                    "body": "Ausschließlich um deine personalisierten Geschichten zu erstellen und zuzustellen, dein Abonnement zu verwalten und dich zu benachrichtigen, wenn Geschichten fertig sind. Keine Werbung, kein Profiling, kein Datenverkauf."
+                },
+                "whoHelpUs": {
+                    "title": "Wer uns hilft (Unterauftragsverarbeiter)",
+                    "body": "Paddle (Zahlungen & Abrechnung), OpenRouter (Geschichtstext und Illustrationsgenerierung), Resend (E-Mail-Zustellung) und unser Cloud-Speicheranbieter (generierte PDFs und Bilder). Jeder erhält nur das, was sein Job erfordert."
+                },
+                "howLongWeKeepIt": {
+                    "title": "Wie lange wir es aufbewahren",
+                    "body": "Deine Kontodaten bleiben, solange das Konto besteht. Generierte Geschichtsdateien folgen der Aufbewahrungsfrist deines Plans — kostenlose Kapitel-PDFs und Bilder werden 30 Tage nach der Erstellung entfernt; Geschichten im kostenpflichtigen Tier werden während deines Abonnements aufbewahrt."
+                },
+                "yourRights": {
+                    "title": "Deine Rechte",
+                    "body": "Exportiere alles, was wir über dich haben, als JSON weiter unten, oder lösche dein Konto — einschließlich aller generierten Dateien — jederzeit. Fragen? Kontaktiere uns über die Kontaktseite."
+                }
+            },
+            "export": {
+                "eyebrow": "Meine Daten exportieren",
+                "body": "Lade alles, was wir über dich haben — Profil, Leser, Charaktere, Geschichten (mit Download-Links für noch vorhandene Dateien) — als einzelne JSON-Datei herunter.",
+                "button": "Meine Daten exportieren",
+                "error": "Export fehlgeschlagen — bitte erneut versuchen."
+            },
+            "delete": {
+                "eyebrow": "Konto löschen",
+                "body": "Das Löschen deines Kontos entfernt dein Profil, Leser, Charaktere, jede generierte Geschichte und PDF sowie deinen Abonnementeintrag. Dies kann nicht rückgängig gemacht werden.",
+                "blocked": "Du hast ein aktives kostenpflichtiges Abonnement — kündige es zuerst auf der Abonnementseite und kehre dann hierher zurück.",
+                "button": "Mein Konto löschen",
+                "modal": {
+                    "title": "Konto für immer löschen?",
+                    "body": "Jede Geschichte, Illustration und jedes Leserprofil wird dauerhaft gelöscht. Es gibt keine Wiederherstellung. Tippe LÖSCHEN zur Bestätigung.",
+                    "confirmWord": "LÖSCHEN",
+                    "confirmLabel": "Bestätigung",
+                    "confirmPlaceholder": "LÖSCHEN",
+                    "error": "Kontolöschung fehlgeschlagen — nichts wurde entfernt. Bitte erneut versuchen.",
+                    "keepButton": "Mein Konto behalten",
+                    "confirmButton": "Für immer löschen"
+                }
+            }
+        }
+    },
+    "notFound": {
+        "eyebrow": "· 404 ·",
+        "heading": "Im Wald verloren?",
+        "subheading": "Diese Seite existiert nicht — aber deine nächste Geschichte schon.",
+        "homeLink": "Bring mich nach Hause"
+    }
+}

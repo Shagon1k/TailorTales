@@ -776,6 +776,7 @@
                 "modal": {
                     "title": "Delete your account forever?",
                     "body": "Every tale, illustration, and reader profile will be permanently erased. There is no recovery. Type DELETE to confirm.",
+                    "confirmWord": "DELETE",
                     "confirmLabel": "Confirmation",
                     "confirmPlaceholder": "DELETE",
                     "error": "Account deletion failed — nothing was removed. Please try again.",
