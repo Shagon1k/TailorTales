@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import type { ILocalizedErrorBody } from '../../common/error-translations.js';
 import type { Prisma, StoryType } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { CREDITS_PER_PAGE } from './subscriptions.constants.js';
@@ -24,9 +25,10 @@ export class QuotaService {
         const limit = subscription.pricingTier.pagesPerMonth;
 
         if (subscription.pagesUsed + cost > limit) {
-            throw new ForbiddenException(
-                `This story needs ${cost} page credits but only ${Math.max(limit - subscription.pagesUsed, 0)} of ${limit} remain this month`,
-            );
+            throw new ForbiddenException({
+                code: 'errors.quota.pageCreditsExceeded',
+                params: { cost, remaining: Math.max(limit - subscription.pagesUsed, 0), limit },
+            } satisfies ILocalizedErrorBody);
         }
     }
 
@@ -45,9 +47,10 @@ export class QuotaService {
         const limit = subscription.pricingTier.regenerationsPerMonth;
 
         if (subscription.regenerationsUsed >= limit) {
-            throw new ForbiddenException(
-                `Regeneration quota of ${limit} per month has been reached`,
-            );
+            throw new ForbiddenException({
+                code: 'errors.quota.regenerationsExceeded',
+                params: { limit },
+            } satisfies ILocalizedErrorBody);
         }
     }
 

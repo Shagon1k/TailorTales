@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import clsx from 'clsx';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import styles from './BrandMark.module.scss';

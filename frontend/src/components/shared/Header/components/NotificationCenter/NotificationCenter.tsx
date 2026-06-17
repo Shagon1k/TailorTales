@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Popover from '@/components/ui/Popover/Popover';
 import Loader from '@/components/ui/Loader/Loader';
 import { notificationsApi } from '@/api/notifications';
@@ -57,10 +58,13 @@ export default function NotificationCenter(): React.ReactElement {
         if (notification.readAt === null) markRead.mutate(notification.id);
     };
 
+    const t = useTranslations('header.notifications');
+
     return (
         <Popover
             opened={opened}
             onChange={setOpened}
+            trapFocus
             target={
                 <NotificationBell
                     count={unreadCount}
@@ -71,7 +75,7 @@ export default function NotificationCenter(): React.ReactElement {
         >
             <div className={styles.center__header}>
                 <span className={styles.center__title} id="notifications-title">
-                    Notifications
+                    {t('title')}
                 </span>
                 {unreadCount > 0 && (
                     <button
@@ -79,7 +83,7 @@ export default function NotificationCenter(): React.ReactElement {
                         className={styles['center__mark-all']}
                         onClick={() => markAllRead.mutate()}
                     >
-                        Mark all as read
+                        {t('markAllRead')}
                     </button>
                 )}
             </div>
@@ -87,7 +91,7 @@ export default function NotificationCenter(): React.ReactElement {
                 <NotificationList notifications={notifications} onItemClick={handleItemClick} />
             ) : (
                 <div className={styles.center__loading}>
-                    <Loader size="sm" centered={false} label="Loading notifications" />
+                    <Loader size="sm" centered={false} label={t('loading')} />
                 </div>
             )}
         </Popover>

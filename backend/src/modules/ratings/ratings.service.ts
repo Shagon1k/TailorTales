@@ -20,7 +20,7 @@ export class RatingsService {
         });
         if (!story) throw new NotFoundException(`Story ${storyId} not found`);
         if (story.status !== 'COMPLETED') {
-            throw new BadRequestException('Only completed stories can be rated');
+            throw new BadRequestException('errors.ratings.storyNotCompleted');
         }
 
         const [rating] = await this.prisma.$transaction([

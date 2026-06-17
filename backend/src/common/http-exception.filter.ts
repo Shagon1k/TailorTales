@@ -7,12 +7,20 @@ import {
     Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import {
+    type IErrorParams,
+    type ILocale,
+    type ILocalizedErrorBody,
+    resolveLocale,
+    translate,
+} from './error-translations.js';
 
 /**
  * Global HTTP exception filter. Handles two cases:
  *
  * 1. HttpException (and subclasses like NotFoundException, ConflictException, etc.) —
  *    formats consistently, logs only 5xx (4xx are expected, not actionable).
+ *    Known error codes are translated via the Accept-Language header.
  *
  * 2. Unexpected errors — logged with full stack trace, returned as 500 so internal
  *    details never leak to the client.
@@ -31,6 +39,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest<Request>();
 
+        const locale = resolveLocale(request.headers['accept-language']);
+
         const isHttp = exception instanceof HttpException;
         const status = isHttp ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -40,17 +50,36 @@ export class AllExceptionsFilter implements ExceptionFilter {
             this.logger.error(`${request.method} ${request.url} [${status}]: ${detail}`, stack);
         }
 
-        const message = isHttp ? this.extractMessage(exception) : 'An unexpected error occurred.';
+        const message = isHttp
+            ? this.extractMessage(exception, locale)
+            : (translate('errors.unknown', locale) ?? 'An unexpected error occurred.');
 
         response.status(status).json({ statusCode: status, message });
     }
 
-    private extractMessage(exception: HttpException): string | string[] {
+    private extractMessage(exception: HttpException, locale: ILocale): string | string[] {
         const body = exception.getResponse();
-        if (typeof body === 'string') return body;
-        if (typeof body === 'object' && body !== null && 'message' in body) {
-            return (body as { message: string | string[] }).message;
+
+        // Parameterized localized error: { code, params? }
+        if (typeof body === 'object' && body !== null && 'code' in body) {
+            const { code, params } = body as ILocalizedErrorBody;
+            return translate(code, locale, params as IErrorParams | undefined) ?? code;
         }
+
+        // Simple error: string code or plain message
+        if (typeof body === 'string') {
+            return translate(body, locale) ?? body;
+        }
+
+        // NestJS default shape: { message, ... }
+        if (typeof body === 'object' && body !== null && 'message' in body) {
+            const msg = (body as { message: string | string[] }).message;
+            if (typeof msg === 'string') {
+                return translate(msg, locale) ?? msg;
+            }
+            return msg;
+        }
+
         return exception.message;
     }
 }

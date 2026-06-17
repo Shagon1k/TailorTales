@@ -14,7 +14,6 @@
     &__label {
         @include t-caps-xs;
         color: var(--text-muted);
-        white-space: nowrap;
     }
 
     &__value {

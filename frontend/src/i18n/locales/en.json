@@ -1,0 +1,1023 @@
+{
+    "common": {
+        "nav": {
+            "howItWorks": "How it works"
+        }
+    },
+    "header": {
+        "nav": {
+            "ariaLabel": "Main navigation",
+            "howItWorks": "How it works",
+            "pricing": "Pricing",
+            "signIn": "Sign in",
+            "cta": "Begin a tale →",
+            "library": "Library",
+            "workshop": "Workshop"
+        },
+        "userChip": {
+            "ariaLabel": "Account menu"
+        },
+        "userMenu": {
+            "myAccount": "My account",
+            "subscription": "Subscription",
+            "children": "Children",
+            "adminPanel": "Admin panel",
+            "signOut": "Sign out"
+        },
+        "notifications": {
+            "title": "Notifications",
+            "markAllRead": "Mark all as read",
+            "loading": "Loading notifications",
+            "list": {
+                "empty": "All quiet for now — new tales will land here.",
+                "unreadLabel": " (unread)"
+            }
+        },
+        "localeSwitcher": {
+            "ariaLabel": "Switch language",
+            "en": "English",
+            "de": "Deutsch",
+            "ru": "Русский"
+        }
+    },
+    "footer": {
+        "brandName": "TailorTales",
+        "tagline": "A small workshop for one child's questions.",
+        "nav": {
+            "ariaLabel": "Footer navigation",
+            "howItWorks": "How it works",
+            "privacy": "Privacy",
+            "contact": "Contact"
+        }
+    },
+    "notifications": {
+        "storyCompleted": "{childName}'s tale \"{title}\" is ready to read",
+        "storyFailed": "We couldn't finish {childName}'s tale — no credits were spent",
+        "paymentFailed": "We couldn't process your payment — please review billing",
+        "subscriptionCanceled": "Your subscription has ended — you're now on the free plan"
+    },
+    "home": {
+        "hero": {
+            "eyebrow": "A small light at bedtime",
+            "heading": "Where their <highlight>questions</highlight> become their <highlight>stories</highlight>.",
+            "subheading": "A small workshop that takes your child's name, age and curiosity, and stitches them into a tiny book or comic — five to twenty pages, theirs to keep forever.",
+            "cta": {
+                "loggedIn": "Open workshop →",
+                "signUp": "Begin your first tale →",
+                "howItWorksButton": "How it works"
+            }
+        },
+        "cta": {
+            "heading": "One small tale, tonight.",
+            "subheading": "Free first chapter. No card, no clock. Just a name, a question, and ten quiet minutes.",
+            "button": "Begin a tale for free →"
+        },
+        "lanterns": {
+            "label": "· How the workshop works ·",
+            "heading": "Three steps, then their book.",
+            "lightAName": {
+                "numeral": "i.",
+                "title": "Light a name",
+                "body": "Tell us who the story is for. Just a name, an age, a few things they love."
+            },
+            "whisperAWhy": {
+                "numeral": "ii.",
+                "title": "Whisper a why",
+                "body": "Pick a question they keep asking. Or one of ours. The tale is built around it."
+            },
+            "carryItHome": {
+                "numeral": "iii.",
+                "title": "Carry it home",
+                "body": "A printable PDF in minutes. Five to twenty pages, age-matched, theirs to keep."
+            }
+        },
+        "tales": {
+            "heading": "Tales lit recently.",
+            "browseLink": "Browse the library →",
+            "card": {
+                "meta": "for {childName}, {age} · {pages} pages",
+                "comicSuffix": " · comic"
+            }
+        }
+    },
+    "howItWorks": {
+        "page": {
+            "title": "How it works"
+        },
+        "hero": {
+            "eyebrow": "How it works",
+            "heading": "Three <highlight>small steps</highlight>, one <highlight>lasting tale</highlight>.",
+            "subheading": "No accounts to configure, no prompts to engineer. You answer three questions and the workshop does the rest."
+        },
+        "steps": {
+            "lightAName": {
+                "numeral": "i.",
+                "title": "Light a name",
+                "body": "Tell us who the story is for — a first name, an age, and two or three things they love right now. Dinosaurs, puddles, their dog. We use that to anchor the tale in their world, not a generic one.",
+                "detail1": "Takes about a minute",
+                "detail2": "One child per tale",
+                "detail3": "You can save profiles for next time"
+            },
+            "whisperAWhy": {
+                "numeral": "ii.",
+                "title": "Whisper a why",
+                "body": "Pick the question or theme that's been on their mind lately. Why is the sky dark? Where do lost things go? Choose from our curated list or type your own. The tale is built around that spark, not around a generic plot.",
+                "detail1": "40+ starter questions",
+                "detail2": "Or write your own in plain words",
+                "detail3": "Tone adjusts to age automatically"
+            },
+            "carryItHome": {
+                "numeral": "iii.",
+                "title": "Carry it home",
+                "body": "In a few minutes, a printable PDF lands in your library. Five to twenty pages — the length fits the age. A picture book for four-year-olds, a longer comic for eight-year-olds. Theirs to keep, re-read, and print.",
+                "detail1": "PDF ready in under 5 minutes",
+                "detail2": "Book or comic format",
+                "detail3": "Print at home or at any copy shop"
+            }
+        }
+    },
+    "pricing": {
+        "page": {
+            "title": "Pricing"
+        },
+        "hero": {
+            "eyebrow": "Pay per tale or join the Story Hour",
+            "heading": "Priced like a <highlight>small workshop</highlight>.",
+            "subheading": "Tales are sold by the page, or in a small monthly bundle. No tricks, no per-book add-ons, no hidden seats. Cancel any time — your shelf stays yours."
+        },
+        "plans": {
+            "creditNote": "Page credits: 1 book page = 1 credit · 1 comic page = 2 credits.",
+            "currentPlan": "Your current plan",
+            "manageInAccount": "Manage in account →",
+            "checkoutSoon": "Checkout coming soon",
+            "priceForever": "forever",
+            "pricePerMonth": "/ month",
+            "mostLoved": "Most loved",
+            "free": {
+                "name": "Free Chapter",
+                "tagline": "A first tale, free.",
+                "cta": "Begin free →"
+            },
+            "storyHour": {
+                "name": "Story Hour",
+                "tagline": "The cosy bedtime bundle.",
+                "cta": "Join Story Hour →"
+            },
+            "family": {
+                "name": "Family Workshop",
+                "tagline": "For voracious little readers.",
+                "cta": "Open the workshop →"
+            },
+            "features": {
+                "tale": "1 tale per month (up to {pages} pages)",
+                "watermarkedPdf": "Watermarked PDF",
+                "regenerations": "{count} page regenerations / month",
+                "childProfile": "1 child profile",
+                "starterArtStyles": "All starter art styles",
+                "pagesPerMonth": "Up to {pages} pages a month",
+                "booksAndComics": "Books and comics",
+                "childrenUnlimited": "Unlimited children",
+                "childrenCount": "Up to {count} children",
+                "noWatermark": "No watermark · print-ready",
+                "storiesForever": "Stories kept forever"
+            }
+        },
+        "comparison": {
+            "heading": "What's in each tier?",
+            "table": {
+                "header": {
+                    "feature": "Feature",
+                    "free": "Free",
+                    "storyHour": "Story Hour",
+                    "family": "Family"
+                },
+                "cell": {
+                    "included": "Included",
+                    "notIncluded": "Not included"
+                },
+                "groups": {
+                    "talesAndPages": "Tales & pages",
+                    "delivery": "Delivery",
+                    "workshop": "Workshop"
+                },
+                "rows": {
+                    "pagesPerMonth": "Pages per month",
+                    "booksAndComics": "Books and comics",
+                    "childrenSupported": "Children supported",
+                    "pageRegenerations": "Page regenerations",
+                    "watermark": "Watermark",
+                    "printReadyPdf": "Print-ready PDF",
+                    "priorityQueue": "Priority queue",
+                    "storiesRetained": "Stories retained",
+                    "contentLanguages": "EN + RU + DE content"
+                },
+                "values": {
+                    "booksOnly": "Books only",
+                    "unlimited": "Unlimited",
+                    "onEveryPage": "On every page",
+                    "none": "None",
+                    "forever": "Forever",
+                    "days": "{days} days",
+                    "perMonth": "{count} / mo"
+                }
+            }
+        },
+        "faq": {
+            "heading": "A few things worth knowing.",
+            "cancelAnyTime": {
+                "question": "Can I cancel any time?",
+                "answer": "Yes — at the click of a button. You keep your plan until the end of the period you paid for, and your finished stories stay in your library."
+            },
+            "unusedCredits": {
+                "question": "What if I don't use my credits?",
+                "answer": "Unused credits expire at the end of each billing month — your full allowance returns with every new cycle."
+            },
+            "contentSafety": {
+                "question": "Is the content safe for my child?",
+                "answer": "Every tale is filtered through layered text and image moderation before delivery. We are strict — child-friendly only."
+            },
+            "childData": {
+                "question": "Do you keep my child's data?",
+                "answer": "Only what's needed to make the tales. Names and photos never leave your account. Full export and deletion any time."
+            },
+            "giftingTale": {
+                "question": "Can I gift a tale?",
+                "answer": "Yes. Both paid plans let you share finished tales — perfect for nieces, nephews, and small friends."
+            },
+            "languages": {
+                "question": "What languages?",
+                "answer": "English, Russian, and German today."
+            }
+        }
+    },
+    "contact": {
+        "page": {
+            "title": "Contact"
+        },
+        "hero": {
+            "eyebrow": "Say hello",
+            "heading": "Get <highlight>in touch</highlight>.",
+            "subheading": "A question, a suggestion, or just a hello — we read every message."
+        },
+        "section": {
+            "heading": "Drop us a line",
+            "body": "We're a small team, so replies may take a day or two. We always write back."
+        },
+        "form": {
+            "nameLabel": "Your name",
+            "namePlaceholder": "Ada",
+            "emailLabel": "Your email",
+            "emailPlaceholder": "ada@example.com",
+            "messageLabel": "Message",
+            "messagePlaceholder": "What's on your mind?",
+            "sendingButton": "Sending…",
+            "sendButton": "Send message →",
+            "successHeading": "Message sent.",
+            "successBody": "We read every one. We'll write back soon."
+        }
+    },
+    "privacy": {
+        "page": {
+            "title": "Privacy"
+        },
+        "hero": {
+            "eyebrow": "Quiet matters",
+            "heading": "Your family's <highlight>data</highlight> is <highlight>yours</highlight>.",
+            "subheading": "Short version: we collect only what we need to make the tales, we never sell it, and you can delete everything at any time."
+        },
+        "whatWeCollect": {
+            "title": "What we collect",
+            "body": "We collect your email address, the first name and age of each child profile you create, and the tale preferences you choose (themes, art style, format). We also collect standard server logs (IP address, browser type) for security and debugging. Nothing else."
+        },
+        "howWeUseIt": {
+            "title": "How we use it",
+            "body": "Your child's name and age are used only to personalise the tale you requested — they are never used for advertising, profiling, or shared with third parties. Your email is used to deliver tales and, if you opt in, to send occasional updates about new features. You can unsubscribe at any time."
+        },
+        "whoWeShareWith": {
+            "title": "Who we share it with",
+            "body": "We use a small number of trusted sub-processors to operate the service: a cloud hosting provider, a payment processor (for paid plans), and an AI image generation service. Each receives only the minimum data needed. We do not sell, rent, or trade your data. Ever."
+        },
+        "yourRights": {
+            "title": "Your rights",
+            "body": "You can export all your data or delete your account at any time from Account → Privacy. Deletion is permanent and processed within 30 days. If you have a question or concern, email us at hello@tailortales.app and we will respond within 5 business days."
+        },
+        "cookies": {
+            "title": "Cookies",
+            "body": "We use one first-party session cookie to keep you signed in, and one cookie to remember your preferences (language, theme). We do not use tracking cookies or third-party advertising cookies."
+        },
+        "lastUpdated": "Last updated: May 2026."
+    },
+    "auth": {
+        "login": {
+            "headerHint": "New here?",
+            "headerCta": "Begin a free tale →",
+            "eyebrow": "· Sign in ·",
+            "heading": "Step back into the workshop.",
+            "subheading": "Sign in to find your library, your children's profiles, and any tales you began but didn't finish.",
+            "googleButton": "Continue with Google",
+            "legal": "By continuing you agree to our terms and privacy policy. We will never sell your child's data. We promise."
+        }
+    },
+    "workshop": {
+        "page": {
+            "title": "Workshop"
+        },
+        "hero": {
+            "eyebrow": "The workshop",
+            "heading": "Let's make one small tale."
+        },
+        "form": {
+            "reader": {
+                "empty": "No readers yet —",
+                "addFirst": "Add a reader first →",
+                "label": "For",
+                "placeholder": "Choose a reader",
+                "loves": "loves:",
+                "closeButton": "Close ×",
+                "changeButton": "Change reader →"
+            },
+            "questionInput": {
+                "number": "1.",
+                "title": "A question to begin with",
+                "subheading": "Type their question, or pluck one from the jar below.",
+                "placeholder": "e.g. Why do mountains breathe smoke?",
+                "jarLabel": "Or pluck one from the jar"
+            },
+            "formatPicker": {
+                "number": "2.",
+                "title": "A book, or a comic",
+                "label": "Story format",
+                "book": {
+                    "title": "Book",
+                    "description": "One illustration per page, gentle prose, the slow kind. 1 credit / page."
+                },
+                "comic": {
+                    "title": "Comic — coming soon",
+                    "description": "Panels, speech bubbles, more zip. Great for readers 6+. 2 credits / page"
+                }
+            },
+            "pageCount": {
+                "number": "3.",
+                "title": "How long the tale should be",
+                "label": "Page count",
+                "option5": "Short · 5 pp",
+                "option8": "Medium · 8 pp",
+                "option12": "Long · 12 pp",
+                "option16": "Big · 16 pp",
+                "option20": "Bedtime saga · 20 pp"
+            },
+            "artStylePicker": {
+                "number": "4.",
+                "title": "A look for the pictures",
+                "note": "All styles are consistent across the book — the fox in chapter 1 is the same fox in chapter 12."
+            },
+            "languagePicker": {
+                "number": "5.",
+                "title": "The language of the tale",
+                "label": "Story language"
+            },
+            "submitError": "Could not start generation. Please try again.",
+            "artStyleLabel": "Art style",
+            "characterModal": {
+                "editTitle": "Edit character",
+                "addTitle": "Add character"
+            }
+        },
+        "summary": {
+            "eyebrow": "Your tale so far",
+            "questionPlaceholder": "Your question will appear here…",
+            "labels": {
+                "reader": "Reader",
+                "character": "Character",
+                "format": "Format",
+                "length": "Length",
+                "language": "Language",
+                "style": "Style"
+            },
+            "characterAction": {
+                "add": "Add",
+                "edit": "Edit"
+            },
+            "lengthValue": "{pageCount} pages",
+            "creditCost": "{creditCost} credits",
+            "creditsRemaining": " · {creditsRemaining} remaining",
+            "quotaExhausted": "This tale needs {creditCost} credits but only {creditsRemaining} remain this cycle — pick a shorter length or upgrade your plan.",
+            "quotaInfo": "{pageCount} pages will use {creditCost} of your {creditsRemaining} remaining credits this cycle.",
+            "generateButton": "Light the lantern →",
+            "draftButton": "Save as draft",
+            "format": {
+                "book": "Book",
+                "comic": "Comic"
+            }
+        },
+        "characterForm": {
+            "nameLabel": "Name",
+            "namePlaceholder": "e.g. Princess Mia",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Describe the character's appearance in detail — hair color, eye color, clothing, distinguishing features…",
+            "cancelButton": "Cancel",
+            "saveButton": "Save",
+            "errors": {
+                "nameRequired": "Name is required",
+                "descriptionRequired": "Description is required"
+            }
+        }
+    },
+    "workshopProgress": {
+        "header": {
+            "eyebrow": "· IN THE WORKSHOP ·",
+            "meta": "for {childName} · age {age} · {pageCount}-page book · {styleName} style"
+        },
+        "failureActions": {
+            "library": "Back to library",
+            "newTale": "Start a new tale"
+        },
+        "hero": {
+            "failed": "Generation failed",
+            "completed": "Your tale is ready!",
+            "inProgress": "page {completedPages} of {totalPages} · {stage}",
+            "startingStage": "starting",
+            "ariaLabel": "Generation progress: {completedPages} of {totalPages} pages"
+        },
+        "stages": {
+            "planning": {
+                "label": "Outline",
+                "subheading": "sketching the chapters"
+            },
+            "words": {
+                "label": "Words",
+                "subheading": "writing for age"
+            },
+            "pictures": {
+                "label": "Pictures",
+                "subheading": "painting each page"
+            },
+            "binding": {
+                "label": "Binding",
+                "subheading": "laying out the spreads"
+            },
+            "ready": {
+                "label": "Ready",
+                "subheading": "a small parcel"
+            }
+        },
+        "pages": {
+            "header": "Pages so far",
+            "count": "{done} OF {total} PAINTED"
+        },
+        "log": {
+            "header": "The workshop log",
+            "live": "● LIVE"
+        },
+        "safety": "It's quite safe to close this window — we'll email {childName}'s tale when it's ready."
+    },
+    "library": {
+        "page": {
+            "title": "Library"
+        },
+        "greeting": {
+            "morning": "Good morning",
+            "afternoon": "Good afternoon",
+            "evening": "Good evening",
+            "stat": {
+                "talesCount": "tales in library",
+                "pagesThisCycle": "pages this cycle",
+                "pagesLeft": "pages left",
+                "regenerationsUsed": "regenerations used"
+            }
+        },
+        "readers": {
+            "heading": "Your readers",
+            "manageLink": "Manage children →",
+            "addLabel": "Add another little reader",
+            "ariaLabel": "Readers"
+        },
+        "readerCard": {
+            "ariaLabel": "{childName}'s reader card",
+            "lastTale": "last tale {relativeTime}",
+            "noTales": "no tales yet",
+            "loves": "loves:",
+            "newTaleButton": "+ New tale",
+            "taleCount": "{count, plural, one {# tale} other {# tales}}"
+        },
+        "grid": {
+            "heading": "Your library",
+            "count": "{count, plural, one {# tale} other {# tales}}",
+            "filterLabel": "Filter",
+            "filterOption": {
+                "all": "All",
+                "child": "For {childName}",
+                "books": "Books",
+                "comics": "Comics"
+            },
+            "empty": "No tales match this filter.",
+            "ariaLabel": "Tales"
+        },
+        "taleCard": {
+            "failedAriaLabel": "{displayTitle} — generation failed, try again",
+            "failedOverlay": "Generation failed",
+            "retryLabel": "Try again →",
+            "age": "age {age}",
+            "pageCount": "{pageCount}pp"
+        },
+        "wonderJar": {
+            "eyebrow": "· From the wonder jar ·",
+            "heading": "Some quiet questions for tonight.",
+            "subheading": "Picked because {namesPhrase} might love them. Tap one to start a tale.",
+            "namesPhraseNone": "your little reader",
+            "namesAnd": "and",
+            "suggestionsAriaLabel": "Question suggestions"
+        }
+    },
+    "storyReader": {
+        "header": {
+            "breadcrumb": {
+                "ariaLabel": "Breadcrumb",
+                "library": "Library",
+                "for": "For {childName}"
+            },
+            "shareButton": "+ Share with family",
+            "downloadButton": "↓ Download PDF",
+            "meta": {
+                "prefix": "a tale for ",
+                "suffix": ", age {age} · {pageCount} pages · {formatLabel} · {finishedLabel}"
+            },
+            "format": {
+                "book": "storybook",
+                "comic": "comic"
+            }
+        },
+        "chapters": {
+            "ariaLabel": "Chapters",
+            "eyebrow": "· Chapters ·",
+            "pageFallback": "Page {order}"
+        },
+        "spread": {
+            "ariaLabel": "Story pages",
+            "pageAriaLabel": "Page {current} of {total}",
+            "navGroupLabel": "Page navigation",
+            "prevButton": "← Previous",
+            "nextButton": "Next →",
+            "prevAriaFirst": "Previous page (already at first)",
+            "prevAriaPage": "Go to page {page}",
+            "nextAriaLast": "Next page (already at last)",
+            "nextAriaPage": "Go to page {page}",
+            "counter": "{current} of {total}"
+        },
+        "details": {
+            "eyebrow": "· Details ·",
+            "labels": {
+                "created": "Created",
+                "reader": "Reader",
+                "format": "Format",
+                "style": "Style",
+                "language": "Language",
+                "fileSize": "File size"
+            },
+            "format": {
+                "book": "Book",
+                "comic": "Comic"
+            }
+        },
+        "rating": {
+            "eyebrow": "· Rate this tale ·",
+            "subheading": "How did {childName} like it? It helps the workshop write the next one.",
+            "ariaLabel": "Story rating",
+            "noteAriaLabel": "Rating note",
+            "notePlaceholder": "Write a small note (optional)…",
+            "shareLabel": "Share this story as an example for other families",
+            "saveButton": "Save rating",
+            "savedStatus": "Saved — thank you!",
+            "defaultError": "Something went wrong. Please try again."
+        },
+        "regeneration": {
+            "eyebrow": "· Remake this page ·",
+            "ariaLabel": "Remake this page",
+            "textButton": "Regenerate text",
+            "illustrationButton": "Repaint illustration",
+            "bothButton": "Remake everything",
+            "quotaExhausted": "No regenerations left this cycle — they refresh when your plan renews.",
+            "quotaInfo": "{count, plural, one {# regeneration left this cycle.} other {# regenerations left this cycle.}}",
+            "modal": {
+                "titles": {
+                    "text": "Regenerate text",
+                    "illustration": "Repaint illustration",
+                    "both": "Regenerate page"
+                },
+                "descriptions": {
+                    "text": "The story text on this page will be rewritten. The illustration stays.",
+                    "illustration": "The picture will be repainted. The text stays.",
+                    "both": "Both the text and the illustration on this page will be remade."
+                },
+                "authorNoteLabel": "Author note (optional)",
+                "authorNoteDescription": "Guide the AI — e.g. \"make it funnier\" or \"add a dragon\".",
+                "authorNotePlaceholder": "Leave blank to let the AI decide…",
+                "cancelButton": "Cancel",
+                "confirmButton": "Confirm",
+                "defaultError": "Something went wrong. Please try again."
+            }
+        }
+    },
+    "account": {
+        "sidebar": {
+            "nav": {
+                "ariaLabel": "Account navigation",
+                "profile": "Profile",
+                "children": "Children",
+                "subscription": "Subscription",
+                "notifications": "Notifications",
+                "language": "Language",
+                "privacy": "Privacy & data",
+                "export": "Export library"
+            },
+            "signOut": "Sign out",
+            "deleteAccount": "Delete account"
+        },
+        "profile": {
+            "editButton": "Edit name",
+            "nameLabel": "Name",
+            "saveButton": "Save",
+            "cancelButton": "Cancel"
+        },
+        "children": {
+            "heading": "Children",
+            "loading": "Loading children",
+            "empty": "No children yet.",
+            "addFirstButton": "Add your first child",
+            "addButton": "Add child",
+            "limitHint": "You've reached the child limit for your plan. Upgrade to add more.",
+            "editModal": {
+                "title": "Edit child"
+            },
+            "addModal": {
+                "title": "Add child"
+            },
+            "editCharacterModal": {
+                "title": "Edit character"
+            },
+            "addCharacterModal": {
+                "title": "Add character"
+            },
+            "deleteModal": {
+                "title": "Delete child",
+                "cancelButton": "Cancel",
+                "deleteButton": "Delete"
+            },
+            "deleteConfirm": "Are you sure you want to delete {childName}? This cannot be undone."
+        },
+        "childForm": {
+            "nameLabel": "Name",
+            "namePlaceholder": "Child's name",
+            "birthdateLabel": "Birthdate",
+            "genderLabel": "Gender",
+            "genderOptions": {
+                "male": "Boy",
+                "female": "Girl"
+            },
+            "interestsLabel": "Interests",
+            "interestsPlaceholder": "Add interest and press Enter",
+            "cancelButton": "Cancel",
+            "saveButton": "Save",
+            "errors": {
+                "nameRequired": "Name is required",
+                "birthdateRequired": "Birthdate is required",
+                "invalidDate": "Invalid date",
+                "birthDateFuture": "Birthdate must be in the past",
+                "genderRequired": "Gender is required"
+            }
+        },
+        "childCard": {
+            "ageLabel": {
+                "infant": "Under 1 year",
+                "years": "{age, plural, one {# year old} other {# years old}}"
+            },
+            "gender": {
+                "male": "Boy",
+                "female": "Girl"
+            },
+            "characterLabel": "Character",
+            "noCharacter": "No character yet.",
+            "editCharacterAriaLabel": "Edit character for {childName}",
+            "addCharacterAriaLabel": "Add character for {childName}",
+            "editCharacterButton": "Edit character",
+            "addCharacterButton": "Add character",
+            "editAriaLabel": "Edit {childName}",
+            "editButton": "Edit",
+            "deleteAriaLabel": "Delete {childName}",
+            "deleteButton": "Delete"
+        },
+        "subscription": {
+            "loading": "Loading your subscription…",
+            "planCard": {
+                "eyebrow": "Current plan",
+                "pastDueWarning": "Your last payment didn't go through — we'll retry automatically. Please check your payment method to keep the workshop open.",
+                "pricePerMonth": "{price} / month",
+                "priceFree": "Free forever",
+                "cancelsOn": "Cancels on {date}",
+                "renewsOnPaid": "Renews on {date} · VAT calculated by Paddle at checkout",
+                "resetsOn": "Resets on {date}",
+                "upgradeButton": "Upgrade →",
+                "cancelButton": "Cancel subscription",
+                "cancelModal": {
+                    "title": "Cancel your subscription?",
+                    "body": "You keep {tierName} until {date} — after that your account returns to the free plan. Finished tales stay in your library.",
+                    "keepButton": "Keep my plan",
+                    "confirmButton": "Cancel subscription"
+                }
+            },
+            "usage": {
+                "eyebrow": "This cycle",
+                "labels": {
+                    "pages": "Pages painted",
+                    "regenerations": "Regenerations",
+                    "children": "Children profiles"
+                },
+                "ariaLabel": "{label} usage"
+            },
+            "payment": {
+                "eyebrow": "Payment details",
+                "body": "Your card, billing address, and Tax ID are managed securely by Paddle — we never store them. Plan changes also happen in the Paddle portal.",
+                "portalButton": "Open billing portal →",
+                "error": "Could not open the billing portal — please try again."
+            },
+            "invoices": {
+                "eyebrow": "Past parcels",
+                "emptyPaid": "No invoices yet — your first one arrives with the next renewal.",
+                "emptyFree": "No invoices — the Free Chapter never bills you.",
+                "pdfLink": "PDF"
+            }
+        },
+        "notifications": {
+            "eyebrow": "Notification preferences",
+            "body": "Choose how you hear from us. Email goes to your inbox; in-app shows up in the bell at the top of the page.",
+            "loadError": "We couldn't load your preferences — please refresh the page.",
+            "events": {
+                "storyCompleted": {
+                    "label": "Tale is ready",
+                    "description": "When a new story finishes generating."
+                },
+                "storyFailed": {
+                    "label": "Tale didn't finish",
+                    "description": "When a story fails to generate. No credits are spent."
+                },
+                "paymentFailed": {
+                    "label": "Payment failed",
+                    "description": "When a subscription payment cannot be processed.",
+                    "note": "Email is always sent for billing issues."
+                },
+                "subscriptionRenewed": {
+                    "label": "Plan renewed",
+                    "description": "When your subscription renews for another month."
+                },
+                "subscriptionCanceled": {
+                    "label": "Subscription ended",
+                    "description": "When your subscription ends and you return to the free plan."
+                }
+            },
+            "channels": {
+                "email": "Email",
+                "inApp": "In-app"
+            }
+        },
+        "language": {
+            "comingSoon": "Language — coming soon"
+        },
+        "privacy": {
+            "info": {
+                "eyebrow": "Privacy & data",
+                "whatWeCollect": {
+                    "title": "What we collect",
+                    "body": "Your Google account basics (name, email, avatar), the child profiles you create (name, birthdate, interests), character descriptions, and the stories we generate for you. We never ask for, or store, payment card details."
+                },
+                "whyWeProcessIt": {
+                    "title": "Why we process it",
+                    "body": "Solely to create and deliver your personalized stories, run your subscription, and notify you when tales are ready. No advertising, no profiling, no selling data."
+                },
+                "whoHelpUs": {
+                    "title": "Who helps us (sub-processors)",
+                    "body": "Paddle (payments & billing), OpenRouter (story text and illustration generation), Resend (email delivery), and our cloud storage provider (generated PDFs and images). Each receives only what their job requires."
+                },
+                "howLongWeKeepIt": {
+                    "title": "How long we keep it",
+                    "body": "Your account data stays while the account exists. Generated story files follow your plan's retention period — Free Chapter PDFs and images are removed 30 days after creation; paid-tier stories are kept while you subscribe."
+                },
+                "yourRights": {
+                    "title": "Your rights",
+                    "body": "Export everything we hold about you as JSON below, or delete your account — including every generated file — at any time. Questions? Reach us via the contact page."
+                }
+            },
+            "export": {
+                "eyebrow": "Export my data",
+                "body": "Download everything we hold about you — profile, readers, characters, stories (with download links for files that still exist) — as a single JSON file.",
+                "button": "Export my data",
+                "error": "Export failed — please try again."
+            },
+            "delete": {
+                "eyebrow": "Delete account",
+                "body": "Deleting your account removes your profile, readers, characters, every generated story and PDF, and your subscription record. This cannot be undone.",
+                "blocked": "You have an active paid subscription — cancel it first on the Subscription page, then return here.",
+                "button": "Delete my account",
+                "modal": {
+                    "title": "Delete your account forever?",
+                    "body": "Every tale, illustration, and reader profile will be permanently erased. There is no recovery. Type DELETE to confirm.",
+                    "confirmWord": "DELETE",
+                    "confirmLabel": "Confirmation",
+                    "confirmPlaceholder": "DELETE",
+                    "error": "Account deletion failed — nothing was removed. Please try again.",
+                    "keepButton": "Keep my account",
+                    "confirmButton": "Delete forever"
+                }
+            }
+        }
+    },
+    "notFound": {
+        "eyebrow": "· 404 ·",
+        "heading": "Lost in the woods?",
+        "subheading": "This page doesn't exist — but your next story does.",
+        "homeLink": "Take me home"
+    },
+    "admin": {
+        "nav": {
+            "ariaLabel": "Admin navigation",
+            "dashboard": "Dashboard",
+            "users": "Users",
+            "stories": "Stories",
+            "artStyles": "Art styles",
+            "ratings": "Ratings",
+            "blueprints": "Blueprints"
+        },
+        "dashboard": {
+            "heading": "Overview",
+            "users": "Users",
+            "stories": "Stories",
+            "activeSubscriptions": "Active subscriptions",
+            "activeSubscriptionsInfo": "Paid tiers only",
+            "mrr": "MRR",
+            "mrrInfo": "Monthly recurring revenue"
+        },
+        "pagination": {
+            "prev": "← Prev",
+            "next": "Next →",
+            "status": "Page {page} of {total}"
+        },
+        "users": {
+            "heading": "Users",
+            "searchPlaceholder": "Search name or email",
+            "searchAriaLabel": "Search users",
+            "loading": "Loading users",
+            "empty": "No users match this search.",
+            "suspendModal": {
+                "title": "Suspend user",
+                "body": "Suspend {name}? They will be signed out everywhere and blocked from signing in until reinstated.",
+                "cancel": "Cancel",
+                "confirm": "Suspend"
+            },
+            "table": {
+                "user": "User",
+                "role": "Role",
+                "tier": "Tier",
+                "stories": "Stories",
+                "joined": "Joined",
+                "status": "Status",
+                "actions": "Actions",
+                "roleAriaLabel": "Role for {name}",
+                "roles": {
+                    "user": "User",
+                    "admin": "Admin",
+                    "superAdmin": "Super admin"
+                },
+                "statusActive": "Active",
+                "statusSuspended": "Suspended",
+                "reinstate": "Reinstate",
+                "suspend": "Suspend"
+            }
+        },
+        "stories": {
+            "heading": "Stories",
+            "searchPlaceholder": "Search title, question or owner",
+            "searchAriaLabel": "Search stories",
+            "loading": "Loading stories",
+            "empty": "No stories match this search.",
+            "deleteModal": {
+                "title": "Delete story",
+                "body": "Permanently delete {title}? This cannot be undone.",
+                "cancel": "Cancel",
+                "confirm": "Delete"
+            },
+            "table": {
+                "story": "Story",
+                "status": "Status",
+                "owner": "Owner",
+                "child": "Child",
+                "pages": "Pages",
+                "created": "Created",
+                "actions": "Actions",
+                "delete": "Delete",
+                "statuses": {
+                    "pending": "Pending",
+                    "generating": "Generating",
+                    "ready": "Ready",
+                    "failed": "Failed"
+                }
+            }
+        },
+        "artStyles": {
+            "heading": "Art styles",
+            "add": "+ Add art style",
+            "loading": "Loading art styles",
+            "empty": "No art styles yet.",
+            "createModalTitle": "Add art style",
+            "editModalTitle": "Edit art style",
+            "table": {
+                "thumbnail": "Thumbnail",
+                "nameSlug": "Name / Slug",
+                "promptPrefix": "Prompt prefix",
+                "active": "Active",
+                "order": "Order",
+                "actions": "Actions",
+                "activeLabel": "Active",
+                "moveUp": "Move {name} up",
+                "moveDown": "Move {name} down",
+                "edit": "Edit",
+                "generateThumbnail": "Generate thumbnail",
+                "regenerateThumbnail": "Regenerate",
+                "generating": "Generating…",
+                "noThumbnail": "none"
+            },
+            "form": {
+                "nameLabel": "Name",
+                "namePlaceholder": "Watercolor",
+                "slugLabel": "Slug",
+                "slugPlaceholder": "watercolor",
+                "slugDescription": "Lowercase, hyphen-separated (e.g. watercolor-style)",
+                "promptPrefixLabel": "Prompt prefix",
+                "promptPrefixPlaceholder": "in a soft watercolor style with…",
+                "promptPrefixDescription": "Prepended to every story generation prompt",
+                "cancel": "Cancel",
+                "save": "Save",
+                "errors": {
+                    "nameRequired": "Name is required",
+                    "slugRequired": "Slug is required",
+                    "slugFormat": "Slug must be kebab-case (e.g. watercolor)",
+                    "promptPrefixRequired": "Prompt prefix is required"
+                }
+            }
+        },
+        "ratings": {
+            "heading": "Ratings",
+            "loading": "Loading ratings",
+            "empty": "No ratings yet.",
+            "table": {
+                "user": "User",
+                "story": "Story",
+                "score": "Score",
+                "comment": "Comment",
+                "date": "Date",
+                "untitled": "(untitled)",
+                "scoreAriaLabel": "{score} out of 5"
+            }
+        },
+        "blueprints": {
+            "heading": "Story blueprints",
+            "add": "+ New blueprint",
+            "backLink": "← Blueprints",
+            "newHeading": "New blueprint",
+            "editHeading": "Edit:",
+            "list": {
+                "empty": "No blueprints yet.",
+                "createFirst": "Create the first one →",
+                "name": "Name",
+                "type": "Type",
+                "created": "Created",
+                "actions": "Actions",
+                "edit": "Edit →"
+            },
+            "form": {
+                "saveChanges": "Save changes",
+                "create": "Create blueprint",
+                "saving": "Saving…",
+                "saveError": "Could not save the blueprint. Please try again.",
+                "deleteConfirm": "Delete \"{name}\"? This cannot be undone.",
+                "nameLabel": "Blueprint name",
+                "namePlaceholder": "My blueprint",
+                "descriptionLabel": "Description",
+                "descriptionPlaceholder": "What this blueprint produces",
+                "typeLabel": "Story type",
+                "systemPromptLabel": "System prompt",
+                "systemPromptPlaceholder": "You are a children's story author…",
+                "cancel": "Cancel",
+                "delete": "Delete blueprint",
+                "deleting": "Deleting…",
+                "deleteError": "Could not delete the blueprint. Please try again.",
+                "typeBook": {
+                    "title": "Book",
+                    "description": "Prose pages with one illustration per spread."
+                },
+                "typeComic": {
+                    "title": "Comic",
+                    "description": "Panels and speech bubbles."
+                }
+            }
+        }
+    }
+}

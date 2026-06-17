@@ -1,6 +1,7 @@
 'use client';
 
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { VisuallyHidden } from '@mantine/core';
 import clsx from 'clsx';
 import type { INotification } from '@/types/notification.types';
@@ -22,14 +23,17 @@ export default function NotificationList({
     notifications,
     onItemClick,
 }: Readonly<INotificationListProps>): React.ReactElement {
+    const t = useTranslations('notifications');
+    const tHeader = useTranslations('header.notifications.list');
+
     if (notifications.length === 0) {
-        return <p className={styles.list__empty}>All quiet for now — new tales will land here.</p>;
+        return <p className={styles.list__empty}>{tHeader('empty')}</p>;
     }
 
     return (
         <ul className={styles.list}>
             {notifications.map((notification) => {
-                const { text, href } = getNotificationContent(notification);
+                const { textKey, textValues, href } = getNotificationContent(notification);
                 const unread = notification.readAt === null;
                 return (
                     <li key={notification.id}>
@@ -39,8 +43,10 @@ export default function NotificationList({
                             onClick={() => onItemClick?.(notification)}
                         >
                             <span className={styles['list__item-text']}>
-                                {text}
-                                {unread && <VisuallyHidden> (unread)</VisuallyHidden>}
+                                {t(textKey as Parameters<typeof t>[0], textValues)}
+                                {unread && (
+                                    <VisuallyHidden>{tHeader('unreadLabel')}</VisuallyHidden>
+                                )}
                             </span>
                             <span className={styles['list__item-time']}>
                                 {getRelativeTime(notification.createdAt)}

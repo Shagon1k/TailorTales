@@ -42,7 +42,7 @@ export class CharactersService {
                 where: { childId: dto.childId, userId },
             });
             if (existing) {
-                throw new ConflictException(`A character already exists for child ${dto.childId}`);
+                throw new ConflictException('errors.characters.duplicateCharacter');
             }
         }
 

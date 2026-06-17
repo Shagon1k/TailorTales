@@ -30,6 +30,15 @@ body {
     outline-offset: 2px;
 }
 
+// ---- View transitions (locale / page navigation) ----
+@media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 300ms;
+        animation-timing-function: ease-out;
+    }
+}
+
 // ---- Scrollbar (webkit) ----
 ::-webkit-scrollbar {
     width: 6px;

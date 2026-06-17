@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Button, { type IButtonProps } from './Button';
 
 export interface IButtonLinkProps extends Omit<IButtonProps, 'component'> {

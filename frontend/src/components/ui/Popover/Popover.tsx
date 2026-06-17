@@ -28,7 +28,7 @@ export default function Popover({
     ...props
 }: Readonly<IPopoverProps>): React.ReactElement {
     return (
-        <MantinePopover position="bottom-end" offset={8} {...props}>
+        <MantinePopover position="bottom-end" offset={8} returnFocus {...props}>
             <MantinePopover.Target>{target}</MantinePopover.Target>
             <MantinePopover.Dropdown
                 className={styles.popover}

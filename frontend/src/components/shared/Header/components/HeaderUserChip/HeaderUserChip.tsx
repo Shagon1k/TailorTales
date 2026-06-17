@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import clsx from 'clsx';
 import { authApi } from '@/api/auth';
 import { useCurrentUser } from '@/context/UserContext';
@@ -16,23 +17,22 @@ interface IMenuLink {
     label: string;
 }
 
-const MENU_LINKS: IMenuLink[] = [
-    { href: '/account', label: 'My account' },
-    { href: '/account/subscription', label: 'Subscription' },
-    { href: '/account/children', label: 'Children' },
-];
-
 export default function HeaderUserChip(): React.ReactElement {
     const { user } = useCurrentUser();
     const { data: subscription } = useSubscription();
     const [opened, setOpened] = useState(false);
+    const t = useTranslations('header');
     const firstName = user?.name?.split(' ')[0] ?? '';
 
-    // Admins get a shortcut into the admin panel; everyone else sees only the account links.
+    const baseLinks: IMenuLink[] = [
+        { href: '/account', label: t('userMenu.myAccount') },
+        { href: '/account/subscription', label: t('userMenu.subscription') },
+        { href: '/account/children', label: t('userMenu.children') },
+    ];
     const menuLinks =
         user && isAdmin(user.role)
-            ? [{ href: '/admin', label: 'Admin panel' }, ...MENU_LINKS]
-            : MENU_LINKS;
+            ? [{ href: '/admin', label: t('userMenu.adminPanel') }, ...baseLinks]
+            : baseLinks;
 
     async function handleSignOut(): Promise<void> {
         setOpened(false);
@@ -53,7 +53,7 @@ export default function HeaderUserChip(): React.ReactElement {
                 <button
                     type="button"
                     className={styles.chip}
-                    aria-label="Account menu"
+                    aria-label={t('userChip.ariaLabel')}
                     aria-haspopup="menu"
                     aria-expanded={opened}
                     onClick={() => setOpened((value) => !value)}
@@ -84,7 +84,7 @@ export default function HeaderUserChip(): React.ReactElement {
                         className={clsx(styles.menu__item, styles['m-sign-out'])}
                         onClick={() => void handleSignOut()}
                     >
-                        Sign out
+                        {t('userMenu.signOut')}
                     </button>
                 </li>
             </ul>
