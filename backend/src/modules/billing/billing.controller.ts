@@ -20,7 +20,7 @@ export class BillingController {
     async cancel(@CurrentUser() user: User): Promise<{ scheduled: boolean }> {
         const subscription = await this.subscriptions.getOrCreateForUser(user.id);
         if (!subscription.paddleSubscriptionId) {
-            throw new ConflictException('No paid subscription to cancel');
+            throw new ConflictException('errors.billing.noActiveSubscription');
         }
 
         await this.paddle.cancelSubscription(subscription.paddleSubscriptionId);
@@ -33,7 +33,7 @@ export class BillingController {
     async createPortalSession(@CurrentUser() user: User): Promise<{ url: string }> {
         const subscription = await this.subscriptions.getOrCreateForUser(user.id);
         if (!subscription.paddleCustomerId) {
-            throw new ConflictException('No Paddle billing profile for this account');
+            throw new ConflictException('errors.billing.noBillingProfile');
         }
 
         return this.paddle.createPortalSession(subscription.paddleCustomerId);

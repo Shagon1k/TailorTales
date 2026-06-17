@@ -41,7 +41,7 @@ export class RegenerationService {
         });
         if (!story) throw new NotFoundException(`Story ${storyId} not found`);
         if (story.status !== 'COMPLETED') {
-            throw new BadRequestException('Only COMPLETED stories can have pages regenerated');
+            throw new BadRequestException('errors.regeneration.storyNotCompleted');
         }
 
         // 2. Page lookup

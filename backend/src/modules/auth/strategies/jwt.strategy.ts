@@ -34,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
         // Suspended accounts are rejected on every request — effectively logged out everywhere.
         if (user.suspendedAt) {
-            throw new UnauthorizedException('Account suspended');
+            throw new UnauthorizedException('errors.auth.accountSuspended');
         }
 
         return user;

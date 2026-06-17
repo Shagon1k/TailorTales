@@ -15,24 +15,31 @@ export class ApiError extends Error {
 }
 
 export async function apiFetch<T = void>(path: string, init?: RequestInit): Promise<T> {
+    const locale = typeof document !== 'undefined' ? document.documentElement.lang : undefined;
+
     const res = await fetch(`${BACKEND_URL}${path}`, {
         ...init,
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            ...(locale ? { 'Accept-Language': locale } : {}),
             ...init?.headers,
         },
     });
 
+    // Parse once — used for both the error message path and the success return path.
+    const isJson = res.headers.get('content-type')?.includes('application/json');
+    const body = isJson ? ((await res.json()) as Record<string, unknown>) : undefined;
+
     if (!res.ok) {
-        throw new ApiError(res.status, `API ${res.status}: ${res.statusText}`);
+        const raw = body?.['message'];
+        const text = Array.isArray(raw)
+            ? String(raw[0])
+            : typeof raw === 'string'
+              ? raw
+              : undefined;
+        throw new ApiError(res.status, text ?? `${res.status}: ${res.statusText}`);
     }
 
-    // Some endpoints return no body (e.g. logout → 200 OK with text/plain)
-    const contentType = res.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-        return undefined as T;
-    }
-
-    return res.json();
+    return body as T;
 }
