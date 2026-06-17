@@ -7,6 +7,7 @@ import '@mantine/core/styles.css';
 import '../../styles/globals.scss';
 import { getServerSubscription } from '@/api/subscription.server';
 import { getServerUser } from '@/api/user.server';
+import CookieConsent from '@/components/shared/CookieConsent/CookieConsent';
 import StarField from '@/components/shared/StarField/StarField';
 import type { ILocale } from '@/i18n/config';
 import Providers from '../providers';
@@ -69,6 +70,7 @@ export default async function LocaleLayout({
                 <NextIntlClientProvider messages={messages}>
                     <Providers initialUser={initialUser} initialSubscription={initialSubscription}>
                         {children}
+                        <CookieConsent />
                     </Providers>
                 </NextIntlClientProvider>
             </body>

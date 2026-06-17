@@ -1019,5 +1019,11 @@
                 }
             }
         }
+    },
+    "cookieConsent": {
+        "ariaLabel": "Cookie-Zustimmung",
+        "body": "Wir verwenden Cookies, um die Nutzung von TailorTales zu analysieren und Ihr Erlebnis zu verbessern. Vor Ihrer Zustimmung findet kein Tracking statt.",
+        "accept": "Akzeptieren",
+        "reject": "Ablehnen"
     }
 }
