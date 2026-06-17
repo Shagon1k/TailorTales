@@ -58,6 +58,15 @@ describe('RatingsService', () => {
             );
         });
 
+        it('should use the localization error code for the not-completed message', async () => {
+            prisma.story.findFirst.mockResolvedValue({ status: 'GENERATING' });
+
+            const err = await service.upsert(STORY_ID, USER_ID, { score: 5 }).catch((e) => e);
+            expect((err as BadRequestException).getResponse()).toMatchObject({
+                message: 'errors.ratings.storyNotCompleted',
+            });
+        });
+
         it('should upsert the rating by the storyId_userId compound key', async () => {
             await service.upsert(STORY_ID, USER_ID, { score: 3, comment: 'nice' });
 

@@ -99,6 +99,17 @@ describe('QuotaService', () => {
             );
         });
 
+        it('should include the error code and dynamic params in the exception body', async () => {
+            getOrCreateForUser.mockResolvedValue(buildSubscription({ pagesUsed: 8 }));
+
+            const err = await service.assertPageCredits('user-1', 5, 'BOOK').catch((e) => e);
+            expect(err).toBeInstanceOf(ForbiddenException);
+            expect((err as ForbiddenException).getResponse()).toMatchObject({
+                code: 'errors.quota.pageCreditsExceeded',
+                params: { cost: 5, remaining: 4, limit: 12 },
+            });
+        });
+
         it('should charge comic pages at 2 credits per page', async () => {
             getOrCreateForUser.mockResolvedValue(buildSubscription({ pagesUsed: 0 }));
 
@@ -135,6 +146,16 @@ describe('QuotaService', () => {
             await expect(service.assertRegenerationCredit('user-1')).rejects.toThrow(
                 ForbiddenException,
             );
+        });
+
+        it('should include the error code and limit param in the exception body', async () => {
+            getOrCreateForUser.mockResolvedValue(buildSubscription({ regenerationsUsed: 3 }));
+
+            const err = await service.assertRegenerationCredit('user-1').catch((e) => e);
+            expect((err as ForbiddenException).getResponse()).toMatchObject({
+                code: 'errors.quota.regenerationsExceeded',
+                params: { limit: 3 },
+            });
         });
     });
 
