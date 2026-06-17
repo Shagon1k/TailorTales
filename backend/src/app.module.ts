@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
+import { SentryModule } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard.js';
@@ -28,6 +29,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
     imports: [
+        SentryModule.forRoot(),
         ConfigModule.forRoot({
             isGlobal: true,
             validate: validateEnv,

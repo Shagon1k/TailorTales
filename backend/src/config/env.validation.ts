@@ -96,6 +96,19 @@ class EnvironmentVariables {
     @IsString()
     CONTACT_INBOX_EMAIL!: string;
 
+    // Sentry — error tracking
+    @IsBoolean()
+    @IsOptional()
+    SENTRY_ENABLED: boolean = false;
+
+    @IsString()
+    @IsOptional()
+    SENTRY_DSN?: string;
+
+    @IsString()
+    @IsOptional()
+    SENTRY_ENVIRONMENT?: string;
+
     // Paddle — billing. Keys are optional because the stub client (USE_PADDLE_STUBS)
     // needs none of them; the real client throws at boot when they are missing.
     @IsBoolean()
@@ -120,6 +133,7 @@ const BOOLEAN_KEYS: Array<keyof EnvironmentVariables> = [
     'USE_EMAIL_STUBS',
     'USE_PADDLE_STUBS',
     'STORAGE_FORCE_PATH_STYLE',
+    'SENTRY_ENABLED',
 ];
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
