@@ -1,7 +1,51 @@
 # Monitoring & Alerting
 
-> How to observe a running TailorTales instance. At MVP the stack uses **Pino structured
-> logs only** (no Sentry, no OpenTelemetry). All signals come from log tailing.
+> How to observe a running TailorTales instance. Three layers:
+>
+> 1. **Sentry** — error tracking (backend exceptions + frontend JS errors) and an uptime monitor.
+> 2. **New Relic** — APM: request latency, throughput, BullMQ job durations (backend only).
+> 3. **Pino structured logs** — the durable, queryable record of everything that happened.
+>
+> Sentry and New Relic are enabled on UAT/prod only; **local dev runs on logs alone** (both
+> agents stay dormant — see [environment-variables.md](environment-variables.md)). Registration
+> and credentials are covered in [external-services.md](external-services.md).
+
+## Observability stack
+
+### Sentry — error tracking
+
+Captures unhandled exceptions and sends them with an `environment` tag (`uat` / `production`)
+so issues are filtered per environment.
+
+| Side     | How it loads                                                                    | Gate                         |
+| -------- | ------------------------------------------------------------------------------- | ---------------------------- |
+| Backend  | `src/instrument.ts` (imported first in `main.ts`) + `SentryModule.forRoot()`    | `SENTRY_ENABLED=true`        |
+| Frontend | `instrumentation-client.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` | `NEXT_PUBLIC_SENTRY_ENABLED` |
+
+- **Backend capture path:** `AllExceptionsFilter` is decorated with `@SentryExceptionCaptured()`,
+  so every exception that reaches the global filter is reported. 4xx client errors are filtered
+  the same way they are in logs (the filter only logs 5xx).
+- **Frontend capture path:** the Next.js instrumentation hooks plus `global-error.tsx`
+  (`Sentry.captureException`) catch render/runtime errors. No PII is sent (`sendDefaultPii` is off).
+- **Source maps:** uploaded at build time via `withSentryConfig` using `SENTRY_AUTH_TOKEN`
+  (a CI secret, never a runtime var). Without it, stack traces show minified frames.
+
+### Sentry — uptime monitor
+
+A single Sentry uptime monitor pings `GET https://api.tailortales.app/health` and alerts (email)
+when the backend is down. `/health` returns `{ "status": "ok" }` and is `@Public()`. Configured
+in the Sentry UI — no app env vars.
+
+### New Relic — APM (backend only)
+
+The agent loads via the **ESM loader** (`NODE_OPTIONS="--import newrelic/esm-loader.mjs"`) because
+the backend is ESM (`"type": "module"`); the CJS `require('newrelic')` pattern does not apply.
+There is **no `NEW_RELIC_ENABLED` flag** — the presence of `NODE_OPTIONS` is the gate, so dev
+(where it is unset) never starts the agent. Config lives in `backend/newrelic.js`; the app name
+comes from `NEW_RELIC_APP_NAME` (`TailorTales-UAT` / `TailorTales-Prod`). `cookie` and
+`authorization` headers are excluded from captured attributes.
+
+Recommended alerts (set up once UAT data flows): error rate > 5%, p95 latency > 1s, Apdex < 0.7.
 
 ## Log structure (Pino / NestJS)
 
