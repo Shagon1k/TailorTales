@@ -1,7 +1,7 @@
 import type { IPricingTier } from '@/types/pricing.types';
 import type { IComparisonGroup, IPricingPlan, TComparisonCellValue } from '../_components/types';
 
-type TTranslate = (key: string, values?: Record<string, unknown>) => string;
+type TTranslate = (key: string, values?: Record<string, string | number | Date>) => string;
 
 const PLAN_KEY: Record<string, 'free' | 'storyHour' | 'family'> = {
     'Free Chapter': 'free',

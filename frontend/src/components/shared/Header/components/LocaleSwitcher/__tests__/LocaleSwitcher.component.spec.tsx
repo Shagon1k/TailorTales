@@ -7,7 +7,11 @@ import LocaleSwitcher from '../LocaleSwitcher';
 const mockReplace = vi.fn();
 
 beforeEach(() => {
-    vi.mocked(useRouter).mockReturnValue({ push: vi.fn(), replace: mockReplace, back: vi.fn() });
+    vi.mocked(useRouter).mockReturnValue({
+        push: vi.fn(),
+        replace: mockReplace,
+        back: vi.fn(),
+    } as unknown as ReturnType<typeof useRouter>);
     vi.mocked(usePathname).mockReturnValue('/');
 });
 
