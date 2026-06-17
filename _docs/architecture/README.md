@@ -12,6 +12,8 @@
 - [Frontend architecture](#frontend-architecture)
 - [Infrastructure & integrations](#infrastructure--integrations)
 
+See also: [data-model.md](data-model.md) · [generation-pipeline.md](generation-pipeline.md) · [auth.md](auth.md) · [user-flows.md](user-flows.md)
+
 ## What TailorTales does
 
 TailorTales generates short (5–20 page), personalized PDF storybooks for children. A
@@ -74,21 +76,28 @@ NestJS discovers everything through the module tree rooted at
 infrastructure (`config/`, `prisma/`, `generated/`, `scripts/`, `common/`) sits at
 `src/` root.
 
-| Module                  | Responsibility                                            | Key endpoints                                                           |
-| ----------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `AuthModule`            | Google OAuth, JWT issuance, the global `JwtAuthGuard`     | `/auth/google`, `/auth/google/callback`, `/auth/logout`                 |
-| `UserModule`            | Current-user profile read/update                          | `/me`                                                                   |
-| `ChildrenModule`        | Child CRUD, scoped to the owner                           | `/children`                                                             |
-| `ArtStylesModule`       | List active art styles for the Workshop                   | `/art-styles`                                                           |
-| `StoryBlueprintsModule` | Narrative-DNA blueprints (admin CRUD, user-readable list) | `/story-blueprints`                                                     |
-| `StoriesModule`         | Story CRUD + **owns the generation/progress URLs**        | `/stories`, `/stories/:id/generate`, `/stories/:id/progress`            |
-| `GenerationModule`      | The generation pipeline (enqueue, worker, 5 stages)       | _(no controller; generate + progress routes live in StoriesController)_ |
-| `RenderingModule`       | `PdfRendererService` + the PageTemplate contract          | —                                                                       |
-| `AiModule`              | `AiClient` / `AiStubClient` behind the `AI_CLIENT` token  | —                                                                       |
-| `StorageModule`         | S3 upload / signed URL / delete                           | —                                                                       |
-| `EmailModule`           | `ResendClient` / `EmailStubClient`                        | —                                                                       |
-| `NotificationsModule`   | Writes `Notification` rows + sends email                  | `/notifications/unread-count` (header-poll shim)                        |
-| `ContactModule`         | Public contact form → inbox email                         | `/contact`                                                              |
+| Module                  | Responsibility                                                                                                               | Key endpoints                                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `AuthModule`            | Google OAuth, JWT issuance, the global `JwtAuthGuard`                                                                        | `/auth/google`, `/auth/google/callback`, `/auth/logout`                                        |
+| `UserModule`            | Current-user profile read/update, GDPR export, account deletion                                                              | `/me`, `/me/export`, `DELETE /me`                                                              |
+| `ChildrenModule`        | Child CRUD, scoped to the owner; enforces `PricingTier.childrenLimit`                                                        | `/children`                                                                                    |
+| `ArtStylesModule`       | List active art styles (user); full CRUD + thumbnail generation (admin)                                                      | `/art-styles`, `/admin/art-styles`                                                             |
+| `StoryBlueprintsModule` | Narrative-DNA blueprints (admin CRUD, user-readable list)                                                                    | `/story-blueprints`                                                                            |
+| `StoriesModule`         | Story CRUD + generation/progress URLs + page HTML for iframe reader                                                          | `/stories`, `/stories/:id/generate`, `/stories/:id/progress`, `/stories/:id/pages/:order/html` |
+| `CharactersModule`      | Character CRUD scoped to owner; optional preview image generation                                                            | `/characters`, `/characters/:id/preview`                                                       |
+| `GenerationModule`      | The generation pipeline (enqueue, worker, 5 stages)                                                                          | _(no controller; generate + progress routes live in `StoriesController`)_                      |
+| `RegenerationModule`    | Per-page re-generation with monthly quota; re-stitches PDF after each change                                                 | `/stories/:id/pages/:order/regenerate`                                                         |
+| `RenderingModule`       | `PdfRendererService` + `PdfBindingService` + the PageTemplate contract                                                       | _(consumed by generation and regeneration pipelines)_                                          |
+| `AiModule`              | `AiClient` / `AiStubClient` behind the `AI_CLIENT` token                                                                     | —                                                                                              |
+| `StorageModule`         | S3 upload / signed URL / bulk delete; key patterns in `storage.keys.ts`                                                      | —                                                                                              |
+| `EmailModule`           | `ResendClient` / `EmailStubClient` behind `EMAIL_CLIENT` token                                                               | —                                                                                              |
+| `PricingTiersModule`    | Public pricing tier list                                                                                                     | `/pricing`                                                                                     |
+| `SubscriptionsModule`   | `QuotaService` (assert/deduct credits, watermark, children limit); usage summary; monthly reset cron; retention cleanup cron | `/subscriptions/me`                                                                            |
+| `BillingModule`         | Paddle checkout + webhook handler; billing portal + invoice list                                                             | `/webhooks/paddle`, `/billing/cancel`, `/billing/portal`, `/billing/invoices`                  |
+| `NotificationsModule`   | `NotificationsService` (inbox, mark-read, SSE stream, preferences) + `NotificationEmitterService` (event → bell + email)     | `/notifications`, `/notifications/stream`, `/notifications/preferences`                        |
+| `RatingsModule`         | Story rating upsert; admin rating view                                                                                       | `/stories/:id/rating`, `/stories/:id/public`, `/admin/ratings`                                 |
+| `AdminModule`           | Admin stats dashboard + user management (list, role change, suspend)                                                         | `/admin/stats`, `/admin/users`                                                                 |
+| `ContactModule`         | Public contact form → inbox email                                                                                            | `/contact`                                                                                     |
 
 Deep dive on the generation flow: **[generation-pipeline.md](generation-pipeline.md)**.
 
@@ -130,7 +139,7 @@ src/app/
   providers.tsx           QueryClient (per-request useState) + MantineProvider + UserProvider
   (public)/               Header + Footer chrome; landing, how-it-works, pricing, privacy, contact
   (private)/              AuthGuard + private Header/Footer; library, workshop, account
-  admin/                  AdminGuard; StoryBlueprint management
+  admin/                  AdminGuard; stats, users, stories, art-styles, ratings, blueprints
   login/                  no chrome (full-bleed split layout)
   not-found.tsx           custom 404
 ```
@@ -138,20 +147,36 @@ src/app/
 Route groups `()` set which layout/chrome wraps a page without affecting the URL.
 `login` sits outside any group so it renders with no header/footer.
 
+All routes have a `[locale]` prefix (`/en`, `/de`, `/ru`) managed by `next-intl`. Links and
+navigation use locale-aware wrappers from `src/i18n/navigation.ts` instead of `next/navigation`
+directly.
+
 **Page inventory:**
 
-| Route               | Auth   | What it does                                                |
-| ------------------- | ------ | ----------------------------------------------------------- |
-| `/`                 | public | Landing — marketing entry point                             |
-| `/how-it-works`     | public | Product walkthrough                                         |
-| `/pricing`          | public | Plan comparison                                             |
-| `/privacy`          | public | Privacy policy                                              |
-| `/contact`          | public | Contact form (routes to `CONTACT_INBOX_EMAIL`)              |
-| `/login`            | public | Google OAuth entry; full-bleed layout, no chrome            |
-| `/library`          | user   | User's story list; entry point after sign-in                |
-| `/workshop`         | user   | Generation form + live SSE progress while the pipeline runs |
-| `/account`          | user   | Children profile management                                 |
-| `/admin/blueprints` | admin  | StoryBlueprint CRUD                                         |
+| Route                    | Auth   | What it does                                                                 |
+| ------------------------ | ------ | ---------------------------------------------------------------------------- |
+| `/`                      | public | Landing — hero, how-it-works explainer, public stories grid                  |
+| `/how-it-works`          | public | Product walkthrough                                                          |
+| `/pricing`               | public | Plan comparison cards, fetched from `GET /pricing`                           |
+| `/privacy`               | public | Privacy policy                                                               |
+| `/contact`               | public | Contact form (routes to `CONTACT_INBOX_EMAIL`)                               |
+| `/login`                 | public | Google OAuth entry; full-bleed layout, no chrome                             |
+| `/library`               | user   | Story grid with filters; usage stats bar; "In the Workshop" active-job strip |
+| `/library/[storyId]`     | user   | Story reader: spread viewer, regeneration panel, rating panel, PDF download  |
+| `/workshop`              | user   | Generation form; redirects to `/workshop/[jobId]` if a job is active         |
+| `/workshop/[jobId]`      | user   | Live generation progress: stage indicators, per-page thumbnail grid, SSE log |
+| `/account/profile`       | user   | Name + avatar                                                                |
+| `/account/children`      | user   | Child CRUD with character description per child                              |
+| `/account/subscription`  | user   | Plan card, usage bars, billing portal link, invoice list                     |
+| `/account/notifications` | user   | Per-event email / in-app toggles                                             |
+| `/account/language`      | user   | Locale switcher (EN / DE / RU)                                               |
+| `/account/privacy`       | user   | GDPR: data export + account deletion                                         |
+| `/admin`                 | admin  | Stats dashboard (users, stories, active subscriptions, MRR)                  |
+| `/admin/users`           | admin  | Paginated user table: search, role change, suspend                           |
+| `/admin/stories`         | admin  | Paginated story table: search, force-delete, toggle public                   |
+| `/admin/art-styles`      | admin  | ArtStyle CRUD, thumbnail generation, reorder                                 |
+| `/admin/ratings`         | admin  | Read-only ratings view                                                       |
+| `/admin/blueprints`      | admin  | StoryBlueprint CRUD                                                          |
 
 ### Session & client auth
 
@@ -169,11 +194,16 @@ API call; that is the security boundary. The client guards are UX only — they 
 an invalid state and redirect the browser:
 
 - **`AuthGuard`** (wraps `(private)/` layout) — redirects to `/login` if `user` is null.
-- **`AdminGuard`** (wraps `admin/` layout) — redirects non-admins to `/library`, unauthenticated
-  users to `/login`.
+- **`AdminGuard`** (wraps `admin/` layout) — redirects non-admins (`USER` role) to `/library`,
+  unauthenticated users to `/login`. Allows both `ADMIN` and `SUPER_ADMIN`.
 
 Both are client components: they read `useCurrentUser()` and fire `router.replace()` via
 `useEffect`. They do not replace the backend guard — they complement it.
+
+**Session + subscription seeding** — the root `layout.tsx` fetches both the user and the
+subscription in parallel and seeds the React Query cache via `useState` initializers. This
+prevents a "…" flash on the `HeaderUserChip` during locale navigation, where Next.js
+remounts the layout but the cache is cold.
 
 ### Component location & the promotion rule
 
@@ -215,6 +245,14 @@ Four strictly-ordered layers: design tokens (`styles/_tokens.scss`) → typograp
 Mantine theme (`theme/mantine.ts`) → per-component `.module.scss`. Components consume
 **semantic tokens only**, never primitives or hardcoded values. The atom library wraps
 Mantine and overrides it with compound modifier classes (`.button.m-primary`).
+
+The atom library (`src/components/ui/`) includes: `Button`, `Card`, `Badge`, `Rating`,
+`Avatar`, `Modal`, `Toast`, `Input`, `Textarea`, `Select`, `TagsInput`, `Divider`,
+`Progress`, `Link`, `CapsLabel`, `BrandMark`, `StatCard`, `NotificationBell`,
+`SuggestionChip`, `Popover`, `Switch`, `Table` (compound), `Loader`, `Pagination`.
+Shared structural components (`src/components/shared/`) include `Header` (with
+`LocaleSwitcher`, `NotificationCenter`, `HeaderUserChip`), `Footer`, and `SidebarLayout`
+(used by both `/account` and `/admin`).
 
 ## Infrastructure & integrations
 
