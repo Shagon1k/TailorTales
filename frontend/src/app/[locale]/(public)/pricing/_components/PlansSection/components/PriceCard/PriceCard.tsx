@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Card from '@/components/ui/Card/Card';
 import Button from '@/components/ui/Button/Button';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
@@ -20,6 +20,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
     const isFree = priceMonthly === 0;
     const buttonVariant = mostLoved ? 'primary' : 'secondary';
     const t = useTranslations('pricing.plans');
+    const locale = useLocale();
 
     const { user } = useCurrentUser();
     const { data: subscription } = useSubscription();
@@ -35,6 +36,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
             customer: { email: user.email },
             settings: {
                 ...PADDLE_CHECKOUT_SETTINGS,
+                locale,
                 successUrl: `${window.location.origin}/account/subscription?checkout=success`,
             },
         });
