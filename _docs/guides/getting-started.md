@@ -136,7 +136,7 @@ docker compose down                  # stop services (data persists in volumes)
 5. **Green before commit**: `pnpm type-check && pnpm lint && pnpm test`.
    Tests must pass with `USE_AI_STUBS=true` and `USE_EMAIL_STUBS=true` (no external calls in CI).
 6. **Commit** with Conventional Commits (`commitlint` enforces it — never `--no-verify`).
-7. **Open a PR** referencing the ROADMAP phase; squash-merge to `main`.
+7. **Open a PR** with a Conventional Commits title; squash-merge to `main`.
 
 ## Troubleshooting
 

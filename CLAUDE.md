@@ -49,6 +49,7 @@ narrative that resists above →  prose (last resort)
 - Remove unused code and refactor when needed — but ONLY with developer approval. Refactoring means structural changes only, with no behavior changes, and always in a separate commit.
 - After any CLI scaffold (NestJS, Next.js, etc.), audit every generated file: verify it is actually needed before keeping it. Default assets, duplicate configs, and boilerplate docs are candidates for removal.
 - Stay in scope. Flag unrelated issues to the developer instead of fixing them inline.
+- Rules that apply only to the backend go in `backend/CLAUDE.md`; rules only for the frontend go in `frontend/CLAUDE.md`. Keep this file for rules that apply across both.
 
 ## Safety
 

@@ -10,13 +10,20 @@
 erDiagram
     User ||--o{ Child : owns
     User ||--o{ Story : owns
-    User ||--o{ StoryBlueprint : "created"
+    User ||--o{ StoryBlueprint : "created by"
     User ||--o{ Notification : receives
+    User ||--o{ Character : owns
+    User ||--|| Subscription : has
+    User ||--o{ Rating : writes
     Child ||--o{ Story : "is reader of"
+    Child |o--o{ Character : "linked to"
     ArtStyle ||--o{ Story : styles
     StoryBlueprint |o--o{ Story : "guided (nullable)"
+    Character |o--o{ Story : "snapshot source"
+    PricingTier ||--o{ Subscription : defines
     Story ||--o{ Page : "has ordered"
-    Story ||--o{ Job : "has"
+    Story ||--o{ Job : tracks
+    Story ||--o{ Rating : receives
 
     User {
         string id PK
@@ -24,7 +31,8 @@ erDiagram
         string googleId UK
         string name
         string avatarUrl "nullable"
-        Role role "USER | ADMIN"
+        Role role
+        json notificationPreferences "nullable"
     }
     Child {
         string id PK
@@ -32,14 +40,23 @@ erDiagram
         string name
         datetime birthdate
         Gender gender
-        string interests "array"
-        string avatarUrl "reserved (v2 photo)"
+        string interests "string array"
+        string avatarUrl "nullable, post-MVP"
+    }
+    Character {
+        string id PK
+        string userId FK
+        string childId FK "nullable"
+        string name
+        string description
+        CharacterSource source
+        string generatedPreviewImageKey "S3 key, nullable"
     }
     ArtStyle {
         string id PK
         string name
         string slug UK
-        string thumbnailUrl
+        string thumbnailUrl "S3 signed URL"
         string promptPrefix
         boolean isActive
         int order
@@ -50,14 +67,15 @@ erDiagram
         string childId FK
         string artStyleId FK
         string blueprintId FK "nullable"
-        StoryType type "BOOK | COMIC"
+        string characterId FK "nullable, provenance"
+        StoryType type
         StoryStatus status
         string question
         int pageCount
-        Language language "EN | RU"
-        string title "LLM, nullable"
-        string styleAnchor "characters + visual style, LLM, nullable"
-        boolean isPublic
+        Language language
+        string title "LLM-generated, nullable"
+        string styleAnchor "visual-identity snapshot, nullable"
+        boolean isPublic "default false"
         string coverImageKey "S3 key, nullable"
         string pdfKey "S3 key, nullable"
     }
@@ -79,12 +97,37 @@ erDiagram
         StoryType type
         string systemPrompt "XML-marked narrative DNA"
         string coverImageKey "S3 key, nullable"
-        string previewPageKeys "array"
+        string previewPageKeys "string array"
+    }
+    PricingTier {
+        string id PK
+        string name UK
+        string paddleProductId "nullable"
+        string paddlePriceId "nullable"
+        int priceMonthly "euro cents; 0 = free"
+        int pagesPerMonth
+        int regenerationsPerMonth
+        int childrenLimit "nullable = unlimited"
+        int retentionDays "nullable = forever"
+        boolean watermark
+        int order
+    }
+    Subscription {
+        string id PK
+        string userId FK UK "one per user"
+        string pricingTierId FK
+        string paddleSubscriptionId "nullable"
+        string paddleCustomerId "nullable, kept after cancel"
+        SubscriptionStatus status
+        boolean cancelAtPeriodEnd
+        datetime currentPeriodEnd "nullable"
+        int pagesUsed "default 0"
+        int regenerationsUsed "default 0"
     }
     Job {
         string id PK
         string storyId FK
-        JobType type "GENERATION | REGENERATION"
+        JobType type
         JobStatus status
         string stage "nullable"
         string error "nullable"
@@ -97,87 +140,103 @@ erDiagram
         json payload
         datetime readAt "nullable = unread"
     }
+    Rating {
+        string id PK
+        string storyId FK
+        string userId FK
+        int score "1–5"
+        string comment "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
 ```
 
 ## Entities
 
-| Entity             | What it is                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **User**           | Google-OAuth identity. `role` is `USER` or `ADMIN`. `avatarUrl` stores the Google profile picture (nullable). Owns children, stories, blueprints, notifications.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| **Child**          | A reader profile under a User. `interests` feeds personalization; `avatarUrl` is reserved for the v2 photo seam.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| **ArtStyle**       | Admin-managed visual style. `name` is the display label; `thumbnailUrl` is the preview shown in the Workshop grid; `promptPrefix` is prepended to every image prompt; `isActive` + `order` control visibility and ordering.                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Story**          | A book or comic (`type`), owned by a User, for a Child. Carries the user inputs and the generation outputs (`title`, `styleAnchor`, `coverImageKey`, `pdfKey`). Books and comics share one entity — they differ only by `type`. `styleAnchor` (Planning-generated) is described below. `isPublic` defaults to `false` and has **no setter endpoint** at MVP — it is intended to be set via the rating/opt-in flow (Post-MVP). The only effect today is that `GET /stories/public` returns rows where `isPublic = true`; since nothing sets it, that endpoint always returns an empty list until the rating flow ships. |
-| **Page**           | One ordered page of a Story — **the materialized, validated Story Plan** and the source the PDF renders from. `layout` is a [PageTemplate](generation-pipeline.md#the-pagetemplate-contract) name (nullable before Planning). `illustrations` holds `{ key, position }` pairs where `position` is the template zone name (e.g. `"main"`, `"cover"`). Unique on `(storyId, order)`.                                                                                                                                                                                                                                     |
-| **StoryBlueprint** | Admin-authored "narrative DNA". `name` and `description` identify it for admins. `systemPrompt` carries XML-marked instructions auto-selected by story `type` during Planning. `coverImageKey` and `previewPageKeys` are optional S3 references for blueprint preview images. (User-facing selection is Post-MVP.)                                                                                                                                                                                                                                                                                                     |
-| **Job**            | Tracks one BullMQ generation (or, when added, regeneration) run. `stage` drives the SSE progress UI. A Story has `Job[]` because regeneration adds more rows over time.                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| **Notification**   | In-app bell record per User. `payload` is event-shaped JSON; `readAt = null` means unread. Email is sent alongside the row by `NotificationsService`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Entity             | What it is                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **User**           | Google-OAuth identity. `role` is `USER`, `ADMIN`, or `SUPER_ADMIN`. `notificationPreferences` is a JSON column (null = all defaults on); preferences are merged with defaults in code. Owns children, stories, blueprints, characters, notifications, ratings, and exactly one subscription row.                                                                                                                                                                                                                               |
+| **Child**          | A reader profile under a User. `interests` feeds personalization. `avatarUrl` is reserved for a post-MVP photo seam — character likeness is stored on `Character`, not `Child`.                                                                                                                                                                                                                                                                                                                                                |
+| **Character**      | A reusable visual identity owned by a User, optionally linked to a Child. `description` is a free-text appearance description fed into the generation prompt. `generatedPreviewImageKey` is an S3 key for an AI-generated portrait. At story creation the Character's description is incorporated into `Story.styleAnchor` — a snapshot that stays stable even if the Character is later edited. `source` is `MANUAL_DESCRIPTION` at MVP; photo-based creation is post-MVP.                                                    |
+| **ArtStyle**       | Admin-managed visual style. `promptPrefix` is prepended to every image prompt for a story using this style. `isActive` and `order` control what appears in the Workshop grid. `thumbnailUrl` holds a signed S3 URL to a generated sample image.                                                                                                                                                                                                                                                                                |
+| **Story**          | A book or comic (`type`), owned by a User, for a Child. Carries both the user inputs (`question`, `pageCount`, `language`, etc.) and the generation outputs (`title`, `styleAnchor`, `coverImageKey`, `pdfKey`). `styleAnchor` is generated once during Planning and prepended to every image prompt — it is an immutable per-story snapshot. `characterId` is a provenance reference only; the generation contract is `styleAnchor`. `isPublic` is set via the rating opt-in flow; public stories appear on the landing page. |
+| **Page**           | One ordered page of a Story — **the materialized, validated Story Plan** and the source the PDF renders from. `layout` is a [PageTemplate](generation-pipeline.md#the-pagetemplate-contract) name. `illustrations` holds `{ key, position }` pairs where `position` is the template zone name (e.g. `"main"`, `"cover"`). `illustrationPrompt` is the prompt used to generate the illustration, stored for regeneration provenance. Unique on `(storyId, order)`.                                                              |
+| **StoryBlueprint** | Admin-authored "narrative DNA". `systemPrompt` carries XML-marked instructions (e.g. `<intro_prompt>`, `<climax_prompt>`) auto-selected by story `type` during Planning. User-facing blueprint selection is post-MVP.                                                                                                                                                                                                                                                                                                          |
+| **PricingTier**    | A subscription tier definition. `priceMonthly` is in euro cents (0 = free). `pagesPerMonth` and `regenerationsPerMonth` are the monthly quotas. `childrenLimit` is null for unlimited. `retentionDays` is null for indefinite retention. `watermark` controls whether generated PDFs carry a watermark overlay. The free tier has no Paddle product (`paddleProductId`/`paddlePriceId` are null). Named `PricingTier` — not `Plan` — to avoid collision with Story Plan.                                                       |
+| **Subscription**   | Every user owns exactly one Subscription row (lazy-created on first use, defaulting to the free tier). `paddleCustomerId` is kept after cancellation so invoice history stays reachable in the Paddle portal. `cancelAtPeriodEnd` is set by a scheduled cancellation; the paid tier stays active until Paddle emits `subscription.canceled`. Counters (`pagesUsed`, `regenerationsUsed`) reset at the start of each billing cycle via the Paddle `subscription.updated` webhook.                                               |
+| **Job**            | Tracks one BullMQ generation or regeneration run. `stage` drives the SSE progress UI. A Story accumulates `Job[]` over time as pages are regenerated.                                                                                                                                                                                                                                                                                                                                                                          |
+| **Notification**   | In-app bell record per User. `payload` is event-shaped JSON. `readAt = null` means unread. Email is sent alongside the record by `NotificationEmitterService` based on the user's `notificationPreferences`.                                                                                                                                                                                                                                                                                                                   |
+| **Rating**         | A story rating by its owner (one per user per story — unique on `[storyId, userId]`). Submitting a rating with `isPublic: true` sets `Story.isPublic = true`; `isPublic: false` retracts it.                                                                                                                                                                                                                                                                                                                                   |
 
-> **`Story.styleAnchor`** — a Planning-generated string describing recurring characters and
-> overall visual style, prepended to every illustration prompt to keep cross-page art consistent.
-> Null until Planning completes.
+### `Story.styleAnchor`
 
-### Cascade deletes and S3 orphaning
+A Planning-generated string describing recurring characters and overall visual style, prepended to every illustration prompt to maintain cross-page art consistency. Generated once from the selected Character (if any) + the ArtStyle's `promptPrefix` + story context. Null until Planning completes. Because it is a snapshot, editing a Character after story creation does not affect existing stories.
 
-The actual `onDelete` values in `schema.prisma` (Prisma's default when omitted is Restrict):
+## Cascade deletes and S3
 
-| Relation                   | `onDelete`   | Effect                                                                       |
-| -------------------------- | ------------ | ---------------------------------------------------------------------------- |
-| `Child.user`               | `Cascade`    | Deleting a User deletes their Children.                                      |
-| `Story.user`               | `Cascade`    | Deleting a User deletes their Stories (and cascades to Pages + Jobs).        |
-| `Story.child`              | `Cascade`    | Deleting a Child deletes their Stories (and cascades to Pages + Jobs).       |
-| `Story.blueprint`          | `SetNull`    | Deleting a StoryBlueprint sets `Story.blueprintId = null` — stories survive. |
-| `Page.story`               | `Cascade`    | Deleting a Story deletes its Pages.                                          |
-| `Job.story`                | `Cascade`    | Deleting a Story deletes its Jobs.                                           |
-| `Notification.user`        | `Cascade`    | Deleting a User deletes their Notifications.                                 |
-| `Story.artStyle`           | _(Restrict)_ | Deleting an ArtStyle is blocked while Stories reference it.                  |
-| `StoryBlueprint.createdBy` | _(Restrict)_ | Deleting a User is blocked while they own Blueprints.                        |
+| Relation                   | `onDelete`   | Effect                                                                                              |
+| -------------------------- | ------------ | --------------------------------------------------------------------------------------------------- |
+| `Child.user`               | `Cascade`    | Deleting a User deletes their Children.                                                             |
+| `Story.user`               | `Cascade`    | Deleting a User deletes their Stories (cascades to Pages + Jobs).                                   |
+| `Story.child`              | `Cascade`    | Deleting a Child deletes their Stories (cascades to Pages + Jobs).                                  |
+| `Character.user`           | `Cascade`    | Deleting a User deletes their Characters.                                                           |
+| `Character.child`          | `SetNull`    | Deleting a Child clears `Character.childId` — the Character survives.                               |
+| `Story.character`          | `SetNull`    | Deleting a Character clears `Story.characterId` — the story's `styleAnchor` snapshot is unaffected. |
+| `Story.blueprint`          | `SetNull`    | Deleting a StoryBlueprint sets `Story.blueprintId = null` — stories survive.                        |
+| `Page.story`               | `Cascade`    | Deleting a Story deletes its Pages.                                                                 |
+| `Job.story`                | `Cascade`    | Deleting a Story deletes its Jobs.                                                                  |
+| `Notification.user`        | `Cascade`    | Deleting a User deletes their Notifications.                                                        |
+| `Rating.story`             | `Cascade`    | Deleting a Story deletes its Ratings.                                                               |
+| `Rating.user`              | `Cascade`    | Deleting a User deletes their Ratings.                                                              |
+| `Subscription.user`        | `Cascade`    | Deleting a User deletes their Subscription row.                                                     |
+| `Story.artStyle`           | _(Restrict)_ | Deleting an ArtStyle is blocked while Stories reference it.                                         |
+| `StoryBlueprint.createdBy` | _(Restrict)_ | Deleting a User is blocked while they own Blueprints.                                               |
+| `Subscription.pricingTier` | _(Restrict)_ | Deleting a PricingTier is blocked while Subscriptions reference it.                                 |
 
-**S3 is not part of the cascade.** Deleting a `Story` removes its DB rows, but any S3 objects
-(`coverImageKey`, `pdfKey`, `Page.illustrations[].key`) are **not deleted** — they become
-orphaned objects in the bucket. The same applies to `User` and `Child` deletions. A placeholder
-comment exists in `StoriesService.remove()` (Phase 5 deferral). Cleanup is planned — see ROADMAP.
+**S3 and account deletion:** `DELETE /me` deletes all of the user's S3 objects by prefix listing before cascading the DB delete. This covers PDFs, page illustrations, cover images, and character preview images. Deleting an individual Story (via the admin panel or `DELETE /stories/:id`) still does **not** automatically delete the story's S3 objects — those keys must be cleaned up separately. The retention cleanup cron (`0 4 * * *`) handles PDFs and illustrations that have passed their tier's `retentionDays`.
 
-### Not yet in the schema
-
-The ROADMAP describes **`PricingTier`**, **`Subscription`**, and **`Rating`**. These are
-**not in `schema.prisma` yet** — they land with the subscriptions and ratings work. Treat the
-glossary entries in [`ROADMAP.md` §4](../../ROADMAP.md) as the plan, not the current schema.
-
-## Enums & status lifecycles
+## Enums and status lifecycles
 
 ```
-Role          USER · ADMIN
-Gender        MALE · FEMALE
-Language      EN · RU
-StoryType     BOOK · COMIC          (COMIC modelled but generation deferred)
-StoryStatus   DRAFT · QUEUED · GENERATING · COMPLETED · FAILED
-JobType       GENERATION · REGENERATION
-JobStatus     PENDING · ACTIVE · COMPLETED · FAILED
-NotificationType  STORY_COMPLETED · STORY_FAILED
+Role              USER · ADMIN · SUPER_ADMIN
+Gender            MALE · FEMALE
+Language          EN · DE · RU
+CharacterSource   MANUAL_DESCRIPTION
+StoryType         BOOK · COMIC           (COMIC modelled; generation is post-MVP)
+StoryStatus       DRAFT · QUEUED · GENERATING · COMPLETED · FAILED
+JobType           GENERATION · REGENERATION
+JobStatus         PENDING · ACTIVE · COMPLETED · FAILED
+SubscriptionStatus  ACTIVE · PAST_DUE · CANCELED
+NotificationType  STORY_COMPLETED · STORY_FAILED · PAYMENT_FAILED · SUBSCRIPTION_CANCELED
 ```
 
-All enum values are `SCREAMING_SNAKE_CASE` (see the Prisma rules).
-
-**Story status** is driven by the generation pipeline:
+**Story status** is driven entirely by the generation pipeline:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DRAFT: Workshop "Save as draft"
-    DRAFT --> QUEUED: enqueue()
-    QUEUED --> GENERATING: worker picks up
-    GENERATING --> COMPLETED: PDF stored
-    GENERATING --> FAILED: any stage error
+    [*] --> DRAFT : Workshop form saved
+    DRAFT --> QUEUED : POST /stories/:id/generate
+    QUEUED --> GENERATING : worker picks up
+    GENERATING --> COMPLETED : PDF stored
+    GENERATING --> FAILED : any stage error
+    FAILED --> DRAFT : user retries (workshop form pre-fills from failed story)
 ```
 
-Today a FAILED story is terminal — `enqueue()` only accepts a story in `DRAFT`. A "Try again"
-path that re-opens generation from FAILED is planned (see ROADMAP).
+A FAILED story can be retried: the workshop form accepts a `?storyId=` param, pre-fills all fields from the failed story, and creates a new DRAFT on submit (leaving the old FAILED row intact).
 
-`Job.status` runs in parallel: `PENDING` (enqueued; set by `GenerationService`) →
-`ACTIVE` (worker has picked up the job; set by BullMQ when processing begins) →
-`COMPLETED`/`FAILED`. The "one active generation per user" rule keys off `PENDING`/`ACTIVE` jobs.
+`Job.status` tracks the BullMQ job in parallel: `PENDING` (enqueued) → `ACTIVE` (worker processing) → `COMPLETED` / `FAILED`. The "one active generation per user" rule checks for `PENDING` or `ACTIVE` jobs across all of a user's stories.
+
+**Subscription status** is driven exclusively by Paddle webhooks:
+
+```
+ACTIVE    — billing current; full tier quota available
+PAST_DUE  — payment failed; Paddle is retrying (dunning); access is preserved during retry window
+CANCELED  — subscription ended; user reverted to free tier
+```
 
 ## Migrations
 
 Migrations live in [`backend/prisma/migrations/`](../../backend/prisma/migrations).
 
-Apply with `pnpm --filter ./backend db:migrate` (dev) or `db:migrate:deploy` (CI/prod). See [getting-started.md](../guides/getting-started.md).
+Apply with `pnpm --filter ./backend db:migrate` (dev) or `db:migrate:deploy` (CI/prod).
+See [getting-started.md](../guides/getting-started.md).

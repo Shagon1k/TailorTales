@@ -55,7 +55,7 @@ sends the cookie automatically — no frontend token management needed.
 
 The tradeoff: CSRF must be considered. Mitigated with `SameSite: Lax`, which blocks
 cross-site POST requests while allowing normal navigation. A stricter CSRF token is a
-deferred decision (see ROADMAP).
+post-MVP decision.
 
 ## Logout and JWT lifetime
 
@@ -65,7 +65,7 @@ no server-side token blocklist.
 
 **Operational implication:** after logout, a client that retained the raw token value can still
 call the API until expiry. This is an accepted trade-off at MVP — revocation infrastructure is a
-deferred decision (see ROADMAP).
+post-MVP decision.
 
 For forced invalidation (e.g. suspected token leakage), the only safe option today is to rotate
 `JWT_SECRET` — this invalidates all issued tokens at once.

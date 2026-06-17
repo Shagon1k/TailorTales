@@ -18,3 +18,7 @@ everything else is React Query. CSS/design-system conventions auto-load from the
 - **Shared (used by 2+ components or areas)** → `src/utils/<name>.utils.ts`. Import via `@/utils/<name>.utils`.
 - **Local (used only within one component or area)** → `<component>/utils/<name>.utils.ts`, co-located next to the component.
 - Never place a utility in a component's `utils/` folder if a second consumer already exists — promote it to `src/utils/` instead.
+
+## i18n navigation
+
+- Always import `Link`, `useRouter`, and `usePathname` from `src/i18n/navigation.ts` — never from `next/navigation` directly. The wrappers inject the active locale; bypassing them breaks locale-prefixed routing.

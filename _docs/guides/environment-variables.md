@@ -1,11 +1,8 @@
 # Environment Variables
 
-> Complete reference for all backend environment variables. The authoritative source is
-> [`backend/src/config/env.validation.ts`](../../backend/src/config/env.validation.ts);
-> this document is derived from it.
->
-> The frontend has one variable: `NEXT_PUBLIC_BACKEND_URL` (default `http://localhost:3001`),
-> already set correctly in `frontend/.env.example`.
+> Complete reference for all environment variables across the stack. The backend's
+> authoritative source is
+> [`backend/src/config/env.validation.ts`](../../backend/src/config/env.validation.ts).
 
 ## Backend variables
 
@@ -29,10 +26,10 @@
 
 ### URLs
 
-| Variable       | Required | Default | Notes                                                        |
-| -------------- | -------- | ------- | ------------------------------------------------------------ |
-| `BACKEND_URL`  | yes      | —       | The backend's own public URL. Used in email links and OAuth. |
-| `FRONTEND_URL` | yes      | —       | The frontend's public URL. Set as the CORS origin.           |
+| Variable       | Required | Default | Notes                                                                                    |
+| -------------- | -------- | ------- | ---------------------------------------------------------------------------------------- |
+| `BACKEND_URL`  | yes      | —       | The backend's own public URL. Used in email links, OAuth callback, and PDF font serving. |
+| `FRONTEND_URL` | yes      | —       | The frontend's public URL. Set as the CORS origin.                                       |
 
 ### Runtime
 
@@ -52,18 +49,18 @@
 | Variable                 | Required | Default | Notes                                                                                                                    |
 | ------------------------ | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `OPENROUTER_API_KEY`     | yes      | —       | Required even if `USE_AI_STUBS=true` (validation runs at startup). An empty string satisfies validation for offline dev. |
-| `OPENROUTER_TEXT_MODEL`  | yes      | —       | Model used for the Planning stage (e.g. `google/gemini-2.0-flash`).                                                      |
-| `OPENROUTER_IMAGE_MODEL` | yes      | —       | Model used for the Pictures stage (e.g. `google/gemini-flash-1.5-8b`).                                                   |
+| `OPENROUTER_TEXT_MODEL`  | yes      | —       | Model used for Planning stage (e.g. `google/gemini-2.0-flash`). Must support `response_format: json_schema`.             |
+| `OPENROUTER_IMAGE_MODEL` | yes      | —       | Model used for Pictures stage (e.g. `google/gemini-flash-1.5-8b`).                                                       |
 | `USE_AI_STUBS`           | no       | `false` | `true` → `AiStubClient` (canned plan + placeholder PNG, no API calls). Required in CI.                                   |
 
 ### Email (Resend)
 
-| Variable              | Required | Default | Notes                                                                                          |
-| --------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------- |
-| `RESEND_API_KEY`      | yes      | —       | Required even if `USE_EMAIL_STUBS=true`. An empty string satisfies validation for offline dev. |
-| `RESEND_FROM`         | yes      | —       | Sender address, e.g. `TailorTales <stories@tailortales.app>`. Must be a verified domain.       |
-| `CONTACT_INBOX_EMAIL` | yes      | —       | Contact-form submissions are forwarded here.                                                   |
-| `USE_EMAIL_STUBS`     | no       | `false` | `true` → `EmailStubClient` (logs emails, no Resend calls). Required in CI.                     |
+| Variable              | Required | Default | Notes                                                                                           |
+| --------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------- |
+| `RESEND_API_KEY`      | yes      | —       | Required even if `USE_EMAIL_STUBS=true`. An empty string satisfies validation for offline dev.  |
+| `RESEND_FROM`         | yes      | —       | Sender address, e.g. `TailorTales <stories@tailortales.app>`. Must be a Resend-verified domain. |
+| `CONTACT_INBOX_EMAIL` | yes      | —       | Contact-form submissions are forwarded here.                                                    |
+| `USE_EMAIL_STUBS`     | no       | `false` | `true` → `EmailStubClient` (logs emails, no Resend calls). Required in CI.                      |
 
 ### Storage (MinIO / AWS S3)
 
@@ -79,9 +76,35 @@
 > In production, leave `STORAGE_ENDPOINT` and `STORAGE_FORCE_PATH_STYLE` unset. The AWS SDK
 > resolves the correct regional endpoint automatically.
 
+### Paddle (subscriptions)
+
+| Variable                            | Required       | Default   | Notes                                                                                     |
+| ----------------------------------- | -------------- | --------- | ----------------------------------------------------------------------------------------- |
+| `USE_PADDLE_STUBS`                  | no             | `false`   | `true` → `PaddleStubClient` (parses fixture files, no Paddle calls). Required in CI.      |
+| `PADDLE_API_KEY`                    | when stubs off | —         | Paddle Billing API key. Sandbox keys contain `_sdbx`; live keys do not.                   |
+| `PADDLE_WEBHOOK_SECRET`             | when stubs off | —         | Webhook destination signing secret (`pdl_ntfset_…`). Each destination has its own secret. |
+| `PADDLE_ENVIRONMENT`                | no             | `sandbox` | `sandbox` \| `production`. Flip to `production` only for the live Paddle account.         |
+| `PADDLE_PRODUCT_ID_STORY_HOUR`      | seed only      | —         | Paddle product ID for Story Hour tier. Used by `pnpm seed:pricing-tiers`.                 |
+| `PADDLE_PRICE_ID_STORY_HOUR`        | seed only      | —         | Paddle monthly price ID for Story Hour.                                                   |
+| `PADDLE_PRODUCT_ID_FAMILY_WORKSHOP` | seed only      | —         | Paddle product ID for Family Workshop tier.                                               |
+| `PADDLE_PRICE_ID_FAMILY_WORKSHOP`   | seed only      | —         | Paddle monthly price ID for Family Workshop.                                              |
+
+> "Seed only" variables are read by `seed-pricing-tiers.ts` and are not validated at server
+> startup. They only need to be set when running `pnpm seed:pricing-tiers`.
+
+## Frontend variables
+
+| Variable                          | Required          | Default                 | Notes                                                                                                                                                    |
+| --------------------------------- | ----------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_BACKEND_URL`         | no                | `http://localhost:3001` | Backend origin. Set in `frontend/.env.example`.                                                                                                          |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | for live checkout | —                       | Paddle.js client-side token. Sandbox tokens start with `test_`; live tokens start with `live_`. The pricing CTA degrades gracefully when this is absent. |
+| `NEXT_PUBLIC_PADDLE_ENV`          | no                | `sandbox`               | `sandbox` \| `production`. Must match the backend's `PADDLE_ENVIRONMENT`.                                                                                |
+| `NEXT_PUBLIC_STORAGE_URL`         | for prod          | —                       | Public S3 / CloudFront base URL. Used to construct public asset URLs (e.g. art-style thumbnails). In dev, MinIO is accessed directly.                    |
+
 ## Minimal CI / offline config
 
 ```bash
+# Backend
 DATABASE_URL=postgresql://localhost/ci
 GOOGLE_CLIENT_ID=stub
 GOOGLE_CLIENT_SECRET=stub
@@ -101,8 +124,23 @@ STORAGE_SECRET_KEY=stub
 STORAGE_BUCKET=tailortales
 USE_AI_STUBS=true
 USE_EMAIL_STUBS=true
+USE_PADDLE_STUBS=true
 ```
 
-> CI sets `DATABASE_URL` explicitly for Prisma client generation (no live DB connection
-> needed for that step). Tests run with `USE_AI_STUBS=true` and `USE_EMAIL_STUBS=true` —
-> no external API calls are made.
+> CI sets `DATABASE_URL` explicitly for Prisma client generation (no live DB connection needed
+> for that step). Tests run with all three stub flags on — no external API calls are made.
+
+## Production-critical differences from dev
+
+| Variable                   | Prod value                                   |
+| -------------------------- | -------------------------------------------- |
+| `NODE_ENV`                 | `production`                                 |
+| `STORAGE_ENDPOINT`         | **Unset** (use AWS S3, not MinIO)            |
+| `STORAGE_FORCE_PATH_STYLE` | **Unset** (defaults false)                   |
+| `USE_AI_STUBS`             | `false`                                      |
+| `USE_EMAIL_STUBS`          | `false`                                      |
+| `USE_PADDLE_STUBS`         | `false`                                      |
+| `PADDLE_ENVIRONMENT`       | `production`                                 |
+| `JWT_SECRET`               | Long, random secret — never reuse dev values |
+| `BACKEND_URL`              | Your production backend domain               |
+| `FRONTEND_URL`             | Your production frontend domain              |

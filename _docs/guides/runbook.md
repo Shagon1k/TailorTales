@@ -34,23 +34,26 @@ UPDATE "Job" SET status = 'FAILED', "updatedAt" = NOW()
 WHERE "storyId" = '<story-id>' AND status IN ('PENDING', 'ACTIVE');
 ```
 
-3. Notify the affected user manually or wait for the planned "Try again" flow to ship
-   (which re-opens generation from `FAILED`).
-
-**Root cause fix:** configure BullMQ retries and add a worker-crash recovery mechanism — see ROADMAP.
+3. The user can then retry via the Workshop — the form accepts `?storyId=<failedId>` and
+   pre-fills all fields from the failed story to create a new DRAFT.
 
 ---
 
-## Story orphaning S3 objects after deletion
+## Story S3 objects orphaned after deletion
 
-**Symptom:** S3 bucket grows over time even as stories are deleted.
+**Symptom:** S3 bucket grows over time even as individual stories are deleted.
 
-**Cause:** `StoriesService.remove()` deletes the Story DB row (which cascades to `Page` and
-`Job` rows via `onDelete: Cascade`) but does **not** delete the associated S3 objects
-(`coverImageKey`, `pdfKey`, `Page.illustrations[].key`). This is a known gap (Phase 5 deferral).
+**Cause by design:** `DELETE /stories/:id` removes the DB row (cascading to `Page` + `Job`)
+but does **not** enumerate and delete S3 objects (`coverImageKey`, `pdfKey`,
+`Page.illustrations[].key`). Full S3 cleanup only happens during account deletion
+(`DELETE /me`) using prefix listing.
 
-**Recovery (manual):** identify orphaned S3 keys by comparing DB keys against bucket objects.
-Automated cleanup is planned — see ROADMAP.
+**Recovery (manual):** collect keys from the story's `Page` rows before deletion, then call
+`StorageService.delete(key)` for each, or delete by S3 prefix `<userId>/<storyId>/`.
+
+> Note: the daily retention cleanup cron (`0 4 * * *`) handles **expired** assets
+> automatically based on `PricingTier.retentionDays` — it does not clean up manually deleted
+> stories.
 
 ---
 
@@ -81,6 +84,78 @@ pnpm --filter backend db:migrate:deploy
 
 This is idempotent — safe to re-run. A new backend that expects a schema column that doesn't
 exist yet will fail at runtime, not at startup.
+
+---
+
+## Paddle webhook not updating subscription tier
+
+**Symptom:** Checkout overlay closed successfully, but the user's tier did not change.
+
+**Diagnosis:**
+
+1. Paddle dashboard → **Developer tools → Notifications → your destination → Logs**:
+    - **No events:** tunnel/URL wrong, or destination not subscribed to the right events
+      (required: `subscription.created`, `.activated`, `.updated`, `.canceled`, `.past_due`,
+      `transaction.payment_failed`).
+    - **400 responses:** bad webhook signature — `PADDLE_WEBHOOK_SECRET` is stale. Re-copy from
+      the destination's Edit page.
+    - **200 but no DB change:** check backend logs for:
+        - `No PricingTier matches Paddle price pri_…` → fix env vars + re-run `seed:pricing-tiers`.
+        - `Subscription event for unknown userId` → `customData.userId` missing from checkout.
+
+2. Replay with the offline fixture:
+    ```bash
+    curl -X POST localhost:3001/webhooks/paddle \
+      -H 'Content-Type: application/json' -H 'paddle-signature: stub' \
+      -d @backend/src/modules/billing/__fixtures__/subscription-activated.json
+    ```
+
+---
+
+## Notification bell badge not updating in real-time
+
+**Symptom:** Bell badge does not update after a story completes or a subscription event fires.
+
+**Architecture note:** The SSE bell stream uses an **in-memory `Map<userId, Subject>`** per
+backend process. A missed push delays the badge until the next page load — the REST
+`GET /notifications/unread-count` endpoint is fetched on first render as a fallback.
+`EventSource` reconnects automatically.
+
+In a **multi-instance** deployment, the push only reaches the in-memory map of the process that
+handled the event — the user may be connected to a different instance. A shared pub/sub
+(e.g. Redis) would fix this; it is out of scope at MVP.
+
+**Quick check:** DevTools → Network → confirm `GET /notifications/stream` is open (status 200,
+no error). If missing, the `access_token` cookie may have expired.
+
+---
+
+## Retention cleanup cron failures
+
+**Symptom:** Expired PDFs/images are not being removed; `retentionDays` not enforced.
+
+- Cron schedule: `0 4 * * *` (4 AM server time).
+- Check backend logs for `RetentionCleanupCron: deleted N assets` or errors near that time.
+- The `pdfKey IS NOT NULL` column is the "not yet purged" marker — rows with a null `pdfKey`
+  are skipped.
+- Verify NestJS scheduler is running: startup log should include `ScheduleModule initialized`.
+
+---
+
+## PDF fonts rendering as fallback system fonts
+
+**Symptom:** Generated PDFs show incorrect fonts (Arial instead of Nunito/Comfortaa).
+
+**Cause:** Puppeteer fetches fonts from `BACKEND_URL/static/fonts/*.woff2` at render time. If
+`BACKEND_URL` is wrong or unreachable from the server process, Puppeteer falls back to system
+fonts.
+
+```bash
+# Verify font endpoint is reachable from the server:
+curl -I ${BACKEND_URL}/static/fonts/Nunito-Regular.woff2   # Expected: 200 OK
+```
+
+In production `BACKEND_URL` must be the real public domain, not `localhost`.
 
 ---
 

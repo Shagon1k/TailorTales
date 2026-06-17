@@ -111,7 +111,7 @@ Concatenates all page text and runs `ai.moderateText()`. Unsafe → the stage th
 story fails with the moderation reason. This runs **after Planning but before Pictures** on
 purpose: image generation is the expensive step, so we reject unsafe text before paying for
 pictures. Image safety relies on the provider's own flags today (a dedicated image
-moderation provider is an open question in the ROADMAP).
+moderation provider is post-MVP).
 
 ### 3. Pictures — _parallel, capped, writes the cover_
 
@@ -140,8 +140,9 @@ handing a flat `IPageToRender[]` to [`PdfRendererService.render()`](../../backen
 > follow private S3 pre-signed URLs from within the headless browser context.
 > The renderer resolves each page's Handlebars template by `layout`, injects the data, prints
 > each page to an A5 PDF with Puppeteer (waiting on `document.fonts.ready` for deterministic
-> output), and stitches them with pdf-lib. **Watermark is hard-coded `true`** at MVP;
-> tier-based watermarking (the real `PricingTier.watermark` flag) is planned — see ROADMAP.
+> output), and stitches them with pdf-lib. **Watermark** is applied when `PricingTier.watermark
+= true` (free tier) — `QuotaService.shouldWatermark(userId)` is called before binding and the
+> flag is passed into `PdfBindingService`.
 
 ### 5. Ready — _publish_
 
@@ -239,7 +240,7 @@ latest job plus a count of pages that already have illustrations. It emits:
 | `completed`     | `Job.status = COMPLETED`                                                                   |
 | `failed`        | `Job.status = FAILED`                                                                      |
 
-> Polling Postgres instead of pushing from the worker because the worker and the HTTP handler share only Postgres. Push would require Redis Pub/Sub — more moving parts for a latency gain invisible on a ~2-minute generation (see ROADMAP).
+> Polling Postgres instead of pushing from the worker because the worker and the HTTP handler share only Postgres. Push would require Redis Pub/Sub — more moving parts for a latency gain invisible on a ~2-minute generation. Redis Pub/Sub is the post-MVP scale-out path.
 
 ## Scale envelope (MVP)
 
@@ -255,8 +256,7 @@ These are the known constraints, not benchmarks — no load testing has been don
   seconds. Real generation time depends on OpenRouter latency and the number of pages;
   expect 1–3 minutes for a 12-page book under normal conditions.
 - **Horizontal scale path.** Adding worker processes against the shared Redis queue requires
-  no code change — the architecture already decouples HTTP from the worker. This is the
-  planned path for scale-out (see ROADMAP).
+  no code change — the architecture already decouples HTTP from the worker.
 
 ## Retry policy and failure recovery
 
@@ -268,11 +268,11 @@ and `GenerationPipeline`'s own catch block sets both `Job.status = FAILED` and
 **Worker crash mid-run** (process killed, OOM, container restart): if the worker dies between
 `Job.status = ACTIVE` and the pipeline's catch block running, the story can be left in
 `GENERATING` with no Job transition. There is no automatic recovery — the story requires manual
-DB intervention to be usable again (set `Story.status = FAILED` to make it eligible for the
-planned "try again" flow).
+DB intervention to be usable again (see [runbook.md](../guides/runbook.md#story-stuck-in-generating)).
 
-A configurable retry count and the "try again" path (re-opening generation from `FAILED`) are
-both planned — see ROADMAP.
+**Retrying a failed story:** once a story is `FAILED`, the user can open the Workshop with
+`?storyId=<failedId>`. The form pre-fills all fields from the failed story and submits a new
+`DRAFT` Story on confirm. The old `FAILED` row is left intact.
 
 ## Concurrency & failure rules (business invariants)
 
@@ -282,6 +282,32 @@ both planned — see ROADMAP.
 - **Status transitions:** `DRAFT → QUEUED` (enqueue) `→ GENERATING` (worker picks up)
   `→ COMPLETED` or `→ FAILED`.
 - **One in-process worker** at MVP; image fan-out is internal (concurrency 3). Horizontal
-  scale = add worker processes against the shared Redis queue, no code change (planned — see ROADMAP).
+  scale = add worker processes against the shared Redis queue, no code change.
 
-> For known limitations and planned work, see [ROADMAP.md § Deferred Decisions](../../ROADMAP.md).
+## Page regeneration
+
+Page regeneration is handled by `RegenerationModule` (separate from the generation pipeline)
+and reuses `PdfBindingService` to re-stitch the PDF after every change.
+
+```
+POST /stories/:id/pages/:order/regenerate { what, prompt? }
+  → QuotaService: assert regenerationsUsed < PricingTier.regenerationsPerMonth
+  → load Story (styleAnchor, artStyle) + Page (illustrationPrompt)
+  → Subscription.regenerationsUsed++
+  → [if text/both] AiClient.generateStoryPlan (single-page variant)
+  → [if illustration/both] AiClient.generateImage (styleAnchor + illustrationPrompt + prompt?)
+  → StorageModule: upload new illustration
+  → DB: update Page
+  → PdfBindingService: re-render + re-stitch full PDF
+  → StorageModule: upload new PDF (overwrites existing pdfKey key)
+  → DB: Story.pdfKey updated
+```
+
+`what: 'both'` re-generates text and illustration in one call (1 quota unit). Calling text
+then illustration separately costs 2 units. The `RegenerationPanel`'s "Remake everything"
+button always uses the atomic `'both'` path.
+
+The in-browser reader uses `GET /stories/:id/pages/:order/html` — the same Handlebars
+template path that Puppeteer uses — so the iframe always shows exactly what the PDF looks
+like. Fonts are served from `GET /static/fonts/*` with `Access-Control-Allow-Origin: *`
+(set on the static file middleware, before the global CORS filter applies).

@@ -34,3 +34,15 @@ every route unless it has `@Public()`. The generation pipeline (BullMQ) has its 
 ## Tests / offline
 
 - Tests and CI run with `USE_AI_STUBS=true` (+ `USE_EMAIL_STUBS=true`): `AI_CLIENT`/`EMAIL_CLIENT` resolve to stub clients, so the full pipeline runs offline with no API spend.
+
+## Symbol-token swap pattern
+
+- `AI_CLIENT`, `EMAIL_CLIENT`, and `PADDLE_CLIENT` are NestJS Symbol injection tokens. Each module provides either the real or stub implementation based on the corresponding `USE_*_STUBS` env flag. New external integrations must follow this same pattern — never instantiate third-party clients inline.
+
+## Error codes
+
+- Services throw string keys (e.g. `'errors.ratings.storyNotCompleted'`) or `{ code: string, params?: object }` objects — never prose error messages. `AllExceptionsFilter` resolves these via `error-translations.ts` and returns the localised message to the client.
+
+## S3 deletion scope
+
+- Entity-level `remove()` services (stories, children) do **not** delete S3 objects. Only `DELETE /me` (account deletion) does full S3 cleanup by prefix-listing all keys for the user. The retention cron handles scheduled expiry. Do not add ad-hoc S3 deletes in other flows without explicit approval.
