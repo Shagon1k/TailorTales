@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import './instrument.js';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';

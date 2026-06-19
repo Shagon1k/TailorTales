@@ -237,3 +237,96 @@ Same steps against <https://vendors.paddle.com> with three differences:
 the same sandbox account. Each destination has its own `PADDLE_WEBHOOK_SECRET`. Every Paddle
 event is pushed to all destinations; cross-environment events are harmless — the handler
 matches by `customData.userId` and logs a warning if the user isn't found.
+
+---
+
+## Sentry — error tracking + uptime
+
+Captures backend exceptions and frontend JS errors, and runs the uptime monitor. Disabled in
+dev (the inits are gated); only UAT/prod report. See
+[monitoring.md](monitoring.md#sentry--error-tracking) for how it's wired in code.
+
+1. Sign up at [sentry.io](https://sentry.io) (free tier ≈ 5k errors/month).
+2. Create **two projects** — copy each DSN (Settings → Projects → Client Keys):
+    - `tailortales-be` — platform **Node.js / NestJS**
+    - `tailortales-fe` — platform **Next.js**
+3. Configure env (UAT/prod only — leave unset in dev):
+
+```bash
+# backend/.env
+SENTRY_ENABLED=true
+SENTRY_DSN="https://…@…ingest.de.sentry.io/…"   # the tailortales-be DSN
+SENTRY_ENVIRONMENT="uat"                          # or "production"
+
+# frontend/.env
+NEXT_PUBLIC_SENTRY_ENABLED=true
+NEXT_PUBLIC_SENTRY_DSN="https://…@…ingest.de.sentry.io/…"   # the tailortales-fe DSN
+NEXT_PUBLIC_SENTRY_ENVIRONMENT="uat"                        # or "production"
+```
+
+4. **Source maps (frontend):** create an auth token (Settings → Auth Tokens, scope
+   `project:releases`) and set it as a **Dokploy build-time variable** on the frontend app —
+   it's consumed by `next build`, never at runtime, and is not a GitHub Actions secret (CI
+   doesn't build images):
+
+```bash
+SENTRY_AUTH_TOKEN="sntrys_…"   # Dokploy build arg; uploads readable stack traces
+```
+
+5. **Uptime monitor:** Sentry → **Crons/Uptime → Uptime Monitors → Add** →
+   `GET https://api.tailortales.app/health`, interval 5 min, alert by email. Replaces a
+   standalone uptime service.
+
+The DSN is safe to expose (it's write-only ingest); the **auth token is a secret**. One Sentry
+account covers all environments — the `environment` tag separates them.
+
+---
+
+## New Relic — APM (backend only)
+
+Request latency, throughput, and BullMQ job durations. Loads via the ESM loader and only when
+`NODE_OPTIONS` is set, so dev never starts the agent. See
+[monitoring.md](monitoring.md#new-relic--apm-backend-only) for the loader rationale.
+
+1. Sign up at [newrelic.com](https://newrelic.com) (free tier ≈ 100 GB/month ingest).
+2. Generate a **license key** (Administration → API keys → "Ingest - License").
+3. Configure env (UAT/prod only):
+
+```bash
+# backend/.env
+NODE_OPTIONS="--import newrelic/esm-loader.mjs"   # the gate — unset in dev
+NEW_RELIC_LICENSE_KEY="…NRAL"
+NEW_RELIC_APP_NAME="TailorTales-UAT"              # or "TailorTales-Prod"
+```
+
+4. Deploy; the app appears in New Relic → **APM & Services** within a minute or two of the first
+   request. Set alerts (error rate, p95 latency, Apdex) once data flows.
+
+The license key is a **secret** — env var only. Config (`backend/newrelic.js`) excludes `cookie`
+and `authorization` headers from captured attributes.
+
+---
+
+## Google Analytics (GA4) — product analytics
+
+Page views and funnels, loaded **prod only** and **only after cookie consent** (GDPR). The
+`CookieConsent` component mounts the GA script via `@next/third-parties/google` once the user
+accepts; nothing is tracked before that.
+
+1. Create a **GA4 property** at [analytics.google.com](https://analytics.google.com) →
+   Admin → Create property → add a **Web** data stream for `https://tailortales.app`.
+2. Copy the **Measurement ID** (`G-XXXXXXXXXX`).
+3. Set it on prod only — leave unset in dev and UAT so analytics never runs outside production:
+
+```bash
+# frontend/.env (prod only)
+NEXT_PUBLIC_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
+```
+
+The Measurement ID is public by design. With it unset, the consent banner still renders but no
+analytics script ever loads. Domain ownership isn't verified at stream creation — verification
+only matters if you later enable Google Ads/Search Console linking.
+
+> **Custom events** (e.g. `story_created`, `signup_completed`) are intentionally deferred until
+> there's real traffic to justify which funnels to instrument. When added, use `sendGAEvent`
+> from `@next/third-parties/google` at the call sites — no new dependency needed.

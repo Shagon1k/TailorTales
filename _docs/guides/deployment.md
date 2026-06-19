@@ -29,6 +29,13 @@ database connection is required during the Docker build — only `DATABASE_URL` 
 
 > `NEXT_TELEMETRY_DISABLED=1` is set in the Dockerfile to suppress Next.js telemetry in CI and production builds.
 
+> **Sentry source maps:** the `build` stage takes a `SENTRY_AUTH_TOKEN` build arg. When set,
+> `next build` (via `withSentryConfig`) uploads source maps to Sentry so production stack traces
+> are de-minified. Set it as a **Dokploy build-time variable** on the frontend app — it's a
+> build-only secret, scoped to the `build` stage and never copied into the runtime image. Leave
+> it unset and the build still succeeds (upload is skipped). It is **not** a GitHub Actions
+> secret — GitHub CI doesn't build images.
+
 ## Environment variables
 
 All backend env vars must be injected at container start — there is no bundled `.env` file.

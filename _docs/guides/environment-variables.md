@@ -92,14 +92,38 @@
 > "Seed only" variables are read by `seed-pricing-tiers.ts` and are not validated at server
 > startup. They only need to be set when running `pnpm seed:pricing-tiers`.
 
+### Monitoring (Sentry + New Relic)
+
+Enabled on UAT/prod only; leave unset in dev. See
+[external-services.md](external-services.md#sentry--error-tracking--uptime) for how to obtain
+each value and [monitoring.md](monitoring.md) for how they're wired.
+
+| Variable                | Required | Default | Notes                                                                                                                                                 |
+| ----------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SENTRY_ENABLED`        | no       | `false` | `true` → `instrument.ts` initialises Sentry. Dev stays silent.                                                                                        |
+| `SENTRY_DSN`            | no       | —       | Backend project (`tailortales-be`) DSN. Write-only ingest key, safe to expose.                                                                        |
+| `SENTRY_ENVIRONMENT`    | no       | —       | `uat` \| `production` — tags every event for per-environment filtering.                                                                               |
+| `NODE_OPTIONS`          | no       | —       | Set to `--import newrelic/esm-loader.mjs` to load the New Relic ESM agent. Its **presence is the gate** — unset → no agent. Not validated at startup. |
+| `NEW_RELIC_LICENSE_KEY` | no       | —       | New Relic ingest license key. Read by `newrelic.js` (not validated at startup). **Secret.**                                                           |
+| `NEW_RELIC_APP_NAME`    | no       | —       | `TailorTales-UAT` \| `TailorTales-Prod`. Read by `newrelic.js` (not validated at startup).                                                            |
+
+> Sentry vars are validated by `env.validation.ts` (all optional). New Relic vars and
+> `NODE_OPTIONS` are consumed by the runtime / `newrelic.js` directly and are **not** part of the
+> startup schema.
+
 ## Frontend variables
 
-| Variable                          | Required          | Default                 | Notes                                                                                                                                                    |
-| --------------------------------- | ----------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_BACKEND_URL`         | no                | `http://localhost:3001` | Backend origin. Set in `frontend/.env.example`.                                                                                                          |
-| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | for live checkout | —                       | Paddle.js client-side token. Sandbox tokens start with `test_`; live tokens start with `live_`. The pricing CTA degrades gracefully when this is absent. |
-| `NEXT_PUBLIC_PADDLE_ENV`          | no                | `sandbox`               | `sandbox` \| `production`. Must match the backend's `PADDLE_ENVIRONMENT`.                                                                                |
-| `NEXT_PUBLIC_STORAGE_URL`         | for prod          | —                       | Public S3 / CloudFront base URL. Used to construct public asset URLs (e.g. art-style thumbnails). In dev, MinIO is accessed directly.                    |
+| Variable                          | Required          | Default                 | Notes                                                                                                                                                                                                              |
+| --------------------------------- | ----------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_BACKEND_URL`         | no                | `http://localhost:3001` | Backend origin. Set in `frontend/.env.example`.                                                                                                                                                                    |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | for live checkout | —                       | Paddle.js client-side token. Sandbox tokens start with `test_`; live tokens start with `live_`. The pricing CTA degrades gracefully when this is absent.                                                           |
+| `NEXT_PUBLIC_PADDLE_ENV`          | no                | `sandbox`               | `sandbox` \| `production`. Must match the backend's `PADDLE_ENVIRONMENT`.                                                                                                                                          |
+| `NEXT_PUBLIC_STORAGE_URL`         | for prod          | —                       | Public S3 / CloudFront base URL. Used to construct public asset URLs (e.g. art-style thumbnails). In dev, MinIO is accessed directly.                                                                              |
+| `NEXT_PUBLIC_SENTRY_ENABLED`      | no                | `false`                 | `true` → Sentry initialises in the browser/edge/server runtimes. Dev stays silent.                                                                                                                                 |
+| `NEXT_PUBLIC_SENTRY_DSN`          | no                | —                       | Frontend project (`tailortales-fe`) DSN. Write-only ingest key, safe to expose.                                                                                                                                    |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | no                | —                       | `uat` \| `production` — tags frontend events.                                                                                                                                                                      |
+| `SENTRY_AUTH_TOKEN`               | prod build only   | —                       | Source-map upload during `next build` (`withSentryConfig`). **Secret** — set as a Dokploy **build-time** variable (build arg), not a runtime var. Not a GitHub Actions secret; see [deployment.md](deployment.md). |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | prod only         | —                       | GA4 Measurement ID (`G-XXXXXXXXXX`). Set on prod only. Unset → cookie banner still renders but no analytics loads.                                                                                                 |
 
 ## Minimal CI / offline config
 

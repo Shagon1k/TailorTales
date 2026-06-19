@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,4 +37,14 @@ const nextConfig: NextConfig = {
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
-export default withNextIntl(nextConfig);
+export default withSentryConfig(withNextIntl(nextConfig), {
+    org: 'tailortales',
+    project: 'tailortales-fe',
+    silent: !process.env.CI,
+    widenClientFileUpload: true,
+    webpack: {
+        treeshake: {
+            removeDebugLogging: true,
+        },
+    },
+});

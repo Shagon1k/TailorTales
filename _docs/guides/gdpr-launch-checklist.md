@@ -17,6 +17,7 @@
 | Subscription + billing data                                    | Contract performance                       | Billing management (via Paddle)      |
 | IP address / server logs                                       | Legitimate interest                        | Security, abuse prevention           |
 | Session cookie (`access_token`)                                | Strictly necessary                         | Authentication                       |
+| Analytics (page views, device/region) via Google Analytics     | Consent (cookie banner)                    | Product analytics — prod only        |
 
 > **Children's data:** the child's name and interests are sent in generation prompts to
 > OpenRouter (an AI provider). This is a cross-border transfer covered under sub-processor
@@ -33,12 +34,14 @@
       a paid subscription is active (user must cancel and wait for period end first).
 - [x] **Retention enforcement** — `RetentionCleanupCron` runs daily and deletes PDFs/images
       past `PricingTier.retentionDays`; free-tier assets have a shorter retention window.
-- [x] **Session cookie** — httpOnly, SameSite: Lax, Secure in production. No analytics cookies.
+- [x] **Session cookie** — httpOnly, SameSite: Lax, Secure in production.
 - [x] **Public-story opt-in** — `Story.isPublic` defaults to `false`. A story only appears
       publicly if the owner explicitly checks "Share as an example" in the rating panel.
-- [x] **No cookie consent banner needed** — the session cookie is strictly necessary; no
-      analytics or tracking scripts are loaded. Adding any analytics requires a consent banner
-      first.
+- [x] **Cookie consent banner** (`CookieConsent`) — gates Google Analytics. No tracking script
+      loads before the user clicks **Accept**; **Reject** is equally prominent (no dark patterns,
+      no pre-ticked boxes). The choice is stored in `localStorage` (`tt_cookie_consent`), not a
+      cookie, so no consent record is itself a tracking cookie. GA only loads on prod
+      (`NEXT_PUBLIC_GA_MEASUREMENT_ID` set) **and** after consent.
 
 ## Legal paperwork (required before production launch)
 
@@ -68,16 +71,20 @@ Replace the placeholder `PrivacyContent` component with a real policy covering:
 
 ### Sub-processor list
 
-| Sub-processor  | Purpose                                                   | Transfer mechanism                                                  |
-| -------------- | --------------------------------------------------------- | ------------------------------------------------------------------- |
-| **Paddle**     | Payment processing, invoicing, VAT compliance             | Independent controller (MoR model — Paddle is the seller of record) |
-| **OpenRouter** | AI text + image generation (story planning, illustration) | Standard Contractual Clauses (SCC) or EU-US DPF if applicable       |
-| **Resend**     | Transactional email delivery                              | SCC or EU-US DPF if applicable                                      |
-| **AWS S3**     | Object storage for generated PDFs and images              | SCC or EU-US DPF; data stored in selected AWS region                |
-| **Google**     | OAuth identity provider (sign-in only; no tracking)       | SCC or EU-US DPF                                                    |
+| Sub-processor          | Purpose                                                   | Transfer mechanism                                                  |
+| ---------------------- | --------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Paddle**             | Payment processing, invoicing, VAT compliance             | Independent controller (MoR model — Paddle is the seller of record) |
+| **OpenRouter**         | AI text + image generation (story planning, illustration) | Standard Contractual Clauses (SCC) or EU-US DPF if applicable       |
+| **Resend**             | Transactional email delivery                              | SCC or EU-US DPF if applicable                                      |
+| **AWS S3**             | Object storage for generated PDFs and images              | SCC or EU-US DPF; data stored in selected AWS region                |
+| **Google (OAuth)**     | OAuth identity provider (sign-in only; no tracking)       | SCC or EU-US DPF                                                    |
+| **Google (Analytics)** | Product analytics — page views (consent-gated, prod)      | SCC or EU-US DPF                                                    |
+| **Sentry**             | Error tracking — exception data, may include IP           | SCC or EU-US DPF (Sentry EU region ingest in use)                   |
+| **New Relic**          | APM — request metadata (cookie/auth headers excluded)     | SCC or EU-US DPF                                                    |
 
 - [ ] Sign DPAs with OpenRouter, Resend, and AWS (or confirm they are covered under existing
       framework agreements). Paddle is an independent controller for payments.
+- [ ] Confirm DPAs / framework coverage for Google Analytics, Sentry, and New Relic.
 - [ ] Document transfer mechanism for each sub-processor in the Privacy Policy.
 
 ### Breach notification procedure
@@ -90,16 +97,20 @@ Replace the placeholder `PrivacyContent` component with a real policy covering:
 
 ## Cookie audit
 
-Current cookies set by TailorTales:
+Current cookies / client storage set by TailorTales:
 
-| Cookie         | Purpose     | Type               | Expiry                             |
-| -------------- | ----------- | ------------------ | ---------------------------------- |
-| `access_token` | Session JWT | Strictly necessary | `JWT_EXPIRY_DAYS` (default 7 days) |
+| Name                | Purpose                     | Type               | Set when            | Expiry                             |
+| ------------------- | --------------------------- | ------------------ | ------------------- | ---------------------------------- |
+| `access_token`      | Session JWT                 | Strictly necessary | Signed in           | `JWT_EXPIRY_DAYS` (default 7 days) |
+| `tt_cookie_consent` | Stores accept/reject choice | Strictly necessary | Banner answered     | `localStorage` (no expiry)         |
+| `_ga`, `_ga_*`      | Google Analytics client ID  | Analytics          | Prod + after Accept | up to 2 years (Google-managed)     |
 
-No third-party cookies. No analytics. No marketing pixels.
+The GA cookies (`_ga*`) are **only** set on production after the user accepts the banner; on dev
+and UAT, and before/after a Reject, no analytics cookies exist. The consent choice itself lives in
+`localStorage`, not a cookie, and is strictly necessary (it records the user's GDPR preference).
 
-**Before adding any analytics or tracking:** add a consent banner first. Cookie consent must be
-freely given, specific, informed, and unambiguous. Pre-ticked boxes are not valid consent.
+Consent is freely given, specific, informed, and unambiguous: Accept and Reject are equally
+prominent, nothing is pre-ticked, and no analytics runs before a positive choice.
 
 ## Pre-launch sign-off
 

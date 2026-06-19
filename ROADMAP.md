@@ -199,6 +199,7 @@ Privacy · Contact _(both static pages)_
 | 11  | Character preview image as visual reference in image generation    | `Character.previewKey` is generated and stored but not currently used in the pipeline — only `Character.description` (text) flows into illustration prompts via `styleAnchor`. Using the preview image as a visual reference input to the image model would give stronger cross-page character consistency than text alone. **Blocker:** not all image models support image-as-reference input; passing an unsupported input silently breaks or is ignored depending on the model. **Agreed approach when revisited:** query the OpenRouter model metadata (or maintain a local capability map keyed by `OPENROUTER_IMAGE_MODEL`) to detect whether the active model accepts image reference inputs; if yes, fetch `Character.previewKey` and pass it alongside the prompt; if no, fall back to text-only (current behaviour). `IGenerateImageInput` would grow an optional `referenceImageBuffer?: Buffer` field, and `AiClient.generateImage()` conditionally includes it. | Post-MVP                   |
 | 12  | Reconsider paid tier names ("Story Hour", "Family Workshop")       | Current names feel functional rather than emotionally resonant with the product. Consider a naming pass before launch — names propagate to `PricingTier.name` (DB unique key used for seeding and plan copy lookup), Paddle catalog product names, and all marketing copy, so a rename requires a migration + re-seed + Paddle catalog update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Pre-launch                 |
 | 13  | Global page transitions via View Transitions API                   | Next.js 16 supports `experimental: { viewTransition: true }` in `next.config.ts`, which wires the View Transitions API automatically to every `<Link>` click. Phase 13 uses `document.startViewTransition` only for locale switching (opt-in, controlled). Enabling it globally is deferred because: (1) 300ms cross-fade is too slow for fast in-app navigation (library, workshop, reader); (2) per-route animation tuning (duration, easing, `view-transition-name` scoping) requires a dedicated design + QA pass across all routes; (3) the flag is still `experimental` — API may change. Revisit when the flag graduates or a design pass for motion is planned.                                                                                                                                                                                                                                                                                                      | Post-MVP / motion pass     |
+| 14  | Custom GA4 event tracking                                          | Phase 15 ships only the GA4 script + cookie consent gate (page views + Enhanced Measurement auto-tracking). Custom events via `sendGAEvent()` — e.g. `story_created`, `signup_completed`, `plan_upgraded` — require real user traffic to know which funnels are worth instrumenting. Add after first users arrive. Use `@next/third-parties/google` `sendGAEvent` at call sites; no new dependencies needed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Post-MVP                   |
 
 ### In-code TODO cross-reference
 
@@ -887,86 +888,92 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ### Phase 15 — Analytics & Monitoring
 
-**Goal:** add observability and product analytics before production deploy — error tracking, APM, uptime monitoring, and Google Analytics with a GDPR-compliant cookie consent banner. No separate staging doc; all setup guides land in `_docs/guides/external-services.md` and env vars in `_docs/guides/environment-variables.md`.
+**Goal:** add observability and product analytics before production deploy — error tracking, APM, uptime monitoring, and Google Analytics with a GDPR-compliant cookie consent banner. No separate staging doc; durable setup guides land in `_docs/guides/external-services.md`, runtime observability in `_docs/guides/monitoring.md`, and env vars in `_docs/guides/environment-variables.md`.
+
+> **Implementation note (diverged from original plan):** UptimeRobot was dropped in favour of **Sentry's built-in uptime monitor** (one fewer account). New Relic loads via the **ESM loader** (`NODE_OPTIONS="--import newrelic/esm-loader.mjs"`) because the backend is ESM — there is no `NEW_RELIC_ENABLED` flag; presence of `NODE_OPTIONS` is the gate. GA4 ships via `@next/third-parties/google` with a `useSyncExternalStore` consent gate.
 
 ---
 
 #### Tools
 
-| Tool                   | Purpose                                                  | Free tier                   |
-| ---------------------- | -------------------------------------------------------- | --------------------------- |
-| Sentry                 | Error tracking — backend exceptions + frontend JS errors | 5k errors/month             |
-| New Relic              | APM — request latency, throughput, BullMQ job durations  | 100 GB/month ingest         |
-| UptimeRobot            | Uptime ping — alerts when `/health` or frontend is down  | 50 monitors, 5-min interval |
-| Google Analytics (GA4) | Product analytics — page views, funnels, retention       | Free                        |
-| Cookie consent banner  | GDPR-required gate before GA loads                       | —                           |
+| Tool                   | Purpose                                                          | Free tier           |
+| ---------------------- | ---------------------------------------------------------------- | ------------------- |
+| Sentry                 | Error tracking — backend exceptions + frontend JS errors         | 5k errors/month     |
+| Sentry Uptime          | Uptime monitor — alerts when `/health` is down (Sentry built-in) | 1 monitor (free)    |
+| New Relic              | APM — request latency, throughput, BullMQ job durations          | 100 GB/month ingest |
+| Google Analytics (GA4) | Product analytics — page views, funnels, retention               | Free                |
+| Cookie consent banner  | GDPR-required gate before GA loads                               | —                   |
 
 #### Env var model
 
-| Variable                        | Dev          | UAT               | Prod               |
-| ------------------------------- | ------------ | ----------------- | ------------------ |
-| `SENTRY_ENABLED`                | `false`      | `true`            | `true`             |
-| `SENTRY_DSN`                    | —            | shared DSN        | shared DSN         |
-| `SENTRY_ENVIRONMENT`            | —            | `uat`             | `production`       |
-| `NEXT_PUBLIC_SENTRY_DSN`        | —            | shared DSN        | shared DSN         |
-| `NEW_RELIC_ENABLED`             | `false`      | `true`            | `true`             |
-| `NEW_RELIC_LICENSE_KEY`         | —            | shared key        | shared key         |
-| `NEW_RELIC_APP_NAME`            | —            | `TailorTales-UAT` | `TailorTales-Prod` |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | — (disabled) | — (disabled)      | `G-XXXXXXXXXX`     |
+| Variable                         | Dev          | UAT                                | Prod                               |
+| -------------------------------- | ------------ | ---------------------------------- | ---------------------------------- |
+| `SENTRY_ENABLED`                 | `false`      | `true`                             | `true`                             |
+| `SENTRY_DSN`                     | —            | shared DSN                         | shared DSN                         |
+| `SENTRY_ENVIRONMENT`             | —            | `uat`                              | `production`                       |
+| `NEXT_PUBLIC_SENTRY_ENABLED`     | `false`      | `true`                             | `true`                             |
+| `NEXT_PUBLIC_SENTRY_DSN`         | —            | shared DSN                         | shared DSN                         |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | —            | `uat`                              | `production`                       |
+| `SENTRY_AUTH_TOKEN`              | —            | Dokploy build arg                  | Dokploy build arg                  |
+| `NODE_OPTIONS`                   | —            | `--import newrelic/esm-loader.mjs` | `--import newrelic/esm-loader.mjs` |
+| `NEW_RELIC_LICENSE_KEY`          | —            | shared key                         | shared key                         |
+| `NEW_RELIC_APP_NAME`             | —            | `TailorTales-UAT`                  | `TailorTales-Prod`                 |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | — (disabled) | — (disabled)                       | `G-XXXXXXXXXX`                     |
 
-UptimeRobot is external — no env vars in the app.
+`SENTRY_AUTH_TOKEN` is build-time only (source map upload) — set it as a Dokploy build-time variable (build arg) on the frontend app, not a runtime env var and not a GitHub Actions secret (CI doesn't build images). The Sentry uptime monitor is configured in the Sentry UI — no app env vars.
 
 ---
 
 #### Sub-tasks
 
-**Sentry**
+**Sentry — error tracking**
 
-- [ ] Create Sentry account + project (Node.js + Next.js); copy DSN
-- [ ] Install `@sentry/nestjs` in backend — init in `main.ts` before app bootstrap; add `SentryModule` with `SENTRY_DSN` + `SENTRY_ENVIRONMENT`; wire `SentryGlobalFilter` alongside `AllExceptionsFilter`
-- [ ] Install `@sentry/nextjs` in frontend — `sentry.client.config.ts` + `sentry.server.config.ts`; wrap `next.config.ts` with `withSentryConfig`
-- [ ] Gate both inits behind `SENTRY_ENABLED=true`; verify dev stays silent
-- [ ] Add `SENTRY_DSN`, `SENTRY_ENABLED`, `SENTRY_ENVIRONMENT`, `NEXT_PUBLIC_SENTRY_DSN` to env matrix + `backend/.env.example` / `frontend/.env.example`
+- [x] Create Sentry account + projects (`tailortales-be` Node/NestJS, `tailortales-fe` Next.js); copy DSNs
+- [x] Install `@sentry/nestjs` in backend — init in `src/instrument.ts` (imported first in `main.ts`); add `SentryModule.forRoot()`; capture via `@SentryExceptionCaptured()` on `AllExceptionsFilter`
+- [x] Install `@sentry/nextjs` in frontend (wizard) — `instrumentation-client.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, `global-error.tsx`; wrap `next.config.ts` with `withSentryConfig`; DSN moved to env, `sendDefaultPii` removed
+- [x] Gate both inits behind `SENTRY_ENABLED` / `NEXT_PUBLIC_SENTRY_ENABLED`; dev stays silent
+- [x] Add Sentry vars to env matrix + `backend/.env.example` / `frontend/.env.example`
+- [x] Wire `SENTRY_AUTH_TOKEN` into the frontend Dockerfile `build` stage (source map upload, build arg)
+- [ ] Create the Sentry auth token + set it as a Dokploy build-time variable on the frontend app
 - [ ] Trigger a test error on UAT; confirm it appears in Sentry with correct environment tag
-- [ ] Document Sentry registration + setup in `_docs/guides/external-services.md`
+- [ ] Delete the wizard-generated `sentry-example-page` after UAT verification
+- [x] Document Sentry registration + setup in `_docs/guides/external-services.md`
+
+**Sentry — uptime monitor** (replaces UptimeRobot)
+
+- [ ] In Sentry UI, add one uptime monitor: `GET https://api.tailortales.app/health` (prod backend)
+- [ ] Configure alert contact (email) for down events
 
 **New Relic APM**
 
-- [ ] Create New Relic account (free tier); generate license key
-- [ ] Install `newrelic` npm package in backend; add `require('newrelic')` as first line of `main.ts` (before any other import); add `newrelic.js` config file (reads `NEW_RELIC_LICENSE_KEY` + `NEW_RELIC_APP_NAME` from env)
-- [ ] Gate agent startup behind `NEW_RELIC_ENABLED=true` (conditional require)
-- [ ] Add `NEW_RELIC_LICENSE_KEY`, `NEW_RELIC_APP_NAME`, `NEW_RELIC_ENABLED` to env matrix + `backend/.env.example`
+- [x] Create New Relic account (free tier); generate license key
+- [x] Install `newrelic` in backend; add `newrelic.js` config (reads `NEW_RELIC_LICENSE_KEY` + `NEW_RELIC_APP_NAME`); load via `NODE_OPTIONS="--import newrelic/esm-loader.mjs"` (ESM loader — backend is `"type": "module"`)
+- [x] Gate agent startup by presence of `NODE_OPTIONS` (unset in dev → agent never loads)
+- [x] Add `NEW_RELIC_LICENSE_KEY`, `NEW_RELIC_APP_NAME`, `NODE_OPTIONS` to env matrix + `backend/.env.example`
 - [ ] Deploy to UAT; verify "TailorTales-UAT" application appears in New Relic with throughput data
-- [ ] Document New Relic registration + setup in `_docs/guides/external-services.md`
-
-**UptimeRobot**
-
-- [ ] Create UptimeRobot account (free tier); add two monitors:
-    - `GET https://api.tailortales.app/health` — prod backend
-    - `GET https://tailortales.app` — prod frontend
-- [ ] (Optional) Add UAT monitors for `api-uat` + `uat` domains
-- [ ] Configure alert contact (email) for down events
-- [ ] Document UptimeRobot setup in `_docs/guides/external-services.md`
+- [ ] Set up alerts (error rate >5%, p95 >1s, Apdex <0.7) + 4-widget dashboard after UAT data flows
+- [x] Document New Relic registration + setup in `_docs/guides/external-services.md`
 
 **Google Analytics + cookie consent banner**
 
-- [ ] Create GA4 property in Google Analytics; copy Measurement ID (`G-XXXXXXXXXX`)
-- [ ] Add `NEXT_PUBLIC_GA_MEASUREMENT_ID` to `frontend/.env.example`; only set on prod
-- [ ] Implement minimal cookie consent banner component:
+- [x] Create GA4 property in Google Analytics; copy Measurement ID
+- [x] Add `NEXT_PUBLIC_GA_MEASUREMENT_ID` to `frontend/.env.example`; only set on prod
+- [x] Implement minimal cookie consent banner component (`CookieConsent`):
     - Slim bottom bar, non-blocking (content always visible)
     - "Accept" / "Reject" — no dark patterns, no pre-ticked boxes
-    - Consent stored in `localStorage`; remembered across sessions
-    - GA4 `<Script>` loads only after consent; no gtag calls before accept
-- [ ] Wire conditional `<Script strategy="afterInteractive">` in root layout; guard with consent state
-- [ ] Update GDPR note in Phase 17 checklist: analytics consent covered by banner
-- [ ] Add `NEXT_PUBLIC_GA_MEASUREMENT_ID` to environment-variables.md and env matrix
-- [ ] Document GA4 property setup in `_docs/guides/external-services.md`
+    - Consent stored in `localStorage` via `useSyncExternalStore`; remembered across sessions, synced across tabs; no SSR flash
+    - GA loads only after `accepted`; no tracking before consent
+- [x] Wire GA via `@next/third-parties/google` `GoogleAnalytics`, mounted inside the consent component and guarded by consent state
+- [x] Banner copy localised (EN / DE / RU)
+- [x] Add `NEXT_PUBLIC_GA_MEASUREMENT_ID` to environment-variables.md and env matrix
+- [x] Document GA4 property setup in `_docs/guides/external-services.md`
+- [ ] Confirm analytics-consent coverage in the GDPR launch checklist before production
 
 **Acceptance Check:**
 
 - Sentry captures a test exception on UAT with `environment=uat` tag
 - New Relic shows "TailorTales-UAT" application with live throughput
-- UptimeRobot alerts fire on prod domain downtime
+- Sentry uptime monitor alerts fire on prod backend downtime
 - GA loads on prod only, and only after user accepts the cookie banner
 - Cookie banner passes basic GDPR check: no pre-consent tracking, reject works, preference persists
 
@@ -1082,13 +1089,17 @@ flowchart LR
 | `SENTRY_ENABLED`                  | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
 | `SENTRY_DSN`                      | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
 | `SENTRY_ENVIRONMENT`              | —                       | —                                                           | `uat`                                                             | `production`                                              |
+| `NEXT_PUBLIC_SENTRY_ENABLED`      | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
 | `NEXT_PUBLIC_SENTRY_DSN`          | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
-| `NEW_RELIC_ENABLED`               | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | —                       | —                                                           | `uat`                                                             | `production`                                              |
+| `NODE_OPTIONS` (New Relic loader) | —                       | —                                                           | `--import newrelic/esm-loader.mjs`                                | `--import newrelic/esm-loader.mjs`                        |
 | `NEW_RELIC_LICENSE_KEY`           | —                       | —                                                           | shared key                                                        | shared key                                                |
 | `NEW_RELIC_APP_NAME`              | —                       | —                                                           | `TailorTales-UAT`                                                 | `TailorTales-Prod`                                        |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | —                       | —                                                           | —                                                                 | `G-XXXXXXXXXX`                                            |
 
-> Monitoring and analytics env vars are introduced in Phase 15. Registration, project creation, and obtaining the keys is covered by the Phase 15 sub-tasks — configure them here per environment when wiring up UAT and prod in dokploy.
+> Monitoring and analytics env vars are introduced in the analytics & monitoring phase. Registration, project creation, and obtaining the keys is covered by that phase's sub-tasks — configure them here per environment when wiring up UAT and prod in dokploy.
+>
+> **`SENTRY_AUTH_TOKEN` is not in this matrix** — it's a **build-time** secret (source-map upload during `next build`), not a runtime env var. Set it as a dokploy **build-time variable** on the frontend app, not in the runtime env panel. New Relic has no `*_ENABLED` flag: the presence of `NODE_OPTIONS` is the gate.
 
 ---
 
@@ -1144,7 +1155,7 @@ flowchart LR
 - [ ] Terms of Service incl. **"service for adults 18+, accounts operated by parents"** clause (keeps US COPPA out of scope — children are not users and we collect nothing from them)
 - [ ] Accept/sign DPAs with sub-processors: OpenRouter, Resend, AWS, Paddle (independent controllers for payments)
 - [ ] Short internal breach-notification procedure (72h to supervisory authority)
-- [ ] Note: no cookie banner needed today (session cookie only, no analytics) — **adding any analytics requires a consent banner first**
+- [ ] Privacy Policy: add Google Analytics, Sentry, and New Relic to the sub-processor list; cookie banner + GA are now live (consent-gated, prod only) — confirm the policy's cookie/analytics section matches
 - [ ] US state laws (CCPA/CPRA etc.): thresholds not met at MVP scale — no action beyond the ToS clause; revisit at scale
 
 **Deployment pipeline (dokploy)**
@@ -1152,6 +1163,7 @@ flowchart LR
 - [ ] Dockerfiles tested end-to-end for both backend and frontend
 - [ ] Graceful shutdown verified — BullMQ worker drains in-flight jobs on SIGTERM before process exit (prevents mid-generation kills on deploy)
 - [ ] dokploy env var injection configured per environment (no secrets in repo)
+- [ ] **Set `SENTRY_AUTH_TOKEN` as a dokploy build-time variable** on the frontend app (UAT + prod) — enables Sentry source-map upload during `next build`. The Dockerfile build arg is already wired; without the token the build still succeeds but prod stack traces stay minified.
 - [ ] `prisma migrate deploy` wired as automatic pre-start/release step on UAT and prod (schema sync = git + deploy, never manual)
 - [ ] Zero-downtime deploy strategy confirmed (dokploy rolling or blue-green)
 
@@ -1215,25 +1227,25 @@ flowchart LR
 
 ## 14. Progress Tracking
 
-| Phase                               | Status         | Notes                                                                                                                                                                                                                                                                                    |
-| ----------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0 — Infrastructure                  | ✅ Done        |                                                                                                                                                                                                                                                                                          |
-| 1 — Auth                            | ✅ Done        |                                                                                                                                                                                                                                                                                          |
-| 2 — Children                        | ✅ Done        |                                                                                                                                                                                                                                                                                          |
-| 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                                                                                                                                                                 |
-| 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                                                                                                                                                          |
-| 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred.                                                                                                                                       |
-| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                                                                                                                                                               |
-| 7 — Mid-point Documentation         | ✅ Done        |                                                                                                                                                                                                                                                                                          |
-| 8 — Character + Regeneration        | ✅ Done        | Character entity + preview; page regeneration (text/illustration/both) with 30-day quota; iframe reader; FAILED stories in library. Resolved Deferred #8 and #9.                                                                                                                         |
-| 9 — Subscriptions                   | ✅ Done        | Paddle MoR, PricingTier + Subscription entities, QuotaService, watermark, GDPR export/delete, retention cron, account + pricing UI wired.                                                                                                                                                |
-| 10 — Notifications                  | ✅ Done        | Full notification inbox, SSE bell stream, subscription-event emails, per-user preferences, NotificationEmitterService.                                                                                                                                                                   |
-| 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                               |
-| 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                          |
-| 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                    |
-| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/CLAUDE.md and frontend/CLAUDE.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules. |
-| 15 — Analytics & Monitoring         | ⬜ Not started |                                                                                                                                                                                                                                                                                          |
-| 16 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                          |
-| 17 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                          |
+| Phase                               | Status         | Notes                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — Infrastructure                  | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
+| 1 — Auth                            | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
+| 2 — Children                        | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
+| 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                                                                                                                                                                                                                        |
+| 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
+| 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred.                                                                                                                                                                                              |
+| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                                                                                                                                                                                                                      |
+| 7 — Mid-point Documentation         | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
+| 8 — Character + Regeneration        | ✅ Done        | Character entity + preview; page regeneration (text/illustration/both) with 30-day quota; iframe reader; FAILED stories in library. Resolved Deferred #8 and #9.                                                                                                                                                                                |
+| 9 — Subscriptions                   | ✅ Done        | Paddle MoR, PricingTier + Subscription entities, QuotaService, watermark, GDPR export/delete, retention cron, account + pricing UI wired.                                                                                                                                                                                                       |
+| 10 — Notifications                  | ✅ Done        | Full notification inbox, SSE bell stream, subscription-event emails, per-user preferences, NotificationEmitterService.                                                                                                                                                                                                                          |
+| 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                                                                                      |
+| 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                 |
+| 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                           |
+| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/CLAUDE.md and frontend/CLAUDE.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                        |
+| 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain. |
+| 16 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
+| 17 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval

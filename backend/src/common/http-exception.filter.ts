@@ -1,11 +1,12 @@
 import {
-    ArgumentsHost,
     Catch,
-    ExceptionFilter,
     HttpException,
     HttpStatus,
     Logger,
+    type ArgumentsHost,
+    type ExceptionFilter,
 } from '@nestjs/common';
+import { SentryExceptionCaptured } from '@sentry/nestjs';
 import type { Request, Response } from 'express';
 import {
     type IErrorParams,
@@ -32,6 +33,7 @@ import {
 export class AllExceptionsFilter implements ExceptionFilter {
     private readonly logger = new Logger(AllExceptionsFilter.name);
 
+    @SentryExceptionCaptured()
     catch(exception: unknown, host: ArgumentsHost): void {
         if (host.getType() !== 'http') return;
 
