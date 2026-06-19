@@ -16,6 +16,12 @@ RUN pnpm install --frozen-lockfile --filter frontend
 COPY tsconfig.base.json ./
 COPY frontend/ ./frontend/
 ENV NEXT_TELEMETRY_DISABLED=1
+# Source-map upload to Sentry runs inside `next build` (via withSentryConfig) only when this
+# token is present — pass it as a Dokploy build-time variable on prod. It is scoped to this
+# build stage and never copied into the `run` stage, so it stays out of the runtime image.
+# Absent (e.g. local builds) → upload is skipped gracefully, build still succeeds.
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 RUN pnpm --filter frontend build
 
 # ---- run ----

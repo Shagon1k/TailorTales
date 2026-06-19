@@ -27,8 +27,8 @@ so issues are filtered per environment.
   the same way they are in logs (the filter only logs 5xx).
 - **Frontend capture path:** the Next.js instrumentation hooks plus `global-error.tsx`
   (`Sentry.captureException`) catch render/runtime errors. No PII is sent (`sendDefaultPii` is off).
-- **Source maps:** uploaded at build time via `withSentryConfig` using `SENTRY_AUTH_TOKEN`
-  (a CI secret, never a runtime var). Without it, stack traces show minified frames.
+- **Source maps:** uploaded during `next build` via `withSentryConfig` using `SENTRY_AUTH_TOKEN`
+  (a Dokploy build-time variable, never a runtime var). Without it, stack traces show minified frames.
 
 ### Sentry — uptime monitor
 

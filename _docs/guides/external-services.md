@@ -265,10 +265,12 @@ NEXT_PUBLIC_SENTRY_ENVIRONMENT="uat"                        # or "production"
 ```
 
 4. **Source maps (frontend):** create an auth token (Settings → Auth Tokens, scope
-   `project:releases`) and set it as a **CI build secret** — never a runtime var:
+   `project:releases`) and set it as a **Dokploy build-time variable** on the frontend app —
+   it's consumed by `next build`, never at runtime, and is not a GitHub Actions secret (CI
+   doesn't build images):
 
 ```bash
-SENTRY_AUTH_TOKEN="sntrys_…"   # build-time only; uploads readable stack traces
+SENTRY_AUTH_TOKEN="sntrys_…"   # Dokploy build arg; uploads readable stack traces
 ```
 
 5. **Uptime monitor:** Sentry → **Crons/Uptime → Uptime Monitors → Add** →
