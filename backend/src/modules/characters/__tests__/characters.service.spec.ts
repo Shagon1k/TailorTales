@@ -1,4 +1,4 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Character } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
@@ -12,6 +12,7 @@ const MOCK_CHARACTER: Character = {
     id: 'char-1',
     userId: 'user-123',
     childId: 'child-1',
+    source: 'FROM_CHILD',
     name: 'Princess Mia',
     description: 'A 6-year-old girl with curly red hair and blue overalls.',
     previewKey: null,
@@ -147,8 +148,7 @@ describe('CharactersService', () => {
     });
 
     describe('create', () => {
-        it('should create and return a new character linked to a child', async () => {
-            characterFindFirst.mockResolvedValue(null);
+        it('should create a child-mirroring character with source FROM_CHILD', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
@@ -163,36 +163,24 @@ describe('CharactersService', () => {
                     userId: 'user-123',
                     name: dto.name,
                     description: dto.description,
+                    source: 'FROM_CHILD',
                     childId: dto.childId,
                 },
             });
             expect(result).toBe(MOCK_CHARACTER);
         });
 
-        it('should create a standalone character when no childId is given', async () => {
-            const standalone = { ...MOCK_CHARACTER, childId: null };
-            characterCreate.mockResolvedValue(standalone);
-            const dto: CreateCharacterDto = { name: 'Generic Hero', description: 'A brave hero.' };
-
-            await service.create('user-123', dto);
-
-            // No conflict check performed when childId is absent
-            expect(characterFindFirst).not.toHaveBeenCalled();
-            expect(characterCreate).toHaveBeenCalledWith({
-                data: { userId: 'user-123', name: dto.name, description: dto.description },
-            });
-        });
-
-        it('should throw ConflictException when the child already has a character', async () => {
-            characterFindFirst.mockResolvedValue(MOCK_CHARACTER);
+        it('should not perform a uniqueness lookup — a child may have several characters', async () => {
+            characterCreate.mockResolvedValue(MOCK_CHARACTER);
             const dto: CreateCharacterDto = {
-                name: 'Another',
-                description: 'Duplicate.',
+                name: 'Princess Mia',
+                description: 'A brave hero.',
                 childId: 'child-1',
             };
 
-            await expect(service.create('user-123', dto)).rejects.toThrow(ConflictException);
-            expect(characterCreate).not.toHaveBeenCalled();
+            await service.create('user-123', dto);
+
+            expect(characterFindFirst).not.toHaveBeenCalled();
         });
     });
 

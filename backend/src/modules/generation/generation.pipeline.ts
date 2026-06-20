@@ -21,7 +21,7 @@ import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
 
 type StoryWithRelations = Story & {
-    child: Pick<Child, 'id' | 'name' | 'birthdate'>;
+    child: Pick<Child, 'id' | 'name' | 'birthdate' | 'interests'>;
     artStyle: Pick<ArtStyle, 'id' | 'name' | 'promptPrefix'>;
 };
 
@@ -172,7 +172,7 @@ export class GenerationPipeline {
             );
         }
 
-        await this.persistStoryPlan(story, plan, blueprint.id, character?.id ?? null);
+        await this.persistStoryPlan(story, plan, blueprint.id);
         return plan;
     }
 
@@ -189,11 +189,11 @@ export class GenerationPipeline {
         story: StoryWithRelations,
         plan: IStoryPlan,
         blueprintId: string,
-        characterId: string | null,
     ): Promise<void> {
+        // characterId is set by the user at story creation — the pipeline never overwrites it.
         await this.prisma.story.update({
             where: { id: story.id },
-            data: { title: plan.title, styleAnchor: plan.styleAnchor, blueprintId, characterId },
+            data: { title: plan.title, styleAnchor: plan.styleAnchor, blueprintId },
         });
 
         await this.prisma.page.createMany({
@@ -326,15 +326,16 @@ export class GenerationPipeline {
     // ---------------------------------------------------------------------------
 
     /**
-     * Looks up the Character associated with the story's child (if any).
-     * Returns null when no character exists — the pipeline continues without one.
+     * Loads the protagonist the user chose for this story (`story.characterId`).
+     * Returns null when none was chosen — the pipeline continues child-led.
      * Uses PrismaService directly so GenerationModule has no dependency on CharactersModule.
      */
     private async loadCharacterForStory(
         story: Story,
     ): Promise<Pick<Character, 'id' | 'name' | 'description'> | null> {
+        if (!story.characterId) return null;
         return this.prisma.character.findFirst({
-            where: { childId: story.childId, userId: story.userId },
+            where: { id: story.characterId, userId: story.userId },
             select: { id: true, name: true, description: true },
         });
     }
@@ -343,7 +344,7 @@ export class GenerationPipeline {
         const story = await this.prisma.story.findUnique({
             where: { id: storyId },
             include: {
-                child: { select: { id: true, name: true, birthdate: true } },
+                child: { select: { id: true, name: true, birthdate: true, interests: true } },
                 artStyle: { select: { id: true, name: true, promptPrefix: true } },
             },
         });

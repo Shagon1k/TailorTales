@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type { Character } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { type IAiClient, AI_CLIENT } from '../ai/ai.types.js';
@@ -37,21 +37,16 @@ export class CharactersService {
     }
 
     async create(userId: string, dto: CreateCharacterDto): Promise<Character> {
-        if (dto.childId) {
-            const existing = await this.prisma.character.findFirst({
-                where: { childId: dto.childId, userId },
-            });
-            if (existing) {
-                throw new ConflictException('errors.characters.duplicateCharacter');
-            }
-        }
-
+        // Every character belongs to a child. A child may have several characters.
+        // Wave-1 only creates child-derived characters (FROM_CHILD); IMAGINED/PROMPT
+        // creation flows arrive with the quiz/prompt features.
         return this.prisma.character.create({
             data: {
                 userId,
+                childId: dto.childId,
+                source: 'FROM_CHILD',
                 name: dto.name,
                 description: dto.description,
-                ...(dto.childId !== undefined && { childId: dto.childId }),
             },
         });
     }

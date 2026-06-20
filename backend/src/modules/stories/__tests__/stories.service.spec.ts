@@ -62,6 +62,7 @@ describe('StoriesService', () => {
     let storyCreate: ReturnType<typeof vi.fn>;
     let storyDelete: ReturnType<typeof vi.fn>;
     let storyCount: ReturnType<typeof vi.fn>;
+    let characterFindFirst: ReturnType<typeof vi.fn>;
     let getSignedUrl: ReturnType<typeof vi.fn>;
     let storageDeleteMany: ReturnType<typeof vi.fn>;
 
@@ -72,6 +73,7 @@ describe('StoriesService', () => {
         storyCreate = vi.fn();
         storyDelete = vi.fn();
         storyCount = vi.fn();
+        characterFindFirst = vi.fn();
         getSignedUrl = vi.fn();
         storageDeleteMany = vi.fn().mockResolvedValue({ requested: 3, deleted: 3 });
 
@@ -89,6 +91,7 @@ describe('StoriesService', () => {
                             delete: storyDelete,
                             count: storyCount,
                         },
+                        character: { findFirst: characterFindFirst },
                         $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
                     },
                 },
@@ -215,6 +218,42 @@ describe('StoriesService', () => {
                 },
             });
             expect(result).toBe(MOCK_STORY);
+        });
+
+        describe('given a chosen characterId', () => {
+            const dtoWithCharacter: CreateStoryDto = {
+                childId: 'child-1',
+                characterId: 'char-1',
+                type: 'BOOK',
+                question: 'Why is the sky blue?',
+                pageCount: 8,
+                artStyleId: 'style-1',
+                language: 'EN',
+            };
+
+            it('should set characterId when the character belongs to the user', async () => {
+                characterFindFirst.mockResolvedValue({ id: 'char-1' });
+                storyCreate.mockResolvedValue(MOCK_STORY);
+
+                await service.create('user-123', dtoWithCharacter);
+
+                expect(characterFindFirst).toHaveBeenCalledWith({
+                    where: { id: 'char-1', userId: 'user-123', childId: 'child-1' },
+                    select: { id: true },
+                });
+                expect(storyCreate).toHaveBeenCalledWith({
+                    data: expect.objectContaining({ characterId: 'char-1' }),
+                });
+            });
+
+            it('should throw NotFoundException when the character is not owned by the user', async () => {
+                characterFindFirst.mockResolvedValue(null);
+
+                await expect(service.create('user-123', dtoWithCharacter)).rejects.toThrow(
+                    NotFoundException,
+                );
+                expect(storyCreate).not.toHaveBeenCalled();
+            });
         });
     });
 

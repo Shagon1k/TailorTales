@@ -11,19 +11,20 @@ import SuggestionChip from '@/components/ui/SuggestionChip/SuggestionChip';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import { storiesApi } from '@/api/stories';
-import { useCharacters, useCreateCharacter, useUpdateCharacter } from '@/hooks/characters';
+import { useCharacters, useCreateCharacter } from '@/hooks/characters';
 import type { IChild } from '@/types/child.types';
-import type { ICharacter } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig, IStoryType, ILanguage } from '@/types/story.types';
 import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
 import ReaderChip from './components/ReaderChip/ReaderChip';
 import ReaderSelector from './components/ReaderSelector/ReaderSelector';
+import CharacterSelector from './components/CharacterSelector/CharacterSelector';
 import ArtStyleGrid from './components/ArtStyleGrid/ArtStyleGrid';
 import WorkshopSummary from './components/WorkshopSummary/WorkshopSummary';
 import CharacterForm, {
     type ICharacterFormValues,
 } from '../../../_components/CharacterForm/CharacterForm';
+import Button from '@/components/ui/Button/Button';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './WorkshopForm.module.scss';
 
@@ -83,21 +84,16 @@ export default function WorkshopForm({
 
     const { data: characters = [] } = useCharacters();
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
-    const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
 
+    const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+    const [isCharacterPickerOpen, setIsCharacterPickerOpen] = useState(false);
     const [isCharacterModalOpen, setIsCharacterModalOpen] = useState(false);
-
-    const characterByChildId = new Map(
-        characters
-            .filter((c): c is ICharacter & { childId: string } => c.childId !== null)
-            .map((c) => [c.childId, c]),
-    );
 
     const selectedChild = readers.find((r) => r.id === selectedChildId) ?? null;
     const selectedArtStyle = artStyles.find((s) => s.id === artStyleId) ?? null;
-    const selectedCharacter = selectedChildId
-        ? (characterByChildId.get(selectedChildId) ?? null)
-        : null;
+    // Characters belong to a child — only show (and allow choosing) the reader's own.
+    const childCharacters = characters.filter((c) => c.childId === selectedChildId);
+    const selectedCharacter = childCharacters.find((c) => c.id === selectedCharacterId) ?? null;
 
     const isValid =
         selectedChildId !== null &&
@@ -109,22 +105,34 @@ export default function WorkshopForm({
 
     function handleReaderSelect(id: string): void {
         setSelectedChildId(id);
+        // Characters are scoped to a child — a previous pick no longer applies.
+        setSelectedCharacterId(null);
         setIsReaderOpen(false);
+    }
+
+    function handleCharacterSelect(id: string | null): void {
+        setSelectedCharacterId(id);
+        setIsCharacterPickerOpen(false);
+    }
+
+    function handleCreateNewCharacter(): void {
+        setIsCharacterPickerOpen(false);
+        setIsCharacterModalOpen(true);
     }
 
     function handleCharacterSubmit(values: ICharacterFormValues): void {
         if (!selectedChildId) return;
-        if (selectedCharacter) {
-            updateCharacter(
-                { id: selectedCharacter.id, payload: values },
-                { onSuccess: () => setIsCharacterModalOpen(false) },
-            );
-        } else {
-            createCharacter(
-                { ...values, childId: selectedChildId },
-                { onSuccess: () => setIsCharacterModalOpen(false) },
-            );
-        }
+        // Inline-created characters belong to the selected reader (source FROM_CHILD)
+        // and are auto-selected once created.
+        createCharacter(
+            { ...values, childId: selectedChildId },
+            {
+                onSuccess: (created) => {
+                    setSelectedCharacterId(created.id);
+                    setIsCharacterModalOpen(false);
+                },
+            },
+        );
     }
 
     async function handleSubmit(): Promise<void> {
@@ -137,6 +145,7 @@ export default function WorkshopForm({
         try {
             const story = await storiesApi.create({
                 childId: selectedChildId,
+                ...(selectedCharacterId !== null && { characterId: selectedCharacterId }),
                 type: storyType,
                 question: question.trim(),
                 pageCount: Number(pageCount),
@@ -319,29 +328,38 @@ export default function WorkshopForm({
                 isValid={isValid}
                 isPending={isPending}
                 onSubmit={handleSubmit}
-                onCharacterEdit={() => setIsCharacterModalOpen(true)}
+                onCharacterChoose={() => setIsCharacterPickerOpen(true)}
             />
+
+            <Modal
+                opened={isCharacterPickerOpen}
+                onClose={() => setIsCharacterPickerOpen(false)}
+                title={t('characterPicker.title')}
+            >
+                {isCharacterPickerOpen && (
+                    <div className={styles.workshop__picker}>
+                        <CharacterSelector
+                            items={childCharacters}
+                            selectedId={selectedCharacterId}
+                            onSelect={handleCharacterSelect}
+                        />
+                        <Button variant="quiet" fullWidth onClick={handleCreateNewCharacter}>
+                            {t('characterPicker.createNew')}
+                        </Button>
+                    </div>
+                )}
+            </Modal>
 
             <Modal
                 opened={isCharacterModalOpen}
                 onClose={() => setIsCharacterModalOpen(false)}
-                title={
-                    selectedCharacter ? t('characterModal.editTitle') : t('characterModal.addTitle')
-                }
+                title={t('characterModal.addTitle')}
             >
                 {isCharacterModalOpen && (
                     <CharacterForm
-                        initialValues={
-                            selectedCharacter
-                                ? {
-                                      name: selectedCharacter.name,
-                                      description: selectedCharacter.description,
-                                  }
-                                : undefined
-                        }
                         onSubmit={handleCharacterSubmit}
                         onCancel={() => setIsCharacterModalOpen(false)}
-                        isSubmitting={selectedCharacter ? isUpdatingCharacter : isCreatingCharacter}
+                        isSubmitting={isCreatingCharacter}
                     />
                 )}
             </Modal>

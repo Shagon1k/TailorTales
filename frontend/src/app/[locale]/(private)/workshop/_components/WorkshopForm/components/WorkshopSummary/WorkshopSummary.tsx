@@ -26,7 +26,7 @@ export interface IWorkshopSummaryProps {
     isValid: boolean;
     isPending: boolean;
     onSubmit: () => void;
-    onCharacterEdit: () => void;
+    onCharacterChoose: () => void;
 }
 
 export default function WorkshopSummary({
@@ -40,7 +40,7 @@ export default function WorkshopSummary({
     isValid,
     isPending,
     onSubmit,
-    onCharacterEdit,
+    onCharacterChoose,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
     const t = useTranslations('workshop.summary');
     const hasQuestion = question.trim().length > 0;
@@ -78,8 +78,10 @@ export default function WorkshopSummary({
                     label={t('labels.character')}
                     value={character?.name ?? null}
                     action={{
-                        label: character ? t('characterAction.edit') : t('characterAction.add'),
-                        onClick: onCharacterEdit,
+                        label: character
+                            ? t('characterAction.change')
+                            : t('characterAction.choose'),
+                        onClick: onCharacterChoose,
                         disabled: child === null,
                     }}
                 />

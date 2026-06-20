@@ -93,6 +93,8 @@ export interface IStoryConfig {
 
 export interface ICreateStoryPayload {
     childId: string;
+    /** Optional protagonist. Omit for a child-led story (no recurring character). */
+    characterId?: string;
     type: IStoryType;
     question: string;
     pageCount: number;

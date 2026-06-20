@@ -391,6 +391,12 @@
             "characterModal": {
                 "editTitle": "Edit character",
                 "addTitle": "Add character"
+            },
+            "characterPicker": {
+                "title": "Choose a character",
+                "listLabel": "Select a character",
+                "none": "No character — the story follows the reader",
+                "createNew": "+ Create a new character"
             }
         },
         "summary": {
@@ -405,8 +411,8 @@
                 "style": "Style"
             },
             "characterAction": {
-                "add": "Add",
-                "edit": "Edit"
+                "choose": "Choose",
+                "change": "Change"
             },
             "lengthValue": "{pageCount} pages",
             "creditCost": "{creditCost} credits",

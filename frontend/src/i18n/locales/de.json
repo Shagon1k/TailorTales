@@ -391,6 +391,12 @@
             "characterModal": {
                 "editTitle": "Charakter bearbeiten",
                 "addTitle": "Charakter hinzufügen"
+            },
+            "characterPicker": {
+                "title": "Charakter auswählen",
+                "listLabel": "Charakter auswählen",
+                "none": "Kein Charakter — die Geschichte folgt dem Kind",
+                "createNew": "+ Neuen Charakter erstellen"
             }
         },
         "summary": {
@@ -405,8 +411,8 @@
                 "style": "Stil"
             },
             "characterAction": {
-                "add": "Hinzufügen",
-                "edit": "Bearbeiten"
+                "choose": "Auswählen",
+                "change": "Ändern"
             },
             "lengthValue": "{pageCount} Seiten",
             "creditCost": "{creditCost} Credits",

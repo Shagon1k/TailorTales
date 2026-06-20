@@ -1,4 +1,4 @@
-import { IsEnum, IsIn, IsInt, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { Language, StoryType } from '../../../generated/prisma/client.js';
 import {
     ALLOWED_PAGE_COUNTS,
@@ -9,6 +9,11 @@ import {
 export class CreateStoryDto {
     @IsString()
     childId!: string;
+
+    /** Optional protagonist. Omit for a child-led story (no recurring character). */
+    @IsString()
+    @IsOptional()
+    characterId?: string;
 
     @IsEnum(StoryType)
     type!: StoryType;

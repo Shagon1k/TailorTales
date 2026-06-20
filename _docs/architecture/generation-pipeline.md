@@ -72,10 +72,15 @@ flowchart TD
 
 ### 1. Planning — _the only text-generation call_
 
-Picks the `StoryBlueprint` for the story's `type` (first by `createdAt`), builds the system
-and user prompts via [`StoryPromptBuilder`](../../backend/src/modules/generation/story-prompt-builder.ts),
+Picks the `StoryBlueprint` for the story's `type` (first by `createdAt`), loads the chosen
+protagonist (`Story.characterId`, if any), builds the system and user prompts via
+[`StoryPromptBuilder`](../../backend/src/modules/generation/story-prompt-builder.ts),
 computes a `max_tokens` ceiling, and asks the LLM for a **Story Plan** — a JSON object with
 this shape:
+
+The user prompt composes: the child's name + age (audience targeting) · the chosen Character
+as the protagonist when present (else child-led) · the child's `interests` as an **optional,
+non-forcing hint** (woven in only when they fit) · the ArtStyle's `promptPrefix`.
 
 ```json
 {

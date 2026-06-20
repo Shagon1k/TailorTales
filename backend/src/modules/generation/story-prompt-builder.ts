@@ -16,11 +16,12 @@ import {
     STORY_STRUCTURE_RULES_HEADER,
     STORY_SYSTEM_PROMPT_SUFFIX,
     buildCharacterPromptSection,
+    buildInterestsHintSection,
 } from './generation.prompts.js';
 import { LANGUAGE_NAMES } from '../../common/languages.constants.js';
 
 interface IPromptContext {
-    child: Pick<Child, 'name' | 'birthdate'>;
+    child: Pick<Child, 'name' | 'birthdate' | 'interests'>;
     artStyle: Pick<ArtStyle, 'promptPrefix'>;
     blueprint: Pick<StoryBlueprint, 'systemPrompt'>;
     question: string;
@@ -56,6 +57,9 @@ export class StoryPromptBuilder {
             '',
             `QUESTION TO ANSWER: "${ctx.question}"`,
             '',
+            ...(ctx.child.interests.length > 0
+                ? [buildInterestsHintSection(ctx.child.interests), '']
+                : []),
             ...(ctx.character
                 ? [buildCharacterPromptSection(ctx.character.name, ctx.character.description), '']
                 : []),

@@ -391,6 +391,12 @@
             "characterModal": {
                 "editTitle": "Редактировать персонажа",
                 "addTitle": "Добавить персонажа"
+            },
+            "characterPicker": {
+                "title": "Выберите персонажа",
+                "listLabel": "Выбор персонажа",
+                "none": "Без персонажа — история про самого читателя",
+                "createNew": "+ Создать нового персонажа"
             }
         },
         "summary": {
@@ -405,8 +411,8 @@
                 "style": "Стиль"
             },
             "characterAction": {
-                "add": "Добавить",
-                "edit": "Изменить"
+                "choose": "Выбрать",
+                "change": "Изменить"
             },
             "lengthValue": "{pageCount} стр.",
             "creditCost": "{creditCost} кредитов",

@@ -4,7 +4,8 @@ import type { ICharacter } from '@/types/character.types';
 export interface ICreateCharacterPayload {
     name: string;
     description: string;
-    childId?: string;
+    /** Owning child — every character belongs to one child. */
+    childId: string;
 }
 
 export type IUpdateCharacterPayload = Partial<

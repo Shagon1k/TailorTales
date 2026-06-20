@@ -40,6 +40,20 @@ export function buildCharacterPromptSection(name: string, description: string): 
     ].join('\n');
 }
 
+/**
+ * Builds an OPTIONAL interests hint from the reader's hobbies. These are inspiration,
+ * never a requirement: the LLM may weave one or two in when they fit the story, and must
+ * not force them, list them mechanically, or bend the plot to fit. Returns '' when empty,
+ * so callers omit the section entirely.
+ */
+export function buildInterestsHintSection(interests: string[]): string {
+    if (interests.length === 0) return '';
+    return [
+        `INTERESTS (optional inspiration — the reader enjoys: ${interests.join(', ')}):`,
+        '  Weave one or two in ONLY if they fit the story naturally. Never force them, list them mechanically, or bend the plot to include them.',
+    ].join('\n');
+}
+
 export const MODERATION_SYSTEM_PROMPT = [
     "You are a content safety reviewer for a children's book platform.",
     'Decide if the text is appropriate for children aged 3–12.',

@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 import {
     CHARACTER_DESCRIPTION_MAX_LENGTH,
     CHARACTER_NAME_MAX_LENGTH,
@@ -15,8 +15,7 @@ export class CreateCharacterDto {
     @MaxLength(CHARACTER_DESCRIPTION_MAX_LENGTH)
     description!: string;
 
-    /** Associate with a specific child. Omit for a standalone user-level character. */
+    /** Owning child — every character belongs to one child. */
     @IsString()
-    @IsOptional()
-    childId?: string;
+    childId!: string;
 }

@@ -90,7 +90,18 @@ export class StoriesService {
         return Promise.all(stories.map((s) => this.toSummary(s)));
     }
 
-    create(userId: string, dto: CreateStoryDto): Promise<Story> {
+    async create(userId: string, dto: CreateStoryDto): Promise<Story> {
+        // A chosen protagonist must belong to the requester AND to the story's child —
+        // characters are scoped to a child. NotFoundException (not Forbidden) avoids
+        // leaking whether the character id exists for another user/child.
+        if (dto.characterId) {
+            const character = await this.prisma.character.findFirst({
+                where: { id: dto.characterId, userId, childId: dto.childId },
+                select: { id: true },
+            });
+            if (!character) throw new NotFoundException(`Character ${dto.characterId} not found`);
+        }
+
         // blueprintId is intentionally absent — the generation pipeline auto-selects
         // the appropriate StoryBlueprint by StoryType in Phase 5.
         return this.prisma.story.create({
@@ -102,6 +113,7 @@ export class StoriesService {
                 pageCount: dto.pageCount,
                 artStyleId: dto.artStyleId,
                 language: dto.language,
+                ...(dto.characterId !== undefined && { characterId: dto.characterId }),
             },
         });
     }
