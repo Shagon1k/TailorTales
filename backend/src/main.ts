@@ -19,6 +19,8 @@ async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
     const configService = app.get(ConfigService);
 
+    app.set('trust proxy', 1);
+
     app.useStaticAssets(join(__dirname, 'modules', 'rendering', 'assets', 'fonts'), {
         prefix: '/static/fonts',
         setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
