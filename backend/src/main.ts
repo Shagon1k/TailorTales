@@ -3,6 +3,7 @@ import './instrument.js';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
@@ -26,6 +27,7 @@ async function bootstrap(): Promise<void> {
         origin: configService.getOrThrow<string>('FRONTEND_URL'),
         credentials: true,
     });
+    app.use(helmet());
     app.use(cookieParser());
     app.useGlobalFilters(new AllExceptionsFilter());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
