@@ -32,8 +32,10 @@ jobs:
             - name: Check (lint + format)
               run: pnpm check
 
-            - name: Type-check
-              run: pnpm type-check
+            # next build type-checks against generated .next/types (route params, page props, etc.)
+            # which tsc alone misses — catches mismatches between Next.js framework types and our code
+            - name: Build (frontend)
+              run: pnpm --filter frontend build
 
             - name: Test
               run: pnpm test

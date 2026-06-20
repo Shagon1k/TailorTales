@@ -2,15 +2,17 @@ import type { Metadata } from 'next';
 import { Newsreader, Plus_Jakarta_Sans, Caveat, Geist_Mono } from 'next/font/google';
 import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import '@mantine/core/styles.css';
 import '../../styles/globals.scss';
 import { getServerSubscription } from '@/api/subscription.server';
 import { getServerUser } from '@/api/user.server';
 import CookieConsent from '@/components/shared/CookieConsent/CookieConsent';
+import JsonLd from '@/components/shared/JsonLd/JsonLd';
 import StarField from '@/components/shared/StarField/StarField';
-import type { ILocale } from '@/i18n/config';
 import Providers from '../providers';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 const newsreader = Newsreader({
     subsets: ['latin'],
@@ -37,17 +39,37 @@ const geistMono = Geist_Mono({
     display: 'swap',
 });
 
-export const metadata: Metadata = {
-    title: {
-        default: 'TailorTales',
-        template: 'TailorTales | %s',
-    },
-    description: 'Personalized AI-generated storybooks & comics for curious kids',
-};
-
 interface ILocaleLayoutProps {
     children: React.ReactNode;
-    params: Promise<{ locale: ILocale }>;
+    params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({
+    params,
+}: Pick<ILocaleLayoutProps, 'params'>): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'seo' });
+
+    return {
+        metadataBase: new URL(SITE_URL),
+        title: {
+            default: 'TailorTales',
+            template: 'TailorTales | %s',
+        },
+        description: t('defaultDescription'),
+        applicationName: 'TailorTales',
+        openGraph: {
+            type: 'website',
+            siteName: t('siteName'),
+            description: t('defaultDescription'),
+            images: [{ url: '/og-default.png', width: 1200, height: 630, alt: t('ogImageAlt') }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            description: t('defaultDescription'),
+            images: ['/og-default.png'],
+        },
+    };
 }
 
 export default async function LocaleLayout({
@@ -55,7 +77,11 @@ export default async function LocaleLayout({
     params,
 }: Readonly<ILocaleLayoutProps>): Promise<React.ReactElement> {
     const { locale } = await params;
-    const [initialUser, messages] = await Promise.all([getServerUser(), getMessages()]);
+    const [initialUser, messages, tSeo] = await Promise.all([
+        getServerUser(),
+        getMessages(),
+        getTranslations({ locale, namespace: 'seo' }),
+    ]);
     // Sequential: subscription requires auth, so we fetch only when user exists.
     const initialSubscription = initialUser ? await getServerSubscription() : null;
     const fontClasses = `${newsreader.variable} ${jakarta.variable} ${caveat.variable} ${geistMono.variable}`;
@@ -64,6 +90,7 @@ export default async function LocaleLayout({
         <html lang={locale} {...mantineHtmlProps} className={fontClasses}>
             <head>
                 <ColorSchemeScript />
+                <JsonLd siteName={tSeo('siteName')} description={tSeo('defaultDescription')} />
             </head>
             <body>
                 <StarField />

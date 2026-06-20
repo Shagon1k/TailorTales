@@ -1,4 +1,9 @@
 {
+    "seo": {
+        "siteName": "TailorTales",
+        "defaultDescription": "Personalized AI-generated storybooks and comics that turn your child's questions into beautiful, custom illustrated tales — 5 to 20 pages, theirs to keep.",
+        "ogImageAlt": "TailorTales — personalized storybooks for curious kids"
+    },
     "common": {
         "nav": {
             "howItWorks": "How it works"
@@ -57,6 +62,9 @@
         "subscriptionCanceled": "Your subscription has ended — you're now on the free plan"
     },
     "home": {
+        "page": {
+            "description": "Turn your child's endless 'why?' into a personalized illustrated storybook. TailorTales crafts custom AI tales by name, age and curiosity — free first chapter."
+        },
         "hero": {
             "eyebrow": "A small light at bedtime",
             "heading": "Where their <highlight>questions</highlight> become their <highlight>stories</highlight>.",
@@ -102,7 +110,8 @@
     },
     "howItWorks": {
         "page": {
-            "title": "How it works"
+            "title": "How it works",
+            "description": "See how TailorTales turns a name, an age and a single question into a personalized, illustrated children's book in three simple steps."
         },
         "hero": {
             "eyebrow": "How it works",
@@ -138,7 +147,8 @@
     },
     "pricing": {
         "page": {
-            "title": "Pricing"
+            "title": "Pricing",
+            "description": "Simple plans for personalized AI storybooks. Start free with your first chapter — no card required. Upgrade anytime for more tales and pages."
         },
         "hero": {
             "eyebrow": "Pay per tale or join the Story Hour",
@@ -252,7 +262,8 @@
     },
     "contact": {
         "page": {
-            "title": "Contact"
+            "title": "Contact",
+            "description": "Questions about TailorTales? Get in touch — we'd love to hear from you about personalized storybooks for your curious kids."
         },
         "hero": {
             "eyebrow": "Say hello",
@@ -278,7 +289,8 @@
     },
     "privacy": {
         "page": {
-            "title": "Privacy"
+            "title": "Privacy",
+            "description": "How TailorTales collects, uses and protects your and your child's data. Read our privacy commitments and your rights."
         },
         "hero": {
             "eyebrow": "Quiet matters",
