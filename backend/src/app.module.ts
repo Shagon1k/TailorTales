@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -35,6 +36,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
             validate: validateEnv,
         }),
         ScheduleModule.forRoot(),
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
         BullModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({
@@ -63,6 +65,10 @@ import { PrismaModule } from './prisma/prisma.module.js';
     ],
     controllers: [AppController],
     providers: [
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
