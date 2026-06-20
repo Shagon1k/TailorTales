@@ -1,4 +1,9 @@
 {
+    "seo": {
+        "siteName": "TailorTales",
+        "defaultDescription": "Personalisierte, KI-generierte Bilderbücher und Comics, die die Fragen deines Kindes in liebevoll illustrierte Geschichten verwandeln — 5 bis 20 Seiten zum Behalten.",
+        "ogImageAlt": "TailorTales — personalisierte Bilderbücher für neugierige Kinder"
+    },
     "common": {
         "nav": {
             "howItWorks": "So funktioniert's"
@@ -57,6 +62,9 @@
         "subscriptionCanceled": "Dein Abonnement ist beendet — du bist jetzt im kostenlosen Plan"
     },
     "home": {
+        "page": {
+            "description": "Verwandle das endlose „Warum?“ deines Kindes in ein personalisiertes Bilderbuch. TailorTales gestaltet KI-Geschichten nach Name, Alter und Neugier — erstes Kapitel gratis."
+        },
         "hero": {
             "eyebrow": "Ein kleines Licht zur Schlafenszeit",
             "heading": "Wo ihre <highlight>Fragen</highlight> ihre <highlight>Geschichten</highlight> werden.",
@@ -102,7 +110,8 @@
     },
     "howItWorks": {
         "page": {
-            "title": "So funktioniert's"
+            "title": "So funktioniert's",
+            "description": "So macht TailorTales aus einem Namen, einem Alter und einer Frage in drei einfachen Schritten ein personalisiertes, illustriertes Kinderbuch."
         },
         "hero": {
             "eyebrow": "So funktioniert's",
@@ -138,7 +147,8 @@
     },
     "pricing": {
         "page": {
-            "title": "Preise"
+            "title": "Preise",
+            "description": "Einfache Tarife für personalisierte KI-Bilderbücher. Starte gratis mit dem ersten Kapitel — ohne Karte. Jederzeit erweiterbar für mehr Geschichten und Seiten."
         },
         "hero": {
             "eyebrow": "Pro Geschichte zahlen oder der Story Hour beitreten",
@@ -252,7 +262,8 @@
     },
     "contact": {
         "page": {
-            "title": "Kontakt"
+            "title": "Kontakt",
+            "description": "Fragen zu TailorTales? Schreib uns — wir freuen uns, von dir über personalisierte Bilderbücher für neugierige Kinder zu hören."
         },
         "hero": {
             "eyebrow": "Hallo sagen",
@@ -278,7 +289,8 @@
     },
     "privacy": {
         "page": {
-            "title": "Datenschutz"
+            "title": "Datenschutz",
+            "description": "Wie TailorTales deine Daten und die deines Kindes erhebt, nutzt und schützt. Lies unsere Datenschutzversprechen und deine Rechte."
         },
         "hero": {
             "eyebrow": "Stille ist wichtig",
@@ -309,8 +321,6 @@
     },
     "auth": {
         "login": {
-            "headerHint": "Neu hier?",
-            "headerCta": "Kostenlose Geschichte beginnen →",
             "eyebrow": "· Anmelden ·",
             "heading": "Zurück in die Werkstatt.",
             "subheading": "Melde dich an, um deine Bibliothek, die Profile deiner Kinder und begonnene Geschichten zu finden.",

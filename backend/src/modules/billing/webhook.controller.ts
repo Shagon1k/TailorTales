@@ -10,6 +10,7 @@ import {
     type RawBodyRequest,
 } from '@nestjs/common';
 import type { Request } from 'express';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Public } from '../auth/decorators/public.decorator.js';
 import { BillingWebhookService } from './billing-webhook.service.js';
 import { PADDLE_CLIENT, type IPaddleClient } from './billing.types.js';
@@ -24,6 +25,7 @@ export class WebhookController {
     ) {}
 
     @Public()
+    @SkipThrottle()
     @Post('paddle')
     @HttpCode(200)
     async handlePaddleWebhook(

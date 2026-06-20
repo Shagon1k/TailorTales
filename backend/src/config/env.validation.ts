@@ -1,5 +1,14 @@
 import { plainToInstance } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Min, validateSync } from 'class-validator';
+import {
+    IsBoolean,
+    IsEnum,
+    IsInt,
+    IsOptional,
+    IsString,
+    Min,
+    MinLength,
+    validateSync,
+} from 'class-validator';
 
 enum Environment {
     Development = 'development',
@@ -23,6 +32,7 @@ class EnvironmentVariables {
     GOOGLE_CLIENT_SECRET!: string;
 
     @IsString()
+    @MinLength(32)
     JWT_SECRET!: string;
 
     @IsInt()

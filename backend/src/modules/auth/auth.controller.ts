@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
@@ -17,6 +18,7 @@ export class AuthController {
     ) {}
 
     @Public()
+    @Throttle({ default: { ttl: 60000, limit: 10 } })
     @Get('google')
     @UseGuards(AuthGuard('google'))
     googleLogin(): void {

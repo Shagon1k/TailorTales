@@ -3,6 +3,7 @@ import './instrument.js';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
@@ -18,6 +19,8 @@ async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
     const configService = app.get(ConfigService);
 
+    app.set('trust proxy', 1);
+
     app.useStaticAssets(join(__dirname, 'modules', 'rendering', 'assets', 'fonts'), {
         prefix: '/static/fonts',
         setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
@@ -26,6 +29,7 @@ async function bootstrap(): Promise<void> {
         origin: configService.getOrThrow<string>('FRONTEND_URL'),
         credentials: true,
     });
+    app.use(helmet());
     app.use(cookieParser());
     app.useGlobalFilters(new AllExceptionsFilter());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));

@@ -43,7 +43,7 @@
 | Notifications         | Email + in-app (bell + toast)                                                                                                                             |
 | Testing               | Vitest + React Testing Library                                                                                                                            |
 | Containerization      | Docker + docker-compose for dev; Dockerfiles deployed via **dokploy**                                                                                     |
-| CI/CD                 | GitHub Actions (lint + type-check + test) — minimal at start                                                                                              |
+| CI/CD                 | GitHub Actions (lint + `next build` + test) — `next build` type-checks Next.js route types that `tsc` alone misses                                        |
 | Observability         | Pino logs only at MVP (no Sentry/OTel for now)                                                                                                            |
 | Compliance            | GDPR (EU-only target audience at MVP)                                                                                                                     |
 
@@ -200,6 +200,8 @@ Privacy · Contact _(both static pages)_
 | 12  | Reconsider paid tier names ("Story Hour", "Family Workshop")       | Current names feel functional rather than emotionally resonant with the product. Consider a naming pass before launch — names propagate to `PricingTier.name` (DB unique key used for seeding and plan copy lookup), Paddle catalog product names, and all marketing copy, so a rename requires a migration + re-seed + Paddle catalog update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Pre-launch                 |
 | 13  | Global page transitions via View Transitions API                   | Next.js 16 supports `experimental: { viewTransition: true }` in `next.config.ts`, which wires the View Transitions API automatically to every `<Link>` click. Phase 13 uses `document.startViewTransition` only for locale switching (opt-in, controlled). Enabling it globally is deferred because: (1) 300ms cross-fade is too slow for fast in-app navigation (library, workshop, reader); (2) per-route animation tuning (duration, easing, `view-transition-name` scoping) requires a dedicated design + QA pass across all routes; (3) the flag is still `experimental` — API may change. Revisit when the flag graduates or a design pass for motion is planned.                                                                                                                                                                                                                                                                                                      | Post-MVP / motion pass     |
 | 14  | Custom GA4 event tracking                                          | Phase 15 ships only the GA4 script + cookie consent gate (page views + Enhanced Measurement auto-tracking). Custom events via `sendGAEvent()` — e.g. `story_created`, `signup_completed`, `plan_upgraded` — require real user traffic to know which funnels are worth instrumenting. Add after first users arrive. Use `@next/third-parties/google` `sendGAEvent` at call sites; no new dependencies needed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Post-MVP                   |
+| 15  | ThrottlerModule Redis storage                                      | Current `@nestjs/throttler` uses in-memory storage — counters reset on restart and are not shared across instances. Upgrade to `@nestjs-throttler-storage-redis` (using the existing BullMQ Redis connection) when horizontal scaling is introduced. No code change needed until multi-instance deploy.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | When multi-instance deploy |
+| 16  | SEO keyword research + meta-description refinement                 | SEO foundation shipped (sitemap, robots, hreflang/canonical, OG/Twitter, JSON-LD, per-page descriptions in EN/DE/RU). Descriptions are benefit-led but not keyword-validated — real keyword research needs live Search Console query data + search-volume tooling. Refine titles/descriptions from GSC Performance once traffic arrives. (`<meta keywords>` intentionally omitted — ignored by Google.)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Post-launch (GSC data)     |
 
 ### In-code TODO cross-reference
 
@@ -979,7 +981,62 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ---
 
-### Phase 16 — Final Manual Check-up
+### Phase 16 — Security Hardening & SEO Foundation ✅
+
+**Goal:** harden the backend security posture and build the frontend SEO foundation before production launch.
+
+**Sub-tasks:**
+
+**Rate limiting**
+
+- [x] Install `@nestjs/throttler`; wire `ThrottlerModule.forRoot` with global default (100 req/60 s)
+- [x] Register `ThrottlerGuard` as first `APP_GUARD` (runs before `JwtAuthGuard`)
+- [x] Per-route overrides: `GET /auth/google` → 10 req/min; `POST /contact` → 5 req/min
+- [x] `@SkipThrottle()` on `POST /webhooks/paddle` (Paddle servers must not be throttled)
+- [x] `app.set('trust proxy', 1)` in `main.ts` so `req.ip` resolves to the real client IP behind Cloudflare/dokploy; without this all users share one throttle bucket
+
+**Security headers**
+
+- [x] Install `helmet`; add `app.use(helmet())` in `main.ts`
+- [x] CSRF analysis: `SameSite: lax` cookie + same-site architecture (`tailortales.app` → `api.tailortales.app`) makes `csurf` unnecessary — documented, no action needed
+
+**JWT hardening**
+
+- [x] Add `@MinLength(32)` to `JWT_SECRET` in `env.validation.ts`; process exits at boot if the secret is weaker
+
+**CI**
+
+- [x] Replace `pnpm type-check` (tsc-only) with `pnpm --filter frontend build` in `ci.yml`; `next build` type-checks against `.next/types/**` (generated route-param types) that `tsc` alone misses
+
+**SEO**
+
+- [x] `frontend/src/app/sitemap.ts` — 5 public pages × 3 locales; each entry carries `alternates.languages` hreflang map
+- [x] `frontend/src/app/robots.ts` — disallow `admin`, `account`, `library`, `workshop`, `login`, and `api` routes
+- [x] `frontend/src/app/manifest.ts` — PWA manifest with `theme_color: '#1a0a00'`, `display: 'standalone'`
+- [x] `frontend/src/components/shared/JsonLd/JsonLd.tsx` — `Organization` + `WebSite` JSON-LD injected site-wide in `<head>`
+- [x] `frontend/src/utils/seo.utils.ts` — `buildMetadata()` helper: canonical, hreflang + `x-default`, OG, Twitter in one call
+- [x] `[locale]/layout.tsx` — `generateMetadata` with `metadataBase`, title template, site-wide OG/Twitter defaults, `JsonLd`
+- [x] All 5 public pages (`/`, `/how-it-works`, `/pricing`, `/contact`, `/privacy`) — `generateMetadata` with per-page canonical, hreflang, and locale-aware descriptions (EN/DE/RU)
+- [x] `[locale]/login/layout.tsx` — `robots: { index: false }` noindex
+- [x] `NEXT_PUBLIC_SITE_URL` env var added; per-page SEO descriptions added to all 3 locale JSON files
+
+**Acceptance Check:**
+
+- `GET /sitemap.xml` returns 15 entries (5 pages × 3 locales) with correct hreflang alternates
+- `GET /robots.txt` disallows all auth-gated and admin paths
+- `GET /manifest.webmanifest` returns valid PWA manifest
+- Public page `<head>` includes: locale-correct canonical, hreflang ×3 + `x-default`, OG tags, Twitter card, JSON-LD `@graph`
+- `/login` carries `<meta name="robots" content="noindex,follow">`
+- Rate limiting active: `POST /contact` rejects after 5 req/min, `GET /auth/google` after 10 req/min
+- Helmet headers present on all responses (`X-Frame-Options`, `X-Content-Type-Options`, etc.)
+- Process fails to start if `JWT_SECRET` is shorter than 32 characters
+- CI `next build` step passes; Next.js route-param type errors caught at build time
+
+**Deliverables:** `_docs/architecture/security.md` (new) + `_docs/guides/seo.md` (new) + env vars doc update + ROADMAP progress.
+
+---
+
+### Phase 17 — Final Manual Check-up
 
 **Goal:** owner-led end-to-end walk-through of the full product on UAT before production deploy. UI polish, copy corrections, and minor UX fixes only — no new features, no architecture changes.
 
@@ -1005,7 +1062,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ---
 
-### Phase 17 — Environments & Production Deploy
+### Phase 18 — Environments & Production Deploy
 
 **Goal:** three environments (dev / UAT / prod) fully configured and documented; app live on production domain via dokploy.
 
@@ -1086,6 +1143,7 @@ flowchart LR
 | `NEXT_PUBLIC_PADDLE_ENV`          | `sandbox`               | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
 | `NEXT_PUBLIC_BACKEND_URL`         | `http://localhost:3001` | `http://localhost:3001`                                     | `https://api-uat.tailortales.app`                                 | `https://api.tailortales.app`                             |
 | `NEXT_PUBLIC_STORAGE_URL`         | `http://localhost:9000` | `http://localhost:9000`                                     | CloudFront or S3 URL                                              | CloudFront or S3 URL                                      |
+| `NEXT_PUBLIC_SITE_URL`            | `http://localhost:3000` | `http://localhost:3000`                                     | `https://uat.tailortales.app`                                     | `https://tailortales.app`                                 |
 | `SENTRY_ENABLED`                  | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
 | `SENTRY_DSN`                      | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
 | `SENTRY_ENVIRONMENT`              | —                       | —                                                           | `uat`                                                             | `production`                                              |
@@ -1146,6 +1204,17 @@ flowchart LR
 - [ ] Confirm single OpenRouter account is sufficient (no env isolation needed — model names differ per env)
 - [ ] Set cheaper models for UAT (`OPENROUTER_TEXT_MODEL` / `OPENROUTER_IMAGE_MODEL`) to keep UAT generation cost low
 
+**SEO & discoverability**
+
+> SEO foundation is built (sitemap, robots, hreflang/canonical, OG/Twitter, JSON-LD, per-page descriptions EN/DE/RU). What remains is environment config + launch-time setup.
+
+- [ ] Set `NEXT_PUBLIC_SITE_URL` per environment (canonical origin: non-www, no trailing slash — `https://tailortales.app` prod, `https://uat.tailortales.app` UAT)
+- [ ] Enforce `www → non-www` 301 redirect at Cloudflare/dokploy so the live host matches the canonical tags
+- [ ] Add the real `og-default.png` (1200×630) social-share image to `frontend/public/` (currently referenced but absent — shares render without a thumbnail until then)
+- [ ] Add dedicated 192×192 + 512×512 (incl. maskable) PWA icons to `frontend/public/` for full installability (manifest currently reuses the 32px favicon + 180px apple-touch)
+- [ ] **Google Search Console:** add the prod property, verify ownership (DNS record or meta-tag via root metadata), submit `https://tailortales.app/sitemap.xml`; check Coverage + Performance after a few days
+- [ ] Consider noindexing the UAT environment entirely (UAT `NEXT_PUBLIC_SITE_URL` should never be submitted to GSC; optionally serve `X-Robots-Tag: noindex` on UAT)
+
 **Legal & compliance (GDPR — must land before prod launch)**
 
 > Technical GDPR side (export, delete, retention) shipped in Phase 9. What remains is paperwork.
@@ -1183,6 +1252,7 @@ flowchart LR
 - PDF fonts render correctly (not fallback system fonts)
 - Backups configured and tested with a restore drill
 - All `USE_*_STUBS` flags are `false` on prod
+- [ ] Rate limiting active — verify `POST /contact` rejects after 5 req/min, `GET /auth/google` after 10 req/min
 
 - [ ] Audit and expand `package.json` scripts for each environment — ensure `dev`, `build`, `start`, `migrate`, `seed`, and any CI scripts are correct and complete for UAT and prod contexts; add missing scripts (e.g. `migrate:prod`, `seed:prod`) if needed
 
@@ -1245,7 +1315,8 @@ flowchart LR
 | 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                           |
 | 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/CLAUDE.md and frontend/CLAUDE.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                        |
 | 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain. |
-| 16 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
-| 17 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
+| 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                  |
+| 17 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
+| 18 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval
