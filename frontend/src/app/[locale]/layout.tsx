@@ -90,7 +90,6 @@ export default async function LocaleLayout({
         <html lang={locale} {...mantineHtmlProps} className={fontClasses}>
             <head>
                 <ColorSchemeScript />
-                { }
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
