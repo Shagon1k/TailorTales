@@ -17,12 +17,12 @@
 
 ### Auth
 
-| Variable               | Required | Default | Notes                                                                                                                                            |
-| ---------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `GOOGLE_CLIENT_ID`     | yes      | —       | Google OAuth 2.0 client ID.                                                                                                                      |
-| `GOOGLE_CLIENT_SECRET` | yes      | —       | Google OAuth 2.0 client secret.                                                                                                                  |
-| `JWT_SECRET`           | yes      | —       | Signs and verifies JWTs. Rotate to invalidate all active sessions.                                                                               |
-| `JWT_EXPIRY_DAYS`      | no       | `7`     | How long an issued JWT is valid. Clearing the cookie does not revoke the token — see [auth.md](../architecture/auth.md#logout-and-jwt-lifetime). |
+| Variable               | Required | Default | Notes                                                                                                                                                 |
+| ---------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GOOGLE_CLIENT_ID`     | yes      | —       | Google OAuth 2.0 client ID.                                                                                                                           |
+| `GOOGLE_CLIENT_SECRET` | yes      | —       | Google OAuth 2.0 client secret.                                                                                                                       |
+| `JWT_SECRET`           | yes      | —       | Signs and verifies JWTs. **Minimum 32 characters** (enforced at startup). Generate with `openssl rand -base64 48`. Rotate to invalidate all sessions. |
+| `JWT_EXPIRY_DAYS`      | no       | `7`     | How long an issued JWT is valid. Clearing the cookie does not revoke the token — see [auth.md](../architecture/auth.md#logout-and-jwt-lifetime).      |
 
 ### URLs
 
@@ -115,6 +115,7 @@ each value and [monitoring.md](monitoring.md) for how they're wired.
 
 | Variable                          | Required          | Default                 | Notes                                                                                                                                                                                                              |
 | --------------------------------- | ----------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL`            | prod              | `http://localhost:3000` | Canonical public frontend origin. Used in sitemap, OG image URLs, JSON-LD, and robots. Must be non-www, no trailing slash (e.g. `https://tailortales.app`). See [seo.md](seo.md).                                  |
 | `NEXT_PUBLIC_BACKEND_URL`         | no                | `http://localhost:3001` | Backend origin. Set in `frontend/.env.example`.                                                                                                                                                                    |
 | `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | for live checkout | —                       | Paddle.js client-side token. Sandbox tokens start with `test_`; live tokens start with `live_`. The pricing CTA degrades gracefully when this is absent.                                                           |
 | `NEXT_PUBLIC_PADDLE_ENV`          | no                | `sandbox`               | `sandbox` \| `production`. Must match the backend's `PADDLE_ENVIRONMENT`.                                                                                                                                          |
@@ -156,15 +157,16 @@ USE_PADDLE_STUBS=true
 
 ## Production-critical differences from dev
 
-| Variable                   | Prod value                                   |
-| -------------------------- | -------------------------------------------- |
-| `NODE_ENV`                 | `production`                                 |
-| `STORAGE_ENDPOINT`         | **Unset** (use AWS S3, not MinIO)            |
-| `STORAGE_FORCE_PATH_STYLE` | **Unset** (defaults false)                   |
-| `USE_AI_STUBS`             | `false`                                      |
-| `USE_EMAIL_STUBS`          | `false`                                      |
-| `USE_PADDLE_STUBS`         | `false`                                      |
-| `PADDLE_ENVIRONMENT`       | `production`                                 |
-| `JWT_SECRET`               | Long, random secret — never reuse dev values |
-| `BACKEND_URL`              | Your production backend domain               |
-| `FRONTEND_URL`             | Your production frontend domain              |
+| Variable                   | Prod value                                            |
+| -------------------------- | ----------------------------------------------------- |
+| `NODE_ENV`                 | `production`                                          |
+| `STORAGE_ENDPOINT`         | **Unset** (use AWS S3, not MinIO)                     |
+| `STORAGE_FORCE_PATH_STYLE` | **Unset** (defaults false)                            |
+| `USE_AI_STUBS`             | `false`                                               |
+| `USE_EMAIL_STUBS`          | `false`                                               |
+| `USE_PADDLE_STUBS`         | `false`                                               |
+| `PADDLE_ENVIRONMENT`       | `production`                                          |
+| `JWT_SECRET`               | Long random secret ≥32 chars — never reuse dev values |
+| `NEXT_PUBLIC_SITE_URL`     | `https://tailortales.app` (canonical non-www origin)  |
+| `BACKEND_URL`              | Your production backend domain                        |
+| `FRONTEND_URL`             | Your production frontend domain                       |
