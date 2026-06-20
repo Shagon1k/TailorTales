@@ -7,8 +7,8 @@ import '@mantine/core/styles.css';
 import '../../styles/globals.scss';
 import { getServerSubscription } from '@/api/subscription.server';
 import { getServerUser } from '@/api/user.server';
+import { buildJsonLd } from '@/utils/seo.utils';
 import CookieConsent from '@/components/shared/CookieConsent/CookieConsent';
-import JsonLd from '@/components/shared/JsonLd/JsonLd';
 import StarField from '@/components/shared/StarField/StarField';
 import Providers from '../providers';
 
@@ -90,7 +90,13 @@ export default async function LocaleLayout({
         <html lang={locale} {...mantineHtmlProps} className={fontClasses}>
             <head>
                 <ColorSchemeScript />
-                <JsonLd siteName={tSeo('siteName')} description={tSeo('defaultDescription')} />
+                { }
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: buildJsonLd(SITE_URL, tSeo('siteName'), tSeo('defaultDescription')),
+                    }}
+                />
             </head>
             <body>
                 <StarField />

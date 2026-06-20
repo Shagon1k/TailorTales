@@ -321,8 +321,6 @@
     },
     "auth": {
         "login": {
-            "headerHint": "New here?",
-            "headerCta": "Begin a free tale →",
             "eyebrow": "· Sign in ·",
             "heading": "Step back into the workshop.",
             "subheading": "Sign in to find your library, your children's profiles, and any tales you began but didn't finish.",

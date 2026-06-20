@@ -53,7 +53,7 @@ Access: `GET /manifest.webmanifest`
 
 ## JSON-LD structured data
 
-`frontend/src/components/shared/JsonLd/JsonLd.tsx` — rendered as a `<script type="application/ld+json">` tag in the `<head>` via the root locale layout.
+Inlined directly in `frontend/src/app/[locale]/layout.tsx` as a `<script type="application/ld+json" dangerouslySetInnerHTML={...}>` tag inside the `<head>` JSX. React 19 throws when a `<script>` tag is rendered inside a React wrapper component during hydration, so the script must live directly in the RSC layout — not in a separate component.
 
 Emits a single `@graph` with two nodes:
 
@@ -75,7 +75,7 @@ These are the only schema.org types relevant to TailorTales at MVP. No `Product`
   wraps it automatically.
 - `description` — locale-aware default from `seo.defaultDescription` translation key.
 - `openGraph` + `twitter` — site-wide fallback OG/Twitter card.
-- `JsonLd` — Organization + WebSite structured data, rendered once per page load.
+- Inline JSON-LD `<script>` — Organization + WebSite structured data, rendered once per page load.
 
 ### Page-level overrides (shared helper)
 

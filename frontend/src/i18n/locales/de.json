@@ -321,8 +321,6 @@
     },
     "auth": {
         "login": {
-            "headerHint": "Neu hier?",
-            "headerCta": "Kostenlose Geschichte beginnen →",
             "eyebrow": "· Anmelden ·",
             "heading": "Zurück in die Werkstatt.",
             "subheading": "Melde dich an, um deine Bibliothek, die Profile deiner Kinder und begonnene Geschichten zu finden.",

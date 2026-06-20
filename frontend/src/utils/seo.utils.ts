@@ -23,6 +23,30 @@ interface IBuildMetadataParams {
     ogImageAlt: string;
 }
 
+export function buildJsonLd(siteUrl: string, siteName: string, description: string): string {
+    return JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+            {
+                '@type': 'Organization',
+                '@id': `${siteUrl}/#organization`,
+                name: siteName,
+                url: siteUrl,
+                logo: `${siteUrl}/apple-icon.png`,
+                description,
+            },
+            {
+                '@type': 'WebSite',
+                '@id': `${siteUrl}/#website`,
+                name: siteName,
+                url: siteUrl,
+                description,
+                publisher: { '@id': `${siteUrl}/#organization` },
+            },
+        ],
+    });
+}
+
 /**
  * Builds canonical + hreflang alternates and Open Graph / Twitter tags for a public page.
  * URLs are relative — Next resolves them against `metadataBase` (set in the locale layout).

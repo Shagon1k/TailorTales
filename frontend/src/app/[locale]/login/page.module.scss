@@ -15,18 +15,6 @@
     padding: var(--space-5) var(--space-8);
 }
 
-.header__cta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-family: var(--font-sans);
-    font-size: var(--fs-base);
-}
-
-.header__cta-hint {
-    color: var(--text-secondary);
-}
-
 .main {
     flex: 1;
     display: grid;
