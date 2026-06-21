@@ -12,6 +12,12 @@ export type IUpdateCharacterPayload = Partial<
     Pick<ICreateCharacterPayload, 'name' | 'description'>
 >;
 
+export interface ICreateCharacterFromPromptPayload {
+    childId: string;
+    /** Free-text idea the AI expands into a character. */
+    prompt: string;
+}
+
 export const charactersApi = {
     getAll: (childId?: string): Promise<ICharacter[]> => {
         const query = childId ? `?childId=${encodeURIComponent(childId)}` : '';
@@ -20,6 +26,12 @@ export const charactersApi = {
 
     create: (payload: ICreateCharacterPayload): Promise<ICharacter> =>
         apiFetch<ICharacter>('/characters', { method: 'POST', body: JSON.stringify(payload) }),
+
+    createFromPrompt: (payload: ICreateCharacterFromPromptPayload): Promise<ICharacter> =>
+        apiFetch<ICharacter>('/characters/from-prompt', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+        }),
 
     update: (id: string, payload: IUpdateCharacterPayload): Promise<ICharacter> =>
         apiFetch<ICharacter>(`/characters/${id}`, {

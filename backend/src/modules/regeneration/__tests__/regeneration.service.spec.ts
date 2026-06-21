@@ -77,6 +77,7 @@ function createService(prisma = createPrismaMock()) {
         generateStoryPlan: vi.fn(),
         generatePageText: vi.fn().mockResolvedValue('Maya smiled.'),
         generateImage: vi.fn().mockResolvedValue(Buffer.from('image')),
+        generateCharacterProfile: vi.fn(),
         moderateText: vi.fn(),
     };
 

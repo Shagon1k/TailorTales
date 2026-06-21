@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 import type {
     IAiClient,
+    ICharacterProfile,
+    IGenerateCharacterProfileInput,
     IGenerateImageInput,
     IGeneratePageTextInput,
     IGenerateStoryPlanInput,
@@ -66,6 +68,16 @@ export class AiStubClient implements IAiClient {
     async generatePageText(_input: IGeneratePageTextInput): Promise<string> {
         this.logger.log('[STUB] Generating page text');
         return 'The sun rose over the mountain, casting golden light across the valley. The little explorer looked around with wide eyes, ready for the adventure ahead.';
+    }
+
+    async generateCharacterProfile(
+        input: IGenerateCharacterProfileInput,
+    ): Promise<ICharacterProfile> {
+        this.logger.log('[STUB] Generating character profile');
+        return {
+            name: 'Pip',
+            description: `A friendly character inspired by: ${input.prompt.slice(0, 120)}. Round amber eyes, tousled brown hair, and a cosy green jumper.`,
+        };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

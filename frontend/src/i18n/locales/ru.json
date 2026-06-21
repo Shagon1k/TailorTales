@@ -433,9 +433,16 @@
             "descriptionPlaceholder": "Опишите внешность персонажа подробно — цвет волос, цвет глаз, одежда, отличительные черты…",
             "cancelButton": "Отмена",
             "saveButton": "Сохранить",
+            "modeGroupLabel": "Как создать персонажа",
+            "modeManual": "Напишу сам",
+            "modePrompt": "Сгенерировать по описанию",
+            "promptLabel": "Опишите персонажа",
+            "promptPlaceholder": "напр., храбрый лисёнок, который любит море, в красном шарфе",
+            "generateButton": "Сгенерировать",
             "errors": {
                 "nameRequired": "Имя обязательно",
-                "descriptionRequired": "Описание обязательно"
+                "descriptionRequired": "Описание обязательно",
+                "promptRequired": "Расскажите немного о персонаже"
             }
         }
     },

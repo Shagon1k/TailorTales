@@ -433,9 +433,16 @@
             "descriptionPlaceholder": "Beschreibe das Aussehen des Charakters detailliert — Haarfarbe, Augenfarbe, Kleidung, besondere Merkmale…",
             "cancelButton": "Abbrechen",
             "saveButton": "Speichern",
+            "modeGroupLabel": "Wie der Charakter erstellt wird",
+            "modeManual": "Selbst schreiben",
+            "modePrompt": "Aus einem Prompt generieren",
+            "promptLabel": "Beschreibe den Charakter",
+            "promptPlaceholder": "z.B. ein mutiger kleiner Fuchs, der das Meer liebt, mit rotem Schal",
+            "generateButton": "Generieren",
             "errors": {
                 "nameRequired": "Name ist erforderlich",
-                "descriptionRequired": "Beschreibung ist erforderlich"
+                "descriptionRequired": "Beschreibung ist erforderlich",
+                "promptRequired": "Erzähl uns ein wenig über den Charakter"
             }
         }
     },

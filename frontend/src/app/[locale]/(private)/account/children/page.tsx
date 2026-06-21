@@ -14,6 +14,7 @@ import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/h
 import {
     useCharacters,
     useCreateCharacter,
+    useCreateCharacterFromPrompt,
     useDeleteCharacter,
     useUpdateCharacter,
 } from '@/hooks/characters';
@@ -42,6 +43,8 @@ export default function ChildrenPage(): React.ReactElement {
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
     const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
     const { mutate: deleteCharacter, isPending: isDeletingCharacter } = useDeleteCharacter();
+    const { mutate: createCharacterFromPrompt, isPending: isGeneratingCharacter } =
+        useCreateCharacterFromPrompt();
 
     const childrenLimit = subscription?.tier.childrenLimit ?? null;
     const atChildrenLimit = childrenLimit !== null && children.length >= childrenLimit;
@@ -76,6 +79,11 @@ export default function ChildrenPage(): React.ReactElement {
         } else {
             createCharacter({ ...values, childId: modal.child.id }, { onSuccess: close });
         }
+    }
+
+    function handleGenerateCharacter(prompt: string): void {
+        if (modal.kind !== 'character') return;
+        createCharacterFromPrompt({ childId: modal.child.id, prompt }, { onSuccess: close });
     }
 
     if (isLoading) {
@@ -188,6 +196,12 @@ export default function ChildrenPage(): React.ReactElement {
                                 ? isUpdatingCharacter
                                 : isCreatingCharacter
                         }
+                        onGenerateFromPrompt={
+                            modal.kind === 'character' && !modal.character
+                                ? handleGenerateCharacter
+                                : undefined
+                        }
+                        isGenerating={isGeneratingCharacter}
                     />
                 )}
             </Modal>

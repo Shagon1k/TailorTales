@@ -1,3 +1,8 @@
+.modes {
+    display: flex;
+    gap: var(--space-2);
+}
+
 .actions {
     display: flex;
     justify-content: flex-end;

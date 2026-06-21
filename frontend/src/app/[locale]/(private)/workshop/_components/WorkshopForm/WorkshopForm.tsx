@@ -11,7 +11,11 @@ import SuggestionChip from '@/components/ui/SuggestionChip/SuggestionChip';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import { storiesApi } from '@/api/stories';
-import { useCharacters, useCreateCharacter } from '@/hooks/characters';
+import {
+    useCharacters,
+    useCreateCharacter,
+    useCreateCharacterFromPrompt,
+} from '@/hooks/characters';
 import type { IChild } from '@/types/child.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig, IStoryType, ILanguage } from '@/types/story.types';
@@ -84,6 +88,8 @@ export default function WorkshopForm({
 
     const { data: characters = [] } = useCharacters();
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
+    const { mutate: createCharacterFromPrompt, isPending: isGeneratingCharacter } =
+        useCreateCharacterFromPrompt();
 
     const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
     const [isCharacterPickerOpen, setIsCharacterPickerOpen] = useState(false);
@@ -126,6 +132,19 @@ export default function WorkshopForm({
         // and are auto-selected once created.
         createCharacter(
             { ...values, childId: selectedChildId },
+            {
+                onSuccess: (created) => {
+                    setSelectedCharacterId(created.id);
+                    setIsCharacterModalOpen(false);
+                },
+            },
+        );
+    }
+
+    function handleGenerateCharacter(prompt: string): void {
+        if (!selectedChildId) return;
+        createCharacterFromPrompt(
+            { childId: selectedChildId, prompt },
             {
                 onSuccess: (created) => {
                     setSelectedCharacterId(created.id);
@@ -360,6 +379,8 @@ export default function WorkshopForm({
                         onSubmit={handleCharacterSubmit}
                         onCancel={() => setIsCharacterModalOpen(false)}
                         isSubmitting={isCreatingCharacter}
+                        onGenerateFromPrompt={handleGenerateCharacter}
+                        isGenerating={isGeneratingCharacter}
                     />
                 )}
             </Modal>

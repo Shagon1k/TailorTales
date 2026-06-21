@@ -37,11 +37,12 @@ vi.mock('@/api/stories', () => ({
     storiesApi: { create: mockStoriesCreate, generate: mockStoriesGenerate },
 }));
 
-// WorkshopForm uses useCharacters/useCreateCharacter/useUpdateCharacter — mock the entire module
-// so tests focus on WorkshopForm behaviour and don't need a real API.
+// WorkshopForm uses the character hooks — mock the entire module so tests focus on
+// WorkshopForm behaviour and don't need a real API.
 vi.mock('@/hooks/characters', () => ({
     useCharacters: vi.fn().mockReturnValue({ data: [] }),
     useCreateCharacter: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
+    useCreateCharacterFromPrompt: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
     useUpdateCharacter: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
 }));
 

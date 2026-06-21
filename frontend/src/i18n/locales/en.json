@@ -433,9 +433,16 @@
             "descriptionPlaceholder": "Describe the character's appearance in detail — hair color, eye color, clothing, distinguishing features…",
             "cancelButton": "Cancel",
             "saveButton": "Save",
+            "modeGroupLabel": "How to create the character",
+            "modeManual": "Write it myself",
+            "modePrompt": "Generate from a prompt",
+            "promptLabel": "Describe the character",
+            "promptPlaceholder": "e.g. a brave little fox who loves the sea, with a red scarf",
+            "generateButton": "Generate",
             "errors": {
                 "nameRequired": "Name is required",
-                "descriptionRequired": "Description is required"
+                "descriptionRequired": "Description is required",
+                "promptRequired": "Tell us a little about the character"
             }
         }
     },

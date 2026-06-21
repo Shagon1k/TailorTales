@@ -47,6 +47,24 @@ export interface IGeneratePageTextInput {
     maxTokens: number;
 }
 
+export const characterProfileSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+});
+
+export type ICharacterProfile = z.infer<typeof characterProfileSchema>;
+
+export const CHARACTER_PROFILE_JSON_SCHEMA = {
+    name: 'character_profile',
+    schema: z.toJSONSchema(characterProfileSchema),
+} as const;
+
+export interface IGenerateCharacterProfileInput {
+    /** Free-text prompt from the parent describing the character they want. */
+    prompt: string;
+    maxTokens: number;
+}
+
 const moderationResultSchema = z.object({
     safe: z.boolean(),
     reason: z.string().optional(),
@@ -65,6 +83,7 @@ export interface IAiClient {
     generateStoryPlan(input: IGenerateStoryPlanInput): Promise<IStoryPlan>;
     generatePageText(input: IGeneratePageTextInput): Promise<string>;
     generateImage(input: IGenerateImageInput): Promise<Buffer>;
+    generateCharacterProfile(input: IGenerateCharacterProfileInput): Promise<ICharacterProfile>;
     moderateText(text: string): Promise<IModerationResult>;
 }
 

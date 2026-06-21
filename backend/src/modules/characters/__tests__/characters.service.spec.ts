@@ -30,6 +30,7 @@ describe('CharactersService', () => {
     let storageUpload: ReturnType<typeof vi.fn>;
     let storageDelete: ReturnType<typeof vi.fn>;
     let aiGenerateImage: ReturnType<typeof vi.fn>;
+    let aiGenerateCharacterProfile: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         characterFindMany = vi.fn();
@@ -40,6 +41,7 @@ describe('CharactersService', () => {
         storageUpload = vi.fn().mockResolvedValue(undefined);
         storageDelete = vi.fn().mockResolvedValue(undefined);
         aiGenerateImage = vi.fn().mockResolvedValue(Buffer.from('fake-image'));
+        aiGenerateCharacterProfile = vi.fn();
 
         const module = await Test.createTestingModule({
             providers: [
@@ -64,7 +66,10 @@ describe('CharactersService', () => {
                 },
                 {
                     provide: AI_CLIENT,
-                    useValue: { generateImage: aiGenerateImage },
+                    useValue: {
+                        generateImage: aiGenerateImage,
+                        generateCharacterProfile: aiGenerateCharacterProfile,
+                    },
                 },
             ],
         }).compile();
@@ -181,6 +186,34 @@ describe('CharactersService', () => {
             await service.create('user-123', dto);
 
             expect(characterFindFirst).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('createFromPrompt', () => {
+        it('should expand the prompt via AI and save with source PROMPT', async () => {
+            aiGenerateCharacterProfile.mockResolvedValue({
+                name: 'Captain Pip',
+                description: 'A brave little fox in a red scarf.',
+            });
+            characterCreate.mockResolvedValue(MOCK_CHARACTER);
+
+            await service.createFromPrompt('user-123', {
+                childId: 'child-1',
+                prompt: 'a brave fox who loves the sea',
+            });
+
+            expect(aiGenerateCharacterProfile).toHaveBeenCalledWith(
+                expect.objectContaining({ prompt: 'a brave fox who loves the sea' }),
+            );
+            expect(characterCreate).toHaveBeenCalledWith({
+                data: {
+                    userId: 'user-123',
+                    childId: 'child-1',
+                    source: 'PROMPT',
+                    name: 'Captain Pip',
+                    description: 'A brave little fox in a red scarf.',
+                },
+            });
         });
     });
 

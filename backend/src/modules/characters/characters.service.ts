@@ -4,9 +4,13 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 import { type IAiClient, AI_CLIENT } from '../ai/ai.types.js';
 import { StorageService } from '../storage/storage.service.js';
 import { StorageKeys } from '../storage/storage.keys.js';
-import { CHARACTER_PREVIEW_IMAGE_SIZE } from './characters.constants.js';
+import {
+    CHARACTER_PREVIEW_IMAGE_SIZE,
+    CHARACTER_PROFILE_MAX_TOKENS,
+} from './characters.constants.js';
 import { buildCharacterPreviewPrompt } from './characters.prompts.js';
 import type { CreateCharacterDto } from './dto/create-character.dto.js';
+import type { CreateCharacterFromPromptDto } from './dto/create-character-from-prompt.dto.js';
 import type { UpdateCharacterDto } from './dto/update-character.dto.js';
 
 @Injectable()
@@ -47,6 +51,24 @@ export class CharactersService {
                 source: 'FROM_CHILD',
                 name: dto.name,
                 description: dto.description,
+            },
+        });
+    }
+
+    /** Expands a parent's free-text idea into a character profile and saves it (source PROMPT). */
+    async createFromPrompt(userId: string, dto: CreateCharacterFromPromptDto): Promise<Character> {
+        const profile = await this.ai.generateCharacterProfile({
+            prompt: dto.prompt,
+            maxTokens: CHARACTER_PROFILE_MAX_TOKENS,
+        });
+
+        return this.prisma.character.create({
+            data: {
+                userId,
+                childId: dto.childId,
+                source: 'PROMPT',
+                name: profile.name,
+                description: profile.description,
             },
         });
     }
