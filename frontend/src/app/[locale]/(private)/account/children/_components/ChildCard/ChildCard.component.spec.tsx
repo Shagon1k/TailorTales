@@ -31,19 +31,25 @@ const MOCK_CHARACTER: ICharacter = {
 
 function renderCard(
     overrides: Partial<IChild> = {},
-    character: ICharacter | null = null,
-    onEdit = vi.fn(),
-    onDelete = vi.fn(),
-    onCharacterEdit = vi.fn(),
+    characters: ICharacter[] = [],
+    handlers: {
+        onEdit?: () => void;
+        onDelete?: () => void;
+        onCharacterAdd?: () => void;
+        onCharacterEdit?: (child: IChild, character: ICharacter) => void;
+        onCharacterDelete?: (character: ICharacter) => void;
+    } = {},
 ): ReturnType<typeof render> {
     return render(
         <MantineProvider>
             <ChildCard
                 child={{ ...MOCK_CHILD, ...overrides }}
-                character={character}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onCharacterEdit={onCharacterEdit}
+                characters={characters}
+                onEdit={handlers.onEdit ?? vi.fn()}
+                onDelete={handlers.onDelete ?? vi.fn()}
+                onCharacterAdd={handlers.onCharacterAdd ?? vi.fn()}
+                onCharacterEdit={handlers.onCharacterEdit ?? vi.fn()}
+                onCharacterDelete={handlers.onCharacterDelete ?? vi.fn()}
             />
         </MantineProvider>,
     );
@@ -83,7 +89,7 @@ describe('ChildCard', () => {
 
     it('should call onEdit with the child when Edit is clicked', async () => {
         const onEdit = vi.fn();
-        renderCard({}, null, onEdit);
+        renderCard({}, [], { onEdit });
 
         await userEvent.click(screen.getByRole('button', { name: `Edit ${MOCK_CHILD.name}` }));
 
@@ -92,53 +98,76 @@ describe('ChildCard', () => {
 
     it('should call onDelete with the child when Delete is clicked', async () => {
         const onDelete = vi.fn();
-        renderCard({}, null, vi.fn(), onDelete);
+        renderCard({}, [], { onDelete });
 
         await userEvent.click(screen.getByRole('button', { name: `Delete ${MOCK_CHILD.name}` }));
 
         expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ id: 'child-1' }));
     });
 
-    describe('given no character is linked', () => {
-        it('should render "No character yet." placeholder', () => {
+    describe('given the child has no characters', () => {
+        it('should render the empty placeholder', () => {
             renderCard();
-            expect(screen.getByText('No character yet.')).toBeInTheDocument();
+            expect(screen.getByText('No characters yet.')).toBeInTheDocument();
         });
 
-        it('should render "Add character" button', () => {
+        it('should render the "Add character" button', () => {
             renderCard();
             expect(
                 screen.getByRole('button', { name: `Add character for ${MOCK_CHILD.name}` }),
             ).toBeInTheDocument();
         });
-    });
 
-    describe('given a character is linked', () => {
-        it('should render the character name and description', () => {
-            renderCard({}, MOCK_CHARACTER);
-            expect(screen.getByText('Princess Mia')).toBeInTheDocument();
-            expect(
-                screen.getByText('A girl with curly red hair and blue overalls.'),
-            ).toBeInTheDocument();
-        });
-
-        it('should render "Edit character" button', () => {
-            renderCard({}, MOCK_CHARACTER);
-            expect(
-                screen.getByRole('button', { name: `Edit character for ${MOCK_CHILD.name}` }),
-            ).toBeInTheDocument();
-        });
-
-        it('should call onCharacterEdit with the child when the character button is clicked', async () => {
-            const onCharacterEdit = vi.fn();
-            renderCard({}, MOCK_CHARACTER, vi.fn(), vi.fn(), onCharacterEdit);
+        it('should call onCharacterAdd with the child when "Add character" is clicked', async () => {
+            const onCharacterAdd = vi.fn();
+            renderCard({}, [], { onCharacterAdd });
 
             await userEvent.click(
-                screen.getByRole('button', { name: `Edit character for ${MOCK_CHILD.name}` }),
+                screen.getByRole('button', { name: `Add character for ${MOCK_CHILD.name}` }),
+            );
+
+            expect(onCharacterAdd).toHaveBeenCalledWith(expect.objectContaining({ id: 'child-1' }));
+        });
+    });
+
+    describe('given the child has characters', () => {
+        const SECOND_CHARACTER: ICharacter = {
+            ...MOCK_CHARACTER,
+            id: 'char-2',
+            name: 'Captain Pip',
+            description: 'A brave little fox.',
+        };
+
+        it('should render every character', () => {
+            renderCard({}, [MOCK_CHARACTER, SECOND_CHARACTER]);
+            expect(screen.getByText('Princess Mia')).toBeInTheDocument();
+            expect(screen.getByText('Captain Pip')).toBeInTheDocument();
+        });
+
+        it('should call onCharacterEdit with the child and character when Edit is clicked', async () => {
+            const onCharacterEdit = vi.fn();
+            renderCard({}, [MOCK_CHARACTER], { onCharacterEdit });
+
+            await userEvent.click(
+                screen.getByRole('button', { name: 'Edit character Princess Mia' }),
             );
 
             expect(onCharacterEdit).toHaveBeenCalledWith(
                 expect.objectContaining({ id: 'child-1' }),
+                expect.objectContaining({ id: 'char-1' }),
+            );
+        });
+
+        it('should call onCharacterDelete with the character when Delete is clicked', async () => {
+            const onCharacterDelete = vi.fn();
+            renderCard({}, [MOCK_CHARACTER], { onCharacterDelete });
+
+            await userEvent.click(
+                screen.getByRole('button', { name: 'Delete character Princess Mia' }),
+            );
+
+            expect(onCharacterDelete).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 'char-1' }),
             );
         });
     });

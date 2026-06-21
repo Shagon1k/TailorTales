@@ -10,10 +10,12 @@ import styles from './ChildCard.module.scss';
 
 interface IChildCardProps {
     child: IChild;
-    character: ICharacter | null;
+    characters: ICharacter[];
     onEdit: (child: IChild) => void;
     onDelete: (child: IChild) => void;
-    onCharacterEdit: (child: IChild) => void;
+    onCharacterAdd: (child: IChild) => void;
+    onCharacterEdit: (child: IChild, character: ICharacter) => void;
+    onCharacterDelete: (character: ICharacter) => void;
 }
 
 function getAge(birthdate: string): number {
@@ -28,10 +30,12 @@ function getAge(birthdate: string): number {
 
 export default function ChildCard({
     child,
-    character,
+    characters,
     onEdit,
     onDelete,
+    onCharacterAdd,
     onCharacterEdit,
+    onCharacterDelete,
 }: Readonly<IChildCardProps>): React.ReactElement {
     const t = useTranslations('account.childCard');
     const age = getAge(child.birthdate);
@@ -60,26 +64,50 @@ export default function ChildCard({
 
                 <div className={styles.character}>
                     <span className={styles['character__label']}>{t('characterLabel')}</span>
-                    {character ? (
-                        <>
-                            <p className={styles['character__name']}>{character.name}</p>
-                            <p className={styles['character__description']}>
-                                {character.description}
-                            </p>
-                        </>
+                    {characters.length > 0 ? (
+                        <ul className={styles['character__list']}>
+                            {characters.map((character) => (
+                                <li key={character.id} className={styles['character__item']}>
+                                    <div className={styles['character__text']}>
+                                        <p className={styles['character__name']}>
+                                            {character.name}
+                                        </p>
+                                        <p className={styles['character__description']}>
+                                            {character.description}
+                                        </p>
+                                    </div>
+                                    <div className={styles['character__item-actions']}>
+                                        <Button
+                                            variant="quiet"
+                                            onClick={() => onCharacterEdit(child, character)}
+                                            aria-label={t('editCharacterAriaLabel', {
+                                                characterName: character.name,
+                                            })}
+                                        >
+                                            {t('editCharacterButton')}
+                                        </Button>
+                                        <Button
+                                            variant="quiet"
+                                            onClick={() => onCharacterDelete(character)}
+                                            aria-label={t('deleteCharacterAriaLabel', {
+                                                characterName: character.name,
+                                            })}
+                                        >
+                                            {t('deleteCharacterButton')}
+                                        </Button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
                     ) : (
                         <p className={styles['character__empty']}>{t('noCharacter')}</p>
                     )}
                     <Button
                         variant="quiet"
-                        onClick={() => onCharacterEdit(child)}
-                        aria-label={
-                            character
-                                ? t('editCharacterAriaLabel', { childName: child.name })
-                                : t('addCharacterAriaLabel', { childName: child.name })
-                        }
+                        onClick={() => onCharacterAdd(child)}
+                        aria-label={t('addCharacterAriaLabel', { childName: child.name })}
                     >
-                        {character ? t('editCharacterButton') : t('addCharacterButton')}
+                        {t('addCharacterButton')}
                     </Button>
                 </div>
 

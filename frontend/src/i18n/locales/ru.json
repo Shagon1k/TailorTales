@@ -679,7 +679,11 @@
                 "cancelButton": "Отмена",
                 "deleteButton": "Удалить"
             },
-            "deleteConfirm": "Вы уверены, что хотите удалить {childName}? Это действие нельзя отменить."
+            "deleteConfirm": "Вы уверены, что хотите удалить {childName}? Это действие нельзя отменить.",
+            "deleteCharacterModal": {
+                "title": "Удалить персонажа"
+            },
+            "deleteCharacterConfirm": "Удалить персонажа {characterName}? Это действие нельзя отменить."
         },
         "childForm": {
             "nameLabel": "Имя",
@@ -711,12 +715,14 @@
                 "male": "Мальчик",
                 "female": "Девочка"
             },
-            "characterLabel": "Персонаж",
-            "noCharacter": "Персонажа пока нет.",
-            "editCharacterAriaLabel": "Редактировать персонажа для {childName}",
+            "characterLabel": "Персонажи",
+            "noCharacter": "Персонажей пока нет.",
+            "editCharacterAriaLabel": "Редактировать персонажа {characterName}",
             "addCharacterAriaLabel": "Добавить персонажа для {childName}",
-            "editCharacterButton": "Редактировать персонажа",
+            "deleteCharacterAriaLabel": "Удалить персонажа {characterName}",
+            "editCharacterButton": "Редактировать",
             "addCharacterButton": "Добавить персонажа",
+            "deleteCharacterButton": "Удалить",
             "editAriaLabel": "Редактировать {childName}",
             "editButton": "Редактировать",
             "deleteAriaLabel": "Удалить {childName}",

@@ -31,3 +31,11 @@ export function useUpdateCharacter(): ReturnType<
         onSuccess: () => queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY }),
     });
 }
+
+export function useDeleteCharacter(): ReturnType<typeof useMutation<void, Error, string>> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => charactersApi.remove(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY }),
+    });
+}

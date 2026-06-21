@@ -679,7 +679,11 @@
                 "cancelButton": "Abbrechen",
                 "deleteButton": "Löschen"
             },
-            "deleteConfirm": "Bist du sicher, dass du {childName} löschen möchtest? Dies kann nicht rückgängig gemacht werden."
+            "deleteConfirm": "Bist du sicher, dass du {childName} löschen möchtest? Dies kann nicht rückgängig gemacht werden.",
+            "deleteCharacterModal": {
+                "title": "Charakter löschen"
+            },
+            "deleteCharacterConfirm": "Charakter {characterName} löschen? Dies kann nicht rückgängig gemacht werden."
         },
         "childForm": {
             "nameLabel": "Name",
@@ -711,12 +715,14 @@
                 "male": "Junge",
                 "female": "Mädchen"
             },
-            "characterLabel": "Charakter",
-            "noCharacter": "Noch kein Charakter.",
-            "editCharacterAriaLabel": "Charakter für {childName} bearbeiten",
+            "characterLabel": "Charaktere",
+            "noCharacter": "Noch keine Charaktere.",
+            "editCharacterAriaLabel": "Charakter {characterName} bearbeiten",
             "addCharacterAriaLabel": "Charakter für {childName} hinzufügen",
-            "editCharacterButton": "Charakter bearbeiten",
+            "deleteCharacterAriaLabel": "Charakter {characterName} löschen",
+            "editCharacterButton": "Bearbeiten",
             "addCharacterButton": "Charakter hinzufügen",
+            "deleteCharacterButton": "Löschen",
             "editAriaLabel": "{childName} bearbeiten",
             "editButton": "Bearbeiten",
             "deleteAriaLabel": "{childName} löschen",

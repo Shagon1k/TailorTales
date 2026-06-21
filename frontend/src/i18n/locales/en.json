@@ -679,7 +679,11 @@
                 "cancelButton": "Cancel",
                 "deleteButton": "Delete"
             },
-            "deleteConfirm": "Are you sure you want to delete {childName}? This cannot be undone."
+            "deleteConfirm": "Are you sure you want to delete {childName}? This cannot be undone.",
+            "deleteCharacterModal": {
+                "title": "Delete character"
+            },
+            "deleteCharacterConfirm": "Delete character {characterName}? This cannot be undone."
         },
         "childForm": {
             "nameLabel": "Name",
@@ -711,12 +715,14 @@
                 "male": "Boy",
                 "female": "Girl"
             },
-            "characterLabel": "Character",
-            "noCharacter": "No character yet.",
-            "editCharacterAriaLabel": "Edit character for {childName}",
+            "characterLabel": "Characters",
+            "noCharacter": "No characters yet.",
+            "editCharacterAriaLabel": "Edit character {characterName}",
             "addCharacterAriaLabel": "Add character for {childName}",
-            "editCharacterButton": "Edit character",
+            "deleteCharacterAriaLabel": "Delete character {characterName}",
+            "editCharacterButton": "Edit",
             "addCharacterButton": "Add character",
+            "deleteCharacterButton": "Delete",
             "editAriaLabel": "Edit {childName}",
             "editButton": "Edit",
             "deleteAriaLabel": "Delete {childName}",
