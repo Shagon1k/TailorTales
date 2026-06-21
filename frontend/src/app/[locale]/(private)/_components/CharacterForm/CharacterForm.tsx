@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
-import clsx from 'clsx';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import Button from '@/components/ui/Button/Button';
+import CharacterQuiz from './components/CharacterQuiz/CharacterQuiz';
 import styles from './CharacterForm.module.scss';
 
 export interface ICharacterFormValues {
@@ -30,7 +30,7 @@ const DEFAULT_VALUES: ICharacterFormValues = {
     description: '',
 };
 
-type TMode = 'manual' | 'prompt';
+type TMode = 'manual' | 'quiz' | 'prompt';
 
 export default function CharacterForm({
     initialValues,
@@ -72,6 +72,13 @@ export default function CharacterForm({
                     </Button>
                     <Button
                         type="button"
+                        variant={mode === 'quiz' ? 'primary' : 'quiet'}
+                        onClick={() => setMode('quiz')}
+                    >
+                        {t('modeQuiz')}
+                    </Button>
+                    <Button
+                        type="button"
                         variant={mode === 'prompt' ? 'primary' : 'quiet'}
                         onClick={() => setMode('prompt')}
                     >
@@ -80,7 +87,7 @@ export default function CharacterForm({
                 </div>
             )}
 
-            {mode === 'manual' ? (
+            {mode === 'manual' && (
                 <form onSubmit={form.onSubmit(onSubmit)}>
                     <Stack gap="sm">
                         <Input
@@ -96,7 +103,7 @@ export default function CharacterForm({
                             maxRows={8}
                             {...form.getInputProps('description')}
                         />
-                        <div className={clsx(styles.actions)}>
+                        <div className={styles.actions}>
                             <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                                 {t('cancelButton')}
                             </Button>
@@ -106,7 +113,17 @@ export default function CharacterForm({
                         </div>
                     </Stack>
                 </form>
-            ) : (
+            )}
+
+            {mode === 'quiz' && (
+                <CharacterQuiz
+                    onSubmit={onSubmit}
+                    onCancel={onCancel}
+                    isSubmitting={isSubmitting}
+                />
+            )}
+
+            {mode === 'prompt' && (
                 <form
                     onSubmit={promptForm.onSubmit((v) => onGenerateFromPrompt?.(v.prompt.trim()))}
                 >

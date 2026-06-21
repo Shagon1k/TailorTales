@@ -444,6 +444,48 @@
                 "descriptionRequired": "Beschreibung ist erforderlich",
                 "promptRequired": "Erzähl uns ein wenig über den Charakter"
             }
+        },
+        "characterQuiz": {
+            "nameLabel": "Name",
+            "namePlaceholder": "z.B. Pip",
+            "genderLabel": "Mädchen oder Junge",
+            "gender": { "girl": "Mädchen", "boy": "Junge" },
+            "hairColorLabel": "Haarfarbe",
+            "hairColor": {
+                "black": "schwarze",
+                "brown": "braune",
+                "blonde": "blonde",
+                "red": "rote"
+            },
+            "hairLengthLabel": "Haarlänge",
+            "hairLength": { "short": "kurze", "medium": "mittellange", "long": "lange" },
+            "eyeColorLabel": "Augenfarbe",
+            "eyeColor": { "brown": "braune", "blue": "blaue", "green": "grüne", "gray": "graue" },
+            "skinToneLabel": "Hautton",
+            "skinTone": {
+                "fair": "helle",
+                "medium": "mittlere",
+                "tan": "gebräunte",
+                "dark": "dunkle"
+            },
+            "clothingColorLabel": "Kleidungsfarbe",
+            "clothingColor": {
+                "red": "rote",
+                "blue": "blaue",
+                "green": "grüne",
+                "yellow": "gelbe",
+                "pink": "rosa"
+            },
+            "clothingItemLabel": "Was trägt die Figur?",
+            "clothingItemPlaceholder": "z.B. ein Regenmantel, ein Kleid, eine Latzhose",
+            "detailLabel": "Etwas Besonderes? (optional)",
+            "detailPlaceholder": "z.B. Sommersprossen, runde Brille, ein kleiner Umhang",
+            "cancelButton": "Abbrechen",
+            "createButton": "Charakter erstellen",
+            "descriptionTemplate": "{gender}. Haare: {hairLength} {hairColor}. Augen: {eyeColor}. Haut: {skinTone}. Kleidung: {clothing}.",
+            "descriptionClothing": "{color} {item}",
+            "descriptionClothingGeneric": "{color} Kleidung",
+            "errors": { "nameRequired": "Name ist erforderlich" }
         }
     },
     "workshopProgress": {

@@ -444,6 +444,38 @@
                 "descriptionRequired": "Description is required",
                 "promptRequired": "Tell us a little about the character"
             }
+        },
+        "characterQuiz": {
+            "nameLabel": "Name",
+            "namePlaceholder": "e.g. Pip",
+            "genderLabel": "Girl or boy",
+            "gender": { "girl": "Girl", "boy": "Boy" },
+            "hairColorLabel": "Hair color",
+            "hairColor": { "black": "black", "brown": "brown", "blonde": "blonde", "red": "red" },
+            "hairLengthLabel": "Hair length",
+            "hairLength": { "short": "short", "medium": "medium-length", "long": "long" },
+            "eyeColorLabel": "Eye color",
+            "eyeColor": { "brown": "brown", "blue": "blue", "green": "green", "gray": "gray" },
+            "skinToneLabel": "Skin tone",
+            "skinTone": { "fair": "fair", "medium": "medium", "tan": "tan", "dark": "dark" },
+            "clothingColorLabel": "Clothing color",
+            "clothingColor": {
+                "red": "red",
+                "blue": "blue",
+                "green": "green",
+                "yellow": "yellow",
+                "pink": "pink"
+            },
+            "clothingItemLabel": "What are they wearing?",
+            "clothingItemPlaceholder": "e.g. a raincoat, a dress, overalls",
+            "detailLabel": "Anything special? (optional)",
+            "detailPlaceholder": "e.g. freckles, round glasses, a small cape",
+            "cancelButton": "Cancel",
+            "createButton": "Create character",
+            "descriptionTemplate": "{gender}. Hair: {hairLength} {hairColor}. Eyes: {eyeColor}. Skin: {skinTone}. Wearing: {clothing}.",
+            "descriptionClothing": "{color} {item}",
+            "descriptionClothingGeneric": "{color} clothes",
+            "errors": { "nameRequired": "Name is required" }
         }
     },
     "workshopProgress": {

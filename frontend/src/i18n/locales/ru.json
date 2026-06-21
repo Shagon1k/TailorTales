@@ -444,6 +444,53 @@
                 "descriptionRequired": "Описание обязательно",
                 "promptRequired": "Расскажите немного о персонаже"
             }
+        },
+        "characterQuiz": {
+            "nameLabel": "Имя",
+            "namePlaceholder": "напр., Пип",
+            "genderLabel": "Девочка или мальчик",
+            "gender": { "girl": "Девочка", "boy": "Мальчик" },
+            "hairColorLabel": "Цвет волос",
+            "hairColor": {
+                "black": "чёрные",
+                "brown": "каштановые",
+                "blonde": "светлые",
+                "red": "рыжие"
+            },
+            "hairLengthLabel": "Длина волос",
+            "hairLength": { "short": "короткие", "medium": "средние", "long": "длинные" },
+            "eyeColorLabel": "Цвет глаз",
+            "eyeColor": {
+                "brown": "карие",
+                "blue": "голубые",
+                "green": "зелёные",
+                "gray": "серые"
+            },
+            "skinToneLabel": "Тон кожи",
+            "skinTone": {
+                "fair": "светлая",
+                "medium": "средняя",
+                "tan": "смуглая",
+                "dark": "тёмная"
+            },
+            "clothingColorLabel": "Цвет одежды",
+            "clothingColor": {
+                "red": "красная",
+                "blue": "синяя",
+                "green": "зелёная",
+                "yellow": "жёлтая",
+                "pink": "розовая"
+            },
+            "clothingItemLabel": "Что на персонаже надето?",
+            "clothingItemPlaceholder": "напр., дождевик, платье, комбинезон",
+            "detailLabel": "Что-то особенное? (необязательно)",
+            "detailPlaceholder": "напр., веснушки, круглые очки, маленький плащ",
+            "cancelButton": "Отмена",
+            "createButton": "Создать персонажа",
+            "descriptionTemplate": "{gender}. Волосы: {hairLength} {hairColor}. Глаза: {eyeColor}. Кожа: {skinTone}. Одежда: {clothing}.",
+            "descriptionClothing": "{color}, {item}",
+            "descriptionClothingGeneric": "{color}",
+            "errors": { "nameRequired": "Имя обязательно" }
         }
     },
     "workshopProgress": {
