@@ -67,7 +67,7 @@ erDiagram
         string childId FK
         string artStyleId FK
         string blueprintId FK "nullable"
-        string characterId FK "nullable, provenance"
+        string characterId FK "nullable, user-selected protagonist"
         StoryType type
         StoryStatus status
         string question
