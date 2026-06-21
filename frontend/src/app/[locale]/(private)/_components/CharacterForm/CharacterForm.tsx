@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import Button from '@/components/ui/Button/Button';
+import type { IUserCharacterSource } from '@/types/character.types';
 import CharacterQuiz from './components/CharacterQuiz/CharacterQuiz';
 import styles from './CharacterForm.module.scss';
 
@@ -17,7 +18,8 @@ export interface ICharacterFormValues {
 
 interface ICharacterFormProps {
     initialValues?: Partial<ICharacterFormValues>;
-    onSubmit: (values: ICharacterFormValues) => void;
+    /** `source` reports how it was made: `IMAGINED` (manual) or `QUIZ`. Ignored on edit. */
+    onSubmit: (values: ICharacterFormValues, source: IUserCharacterSource) => void;
     onCancel: () => void;
     isSubmitting?: boolean;
     /** When provided, offers a second mode that asks the AI to draft the character. */
@@ -88,7 +90,7 @@ export default function CharacterForm({
             )}
 
             {mode === 'manual' && (
-                <form onSubmit={form.onSubmit(onSubmit)}>
+                <form onSubmit={form.onSubmit((v) => onSubmit(v, 'IMAGINED'))}>
                     <Stack gap="sm">
                         <Input
                             label={t('nameLabel')}
@@ -117,7 +119,7 @@ export default function CharacterForm({
 
             {mode === 'quiz' && (
                 <CharacterQuiz
-                    onSubmit={onSubmit}
+                    onSubmit={(v) => onSubmit(v, 'QUIZ')}
                     onCancel={onCancel}
                     isSubmitting={isSubmitting}
                 />

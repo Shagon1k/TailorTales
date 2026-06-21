@@ -41,21 +41,20 @@ export class CharactersService {
     }
 
     async create(userId: string, dto: CreateCharacterDto): Promise<Character> {
-        // Every character belongs to a child. A child may have several characters.
-        // Wave-1 only creates child-derived characters (FROM_CHILD); IMAGINED/PROMPT
-        // creation flows arrive with the quiz/prompt features.
+        // Every character belongs to a child; a child may have several.
+        // source: free-form (manual/prompt) is IMAGINED; the guided quiz sends QUIZ.
         return this.prisma.character.create({
             data: {
                 userId,
                 childId: dto.childId,
-                source: 'FROM_CHILD',
+                source: dto.source ?? 'IMAGINED',
                 name: dto.name,
                 description: dto.description,
             },
         });
     }
 
-    /** Expands a parent's free-text idea into a character profile and saves it (source PROMPT). */
+    /** Expands a parent's free-text idea into a character profile and saves it (free-form → IMAGINED). */
     async createFromPrompt(userId: string, dto: CreateCharacterFromPromptDto): Promise<Character> {
         const profile = await this.ai.generateCharacterProfile({
             prompt: dto.prompt,
@@ -66,7 +65,7 @@ export class CharactersService {
             data: {
                 userId,
                 childId: dto.childId,
-                source: 'PROMPT',
+                source: 'IMAGINED',
                 name: profile.name,
                 description: profile.description,
             },

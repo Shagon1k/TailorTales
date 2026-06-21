@@ -17,6 +17,7 @@ import {
     useCreateCharacterFromPrompt,
 } from '@/hooks/characters';
 import type { IChild } from '@/types/child.types';
+import type { IUserCharacterSource } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig, IStoryType, ILanguage } from '@/types/story.types';
 import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
@@ -126,12 +127,14 @@ export default function WorkshopForm({
         setIsCharacterModalOpen(true);
     }
 
-    function handleCharacterSubmit(values: ICharacterFormValues): void {
+    function handleCharacterSubmit(
+        values: ICharacterFormValues,
+        source: IUserCharacterSource,
+    ): void {
         if (!selectedChildId) return;
-        // Inline-created characters belong to the selected reader (source FROM_CHILD)
-        // and are auto-selected once created.
+        // Inline-created characters belong to the selected reader and are auto-selected.
         createCharacter(
-            { ...values, childId: selectedChildId },
+            { ...values, childId: selectedChildId, source },
             {
                 onSuccess: (created) => {
                     setSelectedCharacterId(created.id);

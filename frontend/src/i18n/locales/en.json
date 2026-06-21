@@ -472,6 +472,8 @@
             "detailPlaceholder": "e.g. freckles, round glasses, a small cape",
             "cancelButton": "Cancel",
             "createButton": "Create character",
+            "photoButton": "📷 Use a photo — coming soon",
+            "photoTooltip": "Soon you'll be able to upload a photo of your child, a parent, or anyone else to use as the story's main character.",
             "descriptionTemplate": "{gender}. Hair: {hairLength} {hairColor}. Eyes: {eyeColor}. Skin: {skinTone}. Wearing: {clothing}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} clothes",

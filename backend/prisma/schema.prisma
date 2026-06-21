@@ -63,9 +63,8 @@ enum SubscriptionStatus {
 }
 
 enum CharacterSource {
-  FROM_CHILD
   IMAGINED
-  PROMPT
+  QUIZ
   PHOTO
 }
 
@@ -219,7 +218,7 @@ model Character {
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   childId     String
   child       Child           @relation(fields: [childId], references: [id], onDelete: Cascade)
-  source      CharacterSource @default(FROM_CHILD)
+  source      CharacterSource @default(IMAGINED)
   name        String
   description String
   previewKey  String?

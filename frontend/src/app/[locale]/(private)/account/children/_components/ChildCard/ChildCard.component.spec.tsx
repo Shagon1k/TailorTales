@@ -21,7 +21,7 @@ const MOCK_CHARACTER: ICharacter = {
     id: 'char-1',
     userId: 'user-123',
     childId: 'child-1',
-    source: 'FROM_CHILD',
+    source: 'IMAGINED',
     name: 'Princess Mia',
     description: 'A girl with curly red hair and blue overalls.',
     previewKey: null,

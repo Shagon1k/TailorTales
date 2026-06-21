@@ -20,7 +20,7 @@ import {
 } from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
 import type { IChild } from '@/types/child.types';
-import type { ICharacter } from '@/types/character.types';
+import type { ICharacter, IUserCharacterSource } from '@/types/character.types';
 import styles from './page.module.scss';
 
 type TModalState =
@@ -72,12 +72,15 @@ export default function ChildrenPage(): React.ReactElement {
         }
     }
 
-    function handleCharacterSubmit(values: ICharacterFormValues): void {
+    function handleCharacterSubmit(
+        values: ICharacterFormValues,
+        source: IUserCharacterSource,
+    ): void {
         if (modal.kind !== 'character') return;
         if (modal.character) {
             updateCharacter({ id: modal.character.id, payload: values }, { onSuccess: close });
         } else {
-            createCharacter({ ...values, childId: modal.child.id }, { onSuccess: close });
+            createCharacter({ ...values, childId: modal.child.id, source }, { onSuccess: close });
         }
     }
 

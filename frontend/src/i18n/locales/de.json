@@ -482,6 +482,8 @@
             "detailPlaceholder": "z.B. Sommersprossen, runde Brille, ein kleiner Umhang",
             "cancelButton": "Abbrechen",
             "createButton": "Charakter erstellen",
+            "photoButton": "📷 Foto verwenden — bald verfügbar",
+            "photoTooltip": "Bald kannst du ein Foto deines Kindes, eines Elternteils oder einer anderen Person hochladen, um sie als Hauptfigur der Geschichte zu verwenden.",
             "descriptionTemplate": "{gender}. Haare: {hairLength} {hairColor}. Augen: {eyeColor}. Haut: {skinTone}. Kleidung: {clothing}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} Kleidung",

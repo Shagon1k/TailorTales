@@ -1,6 +1,6 @@
 'use client';
 
-import { SimpleGrid, Stack } from '@mantine/core';
+import { SimpleGrid, Stack, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
@@ -92,6 +92,14 @@ export default function CharacterQuiz({
     return (
         <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="sm">
+                {/* Photo seam — disabled until the GDPR-gated photo flow ships (Deferred #10). */}
+                <Tooltip label={t('photoTooltip')} multiline w={280} withArrow position="bottom">
+                    <div className={styles.photo}>
+                        <Button type="button" variant="quiet" fullWidth disabled>
+                            {t('photoButton')}
+                        </Button>
+                    </div>
+                </Tooltip>
                 <Input
                     label={t('nameLabel')}
                     placeholder={t('namePlaceholder')}

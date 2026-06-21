@@ -1,11 +1,13 @@
 import { apiFetch } from '@/lib/api';
-import type { ICharacter } from '@/types/character.types';
+import type { ICharacter, IUserCharacterSource } from '@/types/character.types';
 
 export interface ICreateCharacterPayload {
     name: string;
     description: string;
     /** Owning child — every character belongs to one child. */
     childId: string;
+    /** Free-form (`IMAGINED`) or the guided quiz (`QUIZ`). Server defaults to `IMAGINED`. */
+    source: IUserCharacterSource;
 }
 
 export type IUpdateCharacterPayload = Partial<

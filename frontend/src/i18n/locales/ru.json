@@ -487,6 +487,8 @@
             "detailPlaceholder": "напр., веснушки, круглые очки, маленький плащ",
             "cancelButton": "Отмена",
             "createButton": "Создать персонажа",
+            "photoButton": "📷 Использовать фото — скоро",
+            "photoTooltip": "Скоро вы сможете загрузить фото своего ребёнка, родителя или кого угодно, чтобы использовать как главного персонажа истории.",
             "descriptionTemplate": "{gender}. Волосы: {hairLength} {hairColor}. Глаза: {eyeColor}. Кожа: {skinTone}. Одежда: {clothing}.",
             "descriptionClothing": "{color}, {item}",
             "descriptionClothingGeneric": "{color}",

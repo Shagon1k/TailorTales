@@ -12,7 +12,7 @@ const MOCK_CHARACTER: Character = {
     id: 'char-1',
     userId: 'user-123',
     childId: 'child-1',
-    source: 'FROM_CHILD',
+    source: 'IMAGINED',
     name: 'Princess Mia',
     description: 'A 6-year-old girl with curly red hair and blue overalls.',
     previewKey: null,
@@ -153,7 +153,7 @@ describe('CharactersService', () => {
     });
 
     describe('create', () => {
-        it('should create a child-mirroring character with source FROM_CHILD', async () => {
+        it('should default source to IMAGINED for free-form creation', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
@@ -168,11 +168,27 @@ describe('CharactersService', () => {
                     userId: 'user-123',
                     name: dto.name,
                     description: dto.description,
-                    source: 'FROM_CHILD',
+                    source: 'IMAGINED',
                     childId: dto.childId,
                 },
             });
             expect(result).toBe(MOCK_CHARACTER);
+        });
+
+        it('should persist the QUIZ source when the client sets it', async () => {
+            characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            const dto: CreateCharacterDto = {
+                name: 'Pip',
+                description: 'A girl with short brown hair.',
+                childId: 'child-1',
+                source: 'QUIZ',
+            };
+
+            await service.create('user-123', dto);
+
+            expect(characterCreate).toHaveBeenCalledWith({
+                data: expect.objectContaining({ source: 'QUIZ' }),
+            });
         });
 
         it('should not perform a uniqueness lookup — a child may have several characters', async () => {
@@ -190,7 +206,7 @@ describe('CharactersService', () => {
     });
 
     describe('createFromPrompt', () => {
-        it('should expand the prompt via AI and save with source PROMPT', async () => {
+        it('should expand the prompt via AI and save it as free-form (IMAGINED)', async () => {
             aiGenerateCharacterProfile.mockResolvedValue({
                 name: 'Captain Pip',
                 description: 'A brave little fox in a red scarf.',
@@ -209,7 +225,7 @@ describe('CharactersService', () => {
                 data: {
                     userId: 'user-123',
                     childId: 'child-1',
-                    source: 'PROMPT',
+                    source: 'IMAGINED',
                     name: 'Captain Pip',
                     description: 'A brave little fox in a red scarf.',
                 },
