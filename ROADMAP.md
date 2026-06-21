@@ -1232,6 +1232,16 @@ flowchart LR
 
 **Deployment pipeline (dokploy)**
 
+> **Deploy triggers** (fits the GitHub Flow in `git.md` — `main` always deployable):
+>
+> ```
+> merge to main   →  auto-deploy UAT   (every squash-merged PR lands on uat.tailortales.app)
+> push a tag      →  deploy prod       (e.g. v1.0.0 — prod ships only from an explicit tag, never on merge)
+> ```
+>
+> UAT is the continuous integration target; prod is gated behind a deliberate version tag so a merge never reaches real users by itself. Tags follow semver (`vMAJOR.MINOR.PATCH`).
+
+- [ ] Configure dokploy deploy triggers: UAT on `main` push/merge; prod on tag push (`v*`)
 - [ ] Dockerfiles tested end-to-end for both backend and frontend
 - [ ] Graceful shutdown verified — BullMQ worker drains in-flight jobs on SIGTERM before process exit (prevents mid-generation kills on deploy)
 - [ ] dokploy env var injection configured per environment (no secrets in repo)
