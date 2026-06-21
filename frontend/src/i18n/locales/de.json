@@ -386,6 +386,46 @@
                 "title": "Die Sprache der Geschichte",
                 "label": "Geschichtssprache"
             },
+            "genrePicker": {
+                "number": "6.",
+                "title": "Genre wählen",
+                "label": "Genre der Geschichte (optional)",
+                "note": "Optional — bestimmt die Stimmung der Geschichte.",
+                "fairyTale": {
+                    "label": "Märchen",
+                    "hint": "Eine magische Geschichte voller Wunder, Güte und einer sanften Moral."
+                },
+                "bedtime": {
+                    "label": "Gute-Nacht",
+                    "hint": "Ruhig und beruhigend, sanft dem Schlaf entgegen."
+                },
+                "educational": {
+                    "label": "Lehrreich",
+                    "hint": "Erklärt durch die Entdeckungen des Kindes, wie und warum Dinge funktionieren."
+                },
+                "adventure": {
+                    "label": "Abenteuer",
+                    "hint": "Eine mutige kleine Reise über Mut und das Lösen eines Problems."
+                }
+            },
+            "writingStylePicker": {
+                "number": "7.",
+                "title": "Schreibstil wählen",
+                "label": "Schreibstil (optional)",
+                "note": "Optional — prägt den Klang der Worte.",
+                "poetic": {
+                    "label": "Poetisch",
+                    "hint": "Lyrisch und rhythmisch."
+                },
+                "simple": {
+                    "label": "Einfach",
+                    "hint": "Klar und leicht."
+                },
+                "imaginative": {
+                    "label": "Fantasievoll",
+                    "hint": "Kreativ und lebendig."
+                }
+            },
             "submitError": "Generierung konnte nicht gestartet werden. Bitte erneut versuchen.",
             "artStyleLabel": "Kunststil",
             "characterModal": {

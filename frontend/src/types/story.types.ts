@@ -2,6 +2,10 @@ export type IStoryType = 'BOOK' | 'COMIC';
 export type IStoryStatus = 'DRAFT' | 'QUEUED' | 'GENERATING' | 'COMPLETED' | 'FAILED';
 export type ILanguage = 'EN' | 'RU' | 'DE';
 
+/** Optional flavour knobs chosen in the workshop. Each maps to a generation prompt fragment. */
+export type IStoryGenre = 'FAIRY_TALE' | 'BEDTIME' | 'EDUCATIONAL' | 'ADVENTURE';
+export type IWritingStyle = 'POETIC' | 'SIMPLE' | 'IMAGINATIVE';
+
 /** Illustration entry on a Page. Structure is extended in Phase 5 (generation pipeline). */
 export interface IIllustration {
     url: string;
@@ -100,4 +104,7 @@ export interface ICreateStoryPayload {
     pageCount: number;
     artStyleId: string;
     language: ILanguage;
+    /** Optional flavour knobs — omit to leave it to the model. */
+    genre?: IStoryGenre;
+    writingStyle?: IWritingStyle;
 }

@@ -386,6 +386,46 @@
                 "title": "The language of the tale",
                 "label": "Story language"
             },
+            "genrePicker": {
+                "number": "6.",
+                "title": "Pick a genre",
+                "label": "Story genre (optional)",
+                "note": "Optional — sets the mood of the tale.",
+                "fairyTale": {
+                    "label": "Fairy tale",
+                    "hint": "A magical story full of wonder, kindness, and a gentle moral."
+                },
+                "bedtime": {
+                    "label": "Bedtime",
+                    "hint": "Calm and soothing, winding gently down toward sleep."
+                },
+                "educational": {
+                    "label": "Educational",
+                    "hint": "Explains how and why things work through the child’s discovery."
+                },
+                "adventure": {
+                    "label": "Adventure",
+                    "hint": "A brave little journey about courage and solving a problem."
+                }
+            },
+            "writingStylePicker": {
+                "number": "7.",
+                "title": "Pick a writing style",
+                "label": "Writing style (optional)",
+                "note": "Optional — shapes how the words sound.",
+                "poetic": {
+                    "label": "Poetic",
+                    "hint": "Lyrical and rhythmic."
+                },
+                "simple": {
+                    "label": "Simple",
+                    "hint": "Clean and easy."
+                },
+                "imaginative": {
+                    "label": "Imaginative",
+                    "hint": "Creative and vivid."
+                }
+            },
             "submitError": "Could not start generation. Please try again.",
             "artStyleLabel": "Art style",
             "characterModal": {

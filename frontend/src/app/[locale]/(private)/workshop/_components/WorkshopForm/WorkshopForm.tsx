@@ -19,7 +19,13 @@ import {
 import type { IChild } from '@/types/child.types';
 import type { IUserCharacterSource } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
-import type { IStoryConfig, IStoryType, ILanguage } from '@/types/story.types';
+import type {
+    IStoryConfig,
+    IStoryType,
+    ILanguage,
+    IStoryGenre,
+    IWritingStyle,
+} from '@/types/story.types';
 import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
 import ReaderChip from './components/ReaderChip/ReaderChip';
 import ReaderSelector from './components/ReaderSelector/ReaderSelector';
@@ -32,6 +38,20 @@ import CharacterForm, {
 import Button from '@/components/ui/Button/Button';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './WorkshopForm.module.scss';
+
+// Optional flavour knobs — value is the enum sent to the API, key resolves the i18n copy.
+const GENRES: { value: IStoryGenre; key: string }[] = [
+    { value: 'FAIRY_TALE', key: 'fairyTale' },
+    { value: 'BEDTIME', key: 'bedtime' },
+    { value: 'EDUCATIONAL', key: 'educational' },
+    { value: 'ADVENTURE', key: 'adventure' },
+];
+
+const WRITING_STYLES: { value: IWritingStyle; key: string }[] = [
+    { value: 'POETIC', key: 'poetic' },
+    { value: 'SIMPLE', key: 'simple' },
+    { value: 'IMAGINATIVE', key: 'imaginative' },
+];
 
 export interface IWorkshopFormProps {
     readers: IChild[];
@@ -83,6 +103,9 @@ export default function WorkshopForm({
     );
     const [artStyleId, setArtStyleId] = useState<string | null>(initialArtStyleId);
     const [language, setLanguage] = useState<ILanguage | null>(initialLanguage);
+    // Optional flavour knobs. Genre defaults to none; writing style defaults to a clear, simple voice.
+    const [genre, setGenre] = useState<IStoryGenre | null>(null);
+    const [writingStyle, setWritingStyle] = useState<IWritingStyle | null>('SIMPLE');
     const [question, setQuestion] = useState(initialQuestion);
     const [isPending, setIsPending] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
@@ -101,6 +124,8 @@ export default function WorkshopForm({
     // Characters belong to a child — only show (and allow choosing) the reader's own.
     const childCharacters = characters.filter((c) => c.childId === selectedChildId);
     const selectedCharacter = childCharacters.find((c) => c.id === selectedCharacterId) ?? null;
+    const selectedGenreKey = GENRES.find((g) => g.value === genre)?.key ?? null;
+    const selectedStyleKey = WRITING_STYLES.find((s) => s.value === writingStyle)?.key ?? null;
 
     const isValid =
         selectedChildId !== null &&
@@ -173,6 +198,8 @@ export default function WorkshopForm({
                 pageCount: Number(pageCount),
                 artStyleId,
                 language,
+                ...(genre !== null && { genre }),
+                ...(writingStyle !== null && { writingStyle }),
             });
             await storiesApi.generate(story.id);
             router.push(`/workshop/${story.id}`);
@@ -331,6 +358,60 @@ export default function WorkshopForm({
                             </OptionPill>
                         ))}
                     </OptionPillGroup>
+                </section>
+
+                <section className={styles.workshop__section} aria-labelledby="section-genre">
+                    <div className={styles['workshop__section-header']}>
+                        <span className={styles['workshop__section-number']}>
+                            {t('genrePicker.number')}
+                        </span>
+                        <h2 id="section-genre" className={styles['workshop__section-title']}>
+                            {t('genrePicker.title')}
+                        </h2>
+                    </div>
+                    <OptionPillGroup
+                        value={genre}
+                        onChange={(v) => setGenre(v as IStoryGenre)}
+                        label={t('genrePicker.label')}
+                    >
+                        {GENRES.map(({ value, key }) => (
+                            <OptionPill key={value} value={value}>
+                                {t(`genrePicker.${key}.label`)}
+                            </OptionPill>
+                        ))}
+                    </OptionPillGroup>
+                    <p className={styles['workshop__section-note']}>
+                        {selectedGenreKey
+                            ? t(`genrePicker.${selectedGenreKey}.hint`)
+                            : t('genrePicker.note')}
+                    </p>
+                </section>
+
+                <section className={styles.workshop__section} aria-labelledby="section-writing">
+                    <div className={styles['workshop__section-header']}>
+                        <span className={styles['workshop__section-number']}>
+                            {t('writingStylePicker.number')}
+                        </span>
+                        <h2 id="section-writing" className={styles['workshop__section-title']}>
+                            {t('writingStylePicker.title')}
+                        </h2>
+                    </div>
+                    <OptionPillGroup
+                        value={writingStyle}
+                        onChange={(v) => setWritingStyle(v as IWritingStyle)}
+                        label={t('writingStylePicker.label')}
+                    >
+                        {WRITING_STYLES.map(({ value, key }) => (
+                            <OptionPill key={value} value={value}>
+                                {t(`writingStylePicker.${key}.label`)}
+                            </OptionPill>
+                        ))}
+                    </OptionPillGroup>
+                    <p className={styles['workshop__section-note']}>
+                        {selectedStyleKey
+                            ? t(`writingStylePicker.${selectedStyleKey}.hint`)
+                            : t('writingStylePicker.note')}
+                    </p>
                 </section>
                 {submitError !== null && (
                     <p role="alert" className={styles['workshop__error']}>

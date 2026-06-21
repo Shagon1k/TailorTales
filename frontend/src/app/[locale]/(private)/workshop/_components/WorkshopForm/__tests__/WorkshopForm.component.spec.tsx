@@ -154,7 +154,7 @@ describe('WorkshopForm', () => {
     });
 
     describe('given all required fields are filled', () => {
-        async function fillAndSubmit(): Promise<void> {
+        async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
             renderForm({ initialQuestion: 'Why is the sky blue?' });
 
             // Format — RadioCard accessible name = title + description; use ^Book to anchor the match
@@ -172,6 +172,9 @@ describe('WorkshopForm', () => {
             // Language — scope to the "Story language" radiogroup
             const langGroup = screen.getByRole('radiogroup', { name: /story language/i });
             await userEvent.click(within(langGroup).getByRole('radio', { name: /^English/i }));
+
+            // Optional flavour knobs, selected by individual tests before submit.
+            if (beforeSubmit) await beforeSubmit();
 
             // Submit
             await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
@@ -192,6 +195,25 @@ describe('WorkshopForm', () => {
                         artStyleId: 'style-1',
                         language: 'EN',
                     }),
+                );
+            });
+        });
+
+        it('should include the chosen genre and writing style in the payload', async () => {
+            mockStoriesCreate.mockResolvedValue({ id: 'story-new' });
+
+            await fillAndSubmit(async () => {
+                const genreGroup = screen.getByRole('radiogroup', { name: /story genre/i });
+                await userEvent.click(
+                    within(genreGroup).getByRole('radio', { name: /fairy tale/i }),
+                );
+                const styleGroup = screen.getByRole('radiogroup', { name: /writing style/i });
+                await userEvent.click(within(styleGroup).getByRole('radio', { name: /poetic/i }));
+            });
+
+            await waitFor(() => {
+                expect(mockStoriesCreate).toHaveBeenCalledWith(
+                    expect.objectContaining({ genre: 'FAIRY_TALE', writingStyle: 'POETIC' }),
                 );
             });
         });
