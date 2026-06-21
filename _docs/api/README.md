@@ -79,14 +79,15 @@
 
 ### Characters — `/characters`
 
-| Method | Path                      | Auth | Body                 | Response                                                                                                                           |
-| ------ | ------------------------- | ---- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/characters`             | user | —                    | `Character[]` (owner's).                                                                                                           |
-| GET    | `/characters/:id`         | user | —                    | `Character` (404 if not owned).                                                                                                    |
-| POST   | `/characters`             | user | `CreateCharacterDto` | `Character`.                                                                                                                       |
-| PATCH  | `/characters/:id`         | user | `UpdateCharacterDto` | `Character`.                                                                                                                       |
-| DELETE | `/characters/:id`         | user | —                    | 204. Clears `Story.characterId` on related stories (styleAnchor snapshots are unaffected).                                         |
-| POST   | `/characters/:id/preview` | user | —                    | Generates an AI portrait from `description`, stores it in S3, updates `generatedPreviewImageKey`. Returns the updated `Character`. |
+| Method | Path                      | Auth | Body                           | Response                                                                                                             |
+| ------ | ------------------------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/characters`             | user | —                              | `Character[]` (owner's; optional `?childId=` filter).                                                                |
+| GET    | `/characters/:id`         | user | —                              | `Character` (404 if not owned).                                                                                      |
+| POST   | `/characters`             | user | `CreateCharacterDto`           | `Character`. Belongs to a child (`childId` required); `source = FROM_CHILD`.                                         |
+| POST   | `/characters/from-prompt` | user | `CreateCharacterFromPromptDto` | AI drafts a name + appearance from a free-text `prompt`; saved with `source = PROMPT`. Returns the `Character`.      |
+| PATCH  | `/characters/:id`         | user | `UpdateCharacterDto`           | `Character`.                                                                                                         |
+| DELETE | `/characters/:id`         | user | —                              | 204. Clears `Story.characterId` on related stories (styleAnchor snapshots are unaffected).                           |
+| POST   | `/characters/:id/preview` | user | —                              | Generates an AI portrait from `description`, stores it in S3, updates `previewKey`. Returns the updated `Character`. |
 
 ---
 
