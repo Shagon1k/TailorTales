@@ -110,7 +110,7 @@
 | GET    | `/stories/:id`                         | user   | —                       | `IStoryDetail` (pages, signed URLs, `myRating`, `rating`).                                                                     |
 | GET    | `/stories/:id/progress`                | user   | —                       | **SSE** stream — see below.                                                                                                    |
 | GET    | `/stories/:id/pages/:order/html`       | user   | —                       | Handlebars-rendered page HTML (same path as Puppeteer uses). Powers the in-browser reader iframe.                              |
-| POST   | `/stories`                             | user   | `CreateStoryDto`        | Created `Story` (status `DRAFT`).                                                                                              |
+| POST   | `/stories`                             | user   | `CreateStoryDto`        | Created `Story` (status `DRAFT`). `genre` and `writingStyle` are optional flavour knobs.                                       |
 | POST   | `/stories/:id/generate`                | user   | —                       | **202** `{ jobId, storyId }`. 409 if a generation is active or story isn't `DRAFT`. Checks page-credit quota before enqueuing. |
 | POST   | `/stories/:id/pages/:order/regenerate` | user   | `RegeneratePageDto`     | Updated `Page`. Re-stitches PDF. 402 if regeneration quota exhausted.                                                          |
 | POST   | `/stories/:id/rating`                  | user   | `CreateRatingDto`       | Upserted `Rating`. Sets `Story.isPublic` when `isPublic` field is present.                                                     |

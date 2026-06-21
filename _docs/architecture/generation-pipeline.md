@@ -80,7 +80,9 @@ this shape:
 
 The user prompt composes: the child's name + age (audience targeting) · the chosen Character
 as the protagonist when present (else child-led) · the child's `interests` as an **optional,
-non-forcing hint** (woven in only when they fit) · the ArtStyle's `promptPrefix`.
+non-forcing hint** (woven in only when they fit) · the optional `genre` and `writingStyle`
+flavour knobs, each injecting a fixed prompt fragment when set (omitted otherwise) · the
+ArtStyle's `promptPrefix`.
 
 ```json
 {
@@ -125,8 +127,11 @@ generates illustrations with **capped concurrency** (`IMAGE_CONCURRENCY = 3`): t
 sliced into batches of 3 and each batch is awaited with `Promise.all`. Text was a single
 structured call, so only images parallelize.
 
-For each page: the prompt is `styleAnchor + "\n\n" + page.illustrationPrompt` (the
-style anchor is prepended to **every** image for cross-page character/style consistency),
+For each page: the prompt is `styleAnchor + "\n\n" + page.illustrationPrompt + "\n\n" +
+IMAGE_NO_TEXT_DIRECTIVE` (the style anchor is prepended to **every** image for cross-page
+character/style consistency; the no-text directive forbids in-image words on every image —
+including covers and COMIC speech bubbles — since image models render text, especially
+Cyrillic, unreliably),
 the image size comes from the template's `images[0].size`, the bytes are uploaded to
 `StorageKeys.pageIllustration(userId, storyId, order)`, and the key is written back to
 `Page.illustrations` as `[{ key, position }]`.
