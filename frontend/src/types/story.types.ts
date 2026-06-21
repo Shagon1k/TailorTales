@@ -57,6 +57,8 @@ export interface IStorySummary {
     pageCount: number;
     artStyleId: string;
     language: ILanguage;
+    genre: IStoryGenre | null;
+    writingStyle: IWritingStyle | null;
     title: string | null;
     styleAnchor: string | null;
     isPublic: boolean;

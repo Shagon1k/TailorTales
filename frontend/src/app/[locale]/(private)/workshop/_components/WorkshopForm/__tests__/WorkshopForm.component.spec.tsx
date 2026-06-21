@@ -153,6 +153,17 @@ describe('WorkshopForm', () => {
         });
     });
 
+    describe('given a failed-story retry pre-fills the flavour knobs', () => {
+        it('should pre-select the provided genre and writing style', () => {
+            renderForm({ initialGenre: 'ADVENTURE', initialWritingStyle: 'IMAGINATIVE' });
+
+            const genreGroup = screen.getByRole('radiogroup', { name: /story genre/i });
+            expect(within(genreGroup).getByRole('radio', { name: /adventure/i })).toBeChecked();
+            const styleGroup = screen.getByRole('radiogroup', { name: /writing style/i });
+            expect(within(styleGroup).getByRole('radio', { name: /imaginative/i })).toBeChecked();
+        });
+    });
+
     describe('given all required fields are filled', () => {
         async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
             renderForm({ initialQuestion: 'Why is the sky blue?' });

@@ -69,6 +69,10 @@ export interface IWorkshopFormProps {
     initialArtStyleId?: string | null;
     /** Pre-selected language — from a failed story retry. */
     initialLanguage?: ILanguage | null;
+    /** Pre-selected genre — from a failed story retry. */
+    initialGenre?: IStoryGenre | null;
+    /** Pre-selected writing style — from a failed story retry; defaults to a simple voice. */
+    initialWritingStyle?: IWritingStyle | null;
 }
 
 export default function WorkshopForm({
@@ -81,6 +85,8 @@ export default function WorkshopForm({
     initialPageCount = null,
     initialArtStyleId = null,
     initialLanguage = null,
+    initialGenre = null,
+    initialWritingStyle = 'SIMPLE',
 }: Readonly<IWorkshopFormProps>): React.ReactElement {
     const t = useTranslations('workshop.form');
     const router = useRouter();
@@ -103,9 +109,10 @@ export default function WorkshopForm({
     );
     const [artStyleId, setArtStyleId] = useState<string | null>(initialArtStyleId);
     const [language, setLanguage] = useState<ILanguage | null>(initialLanguage);
-    // Optional flavour knobs. Genre defaults to none; writing style defaults to a clear, simple voice.
-    const [genre, setGenre] = useState<IStoryGenre | null>(null);
-    const [writingStyle, setWritingStyle] = useState<IWritingStyle | null>('SIMPLE');
+    // Optional flavour knobs. Genre defaults to none; writing style defaults to a clear, simple
+    // voice. Both restore from a failed-story retry via the initial props.
+    const [genre, setGenre] = useState<IStoryGenre | null>(initialGenre);
+    const [writingStyle, setWritingStyle] = useState<IWritingStyle | null>(initialWritingStyle);
     const [question, setQuestion] = useState(initialQuestion);
     const [isPending, setIsPending] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);

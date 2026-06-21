@@ -57,6 +57,8 @@ export default async function WorkshopPage({
                 initialPageCount={prefillStory?.pageCount ?? null}
                 initialArtStyleId={prefillStory?.artStyleId ?? null}
                 initialLanguage={prefillStory?.language ?? null}
+                initialGenre={prefillStory?.genre ?? null}
+                initialWritingStyle={prefillStory ? prefillStory.writingStyle : 'SIMPLE'}
             />
         </main>
     );
