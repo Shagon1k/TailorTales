@@ -32,6 +32,8 @@ const MOCK_STORY: Story = {
     pageCount: 8,
     artStyleId: 'style-1',
     language: 'EN',
+    genre: null,
+    writingStyle: null,
     title: null,
     styleAnchor: null,
     characterId: null,
@@ -253,6 +255,28 @@ describe('StoriesService', () => {
                     NotFoundException,
                 );
                 expect(storyCreate).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('given genre and writing style', () => {
+            it('should persist them on the story', async () => {
+                storyCreate.mockResolvedValue(MOCK_STORY);
+                const dto: CreateStoryDto = {
+                    childId: 'child-1',
+                    type: 'BOOK',
+                    question: 'Why is the sky blue?',
+                    pageCount: 8,
+                    artStyleId: 'style-1',
+                    language: 'EN',
+                    genre: 'BEDTIME',
+                    writingStyle: 'POETIC',
+                };
+
+                await service.create('user-123', dto);
+
+                expect(storyCreate).toHaveBeenCalledWith({
+                    data: expect.objectContaining({ genre: 'BEDTIME', writingStyle: 'POETIC' }),
+                });
             });
         });
     });

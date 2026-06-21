@@ -136,6 +136,8 @@ export class GenerationPipeline {
             pageCount: story.pageCount,
             language: story.language,
             character: character ?? undefined,
+            genre: story.genre,
+            writingStyle: story.writingStyle,
         });
         const maxTokens = computeMaxTokens(story.pageCount, story.language);
 

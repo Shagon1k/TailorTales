@@ -1,5 +1,5 @@
 import { IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { Language, StoryType } from '../../../generated/prisma/client.js';
+import { Language, StoryGenre, StoryType, WritingStyle } from '../../../generated/prisma/client.js';
 import {
     ALLOWED_PAGE_COUNTS,
     STORY_QUESTION_MAX_LENGTH,
@@ -32,4 +32,14 @@ export class CreateStoryDto {
 
     @IsEnum(Language)
     language!: Language;
+
+    /** Optional flavour knob — shapes plot/theme. Omit to leave it to the model. */
+    @IsEnum(StoryGenre)
+    @IsOptional()
+    genre?: StoryGenre;
+
+    /** Optional flavour knob — shapes prose voice. Omit to leave it to the model. */
+    @IsEnum(WritingStyle)
+    @IsOptional()
+    writingStyle?: WritingStyle;
 }

@@ -29,6 +29,20 @@ enum StoryType {
   COMIC
 }
 
+// Optional story flavour knobs — each maps to a prompt fragment injected at Planning.
+enum StoryGenre {
+  FAIRY_TALE
+  BEDTIME
+  EDUCATIONAL
+  ADVENTURE
+}
+
+enum WritingStyle {
+  POETIC
+  SIMPLE
+  IMAGINATIVE
+}
+
 enum StoryStatus {
   DRAFT
   QUEUED
@@ -183,6 +197,8 @@ model Story {
   artStyleId String
   artStyle   ArtStyle    @relation(fields: [artStyleId], references: [id])
   language   Language
+  genre        StoryGenre?
+  writingStyle WritingStyle?
   title         String?
   styleAnchor   String?
   characterId   String?

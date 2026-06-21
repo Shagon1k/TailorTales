@@ -114,6 +114,8 @@ export class StoriesService {
                 artStyleId: dto.artStyleId,
                 language: dto.language,
                 ...(dto.characterId !== undefined && { characterId: dto.characterId }),
+                ...(dto.genre !== undefined && { genre: dto.genre }),
+                ...(dto.writingStyle !== undefined && { writingStyle: dto.writingStyle }),
             },
         });
     }

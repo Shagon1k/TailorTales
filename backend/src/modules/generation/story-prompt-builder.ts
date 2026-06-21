@@ -5,6 +5,8 @@ import type {
     Child,
     Language,
     StoryBlueprint,
+    StoryGenre,
+    WritingStyle,
 } from '../../generated/prisma/client.js';
 import {
     BOOK_INTERIOR_TEMPLATE_NAMES,
@@ -16,7 +18,9 @@ import {
     STORY_STRUCTURE_RULES_HEADER,
     STORY_SYSTEM_PROMPT_SUFFIX,
     buildCharacterPromptSection,
+    buildGenreSection,
     buildInterestsHintSection,
+    buildWritingStyleSection,
 } from './generation.prompts.js';
 import { LANGUAGE_NAMES } from '../../common/languages.constants.js';
 
@@ -29,6 +33,9 @@ interface IPromptContext {
     language: Language;
     /** When present, guides the LLM's styleAnchor generation and illustration prompts. */
     character?: Pick<Character, 'name' | 'description'>;
+    /** Optional flavour knobs — each injects a prompt fragment when set. */
+    genre?: StoryGenre | null;
+    writingStyle?: WritingStyle | null;
 }
 
 @Injectable()
@@ -57,6 +64,8 @@ export class StoryPromptBuilder {
             '',
             `QUESTION TO ANSWER: "${ctx.question}"`,
             '',
+            ...(ctx.genre ? [buildGenreSection(ctx.genre), ''] : []),
+            ...(ctx.writingStyle ? [buildWritingStyleSection(ctx.writingStyle), ''] : []),
             ...(ctx.child.interests.length > 0
                 ? [buildInterestsHintSection(ctx.child.interests), '']
                 : []),

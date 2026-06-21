@@ -26,6 +26,8 @@ const mockStory = {
     pageCount: 5,
     artStyleId: 'style-1',
     language: 'EN',
+    genre: null,
+    writingStyle: null,
     title: null,
     styleAnchor: null,
     isPublic: false,

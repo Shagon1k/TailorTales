@@ -37,6 +37,8 @@ const MOCK_SUMMARY: IStorySummary = {
     pageCount: 8,
     artStyleId: 'style-1',
     language: 'EN',
+    genre: null,
+    writingStyle: null,
     title: null,
     styleAnchor: null,
     characterId: null,
