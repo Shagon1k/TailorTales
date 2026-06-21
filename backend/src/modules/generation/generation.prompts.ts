@@ -13,6 +13,16 @@ export const STORY_SYSTEM_PROMPT_SUFFIX = [
     'the image model will not see other pages.',
 ].join('\n');
 
+/**
+ * Appended to EVERY illustration prompt (cover included). Image models render text
+ * unreliably — especially Cyrillic — producing garbled glyphs. We'd rather have no text
+ * than broken text, so we forbid it outright. Positive, concrete phrasing works better
+ * than a negative shout: the model honours "wordless illustration" more reliably than
+ * "do not use text". Note: this intentionally also clears COMIC speech bubbles.
+ */
+export const IMAGE_NO_TEXT_DIRECTIVE =
+    'A fully wordless illustration: no letters, words, numbers, captions, signage, or speech bubbles of any kind — convey everything through imagery alone.';
+
 export const STORY_STRUCTURE_RULES_HEADER = 'PAGE STRUCTURE (mandatory):';
 export const STORY_OUTPUT_RULES_HEADER = 'OUTPUT RULES:';
 

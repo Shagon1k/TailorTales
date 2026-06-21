@@ -19,6 +19,7 @@ import { QuotaService } from '../subscriptions/quota.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
+import { IMAGE_NO_TEXT_DIRECTIVE } from './generation.prompts.js';
 
 type StoryWithRelations = Story & {
     child: Pick<Child, 'id' | 'name' | 'birthdate' | 'interests'>;
@@ -279,7 +280,8 @@ export class GenerationPipeline {
         if (!page.illustrationPrompt) return;
 
         const imageSlot = tpl.images[0];
-        const prompt = `${story.styleAnchor ?? ''}\n\n${page.illustrationPrompt}`.trim();
+        const prompt =
+            `${story.styleAnchor ?? ''}\n\n${page.illustrationPrompt}\n\n${IMAGE_NO_TEXT_DIRECTIVE}`.trim();
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
