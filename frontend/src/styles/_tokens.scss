@@ -129,6 +129,8 @@
         rgba(248, 110, 66, 0) 65%
     );
     --gradient-card-twilight: linear-gradient(180deg, #4a2620 0%, #391b18 100%);
+    // Warm, gold-tipped panel for the final CTA — distinct from the twilight cards above it.
+    --gradient-card-ember: linear-gradient(135deg, #6a2a2a 0%, #8a4a2e 58%, #a87a3a 100%);
     --gradient-fox-bevel: linear-gradient(135deg, #fbb08e 0%, #f86e42 100%);
     --gradient-progress: linear-gradient(90deg, #b23641 0%, #f86e42 50%, #dbb155 100%);
     --gradient-hatch-light: repeating-linear-gradient(
