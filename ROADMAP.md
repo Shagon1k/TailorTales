@@ -1242,6 +1242,7 @@ flowchart LR
 > UAT is the continuous integration target; prod is gated behind a deliberate version tag so a merge never reaches real users by itself. Tags follow semver (`vMAJOR.MINOR.PATCH`).
 
 - [ ] Configure dokploy deploy triggers: UAT on `main` push/merge; prod on tag push (`v*`)
+- [ ] CI gitleaks gate (hard-block on detected secrets) — the local pre-commit hook is best-effort (warns + continues if Homebrew/gitleaks is unavailable), so CI must be the real enforcement point before merge/deploy
 - [ ] Dockerfiles tested end-to-end for both backend and frontend
 - [ ] Graceful shutdown verified — BullMQ worker drains in-flight jobs on SIGTERM before process exit (prevents mid-generation kills on deploy)
 - [ ] dokploy env var injection configured per environment (no secrets in repo)
