@@ -50,14 +50,23 @@ Use to clarify the area: `feat(auth):`, `fix(backend):`, `docs(roadmap):`, `chor
 
 - **Imperative mood** — "add", not "added" or "adds".
 - **No trailing period.**
-- **Under 72 characters.**
 - **Lowercase** (except proper nouns).
 
 ### Body (optional)
 
 - Blank line between subject and body.
 - Explain _why_, not _what_ (the diff shows what).
-- Wrap at 100 chars (enforced by commitlint).
+
+### Limits
+
+Cite the config when a limit comes up — never restate the number elsewhere, so it can't drift.
+
+| Constraint                     | Source (`commitlint.config.js` rule)         |
+| ------------------------------ | -------------------------------------------- |
+| Header `type(scope): subject`  | `header-max-length` (72)                     |
+| Body / footer line length      | `body-max-line-length`, `footer-max-line-length` (100) |
+| Allowed types                  | `type-enum` (see type table above)           |
+| Scope optional                 | `scope-empty`                                |
 
 ### Examples
 
@@ -73,7 +82,7 @@ refactor(backend): extract DTO validation into pipe
 
 - **Squash merge** to `main` — one commit per logical PR, clean linear history.
 - PR title MUST follow Conventional Commits — it becomes the squash-commit message.
-- PR description MUST include:
+- PR description MUST include (the `.github/PULL_REQUEST_TEMPLATE.md` template prompts for these):
     - **ROADMAP phase reference** (e.g. "Phase 1 — Auth").
     - **Acceptance check confirmation** — which checks pass.
     - **New env vars / migrations** — call out anything operational.
@@ -84,3 +93,9 @@ refactor(backend): extract DTO validation into pipe
 - **`commitlint` + `husky`** enforce Conventional Commits at commit time (set up in Phase 0).
 - Commits failing the check must be rewritten — do NOT bypass with `--no-verify`.
 - Branch name validation is lightweight (visual review at PR time); may be automated later.
+
+## Anti-patterns
+
+- Never `git push --force` to a shared branch — it rewrites history others depend on. Use `--force-with-lease` and only on your own branch.
+- Never bypass hooks with `--no-verify` — fix the lint/commitlint failure instead.
+- Never put two scopes in one commit — split them so each is independently revertable.

@@ -3,17 +3,22 @@ import { ConfigService } from '@nestjs/config';
 import { AppError } from '../../common/errors.js';
 import {
     type IAiClient,
+    type ICharacterProfile,
+    type IGenerateCharacterProfileInput,
     type IGenerateImageInput,
     type IGeneratePageTextInput,
     type IGenerateStoryPlanInput,
     type IModerationResult,
     type IStoryPlan,
+    CHARACTER_PROFILE_JSON_SCHEMA,
     MODERATION_JSON_SCHEMA,
     STORY_PLAN_JSON_SCHEMA,
+    characterProfileSchema,
     moderationSchema,
     storyPlanSchema,
 } from './ai.types.js';
 import { MODERATION_SYSTEM_PROMPT } from '../generation/generation.prompts.js';
+import { CHARACTER_PROFILE_SYSTEM_PROMPT } from '../characters/characters.prompts.js';
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 1_000;
@@ -90,6 +95,47 @@ export class AiClient implements IAiClient {
         const text = data.choices[0]?.message?.content;
         if (!text?.trim()) throw new Error('OpenRouter returned empty page text content');
         return text.trim();
+    }
+
+    async generateCharacterProfile(
+        input: IGenerateCharacterProfileInput,
+    ): Promise<ICharacterProfile> {
+        this.logger.log(`Generating character profile (model: ${this.textModel})`);
+
+        const body = {
+            model: this.textModel,
+            max_tokens: input.maxTokens,
+            response_format: {
+                type: 'json_schema',
+                json_schema: CHARACTER_PROFILE_JSON_SCHEMA,
+            },
+            messages: [
+                { role: 'system', content: CHARACTER_PROFILE_SYSTEM_PROMPT },
+                { role: 'user', content: input.prompt },
+            ],
+        };
+
+        const data = await this.post<{ choices: { message: { content: string } }[] }>(
+            '/chat/completions',
+            body,
+        );
+
+        const raw = data.choices[0]?.message?.content;
+        if (!raw) throw new Error('OpenRouter returned empty character profile content');
+
+        let parsed: unknown;
+        try {
+            parsed = JSON.parse(raw);
+        } catch {
+            throw new Error(`Character profile response was not valid JSON: ${raw.slice(0, 200)}`);
+        }
+
+        const result = characterProfileSchema.safeParse(parsed);
+        if (!result.success) {
+            throw new Error(`Character profile schema mismatch: ${result.error.message}`);
+        }
+
+        return result.data;
     }
 
     async generateImage(input: IGenerateImageInput): Promise<Buffer> {

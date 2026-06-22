@@ -3,6 +3,7 @@ import type { Character, User } from '../../generated/prisma/client.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { CharactersService } from './characters.service.js';
 import { CreateCharacterDto } from './dto/create-character.dto.js';
+import { CreateCharacterFromPromptDto } from './dto/create-character-from-prompt.dto.js';
 import { UpdateCharacterDto } from './dto/update-character.dto.js';
 
 @Controller('characters')
@@ -22,6 +23,14 @@ export class CharactersController {
     @Post()
     create(@CurrentUser() user: User, @Body() dto: CreateCharacterDto): Promise<Character> {
         return this.charactersService.create(user.id, dto);
+    }
+
+    @Post('from-prompt')
+    createFromPrompt(
+        @CurrentUser() user: User,
+        @Body() dto: CreateCharacterFromPromptDto,
+    ): Promise<Character> {
+        return this.charactersService.createFromPrompt(user.id, dto);
     }
 
     @Patch(':id')

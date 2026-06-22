@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     charactersApi,
+    type ICreateCharacterFromPromptPayload,
     type ICreateCharacterPayload,
     type IUpdateCharacterPayload,
 } from '@/api/characters';
@@ -28,6 +29,24 @@ export function useUpdateCharacter(): ReturnType<
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, payload }) => charactersApi.update(id, payload),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY }),
+    });
+}
+
+export function useDeleteCharacter(): ReturnType<typeof useMutation<void, Error, string>> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => charactersApi.remove(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY }),
+    });
+}
+
+export function useCreateCharacterFromPrompt(): ReturnType<
+    typeof useMutation<ICharacter, Error, ICreateCharacterFromPromptPayload>
+> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: charactersApi.createFromPrompt,
         onSuccess: () => queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY }),
     });
 }

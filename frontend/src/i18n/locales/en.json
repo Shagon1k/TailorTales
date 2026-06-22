@@ -386,11 +386,57 @@
                 "title": "The language of the tale",
                 "label": "Story language"
             },
+            "genrePicker": {
+                "number": "6.",
+                "title": "Pick a genre",
+                "label": "Story genre (optional)",
+                "note": "Optional — sets the mood of the tale.",
+                "fairyTale": {
+                    "label": "Fairy tale",
+                    "hint": "A magical story full of wonder, kindness, and a gentle moral."
+                },
+                "bedtime": {
+                    "label": "Bedtime",
+                    "hint": "Calm and soothing, winding gently down toward sleep."
+                },
+                "educational": {
+                    "label": "Educational",
+                    "hint": "Explains how and why things work through the child’s discovery."
+                },
+                "adventure": {
+                    "label": "Adventure",
+                    "hint": "A brave little journey about courage and solving a problem."
+                }
+            },
+            "writingStylePicker": {
+                "number": "7.",
+                "title": "Pick a writing style",
+                "label": "Writing style (optional)",
+                "note": "Optional — shapes how the words sound.",
+                "poetic": {
+                    "label": "Poetic",
+                    "hint": "Lyrical and rhythmic."
+                },
+                "simple": {
+                    "label": "Simple",
+                    "hint": "Clean and easy."
+                },
+                "imaginative": {
+                    "label": "Imaginative",
+                    "hint": "Creative and vivid."
+                }
+            },
             "submitError": "Could not start generation. Please try again.",
             "artStyleLabel": "Art style",
             "characterModal": {
                 "editTitle": "Edit character",
                 "addTitle": "Add character"
+            },
+            "characterPicker": {
+                "title": "Choose a character",
+                "listLabel": "Select a character",
+                "none": "No character — the story follows the reader",
+                "createNew": "+ Create a new character"
             }
         },
         "summary": {
@@ -405,8 +451,8 @@
                 "style": "Style"
             },
             "characterAction": {
-                "add": "Add",
-                "edit": "Edit"
+                "choose": "Choose",
+                "change": "Change"
             },
             "lengthValue": "{pageCount} pages",
             "creditCost": "{creditCost} credits",
@@ -427,10 +473,51 @@
             "descriptionPlaceholder": "Describe the character's appearance in detail — hair color, eye color, clothing, distinguishing features…",
             "cancelButton": "Cancel",
             "saveButton": "Save",
+            "modeGroupLabel": "How to create the character",
+            "modeManual": "Write it myself",
+            "modePrompt": "Generate from a prompt",
+            "promptLabel": "Describe the character",
+            "promptPlaceholder": "e.g. a brave little fox who loves the sea, with a red scarf",
+            "generateButton": "Generate",
             "errors": {
                 "nameRequired": "Name is required",
-                "descriptionRequired": "Description is required"
+                "descriptionRequired": "Description is required",
+                "promptRequired": "Tell us a little about the character"
             }
+        },
+        "characterQuiz": {
+            "nameLabel": "Name",
+            "namePlaceholder": "e.g. Pip",
+            "genderLabel": "Girl or boy",
+            "gender": { "girl": "Girl", "boy": "Boy" },
+            "hairColorLabel": "Hair color",
+            "hairColor": { "black": "black", "brown": "brown", "blonde": "blonde", "red": "red" },
+            "hairLengthLabel": "Hair length",
+            "hairLength": { "short": "short", "medium": "medium-length", "long": "long" },
+            "eyeColorLabel": "Eye color",
+            "eyeColor": { "brown": "brown", "blue": "blue", "green": "green", "gray": "gray" },
+            "skinToneLabel": "Skin tone",
+            "skinTone": { "fair": "fair", "medium": "medium", "tan": "tan", "dark": "dark" },
+            "clothingColorLabel": "Clothing color",
+            "clothingColor": {
+                "red": "red",
+                "blue": "blue",
+                "green": "green",
+                "yellow": "yellow",
+                "pink": "pink"
+            },
+            "clothingItemLabel": "What are they wearing?",
+            "clothingItemPlaceholder": "e.g. a raincoat, a dress, overalls",
+            "detailLabel": "Anything special? (optional)",
+            "detailPlaceholder": "e.g. freckles, round glasses, a small cape",
+            "cancelButton": "Cancel",
+            "createButton": "Create character",
+            "photoButton": "📷 Use a photo — coming soon",
+            "photoTooltip": "Soon you'll be able to upload a photo of your child, a parent, or anyone else to use as the story's main character.",
+            "descriptionTemplate": "{gender}. Hair: {hairLength} {hairColor}. Eyes: {eyeColor}. Skin: {skinTone}. Wearing: {clothing}.",
+            "descriptionClothing": "{color} {item}",
+            "descriptionClothingGeneric": "{color} clothes",
+            "errors": { "nameRequired": "Name is required" }
         }
     },
     "workshopProgress": {
@@ -673,7 +760,11 @@
                 "cancelButton": "Cancel",
                 "deleteButton": "Delete"
             },
-            "deleteConfirm": "Are you sure you want to delete {childName}? This cannot be undone."
+            "deleteConfirm": "Are you sure you want to delete {childName}? This cannot be undone.",
+            "deleteCharacterModal": {
+                "title": "Delete character"
+            },
+            "deleteCharacterConfirm": "Delete character {characterName}? This cannot be undone."
         },
         "childForm": {
             "nameLabel": "Name",
@@ -705,12 +796,14 @@
                 "male": "Boy",
                 "female": "Girl"
             },
-            "characterLabel": "Character",
-            "noCharacter": "No character yet.",
-            "editCharacterAriaLabel": "Edit character for {childName}",
+            "characterLabel": "Characters",
+            "noCharacter": "No characters yet.",
+            "editCharacterAriaLabel": "Edit character {characterName}",
             "addCharacterAriaLabel": "Add character for {childName}",
-            "editCharacterButton": "Edit character",
+            "deleteCharacterAriaLabel": "Delete character {characterName}",
+            "editCharacterButton": "Edit",
             "addCharacterButton": "Add character",
+            "deleteCharacterButton": "Delete",
             "editAriaLabel": "Edit {childName}",
             "editButton": "Edit",
             "deleteAriaLabel": "Delete {childName}",

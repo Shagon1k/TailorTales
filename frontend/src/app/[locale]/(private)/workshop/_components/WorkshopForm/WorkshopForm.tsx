@@ -11,21 +11,47 @@ import SuggestionChip from '@/components/ui/SuggestionChip/SuggestionChip';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import { storiesApi } from '@/api/stories';
-import { useCharacters, useCreateCharacter, useUpdateCharacter } from '@/hooks/characters';
+import {
+    useCharacters,
+    useCreateCharacter,
+    useCreateCharacterFromPrompt,
+} from '@/hooks/characters';
 import type { IChild } from '@/types/child.types';
-import type { ICharacter } from '@/types/character.types';
+import type { IUserCharacterSource } from '@/types/character.types';
 import type { IArtStyle } from '@/types/art-style.types';
-import type { IStoryConfig, IStoryType, ILanguage } from '@/types/story.types';
+import type {
+    IStoryConfig,
+    IStoryType,
+    ILanguage,
+    IStoryGenre,
+    IWritingStyle,
+} from '@/types/story.types';
 import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
 import ReaderChip from './components/ReaderChip/ReaderChip';
 import ReaderSelector from './components/ReaderSelector/ReaderSelector';
+import CharacterSelector from './components/CharacterSelector/CharacterSelector';
 import ArtStyleGrid from './components/ArtStyleGrid/ArtStyleGrid';
 import WorkshopSummary from './components/WorkshopSummary/WorkshopSummary';
 import CharacterForm, {
     type ICharacterFormValues,
 } from '../../../_components/CharacterForm/CharacterForm';
+import Button from '@/components/ui/Button/Button';
 import Modal from '@/components/ui/Modal/Modal';
 import styles from './WorkshopForm.module.scss';
+
+// Optional flavour knobs — value is the enum sent to the API, key resolves the i18n copy.
+const GENRES: { value: IStoryGenre; key: string }[] = [
+    { value: 'FAIRY_TALE', key: 'fairyTale' },
+    { value: 'BEDTIME', key: 'bedtime' },
+    { value: 'EDUCATIONAL', key: 'educational' },
+    { value: 'ADVENTURE', key: 'adventure' },
+];
+
+const WRITING_STYLES: { value: IWritingStyle; key: string }[] = [
+    { value: 'POETIC', key: 'poetic' },
+    { value: 'SIMPLE', key: 'simple' },
+    { value: 'IMAGINATIVE', key: 'imaginative' },
+];
 
 export interface IWorkshopFormProps {
     readers: IChild[];
@@ -43,6 +69,10 @@ export interface IWorkshopFormProps {
     initialArtStyleId?: string | null;
     /** Pre-selected language — from a failed story retry. */
     initialLanguage?: ILanguage | null;
+    /** Pre-selected genre — from a failed story retry. */
+    initialGenre?: IStoryGenre | null;
+    /** Pre-selected writing style — from a failed story retry; defaults to a simple voice. */
+    initialWritingStyle?: IWritingStyle | null;
 }
 
 export default function WorkshopForm({
@@ -55,6 +85,8 @@ export default function WorkshopForm({
     initialPageCount = null,
     initialArtStyleId = null,
     initialLanguage = null,
+    initialGenre = null,
+    initialWritingStyle = 'SIMPLE',
 }: Readonly<IWorkshopFormProps>): React.ReactElement {
     const t = useTranslations('workshop.form');
     const router = useRouter();
@@ -77,27 +109,30 @@ export default function WorkshopForm({
     );
     const [artStyleId, setArtStyleId] = useState<string | null>(initialArtStyleId);
     const [language, setLanguage] = useState<ILanguage | null>(initialLanguage);
+    // Optional flavour knobs. Genre defaults to none; writing style defaults to a clear, simple
+    // voice. Both restore from a failed-story retry via the initial props.
+    const [genre, setGenre] = useState<IStoryGenre | null>(initialGenre);
+    const [writingStyle, setWritingStyle] = useState<IWritingStyle | null>(initialWritingStyle);
     const [question, setQuestion] = useState(initialQuestion);
     const [isPending, setIsPending] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
     const { data: characters = [] } = useCharacters();
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
-    const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
+    const { mutate: createCharacterFromPrompt, isPending: isGeneratingCharacter } =
+        useCreateCharacterFromPrompt();
 
+    const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+    const [isCharacterPickerOpen, setIsCharacterPickerOpen] = useState(false);
     const [isCharacterModalOpen, setIsCharacterModalOpen] = useState(false);
-
-    const characterByChildId = new Map(
-        characters
-            .filter((c): c is ICharacter & { childId: string } => c.childId !== null)
-            .map((c) => [c.childId, c]),
-    );
 
     const selectedChild = readers.find((r) => r.id === selectedChildId) ?? null;
     const selectedArtStyle = artStyles.find((s) => s.id === artStyleId) ?? null;
-    const selectedCharacter = selectedChildId
-        ? (characterByChildId.get(selectedChildId) ?? null)
-        : null;
+    // Characters belong to a child — only show (and allow choosing) the reader's own.
+    const childCharacters = characters.filter((c) => c.childId === selectedChildId);
+    const selectedCharacter = childCharacters.find((c) => c.id === selectedCharacterId) ?? null;
+    const selectedGenreKey = GENRES.find((g) => g.value === genre)?.key ?? null;
+    const selectedStyleKey = WRITING_STYLES.find((s) => s.value === writingStyle)?.key ?? null;
 
     const isValid =
         selectedChildId !== null &&
@@ -109,22 +144,49 @@ export default function WorkshopForm({
 
     function handleReaderSelect(id: string): void {
         setSelectedChildId(id);
+        // Characters are scoped to a child — a previous pick no longer applies.
+        setSelectedCharacterId(null);
         setIsReaderOpen(false);
     }
 
-    function handleCharacterSubmit(values: ICharacterFormValues): void {
+    function handleCharacterSelect(id: string | null): void {
+        setSelectedCharacterId(id);
+        setIsCharacterPickerOpen(false);
+    }
+
+    function handleCreateNewCharacter(): void {
+        setIsCharacterPickerOpen(false);
+        setIsCharacterModalOpen(true);
+    }
+
+    function handleCharacterSubmit(
+        values: ICharacterFormValues,
+        source: IUserCharacterSource,
+    ): void {
         if (!selectedChildId) return;
-        if (selectedCharacter) {
-            updateCharacter(
-                { id: selectedCharacter.id, payload: values },
-                { onSuccess: () => setIsCharacterModalOpen(false) },
-            );
-        } else {
-            createCharacter(
-                { ...values, childId: selectedChildId },
-                { onSuccess: () => setIsCharacterModalOpen(false) },
-            );
-        }
+        // Inline-created characters belong to the selected reader and are auto-selected.
+        createCharacter(
+            { ...values, childId: selectedChildId, source },
+            {
+                onSuccess: (created) => {
+                    setSelectedCharacterId(created.id);
+                    setIsCharacterModalOpen(false);
+                },
+            },
+        );
+    }
+
+    function handleGenerateCharacter(prompt: string): void {
+        if (!selectedChildId) return;
+        createCharacterFromPrompt(
+            { childId: selectedChildId, prompt },
+            {
+                onSuccess: (created) => {
+                    setSelectedCharacterId(created.id);
+                    setIsCharacterModalOpen(false);
+                },
+            },
+        );
     }
 
     async function handleSubmit(): Promise<void> {
@@ -137,11 +199,14 @@ export default function WorkshopForm({
         try {
             const story = await storiesApi.create({
                 childId: selectedChildId,
+                ...(selectedCharacterId !== null && { characterId: selectedCharacterId }),
                 type: storyType,
                 question: question.trim(),
                 pageCount: Number(pageCount),
                 artStyleId,
                 language,
+                ...(genre !== null && { genre }),
+                ...(writingStyle !== null && { writingStyle }),
             });
             await storiesApi.generate(story.id);
             router.push(`/workshop/${story.id}`);
@@ -301,6 +366,60 @@ export default function WorkshopForm({
                         ))}
                     </OptionPillGroup>
                 </section>
+
+                <section className={styles.workshop__section} aria-labelledby="section-genre">
+                    <div className={styles['workshop__section-header']}>
+                        <span className={styles['workshop__section-number']}>
+                            {t('genrePicker.number')}
+                        </span>
+                        <h2 id="section-genre" className={styles['workshop__section-title']}>
+                            {t('genrePicker.title')}
+                        </h2>
+                    </div>
+                    <OptionPillGroup
+                        value={genre}
+                        onChange={(v) => setGenre(v as IStoryGenre)}
+                        label={t('genrePicker.label')}
+                    >
+                        {GENRES.map(({ value, key }) => (
+                            <OptionPill key={value} value={value}>
+                                {t(`genrePicker.${key}.label`)}
+                            </OptionPill>
+                        ))}
+                    </OptionPillGroup>
+                    <p className={styles['workshop__section-note']}>
+                        {selectedGenreKey
+                            ? t(`genrePicker.${selectedGenreKey}.hint`)
+                            : t('genrePicker.note')}
+                    </p>
+                </section>
+
+                <section className={styles.workshop__section} aria-labelledby="section-writing">
+                    <div className={styles['workshop__section-header']}>
+                        <span className={styles['workshop__section-number']}>
+                            {t('writingStylePicker.number')}
+                        </span>
+                        <h2 id="section-writing" className={styles['workshop__section-title']}>
+                            {t('writingStylePicker.title')}
+                        </h2>
+                    </div>
+                    <OptionPillGroup
+                        value={writingStyle}
+                        onChange={(v) => setWritingStyle(v as IWritingStyle)}
+                        label={t('writingStylePicker.label')}
+                    >
+                        {WRITING_STYLES.map(({ value, key }) => (
+                            <OptionPill key={value} value={value}>
+                                {t(`writingStylePicker.${key}.label`)}
+                            </OptionPill>
+                        ))}
+                    </OptionPillGroup>
+                    <p className={styles['workshop__section-note']}>
+                        {selectedStyleKey
+                            ? t(`writingStylePicker.${selectedStyleKey}.hint`)
+                            : t('writingStylePicker.note')}
+                    </p>
+                </section>
                 {submitError !== null && (
                     <p role="alert" className={styles['workshop__error']}>
                         {submitError}
@@ -319,29 +438,40 @@ export default function WorkshopForm({
                 isValid={isValid}
                 isPending={isPending}
                 onSubmit={handleSubmit}
-                onCharacterEdit={() => setIsCharacterModalOpen(true)}
+                onCharacterChoose={() => setIsCharacterPickerOpen(true)}
             />
+
+            <Modal
+                opened={isCharacterPickerOpen}
+                onClose={() => setIsCharacterPickerOpen(false)}
+                title={t('characterPicker.title')}
+            >
+                {isCharacterPickerOpen && (
+                    <div className={styles.workshop__picker}>
+                        <CharacterSelector
+                            items={childCharacters}
+                            selectedId={selectedCharacterId}
+                            onSelect={handleCharacterSelect}
+                        />
+                        <Button variant="quiet" fullWidth onClick={handleCreateNewCharacter}>
+                            {t('characterPicker.createNew')}
+                        </Button>
+                    </div>
+                )}
+            </Modal>
 
             <Modal
                 opened={isCharacterModalOpen}
                 onClose={() => setIsCharacterModalOpen(false)}
-                title={
-                    selectedCharacter ? t('characterModal.editTitle') : t('characterModal.addTitle')
-                }
+                title={t('characterModal.addTitle')}
             >
                 {isCharacterModalOpen && (
                     <CharacterForm
-                        initialValues={
-                            selectedCharacter
-                                ? {
-                                      name: selectedCharacter.name,
-                                      description: selectedCharacter.description,
-                                  }
-                                : undefined
-                        }
                         onSubmit={handleCharacterSubmit}
                         onCancel={() => setIsCharacterModalOpen(false)}
-                        isSubmitting={selectedCharacter ? isUpdatingCharacter : isCreatingCharacter}
+                        isSubmitting={isCreatingCharacter}
+                        onGenerateFromPrompt={handleGenerateCharacter}
+                        isGenerating={isGeneratingCharacter}
                     />
                 )}
             </Modal>

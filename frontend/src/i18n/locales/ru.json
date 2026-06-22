@@ -386,11 +386,57 @@
                 "title": "Язык сказки",
                 "label": "Язык истории"
             },
+            "genrePicker": {
+                "number": "6.",
+                "title": "Выберите жанр",
+                "label": "Жанр истории (необязательно)",
+                "note": "Необязательно — задаёт настроение истории.",
+                "fairyTale": {
+                    "label": "Сказка",
+                    "hint": "Волшебная история, полная чудес, доброты и мягкой морали."
+                },
+                "bedtime": {
+                    "label": "Перед сном",
+                    "hint": "Спокойная и убаюкивающая, мягко ведёт ко сну."
+                },
+                "educational": {
+                    "label": "Познавательная",
+                    "hint": "Объясняет, как и почему всё устроено, через открытия ребёнка."
+                },
+                "adventure": {
+                    "label": "Приключение",
+                    "hint": "Смелое маленькое путешествие о храбрости и решении задачи."
+                }
+            },
+            "writingStylePicker": {
+                "number": "7.",
+                "title": "Выберите стиль письма",
+                "label": "Стиль письма (необязательно)",
+                "note": "Необязательно — определяет, как звучат слова.",
+                "poetic": {
+                    "label": "Поэтичный",
+                    "hint": "Лиричный и ритмичный."
+                },
+                "simple": {
+                    "label": "Простой",
+                    "hint": "Чистый и понятный."
+                },
+                "imaginative": {
+                    "label": "Образный",
+                    "hint": "Творческий и яркий."
+                }
+            },
             "submitError": "Не удалось запустить создание. Пожалуйста, попробуйте ещё раз.",
             "artStyleLabel": "Стиль иллюстраций",
             "characterModal": {
                 "editTitle": "Редактировать персонажа",
                 "addTitle": "Добавить персонажа"
+            },
+            "characterPicker": {
+                "title": "Выберите персонажа",
+                "listLabel": "Выбор персонажа",
+                "none": "Без персонажа — история про самого читателя",
+                "createNew": "+ Создать нового персонажа"
             }
         },
         "summary": {
@@ -405,8 +451,8 @@
                 "style": "Стиль"
             },
             "characterAction": {
-                "add": "Добавить",
-                "edit": "Изменить"
+                "choose": "Выбрать",
+                "change": "Изменить"
             },
             "lengthValue": "{pageCount} стр.",
             "creditCost": "{creditCost} кредитов",
@@ -427,10 +473,66 @@
             "descriptionPlaceholder": "Опишите внешность персонажа подробно — цвет волос, цвет глаз, одежда, отличительные черты…",
             "cancelButton": "Отмена",
             "saveButton": "Сохранить",
+            "modeGroupLabel": "Как создать персонажа",
+            "modeManual": "Напишу сам",
+            "modePrompt": "Сгенерировать по описанию",
+            "promptLabel": "Опишите персонажа",
+            "promptPlaceholder": "напр., храбрый лисёнок, который любит море, в красном шарфе",
+            "generateButton": "Сгенерировать",
             "errors": {
                 "nameRequired": "Имя обязательно",
-                "descriptionRequired": "Описание обязательно"
+                "descriptionRequired": "Описание обязательно",
+                "promptRequired": "Расскажите немного о персонаже"
             }
+        },
+        "characterQuiz": {
+            "nameLabel": "Имя",
+            "namePlaceholder": "напр., Пип",
+            "genderLabel": "Девочка или мальчик",
+            "gender": { "girl": "Девочка", "boy": "Мальчик" },
+            "hairColorLabel": "Цвет волос",
+            "hairColor": {
+                "black": "чёрные",
+                "brown": "каштановые",
+                "blonde": "светлые",
+                "red": "рыжие"
+            },
+            "hairLengthLabel": "Длина волос",
+            "hairLength": { "short": "короткие", "medium": "средние", "long": "длинные" },
+            "eyeColorLabel": "Цвет глаз",
+            "eyeColor": {
+                "brown": "карие",
+                "blue": "голубые",
+                "green": "зелёные",
+                "gray": "серые"
+            },
+            "skinToneLabel": "Тон кожи",
+            "skinTone": {
+                "fair": "светлая",
+                "medium": "средняя",
+                "tan": "смуглая",
+                "dark": "тёмная"
+            },
+            "clothingColorLabel": "Цвет одежды",
+            "clothingColor": {
+                "red": "красная",
+                "blue": "синяя",
+                "green": "зелёная",
+                "yellow": "жёлтая",
+                "pink": "розовая"
+            },
+            "clothingItemLabel": "Что на персонаже надето?",
+            "clothingItemPlaceholder": "напр., дождевик, платье, комбинезон",
+            "detailLabel": "Что-то особенное? (необязательно)",
+            "detailPlaceholder": "напр., веснушки, круглые очки, маленький плащ",
+            "cancelButton": "Отмена",
+            "createButton": "Создать персонажа",
+            "photoButton": "📷 Использовать фото — скоро",
+            "photoTooltip": "Скоро вы сможете загрузить фото своего ребёнка, родителя или кого угодно, чтобы использовать как главного персонажа истории.",
+            "descriptionTemplate": "{gender}. Волосы: {hairLength} {hairColor}. Глаза: {eyeColor}. Кожа: {skinTone}. Одежда: {clothing}.",
+            "descriptionClothing": "{color}, {item}",
+            "descriptionClothingGeneric": "{color}",
+            "errors": { "nameRequired": "Имя обязательно" }
         }
     },
     "workshopProgress": {
@@ -673,7 +775,11 @@
                 "cancelButton": "Отмена",
                 "deleteButton": "Удалить"
             },
-            "deleteConfirm": "Вы уверены, что хотите удалить {childName}? Это действие нельзя отменить."
+            "deleteConfirm": "Вы уверены, что хотите удалить {childName}? Это действие нельзя отменить.",
+            "deleteCharacterModal": {
+                "title": "Удалить персонажа"
+            },
+            "deleteCharacterConfirm": "Удалить персонажа {characterName}? Это действие нельзя отменить."
         },
         "childForm": {
             "nameLabel": "Имя",
@@ -705,12 +811,14 @@
                 "male": "Мальчик",
                 "female": "Девочка"
             },
-            "characterLabel": "Персонаж",
-            "noCharacter": "Персонажа пока нет.",
-            "editCharacterAriaLabel": "Редактировать персонажа для {childName}",
+            "characterLabel": "Персонажи",
+            "noCharacter": "Персонажей пока нет.",
+            "editCharacterAriaLabel": "Редактировать персонажа {characterName}",
             "addCharacterAriaLabel": "Добавить персонажа для {childName}",
-            "editCharacterButton": "Редактировать персонажа",
+            "deleteCharacterAriaLabel": "Удалить персонажа {characterName}",
+            "editCharacterButton": "Редактировать",
             "addCharacterButton": "Добавить персонажа",
+            "deleteCharacterButton": "Удалить",
             "editAriaLabel": "Редактировать {childName}",
             "editButton": "Редактировать",
             "deleteAriaLabel": "Удалить {childName}",

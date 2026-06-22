@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { storiesServerApi } from '@/api/stories.server';
 import HomePage from '../page';
 
 vi.mock('@/api/user.server', () => ({
@@ -59,6 +60,23 @@ describe('HomePage', () => {
             expect(
                 screen.getByRole('link', { name: /begin your first tale/i }),
             ).toBeInTheDocument();
+        });
+    });
+
+    describe('given the public stories API is unreachable', () => {
+        it('should still render the marketing page instead of crashing', async () => {
+            // Arrange — simulate a backend outage on the public-stories fetch.
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+            vi.mocked(storiesServerApi.getPublic).mockRejectedValueOnce(new Error('fetch failed'));
+
+            // Act
+            renderWithMantine(await HomePage());
+
+            // Assert — the page degrades gracefully, hero still present.
+            expect(
+                screen.getByRole('heading', { level: 1, name: /where their questions/i }),
+            ).toBeInTheDocument();
+            consoleError.mockRestore();
         });
     });
 });

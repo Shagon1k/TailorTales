@@ -15,6 +15,7 @@ paths:
 - Follow F.I.R.S.T.: tests must be Fast, Isolated, Repeatable, Self-validating, and Thorough.
 - Don't write tests just to improve coverage numbers — cover meaningful scenarios (happy path, edge cases, error states).
 - Each test file must cover only one source file. Do not test multiple modules in a single test file.
+- Never commit an unconditional `.skip`/`.only` — disable a test only with a tracker reference in the title (e.g. `it.skip('TT-123: …', …)`). Environment-conditional skips (`describe.skipIf(CI)`) are fine.
 
 ### File Structure
 
@@ -42,6 +43,7 @@ paths:
 - Vitest globals are enabled (`globals: true`) — do NOT import `describe`, `it`, `expect`, `vi`,
   `beforeEach`, `afterEach`, etc. They are available without imports.
 - Don't mock what you don't own — wrap third-party libraries first, then mock the wrapper.
+- When `vi.spyOn` must intercept a call inside the module under test, `await import('…')` that module **inside** the test/`beforeEach` after the spy is set. A static top-of-file import caches the reference before the spy attaches, so the spy silently never fires.
 
 ---
 
@@ -67,6 +69,7 @@ paths:
     - ❌ `expect(button.disabled).toBe(true)`
     - ✅ `expect(button).toBeDisabled()`
 - Use `user-event` over `fireEvent` for simulating user interactions.
+- Never wait on a fixed `setTimeout` — await the actual outcome with `find*` or `waitForElementToBeRemoved`, or drive time with `vi.useFakeTimers()`. Reserve `waitFor` for non-DOM conditions only.
 
 ### Custom Hooks
 

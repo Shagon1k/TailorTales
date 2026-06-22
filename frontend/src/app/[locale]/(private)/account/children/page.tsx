@@ -11,10 +11,16 @@ import CharacterForm, {
     type ICharacterFormValues,
 } from '../../_components/CharacterForm/CharacterForm';
 import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/hooks/children';
-import { useCharacters, useCreateCharacter, useUpdateCharacter } from '@/hooks/characters';
+import {
+    useCharacters,
+    useCreateCharacter,
+    useCreateCharacterFromPrompt,
+    useDeleteCharacter,
+    useUpdateCharacter,
+} from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
 import type { IChild } from '@/types/child.types';
-import type { ICharacter } from '@/types/character.types';
+import type { ICharacter, IUserCharacterSource } from '@/types/character.types';
 import styles from './page.module.scss';
 
 type TModalState =
@@ -22,7 +28,8 @@ type TModalState =
     | { kind: 'add' }
     | { kind: 'edit'; child: IChild }
     | { kind: 'delete'; child: IChild }
-    | { kind: 'character'; child: IChild; character: ICharacter | null };
+    | { kind: 'character'; child: IChild; character: ICharacter | null }
+    | { kind: 'deleteCharacter'; character: ICharacter };
 
 export default function ChildrenPage(): React.ReactElement {
     const t = useTranslations('account.children');
@@ -35,6 +42,9 @@ export default function ChildrenPage(): React.ReactElement {
     const { mutate: deleteChild, isPending: isDeleting } = useDeleteChild();
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
     const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
+    const { mutate: deleteCharacter, isPending: isDeletingCharacter } = useDeleteCharacter();
+    const { mutate: createCharacterFromPrompt, isPending: isGeneratingCharacter } =
+        useCreateCharacterFromPrompt();
 
     const childrenLimit = subscription?.tier.childrenLimit ?? null;
     const atChildrenLimit = childrenLimit !== null && children.length >= childrenLimit;
@@ -42,11 +52,14 @@ export default function ChildrenPage(): React.ReactElement {
     const [modal, setModal] = useState<TModalState>({ kind: 'closed' });
     const close = (): void => setModal({ kind: 'closed' });
 
-    const characterByChildId = new Map(
-        characters
-            .filter((c): c is ICharacter & { childId: string } => c.childId !== null)
-            .map((c) => [c.childId, c]),
-    );
+    // A child may own several characters — group them all (Model B).
+    const charactersByChildId = new Map<string, ICharacter[]>();
+    for (const character of characters) {
+        if (character.childId === null) continue;
+        const list = charactersByChildId.get(character.childId) ?? [];
+        list.push(character);
+        charactersByChildId.set(character.childId, list);
+    }
 
     const isFormOpen = modal.kind === 'add' || modal.kind === 'edit';
     const isCharacterFormOpen = modal.kind === 'character';
@@ -59,13 +72,21 @@ export default function ChildrenPage(): React.ReactElement {
         }
     }
 
-    function handleCharacterSubmit(values: ICharacterFormValues): void {
+    function handleCharacterSubmit(
+        values: ICharacterFormValues,
+        source: IUserCharacterSource,
+    ): void {
         if (modal.kind !== 'character') return;
         if (modal.character) {
             updateCharacter({ id: modal.character.id, payload: values }, { onSuccess: close });
         } else {
-            createCharacter({ ...values, childId: modal.child.id }, { onSuccess: close });
+            createCharacter({ ...values, childId: modal.child.id, source }, { onSuccess: close });
         }
+    }
+
+    function handleGenerateCharacter(prompt: string): void {
+        if (modal.kind !== 'character') return;
+        createCharacterFromPrompt({ childId: modal.child.id, prompt }, { onSuccess: close });
     }
 
     if (isLoading) {
@@ -110,15 +131,17 @@ export default function ChildrenPage(): React.ReactElement {
                             <ChildCard
                                 key={child.id}
                                 child={child}
-                                character={characterByChildId.get(child.id) ?? null}
+                                characters={charactersByChildId.get(child.id) ?? []}
                                 onEdit={(c) => setModal({ kind: 'edit', child: c })}
                                 onDelete={(c) => setModal({ kind: 'delete', child: c })}
-                                onCharacterEdit={(c) =>
-                                    setModal({
-                                        kind: 'character',
-                                        child: c,
-                                        character: characterByChildId.get(c.id) ?? null,
-                                    })
+                                onCharacterAdd={(c) =>
+                                    setModal({ kind: 'character', child: c, character: null })
+                                }
+                                onCharacterEdit={(c, character) =>
+                                    setModal({ kind: 'character', child: c, character })
+                                }
+                                onCharacterDelete={(character) =>
+                                    setModal({ kind: 'deleteCharacter', character })
                                 }
                             />
                         ))}
@@ -176,6 +199,12 @@ export default function ChildrenPage(): React.ReactElement {
                                 ? isUpdatingCharacter
                                 : isCreatingCharacter
                         }
+                        onGenerateFromPrompt={
+                            modal.kind === 'character' && !modal.character
+                                ? handleGenerateCharacter
+                                : undefined
+                        }
+                        isGenerating={isGeneratingCharacter}
                     />
                 )}
             </Modal>
@@ -199,6 +228,35 @@ export default function ChildrenPage(): React.ReactElement {
                                 variant="primary"
                                 loading={isDeleting}
                                 onClick={() => deleteChild(modal.child.id, { onSuccess: close })}
+                            >
+                                {t('deleteModal.deleteButton')}
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
+
+            <Modal
+                opened={modal.kind === 'deleteCharacter'}
+                onClose={close}
+                title={t('deleteCharacterModal.title')}
+                size="sm"
+            >
+                {modal.kind === 'deleteCharacter' && (
+                    <div className={styles['delete-confirm']}>
+                        <p className={styles['delete-confirm__text']}>
+                            {t('deleteCharacterConfirm', { characterName: modal.character.name })}
+                        </p>
+                        <div className={styles['delete-confirm__actions']}>
+                            <Button variant="quiet" onClick={close} disabled={isDeletingCharacter}>
+                                {t('deleteModal.cancelButton')}
+                            </Button>
+                            <Button
+                                variant="primary"
+                                loading={isDeletingCharacter}
+                                onClick={() =>
+                                    deleteCharacter(modal.character.id, { onSuccess: close })
+                                }
                             >
                                 {t('deleteModal.deleteButton')}
                             </Button>

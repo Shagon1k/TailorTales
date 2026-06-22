@@ -26,6 +26,8 @@ const mockStory = {
     pageCount: 5,
     artStyleId: 'style-1',
     language: 'EN',
+    genre: null,
+    writingStyle: null,
     title: null,
     styleAnchor: null,
     isPublic: false,
@@ -33,7 +35,7 @@ const mockStory = {
     pdfKey: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    child: { id: 'child-1', name: 'Maya', birthdate: new Date('2019-01-01') },
+    child: { id: 'child-1', name: 'Maya', birthdate: new Date('2019-01-01'), interests: [] },
     artStyle: { id: 'style-1', name: 'Storybook', promptPrefix: 'Warm watercolour style.' },
 };
 

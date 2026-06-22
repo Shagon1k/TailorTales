@@ -8,7 +8,13 @@ import globals from 'globals';
 export default tseslint.config(
     // Global ignores
     {
-        ignores: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/coverage/**'],
+        ignores: [
+            '**/node_modules/**',
+            '**/dist/**',
+            '**/.next/**',
+            '**/coverage/**',
+            '**/generated/**',
+        ],
     },
 
     // Base JS rules for all files
@@ -20,6 +26,9 @@ export default tseslint.config(
         extends: [tseslint.configs.recommended],
         rules: {
             'no-duplicate-imports': 'error',
+            // Soft guard against god-files — a signal to decompose, not a hard block (warn).
+            // Counts code lines only; generated code is excluded above.
+            'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
         },
     },
 

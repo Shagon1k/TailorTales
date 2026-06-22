@@ -37,11 +37,12 @@ vi.mock('@/api/stories', () => ({
     storiesApi: { create: mockStoriesCreate, generate: mockStoriesGenerate },
 }));
 
-// WorkshopForm uses useCharacters/useCreateCharacter/useUpdateCharacter — mock the entire module
-// so tests focus on WorkshopForm behaviour and don't need a real API.
+// WorkshopForm uses the character hooks — mock the entire module so tests focus on
+// WorkshopForm behaviour and don't need a real API.
 vi.mock('@/hooks/characters', () => ({
     useCharacters: vi.fn().mockReturnValue({ data: [] }),
     useCreateCharacter: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
+    useCreateCharacterFromPrompt: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
     useUpdateCharacter: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
 }));
 
@@ -152,8 +153,19 @@ describe('WorkshopForm', () => {
         });
     });
 
+    describe('given a failed-story retry pre-fills the flavour knobs', () => {
+        it('should pre-select the provided genre and writing style', () => {
+            renderForm({ initialGenre: 'ADVENTURE', initialWritingStyle: 'IMAGINATIVE' });
+
+            const genreGroup = screen.getByRole('radiogroup', { name: /story genre/i });
+            expect(within(genreGroup).getByRole('radio', { name: /adventure/i })).toBeChecked();
+            const styleGroup = screen.getByRole('radiogroup', { name: /writing style/i });
+            expect(within(styleGroup).getByRole('radio', { name: /imaginative/i })).toBeChecked();
+        });
+    });
+
     describe('given all required fields are filled', () => {
-        async function fillAndSubmit(): Promise<void> {
+        async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
             renderForm({ initialQuestion: 'Why is the sky blue?' });
 
             // Format — RadioCard accessible name = title + description; use ^Book to anchor the match
@@ -171,6 +183,9 @@ describe('WorkshopForm', () => {
             // Language — scope to the "Story language" radiogroup
             const langGroup = screen.getByRole('radiogroup', { name: /story language/i });
             await userEvent.click(within(langGroup).getByRole('radio', { name: /^English/i }));
+
+            // Optional flavour knobs, selected by individual tests before submit.
+            if (beforeSubmit) await beforeSubmit();
 
             // Submit
             await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
@@ -191,6 +206,25 @@ describe('WorkshopForm', () => {
                         artStyleId: 'style-1',
                         language: 'EN',
                     }),
+                );
+            });
+        });
+
+        it('should include the chosen genre and writing style in the payload', async () => {
+            mockStoriesCreate.mockResolvedValue({ id: 'story-new' });
+
+            await fillAndSubmit(async () => {
+                const genreGroup = screen.getByRole('radiogroup', { name: /story genre/i });
+                await userEvent.click(
+                    within(genreGroup).getByRole('radio', { name: /fairy tale/i }),
+                );
+                const styleGroup = screen.getByRole('radiogroup', { name: /writing style/i });
+                await userEvent.click(within(styleGroup).getByRole('radio', { name: /poetic/i }));
+            });
+
+            await waitFor(() => {
+                expect(mockStoriesCreate).toHaveBeenCalledWith(
+                    expect.objectContaining({ genre: 'FAIRY_TALE', writingStyle: 'POETIC' }),
                 );
             });
         });

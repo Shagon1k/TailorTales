@@ -1,4 +1,4 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Character } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
@@ -12,6 +12,7 @@ const MOCK_CHARACTER: Character = {
     id: 'char-1',
     userId: 'user-123',
     childId: 'child-1',
+    source: 'IMAGINED',
     name: 'Princess Mia',
     description: 'A 6-year-old girl with curly red hair and blue overalls.',
     previewKey: null,
@@ -29,6 +30,7 @@ describe('CharactersService', () => {
     let storageUpload: ReturnType<typeof vi.fn>;
     let storageDelete: ReturnType<typeof vi.fn>;
     let aiGenerateImage: ReturnType<typeof vi.fn>;
+    let aiGenerateCharacterProfile: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         characterFindMany = vi.fn();
@@ -39,6 +41,7 @@ describe('CharactersService', () => {
         storageUpload = vi.fn().mockResolvedValue(undefined);
         storageDelete = vi.fn().mockResolvedValue(undefined);
         aiGenerateImage = vi.fn().mockResolvedValue(Buffer.from('fake-image'));
+        aiGenerateCharacterProfile = vi.fn();
 
         const module = await Test.createTestingModule({
             providers: [
@@ -63,7 +66,10 @@ describe('CharactersService', () => {
                 },
                 {
                     provide: AI_CLIENT,
-                    useValue: { generateImage: aiGenerateImage },
+                    useValue: {
+                        generateImage: aiGenerateImage,
+                        generateCharacterProfile: aiGenerateCharacterProfile,
+                    },
                 },
             ],
         }).compile();
@@ -147,8 +153,7 @@ describe('CharactersService', () => {
     });
 
     describe('create', () => {
-        it('should create and return a new character linked to a child', async () => {
-            characterFindFirst.mockResolvedValue(null);
+        it('should default source to IMAGINED for free-form creation', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
@@ -163,36 +168,68 @@ describe('CharactersService', () => {
                     userId: 'user-123',
                     name: dto.name,
                     description: dto.description,
+                    source: 'IMAGINED',
                     childId: dto.childId,
                 },
             });
             expect(result).toBe(MOCK_CHARACTER);
         });
 
-        it('should create a standalone character when no childId is given', async () => {
-            const standalone = { ...MOCK_CHARACTER, childId: null };
-            characterCreate.mockResolvedValue(standalone);
-            const dto: CreateCharacterDto = { name: 'Generic Hero', description: 'A brave hero.' };
+        it('should persist the QUIZ source when the client sets it', async () => {
+            characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            const dto: CreateCharacterDto = {
+                name: 'Pip',
+                description: 'A girl with short brown hair.',
+                childId: 'child-1',
+                source: 'QUIZ',
+            };
 
             await service.create('user-123', dto);
 
-            // No conflict check performed when childId is absent
-            expect(characterFindFirst).not.toHaveBeenCalled();
             expect(characterCreate).toHaveBeenCalledWith({
-                data: { userId: 'user-123', name: dto.name, description: dto.description },
+                data: expect.objectContaining({ source: 'QUIZ' }),
             });
         });
 
-        it('should throw ConflictException when the child already has a character', async () => {
-            characterFindFirst.mockResolvedValue(MOCK_CHARACTER);
+        it('should not perform a uniqueness lookup — a child may have several characters', async () => {
+            characterCreate.mockResolvedValue(MOCK_CHARACTER);
             const dto: CreateCharacterDto = {
-                name: 'Another',
-                description: 'Duplicate.',
+                name: 'Princess Mia',
+                description: 'A brave hero.',
                 childId: 'child-1',
             };
 
-            await expect(service.create('user-123', dto)).rejects.toThrow(ConflictException);
-            expect(characterCreate).not.toHaveBeenCalled();
+            await service.create('user-123', dto);
+
+            expect(characterFindFirst).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('createFromPrompt', () => {
+        it('should expand the prompt via AI and save it as free-form (IMAGINED)', async () => {
+            aiGenerateCharacterProfile.mockResolvedValue({
+                name: 'Captain Pip',
+                description: 'A brave little fox in a red scarf.',
+            });
+            characterCreate.mockResolvedValue(MOCK_CHARACTER);
+
+            await service.createFromPrompt('user-123', {
+                childId: 'child-1',
+                prompt: 'a brave fox who loves the sea',
+            });
+
+            expect(aiGenerateCharacterProfile).toHaveBeenCalledWith(
+                expect.objectContaining({ prompt: 'a brave fox who loves the sea' }),
+            );
+            expect(characterCreate).toHaveBeenCalledWith({
+                data: {
+                    userId: 'user-123',
+                    childId: 'child-1',
+                    source: 'IMAGINED',
+                    name: 'Captain Pip',
+                    description: 'A brave little fox in a red scarf.',
+                },
+            });
         });
     });
 

@@ -79,14 +79,15 @@
 
 ### Characters — `/characters`
 
-| Method | Path                      | Auth | Body                 | Response                                                                                                                           |
-| ------ | ------------------------- | ---- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/characters`             | user | —                    | `Character[]` (owner's).                                                                                                           |
-| GET    | `/characters/:id`         | user | —                    | `Character` (404 if not owned).                                                                                                    |
-| POST   | `/characters`             | user | `CreateCharacterDto` | `Character`.                                                                                                                       |
-| PATCH  | `/characters/:id`         | user | `UpdateCharacterDto` | `Character`.                                                                                                                       |
-| DELETE | `/characters/:id`         | user | —                    | 204. Clears `Story.characterId` on related stories (styleAnchor snapshots are unaffected).                                         |
-| POST   | `/characters/:id/preview` | user | —                    | Generates an AI portrait from `description`, stores it in S3, updates `generatedPreviewImageKey`. Returns the updated `Character`. |
+| Method | Path                      | Auth | Body                           | Response                                                                                                             |
+| ------ | ------------------------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/characters`             | user | —                              | `Character[]` (owner's; optional `?childId=` filter).                                                                |
+| GET    | `/characters/:id`         | user | —                              | `Character` (404 if not owned).                                                                                      |
+| POST   | `/characters`             | user | `CreateCharacterDto`           | `Character`. Belongs to a child (`childId` required). `source`: `IMAGINED` (default) or `QUIZ`.                      |
+| POST   | `/characters/from-prompt` | user | `CreateCharacterFromPromptDto` | AI drafts a name + appearance from a free-text `prompt`; saved as free-form (`source = IMAGINED`).                   |
+| PATCH  | `/characters/:id`         | user | `UpdateCharacterDto`           | `Character`.                                                                                                         |
+| DELETE | `/characters/:id`         | user | —                              | 204. Clears `Story.characterId` on related stories (styleAnchor snapshots are unaffected).                           |
+| POST   | `/characters/:id/preview` | user | —                              | Generates an AI portrait from `description`, stores it in S3, updates `previewKey`. Returns the updated `Character`. |
 
 ---
 
@@ -109,7 +110,7 @@
 | GET    | `/stories/:id`                         | user   | —                       | `IStoryDetail` (pages, signed URLs, `myRating`, `rating`).                                                                     |
 | GET    | `/stories/:id/progress`                | user   | —                       | **SSE** stream — see below.                                                                                                    |
 | GET    | `/stories/:id/pages/:order/html`       | user   | —                       | Handlebars-rendered page HTML (same path as Puppeteer uses). Powers the in-browser reader iframe.                              |
-| POST   | `/stories`                             | user   | `CreateStoryDto`        | Created `Story` (status `DRAFT`).                                                                                              |
+| POST   | `/stories`                             | user   | `CreateStoryDto`        | Created `Story` (status `DRAFT`). `genre` and `writingStyle` are optional flavour knobs.                                       |
 | POST   | `/stories/:id/generate`                | user   | —                       | **202** `{ jobId, storyId }`. 409 if a generation is active or story isn't `DRAFT`. Checks page-credit quota before enqueuing. |
 | POST   | `/stories/:id/pages/:order/regenerate` | user   | `RegeneratePageDto`     | Updated `Page`. Re-stitches PDF. 402 if regeneration quota exhausted.                                                          |
 | POST   | `/stories/:id/rating`                  | user   | `CreateRatingDto`       | Upserted `Rating`. Sets `Story.isPublic` when `isPublic` field is present.                                                     |

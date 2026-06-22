@@ -1,12 +1,16 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type { Character } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { type IAiClient, AI_CLIENT } from '../ai/ai.types.js';
 import { StorageService } from '../storage/storage.service.js';
 import { StorageKeys } from '../storage/storage.keys.js';
-import { CHARACTER_PREVIEW_IMAGE_SIZE } from './characters.constants.js';
+import {
+    CHARACTER_PREVIEW_IMAGE_SIZE,
+    CHARACTER_PROFILE_MAX_TOKENS,
+} from './characters.constants.js';
 import { buildCharacterPreviewPrompt } from './characters.prompts.js';
 import type { CreateCharacterDto } from './dto/create-character.dto.js';
+import type { CreateCharacterFromPromptDto } from './dto/create-character-from-prompt.dto.js';
 import type { UpdateCharacterDto } from './dto/update-character.dto.js';
 
 @Injectable()
@@ -37,21 +41,33 @@ export class CharactersService {
     }
 
     async create(userId: string, dto: CreateCharacterDto): Promise<Character> {
-        if (dto.childId) {
-            const existing = await this.prisma.character.findFirst({
-                where: { childId: dto.childId, userId },
-            });
-            if (existing) {
-                throw new ConflictException('errors.characters.duplicateCharacter');
-            }
-        }
+        // Every character belongs to a child; a child may have several.
+        // source: free-form (manual/prompt) is IMAGINED; the guided quiz sends QUIZ.
+        return this.prisma.character.create({
+            data: {
+                userId,
+                childId: dto.childId,
+                source: dto.source ?? 'IMAGINED',
+                name: dto.name,
+                description: dto.description,
+            },
+        });
+    }
+
+    /** Expands a parent's free-text idea into a character profile and saves it (free-form → IMAGINED). */
+    async createFromPrompt(userId: string, dto: CreateCharacterFromPromptDto): Promise<Character> {
+        const profile = await this.ai.generateCharacterProfile({
+            prompt: dto.prompt,
+            maxTokens: CHARACTER_PROFILE_MAX_TOKENS,
+        });
 
         return this.prisma.character.create({
             data: {
                 userId,
-                name: dto.name,
-                description: dto.description,
-                ...(dto.childId !== undefined && { childId: dto.childId }),
+                childId: dto.childId,
+                source: 'IMAGINED',
+                name: profile.name,
+                description: profile.description,
             },
         });
     }

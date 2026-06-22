@@ -31,7 +31,12 @@ export async function generateMetadata({
 export default async function HomePage(): Promise<React.ReactElement> {
     const [user, publicStories] = await Promise.all([
         getServerUser(),
-        storiesServerApi.getPublic(),
+        // The marketing page must render even if the API is unreachable —
+        // degrade to no featured tales rather than crashing the whole page.
+        storiesServerApi.getPublic().catch((err: unknown) => {
+            console.error('Public stories fetch failed; rendering landing without tales', err);
+            return [];
+        }),
     ]);
 
     return (
