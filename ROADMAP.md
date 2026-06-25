@@ -174,7 +174,7 @@ Privacy · Contact _(both static pages)_
 - **ROADMAP.md is the single source of truth.** Update it on every scope change or decision.
 - **DESIGN.md** documents all UI/UX decisions from design screen reviews. Update after each design review session.
 - **Per-phase docs (staging) → durable docs (lasting).** While a phase is in progress, capture what it built in `_docs/phase-N-<name>.md` following `TEMPLATE.md` (summary, what was added, structure, commands, env/migrations, gotchas). These are temporary working notes. At documentation phases (7, 14, …) the accumulated phase docs are **consolidated into the durable docs** (`architecture/`, `api/`, `guides/`, `decisions/`) and the `phase-N` files removed. Durable docs are **phase-agnostic** and human-facing — the lasting source of truth; anything unbuilt is "planned (see ROADMAP)".
-- **Rules revision:** after each phase, review and propose updates to `CLAUDE.md` and `.claude/rules/*.md` based on what was learned. **Each revision requires developer approval before commit.**
+- **Rules revision:** after each phase, review and propose updates to `AGENTS.md` and `.agent-docs/rules/*.md` based on what was learned. **Each revision requires developer approval before commit.**
 - **Phase completion gate:** a phase is NOT complete until acceptance checks pass AND its `_docs/phase-N-<name>.md` is written. No half-finished phases in `main`.
 
 ---
@@ -253,7 +253,7 @@ Privacy · Contact _(both static pages)_
 - [x] Prisma init in `backend/`, connect to PostgreSQL
 - [x] Shared ESLint + Prettier config at root
 - [x] Vitest setup in both `backend/` and `frontend/`
-- [x] **Husky + commitlint** — pre-commit hook enforces Conventional Commits per [`.claude/rules/git.md`](.claude/rules/git.md). `prepare` script installs hooks on `pnpm install`.
+- [x] **Husky + commitlint** — pre-commit hook enforces Conventional Commits per [`.agent-docs/rules/git.md`](.agent-docs/rules/git.md). `prepare` script installs hooks on `pnpm install`.
 - [x] Basic health-check endpoint in Nest (`GET /health`)
 - [x] Basic landing page in Next
 - [x] GitHub Actions workflow: install + lint + type-check + test on PR
@@ -333,8 +333,8 @@ Privacy · Contact _(both static pages)_
 
 **Goal:** establish the visual foundation — design tokens, Mantine theme, atom library, route-group layouts, static pages, account shell, and the `ArtStyle` entity — so all subsequent phases build on a consistent base.
 
-> All TypeScript follows `.claude/rules/typescript.md` (e.g. `IComponentNameProps`, explicit return types, no `React.FC`).
-> All CSS follows `frontend/.claude/rules/css.md` (tokens → Mantine theme → CSS Modules; semantic tokens only; `m-` modifiers).
+> All TypeScript follows `.agent-docs/rules/typescript.md` (e.g. `IComponentNameProps`, explicit return types, no `React.FC`).
+> All CSS follows `.agent-docs/rules/frontend-css.md` (tokens → Mantine theme → CSS Modules; semantic tokens only; `m-` modifiers).
 > The "promotion rule" governs component location: start co-located, lift only when a second consumer needs the component.
 
 **Sub-tasks:**
@@ -646,14 +646,14 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [x] API reference
 - [x] Developer onboarding + external-services guides
 - [x] Remove per-phase `_docs/phase-N-*.md` scaffolding
-- [x] Sweep `CLAUDE.md` + `.claude/rules/*.md`
+- [x] Sweep `AGENTS.md` + `.agent-docs/rules/*.md`
 - [x] Verify `DESIGN.md` and `ROADMAP.md`
 
 **Acceptance Check:**
 
 - A new developer can clone the repo, follow the onboarding guide, and run the full stack locally without assistance
 - The durable docs (`architecture/`, `api/`, `guides/`) accurately describe the system as built; no `phase-N` docs remain in `_docs/`
-- `CLAUDE.md` and rules files updated with any new conventions discovered
+- `AGENTS.md` and rules files updated with any new conventions discovered
 - Architecture overview covers all major system components
 
 **Deliverables:** durable-doc updates (architecture / api / guides, as relevant) + ROADMAP progress.
@@ -873,7 +873,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [ ] Monitoring & alerting guide: log structure (Pino), what to watch, how to diagnose common failures
 - [ ] Backup strategy doc: Postgres backup schedule + restore procedure, S3 versioning policy
 - [ ] Final sweep of all durable docs (`_docs/architecture/`, `api/`, `guides/`, `decisions/`): verify accuracy, update any commands or configs that changed during later phases
-- [ ] Final sweep of `CLAUDE.md` + all `.claude/rules/*.md`: incorporate all patterns and lessons from Phases 7–13; propose updates for developer approval
+- [ ] Final sweep of `AGENTS.md` + all `.agent-docs/rules/*.md`: incorporate all patterns and lessons from Phases 7–13; propose updates for developer approval
 - [ ] Final review of `DESIGN.md`: confirm it matches what was actually built (no deferred items silently dropped)
 - [ ] Final review of `ROADMAP.md`: move completed items to ✅, update open questions, archive resolved deferred decisions
 - [ ] Update the architecture docs to reflect the full system including Phases 7–13 additions
@@ -883,7 +883,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 - Ops runbook covers full deployment from zero to live
 - All durable docs accurate and complete through Phase 13
-- `CLAUDE.md` and rules files reflect all conventions established across the full build
+- `AGENTS.md` and rules files reflect all conventions established across the full build
 - `ROADMAP.md` accurately reflects the shipped product
 - GDPR launch checklist is complete or explicitly blocked before production deploy
 
@@ -1327,7 +1327,7 @@ flowchart LR
 | 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                                                                                      |
 | 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                 |
 | 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                           |
-| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/CLAUDE.md and frontend/CLAUDE.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                        |
+| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                        |
 | 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain. |
 | 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                  |
 | 17 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |

@@ -1,7 +1,7 @@
 # Testing
 
 > How tests are written and run in TailorTales. Full conventions live in
-> [`.claude/rules/testing.md`](../../.claude/rules/testing.md) — that file is the
+> [`.agent-docs/rules/testing.md`](../../.agent-docs/rules/testing.md) — that file is the
 > authoritative spec for naming, structure, and framework usage. This guide covers the
 > practical "how to run" and "how it fits together" view.
 
@@ -60,6 +60,6 @@ for the reference implementation.
 
 ## What is not yet tested
 
-- E2E / supertest HTTP tests — not set up yet. Add the convention to `.claude/rules/testing.md`
+- E2E / supertest HTTP tests — not set up yet. Add the convention to `.agent-docs/rules/testing.md`
   when they are introduced.
 - Visual regression tests — planned, not yet in scope.

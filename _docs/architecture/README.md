@@ -43,7 +43,10 @@ TailorTales/
   backend/        NestJS REST API + BullMQ generation worker (same process at MVP)
   frontend/       Next.js App Router (React, TypeScript, Mantine)
   _docs/          This documentation (architecture, api, guides, decisions)
-  .claude/        Project-wide agent rules (typescript, testing, git)
+  AGENTS.md      Agent-facing project instructions
+  .agent-docs/   Source-of-truth agent rule docs
+  .agents/       Generic repo skills
+  .claude/       Claude compatibility adapters
   docker-compose.yml   Postgres + Redis + MinIO for local dev
 ```
 
