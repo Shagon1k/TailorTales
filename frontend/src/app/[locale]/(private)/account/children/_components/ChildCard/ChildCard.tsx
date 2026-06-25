@@ -76,6 +76,7 @@ export default function ChildCard({
                                                 alt=""
                                                 fill
                                                 sizes="56px"
+                                                unoptimized
                                                 className={styles['character__preview-img']}
                                             />
                                         ) : (

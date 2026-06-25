@@ -81,6 +81,7 @@ function CharacterOptionCard({
                         alt=""
                         fill
                         sizes="64px"
+                        unoptimized
                         className={styles['character-selector__thumb-img']}
                     />
                 ) : (

@@ -47,6 +47,7 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                         alt=""
                         fill
                         sizes="(min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 480px) 33vw, 50vw"
+                        unoptimized
                         className={styles['tale-card__cover-img']}
                     />
                 ) : (
