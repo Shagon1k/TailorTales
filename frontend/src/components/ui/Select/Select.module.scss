@@ -8,7 +8,7 @@
         border-radius: var(--radius-md);
         background: transparent;
         font-family: var(--font-sans);
-        font-size: var(--fs-md);
+        font-size: var(--fs-base);
         line-height: 1.2;
         width: 100%;
         cursor: pointer;
@@ -109,7 +109,7 @@
 // ── Option ──────────────────────────────────────────────────────────────
 .select__option {
     font-family: var(--font-sans);
-    font-size: var(--fs-md);
+    font-size: var(--fs-base);
     color: var(--text-primary);
     padding: var(--space-2) var(--space-5);
     cursor: pointer;

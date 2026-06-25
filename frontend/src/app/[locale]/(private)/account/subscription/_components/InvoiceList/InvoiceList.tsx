@@ -5,6 +5,7 @@ import { Stack } from '@mantine/core';
 import Card from '@/components/ui/Card/Card';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import Link from '@/components/ui/Link/Link';
+import Loader from '@/components/ui/Loader/Loader';
 import { useInvoices } from '@/hooks/subscription';
 import { formatLongDate } from '@/utils/date.utils';
 import { formatMoney } from '@/utils/money.utils';
@@ -16,14 +17,16 @@ interface IInvoiceListProps {
 
 export default function InvoiceList({ isPaid }: Readonly<IInvoiceListProps>): React.ReactElement {
     const t = useTranslations('account.subscription.invoices');
-    const { data: invoices } = useInvoices();
+    const { data: invoices, isLoading } = useInvoices();
 
     return (
-        <Card variant="default" size="md">
+        <Card variant="gradient" size="md">
             <Stack gap="sm">
                 <CapsLabel>{t('eyebrow')}</CapsLabel>
 
-                {!invoices || invoices.length === 0 ? (
+                {isLoading ? (
+                    <Loader size="sm" label={t('loading')} />
+                ) : !invoices || invoices.length === 0 ? (
                     <p className={styles['invoice-list__empty']}>
                         {isPaid ? t('emptyPaid') : t('emptyFree')}
                     </p>

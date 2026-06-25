@@ -8,12 +8,12 @@
 
 .delete-account__blocked {
     @include t-body-sm;
-    color: var(--accent-warm);
+    color: var(--accent-danger);
     margin: 0;
 }
 
 .delete-account__error {
     @include t-body-sm;
-    color: var(--accent-warm);
+    color: var(--accent-danger);
     margin: 0;
 }

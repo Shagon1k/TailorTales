@@ -103,7 +103,7 @@ export default function ChildCard({
                         <p className={styles['character__empty']}>{t('noCharacter')}</p>
                     )}
                     <Button
-                        variant="quiet"
+                        variant="secondary"
                         onClick={() => onCharacterAdd(child)}
                         aria-label={t('addCharacterAriaLabel', { childName: child.name })}
                     >
@@ -120,7 +120,7 @@ export default function ChildCard({
                         {t('editButton')}
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant="quiet"
                         onClick={() => onDelete(child)}
                         aria-label={t('deleteAriaLabel', { childName: child.name })}
                     >

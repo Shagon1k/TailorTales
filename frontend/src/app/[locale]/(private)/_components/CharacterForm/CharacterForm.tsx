@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import Button from '@/components/ui/Button/Button';
+import Select from '@/components/ui/Select/Select';
 import type { IUserCharacterSource } from '@/types/character.types';
 import CharacterQuiz from './components/CharacterQuiz/CharacterQuiz';
 import styles from './CharacterForm.module.scss';
@@ -33,6 +34,10 @@ const DEFAULT_VALUES: ICharacterFormValues = {
 };
 
 type TMode = 'manual' | 'quiz' | 'prompt';
+
+function isMode(value: string | null): value is TMode {
+    return value === 'manual' || value === 'quiz' || value === 'prompt';
+}
 
 export default function CharacterForm({
     initialValues,
@@ -64,29 +69,19 @@ export default function CharacterForm({
     return (
         <Stack gap="sm">
             {canGenerate && (
-                <div className={styles.modes} role="group" aria-label={t('modeGroupLabel')}>
-                    <Button
-                        type="button"
-                        variant={mode === 'manual' ? 'primary' : 'quiet'}
-                        onClick={() => setMode('manual')}
-                    >
-                        {t('modeManual')}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant={mode === 'quiz' ? 'primary' : 'quiet'}
-                        onClick={() => setMode('quiz')}
-                    >
-                        {t('modeQuiz')}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant={mode === 'prompt' ? 'primary' : 'quiet'}
-                        onClick={() => setMode('prompt')}
-                    >
-                        {t('modePrompt')}
-                    </Button>
-                </div>
+                <Select
+                    label={t('modeGroupLabel')}
+                    value={mode}
+                    data={[
+                        { value: 'manual', label: t('modeManual') },
+                        { value: 'quiz', label: t('modeQuiz') },
+                        { value: 'prompt', label: t('modePrompt') },
+                    ]}
+                    allowDeselect={false}
+                    onChange={(value) => {
+                        if (isMode(value)) setMode(value);
+                    }}
+                />
             )}
 
             {mode === 'manual' && (

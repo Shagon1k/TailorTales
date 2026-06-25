@@ -78,8 +78,11 @@ describe('AccountSidebar', () => {
             expect(screen.getByRole('link', { name: /children/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /subscription/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /notifications/i })).toBeInTheDocument();
-            expect(screen.getByRole('link', { name: /language/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /privacy/i })).toBeInTheDocument();
+            expect(screen.queryByRole('link', { name: /language/i })).not.toBeInTheDocument();
+            expect(
+                screen.queryByRole('button', { name: /export library/i }),
+            ).not.toBeInTheDocument();
         });
 
         it('should link nav items to the correct hrefs', () => {

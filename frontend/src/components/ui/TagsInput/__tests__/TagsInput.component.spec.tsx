@@ -55,6 +55,31 @@ describe('TagsInput', () => {
             expect(screen.getByText('dragons')).toBeInTheDocument();
             expect(screen.getByText('space')).toBeInTheDocument();
         });
+
+        it('should hide the placeholder when tags are already present', () => {
+            renderTagsInput({
+                defaultValue: ['dragons'],
+                placeholder: 'Add interest and press Enter',
+            });
+            expect(screen.getByRole('combobox')).not.toHaveAttribute(
+                'placeholder',
+                'Add interest and press Enter',
+            );
+        });
+    });
+
+    describe('given a controlled value', () => {
+        it('should hide the placeholder when tags are present', () => {
+            renderTagsInput({
+                value: ['dragons'],
+                placeholder: 'Add interest and press Enter',
+                onChange: vi.fn(),
+            });
+            expect(screen.getByRole('combobox')).not.toHaveAttribute(
+                'placeholder',
+                'Add interest and press Enter',
+            );
+        });
     });
 
     describe('given typing and pressing Enter', () => {

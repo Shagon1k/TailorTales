@@ -124,6 +124,41 @@ describe('AiClient', () => {
     });
 
     describe('generateImage', () => {
+        it('should extract base64 from the OpenRouter message.images array', async () => {
+            const fakeBase64 = Buffer.from('images array image').toString('base64');
+
+            vi.stubGlobal(
+                'fetch',
+                vi.fn().mockResolvedValue({
+                    ok: true,
+                    status: 200,
+                    json: () =>
+                        Promise.resolve({
+                            choices: [
+                                {
+                                    message: {
+                                        content: null,
+                                        images: [
+                                            {
+                                                type: 'image_url',
+                                                image_url: {
+                                                    url: `data:image/png;base64,${fakeBase64}`,
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
+                        }),
+                }),
+            );
+
+            const buf = await client.generateImage({ prompt: 'a fox', size: '1024x1536' });
+
+            expect(Buffer.isBuffer(buf)).toBe(true);
+            expect(buf.toString()).toBe('images array image');
+        });
+
         it('should extract base64 from image_url content part', async () => {
             const fakeBase64 = Buffer.from('fake image').toString('base64');
 

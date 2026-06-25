@@ -6,6 +6,8 @@
         box-shadow var(--duration-base) var(--ease-out),
         transform var(--duration-base) var(--ease-out),
         background var(--duration-base) var(--ease-out),
+        border-color var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out),
         opacity var(--duration-base) var(--ease-out);
 
     &[data-disabled] {
@@ -46,24 +48,26 @@
     }
 
     &.m-secondary {
-        background: transparent;
+        background: rgba(248, 234, 206, 0.14);
         color: var(--text-primary);
-        border: 1.5px solid var(--border-strong);
+        border: 1px solid var(--border-subtle);
 
         &:not([data-disabled]):hover {
             background: var(--bg-elevated-hover);
-            border-color: var(--border-on-dark);
+            border-color: var(--border-strong);
+            box-shadow: 0 0 0 1px var(--border-subtle);
         }
     }
 
     &.m-quiet {
         background: transparent;
         color: var(--text-secondary);
-        border: none;
+        border: 1px solid var(--border-subtle);
 
         &:not([data-disabled]):hover {
-            background: var(--bg-elevated-hover);
+            background: rgba(248, 234, 206, 0.08);
             color: var(--text-primary);
+            border-color: var(--border-strong);
         }
     }
 
@@ -86,4 +90,11 @@
             background: var(--bg-card-3);
         }
     }
+}
+
+.button__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }

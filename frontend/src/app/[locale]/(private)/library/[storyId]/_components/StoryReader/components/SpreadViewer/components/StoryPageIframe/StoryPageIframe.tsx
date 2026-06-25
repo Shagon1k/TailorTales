@@ -24,6 +24,7 @@ export default function StoryPageIframe({
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [scale, setScale] = useState(1);
+    const [isFrameReady, setIsFrameReady] = useState(false);
 
     // Fetch page HTML whenever storyId or pageOrder changes.
     useEffect(() => {
@@ -37,6 +38,7 @@ export default function StoryPageIframe({
             setHtml(cached);
             setIsLoading(false);
             setError(null);
+            setIsFrameReady(false);
             return;
         }
 
@@ -44,7 +46,6 @@ export default function StoryPageIframe({
 
         async function fetchPageHtml(): Promise<void> {
             setIsLoading(true);
-            setHtml(null);
             setError(null);
             try {
                 const result = await storiesApi.getPageHtml(storyId, pageOrder);
@@ -52,6 +53,7 @@ export default function StoryPageIframe({
                     htmlCacheRef.current.set(pageOrder, result);
                     setHtml(result);
                     setIsLoading(false);
+                    setIsFrameReady(false);
                 }
             } catch (err: unknown) {
                 if (!cancelled) {
@@ -109,13 +111,12 @@ export default function StoryPageIframe({
                 )}
                 {html && (
                     <iframe
-                        // key forces a fresh document when the page changes,
-                        // avoiding stale srcDoc content visible during the next fetch.
-                        key={`${storyId}-${pageOrder}`}
                         srcDoc={html}
                         title={`Page ${pageOrder}`}
                         className={styles['page-iframe__frame']}
                         sandbox="allow-same-origin"
+                        onLoad={() => setIsFrameReady(true)}
+                        data-ready={isFrameReady}
                     />
                 )}
             </div>

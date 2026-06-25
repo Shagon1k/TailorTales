@@ -70,7 +70,7 @@ export function buildMetadata({
     const socialTitle = title ? `${siteName} | ${title}` : siteName;
 
     return {
-        title,
+        title: title ?? { absolute: siteName },
         description,
         alternates: { canonical, languages },
         openGraph: {

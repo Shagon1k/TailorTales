@@ -38,7 +38,7 @@ export default function DeleteAccountSection({
     }
 
     return (
-        <Card variant="default" size="md">
+        <Card variant="gradient" size="md">
             <Stack gap="sm">
                 <CapsLabel>{t('eyebrow')}</CapsLabel>
                 <p className={styles['delete-account__copy']}>{t('body')}</p>

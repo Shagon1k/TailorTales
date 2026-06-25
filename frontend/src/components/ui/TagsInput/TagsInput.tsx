@@ -17,11 +17,21 @@ export interface ITagsInputProps extends OmitStyling<
 
 export default function TagsInput({
     surface = 'twilight',
+    placeholder,
+    value,
+    defaultValue,
     ...props
 }: Readonly<ITagsInputProps>): React.ReactElement {
+    const hasTags =
+        (Array.isArray(value) && value.length > 0) ||
+        (Array.isArray(defaultValue) && defaultValue.length > 0);
+
     return (
         <MantineTagsInput
             variant="unstyled"
+            placeholder={hasTags ? undefined : placeholder}
+            value={value}
+            defaultValue={defaultValue}
             classNames={{
                 root: clsx(styles['tags-input'], styles[`m-${surface}`]),
                 label: styles['tags-input__label'],

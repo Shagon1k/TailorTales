@@ -217,9 +217,8 @@
                     "pageRegenerations": "Seiten-Regenerierungen",
                     "watermark": "Wasserzeichen",
                     "printReadyPdf": "Druckfertiges PDF",
-                    "priorityQueue": "Prioritätswarteschlange",
-                    "storiesRetained": "Gespeicherte Geschichten",
-                    "contentLanguages": "EN + RU + DE Inhalt"
+                    "generatedFilesRetained": "Generierte Dateien gespeichert",
+                    "contentLanguages": "Mehrsprachige Inhalte"
                 },
                 "values": {
                     "booksOnly": "Nur Bücher",
@@ -315,7 +314,7 @@
         },
         "cookies": {
             "title": "Cookies",
-            "body": "Wir verwenden ein eigenes Sitzungs-Cookie, um dich angemeldet zu halten, und ein Cookie zum Speichern deiner Einstellungen (Sprache, Theme). Wir verwenden keine Tracking-Cookies oder Werbe-Cookies von Drittanbietern."
+            "body": "Wir verwenden ein eigenes Sitzungs-Cookie, um dich angemeldet zu halten. Deine Cookie-Einwilligung wird im lokalen Speicher gespeichert, nicht in einem Cookie. Analyse-Cookies werden nur in Produktion gesetzt, nachdem du zugestimmt hast; Werbe-Cookies von Drittanbietern verwenden wir nicht."
         },
         "lastUpdated": "Zuletzt aktualisiert: Mai 2026."
     },
@@ -475,6 +474,7 @@
             "saveButton": "Speichern",
             "modeGroupLabel": "Wie der Charakter erstellt wird",
             "modeManual": "Selbst schreiben",
+            "modeQuiz": "Geführt erstellen",
             "modePrompt": "Aus einem Prompt generieren",
             "promptLabel": "Beschreibe den Charakter",
             "promptPlaceholder": "z.B. ein mutiger kleiner Fuchs, der das Meer liebt, mit rotem Schal",
@@ -855,6 +855,7 @@
             },
             "invoices": {
                 "eyebrow": "Vergangene Pakete",
+                "loading": "Rechnungen werden geladen",
                 "emptyPaid": "Noch keine Rechnungen — deine erste kommt mit der nächsten Verlängerung.",
                 "emptyFree": "Keine Rechnungen — das kostenlose Kapitel stellt dir nie etwas in Rechnung.",
                 "pdfLink": "PDF"

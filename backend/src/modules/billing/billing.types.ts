@@ -31,9 +31,27 @@ export interface IInvoice {
     invoicePdfUrl: string | null;
 }
 
+export interface IPaddleCustomer {
+    id: string;
+    email: string;
+}
+
+export interface IPaddleSubscriptionSnapshot {
+    id: string;
+    customerId: string;
+    status: string;
+    createdAt: string;
+    customData: { userId?: string } | null;
+    items: Array<{ price?: { id?: string } }>;
+    currentBillingPeriod: { startsAt?: string; endsAt?: string } | null;
+    scheduledChange: { action?: string } | null;
+}
+
 export interface IPaddleClient {
     /** Verifies the webhook signature and returns the parsed event. Throws on a bad signature. */
     verifyAndParseWebhook(rawBody: Buffer, signature: string): Promise<IPaddleEvent>;
+    findCustomersByEmail(email: string): Promise<IPaddleCustomer[]>;
+    listSubscriptions(paddleCustomerId: string): Promise<IPaddleSubscriptionSnapshot[]>;
     /** Schedules cancellation at the end of the current billing period. */
     cancelSubscription(paddleSubscriptionId: string): Promise<void>;
     /** Returns the customer's Paddle-hosted billing portal URL. */

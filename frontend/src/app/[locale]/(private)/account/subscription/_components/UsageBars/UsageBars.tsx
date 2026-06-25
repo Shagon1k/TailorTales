@@ -38,7 +38,7 @@ export default function UsageBars({ subscription }: Readonly<IUsageBarsProps>): 
     ];
 
     return (
-        <Card variant="default" size="md">
+        <Card variant="gradient" size="md">
             <Stack gap="md">
                 <CapsLabel>{t('eyebrow')}</CapsLabel>
                 {rows.map((row) => (

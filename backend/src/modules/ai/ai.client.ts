@@ -23,6 +23,18 @@ const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 1_000;
 
+interface IImageUrlPart {
+    type: 'image_url';
+    image_url: {
+        url: string;
+    };
+}
+
+interface IGenerateImageMessage {
+    content?: unknown;
+    images?: unknown;
+}
+
 @Injectable()
 export class AiClient implements IAiClient {
     private readonly logger = new Logger(AiClient.name);
@@ -151,10 +163,10 @@ export class AiClient implements IAiClient {
         };
 
         const data = await this.post<{
-            choices: { message: { content: unknown } }[];
+            choices: { message: IGenerateImageMessage }[];
         }>('/chat/completions', body);
 
-        return this.extractImageBuffer(data.choices[0]?.message?.content, input.size);
+        return this.extractImageBuffer(data.choices[0]?.message, input.size);
     }
 
     async moderateText(text: string): Promise<IModerationResult> {
@@ -202,40 +214,73 @@ export class AiClient implements IAiClient {
         }
     }
 
-    private extractImageBuffer(content: unknown, size: string): Buffer {
-        // OpenRouter image models return content as an array of parts or a plain string.
-        // Handle both shapes — the exact format depends on the underlying model.
-        if (Array.isArray(content)) {
-            for (const part of content) {
-                if (
-                    part &&
-                    typeof part === 'object' &&
-                    'type' in part &&
-                    part.type === 'image_url' &&
-                    'image_url' in part &&
-                    part.image_url &&
-                    typeof part.image_url === 'object' &&
-                    'url' in part.image_url &&
-                    typeof part.image_url.url === 'string'
-                ) {
-                    return this.dataUrlToBuffer(part.image_url.url);
-                }
-            }
+    private extractImageBuffer(message: IGenerateImageMessage | undefined, size: string): Buffer {
+        const contentBuffer = this.extractImageBufferFromValue(message?.content);
+        if (contentBuffer) {
+            return contentBuffer;
         }
 
-        if (typeof content === 'string' && content.startsWith('data:')) {
-            return this.dataUrlToBuffer(content);
+        const imagesBuffer = this.extractImageBufferFromValue(message?.images);
+        if (imagesBuffer) {
+            return imagesBuffer;
         }
 
-        const preview =
-            typeof content === 'string'
-                ? content.slice(0, 120)
-                : JSON.stringify(content).slice(0, 120);
+        const preview = JSON.stringify({
+            content: message?.content,
+            images: message?.images,
+        }).slice(0, 240);
         this.logger.error(`Unknown image response format (size: ${size}): ${preview}`);
         throw new Error(
             `Unexpected image response format from OpenRouter (size: ${size}). ` +
-                `Content type: ${typeof content}`,
+                `Content type: ${typeof message?.content}`,
         );
+    }
+
+    private extractImageBufferFromValue(value: unknown): Buffer | null {
+        if (Array.isArray(value)) {
+            for (const part of value) {
+                const imageUrl = this.getImageUrl(part);
+                if (imageUrl) {
+                    return this.dataUrlToBuffer(imageUrl);
+                }
+            }
+            return null;
+        }
+
+        if (typeof value === 'string' && value.startsWith('data:')) {
+            return this.dataUrlToBuffer(value);
+        }
+
+        const imageUrl = this.getImageUrl(value);
+        if (imageUrl) {
+            return this.dataUrlToBuffer(imageUrl);
+        }
+
+        return null;
+    }
+
+    private getImageUrl(value: unknown): string | null {
+        if (!this.isImageUrlPart(value)) {
+            return null;
+        }
+
+        return value.image_url.url;
+    }
+
+    private isImageUrlPart(value: unknown): value is IImageUrlPart {
+        if (!value || typeof value !== 'object') {
+            return false;
+        }
+
+        if (!('type' in value) || value.type !== 'image_url') {
+            return false;
+        }
+
+        if (!('image_url' in value) || !value.image_url || typeof value.image_url !== 'object') {
+            return false;
+        }
+
+        return 'url' in value.image_url && typeof value.image_url.url === 'string';
     }
 
     private dataUrlToBuffer(dataUrl: string): Buffer {

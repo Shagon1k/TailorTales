@@ -845,13 +845,13 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **Sub-tasks:**
 
-- [ ] Frontend: `next-intl` setup, EN + RU translation files
-- [ ] `/account` → Language section wired: EN / RU switcher (persists to `User.language Language` if logged in, else cookie — reuses `Language` enum already defined in Phase 4)
-- [ ] Backend: localized error messages via Accept-Language header
-- [ ] Generation: `language` param drives LLM output language (already passed in `customization` JSON — ensure prompts are language-aware)
-- [ ] Translate all existing UI strings to RU
-- [ ] Paddle checkout: pass `locale` to `PADDLE_CHECKOUT_SETTINGS` (`frontend/src/lib/paddle.ts`) from the active UI language — Paddle overlay supports localized checkout UI
-- [ ] Tests: language switching, localized errors, generated content in correct language
+- [x] Frontend: `next-intl` setup, EN + RU translation files
+- [x] `/account` → Language section wired: EN / RU switcher (persists to `User.language Language` if logged in, else cookie — reuses `Language` enum already defined in Phase 4)
+- [x] Backend: localized error messages via Accept-Language header
+- [x] Generation: `language` param drives LLM output language (already passed in `customization` JSON — ensure prompts are language-aware)
+- [x] Translate all existing UI strings to RU
+- [x] Paddle checkout: pass `locale` to `PADDLE_CHECKOUT_SETTINGS` (`frontend/src/lib/paddle.ts`) from the active UI language — Paddle overlay supports localized checkout UI
+- [x] Tests: language switching, localized errors, generated content in correct language
 
 **Acceptance Check:**
 
@@ -869,15 +869,15 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **Sub-tasks:**
 
-- [ ] Ops runbook: deployment procedure, rollback steps, env variable reference (all vars across all services), health check endpoints
-- [ ] Monitoring & alerting guide: log structure (Pino), what to watch, how to diagnose common failures
-- [ ] Backup strategy doc: Postgres backup schedule + restore procedure, S3 versioning policy
-- [ ] Final sweep of all durable docs (`_docs/architecture/`, `api/`, `guides/`, `decisions/`): verify accuracy, update any commands or configs that changed during later phases
-- [ ] Final sweep of `AGENTS.md` + all `.agent-docs/rules/*.md`: incorporate all patterns and lessons from Phases 7–13; propose updates for developer approval
-- [ ] Final review of `DESIGN.md`: confirm it matches what was actually built (no deferred items silently dropped)
-- [ ] Final review of `ROADMAP.md`: move completed items to ✅, update open questions, archive resolved deferred decisions
-- [ ] Update the architecture docs to reflect the full system including Phases 7–13 additions
-- [ ] GDPR launch review: verify privacy policy copy, sub-processors, cookies, account export/delete, S3 retention cleanup, public-story opt-in consent, and child/reference-image handling against production behavior
+- [x] Ops runbook: deployment procedure, rollback steps, env variable reference (all vars across all services), health check endpoints
+- [x] Monitoring & alerting guide: log structure (Pino), what to watch, how to diagnose common failures
+- [x] Backup strategy doc: Postgres backup schedule + restore procedure, S3 versioning policy
+- [x] Final sweep of all durable docs (`_docs/architecture/`, `api/`, `guides/`, `decisions/`): verify accuracy, update any commands or configs that changed during later phases
+- [x] Final sweep of `AGENTS.md` + all `.agent-docs/rules/*.md`: incorporate all patterns and lessons from Phases 7–13; propose updates for developer approval
+- [x] Final review of `DESIGN.md`: confirm it matches what was actually built (no deferred items silently dropped)
+- [x] Final review of `ROADMAP.md`: move completed items to ✅, update open questions, archive resolved deferred decisions
+- [x] Update the architecture docs to reflect the full system including Phases 7–13 additions
+- [x] GDPR launch review: verify privacy policy copy, sub-processors, cookies, account export/delete, S3 retention cleanup, public-story opt-in consent, and child/reference-image handling against production behavior
 
 **Acceptance Check:**
 

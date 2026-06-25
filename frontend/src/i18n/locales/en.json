@@ -217,9 +217,8 @@
                     "pageRegenerations": "Page regenerations",
                     "watermark": "Watermark",
                     "printReadyPdf": "Print-ready PDF",
-                    "priorityQueue": "Priority queue",
-                    "storiesRetained": "Stories retained",
-                    "contentLanguages": "EN + RU + DE content"
+                    "generatedFilesRetained": "Generated files retained",
+                    "contentLanguages": "Multilingual content"
                 },
                 "values": {
                     "booksOnly": "Books only",
@@ -315,7 +314,7 @@
         },
         "cookies": {
             "title": "Cookies",
-            "body": "We use one first-party session cookie to keep you signed in, and one cookie to remember your preferences (language, theme). We do not use tracking cookies or third-party advertising cookies."
+            "body": "We use one first-party session cookie to keep you signed in. Your cookie-consent choice is stored in local storage, not a cookie. Analytics cookies are set only after you accept them in production; we do not use third-party advertising cookies."
         },
         "lastUpdated": "Last updated: May 2026."
     },
@@ -475,6 +474,7 @@
             "saveButton": "Save",
             "modeGroupLabel": "How to create the character",
             "modeManual": "Write it myself",
+            "modeQuiz": "Use the guide",
             "modePrompt": "Generate from a prompt",
             "promptLabel": "Describe the character",
             "promptPlaceholder": "e.g. a brave little fox who loves the sea, with a red scarf",
@@ -845,6 +845,7 @@
             },
             "invoices": {
                 "eyebrow": "Past parcels",
+                "loading": "Loading invoices",
                 "emptyPaid": "No invoices yet — your first one arrives with the next renewal.",
                 "emptyFree": "No invoices — the Free Chapter never bills you.",
                 "pdfLink": "PDF"

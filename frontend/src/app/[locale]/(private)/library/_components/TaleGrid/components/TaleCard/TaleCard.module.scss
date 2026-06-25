@@ -27,6 +27,19 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--gradient-hatch-light);
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--bg-canvas) 6%, transparent) 0%,
+            color-mix(in srgb, var(--bg-canvas) 8%, transparent) 36%,
+            color-mix(in srgb, var(--bg-canvas) 52%, transparent) 100%
+        );
+        pointer-events: none;
+    }
 }
 
 .tale-card__cover-img {
@@ -43,22 +56,34 @@
     padding: var(--space-4);
     margin: 0;
     font-style: italic;
-    color: var(--text-primary);
-    background: var(--gradient-hatch-light);
+    color: var(--color-moon);
+    text-shadow:
+        0 1px 2px rgb(0 0 0 / 0.28),
+        0 8px 24px rgb(0 0 0 / 0.26);
     word-break: break-word;
+    z-index: 1;
 }
 
 .tale-card__failed-overlay {
     @include t-body-sm;
 
     position: absolute;
-    inset: 0;
+    top: var(--space-4);
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--color-twilight) 72%, transparent);
+    min-height: 32px;
+    padding: 0 var(--space-4);
+    border: 1px solid color-mix(in srgb, var(--border-on-card) 65%, transparent);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--bg-canvas) 72%, transparent);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.16);
     color: var(--text-inverse);
     font-style: italic;
+    white-space: nowrap;
+    z-index: 1;
 }
 
 .tale-card__meta {

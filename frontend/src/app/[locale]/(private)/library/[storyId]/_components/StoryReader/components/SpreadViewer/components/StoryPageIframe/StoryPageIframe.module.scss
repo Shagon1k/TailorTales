@@ -7,19 +7,26 @@
 
 // Fixed A5 stage (559×794 px), scaled from top-left to fill the container width.
 .page-iframe__stage {
+    position: relative;
     transform-origin: top left;
     // width and height are set via inline style
 }
 
 .page-iframe__skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    background: var(--bg-card);
+    background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+    backdrop-filter: blur(3px);
     animation: skeleton-pulse 1.5s ease-in-out infinite;
+    pointer-events: none;
 
     @media (prefers-reduced-motion: reduce) {
         animation: none;
         opacity: 0.6;
+        backdrop-filter: none;
     }
 }
 
@@ -35,6 +42,10 @@
 
 .page-iframe__error {
     @include t-body-sm;
+
+    position: absolute;
+    inset: 0;
+    z-index: 2;
     width: 100%;
     height: 100%;
     display: flex;
@@ -51,4 +62,14 @@
     width: 100%;
     height: 100%;
     border: none;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+
+    &[data-ready='true'] {
+        opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
 }

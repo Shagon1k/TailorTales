@@ -40,6 +40,7 @@
 | fox        | `#f86e42` | `--color-fox`        |
 | fox-soft   | `#fbb08e` | `--color-fox-soft`   |
 | ember      | `#b23641` | `--color-ember`      |
+| flame      | `#ff6470` | `--color-flame`      |
 | plum       | `#672131` | `--color-plum`       |
 | leaf       | `#547e4b` | `--color-leaf`       |
 | gold       | `#dbb155` | `--color-gold`       |
@@ -55,7 +56,7 @@ TEXT       --text-primary · --text-secondary · --text-muted
            --text-accent · --text-inverse
 BORDERS    --border-subtle · --border-strong · --border-on-card
 ACCENTS    --accent-primary (fox) · --accent-warm (ember) · --accent-gold
-           --accent-cool · --accent-deep
+           --accent-danger (flame) · --accent-cool · --accent-deep
 OPACITY    --opacity-disabled (0.40) · --opacity-muted (0.55)
            --opacity-secondary (0.78) · --opacity-full (1.00)
 ```

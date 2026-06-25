@@ -23,7 +23,6 @@ export default function AccountSidebar(): React.ReactElement {
         { href: '/account/children', label: t('nav.children') },
         { href: '/account/subscription', label: t('nav.subscription') },
         { href: '/account/notifications', label: t('nav.notifications') },
-        { href: '/account/language', label: t('nav.language') },
         { href: '/account/privacy', label: t('nav.privacy') },
     ];
 
@@ -63,12 +62,6 @@ export default function AccountSidebar(): React.ReactElement {
                             </Link>
                         </li>
                     ))}
-                    <li>
-                        <button type="button" className={styles['sidebar__nav-item']}>
-                            <span className={styles['sidebar__nav-icon']} aria-hidden="true" />
-                            {t('nav.export')}
-                        </button>
-                    </li>
                 </ul>
             </nav>
 

@@ -1,5 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { IInvoice, IPaddleClient, IPaddleEvent } from './billing.types.js';
+import type {
+    IInvoice,
+    IPaddleClient,
+    IPaddleCustomer,
+    IPaddleEvent,
+    IPaddleSubscriptionSnapshot,
+} from './billing.types.js';
 
 /**
  * Offline stand-in for the Paddle API (USE_PADDLE_STUBS=true).
@@ -15,6 +21,16 @@ export class PaddleStubClient implements IPaddleClient {
         // owns the snake_case wire-format mapping, the stub doesn't replicate it.
         const event = JSON.parse(rawBody.toString('utf8')) as IPaddleEvent;
         return event;
+    }
+
+    async findCustomersByEmail(email: string): Promise<IPaddleCustomer[]> {
+        this.logger.log(`[stub] findCustomersByEmail(${email})`);
+        return [];
+    }
+
+    async listSubscriptions(paddleCustomerId: string): Promise<IPaddleSubscriptionSnapshot[]> {
+        this.logger.log(`[stub] listSubscriptions(${paddleCustomerId})`);
+        return [];
     }
 
     async cancelSubscription(paddleSubscriptionId: string): Promise<void> {

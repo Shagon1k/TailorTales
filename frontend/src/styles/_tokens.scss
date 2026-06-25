@@ -19,6 +19,7 @@
     --color-fox: #f86e42;
     --color-fox-soft: #fbb08e;
     --color-ember: #b23641;
+    --color-flame: #ff6470;
     --color-plum: #672131;
     --color-leaf: #547e4b;
     --color-gold: #dbb155;
@@ -50,6 +51,7 @@
     // ---- Semantic accents ----
     --accent-primary: var(--color-fox);
     --accent-warm: var(--color-ember);
+    --accent-danger: var(--color-flame);
     --accent-gold: var(--color-gold);
     --accent-cool: var(--color-leaf);
     --accent-deep: var(--color-plum);
