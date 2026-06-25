@@ -25,6 +25,7 @@ const MOCK_CHARACTER: ICharacter = {
     name: 'Princess Mia',
     description: 'A girl with curly red hair and blue overalls.',
     previewKey: null,
+    previewUrl: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
 };

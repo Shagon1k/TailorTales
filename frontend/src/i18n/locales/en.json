@@ -352,8 +352,17 @@
                 "placeholder": "e.g. Why do mountains breathe smoke?",
                 "jarLabel": "Or pluck one from the jar"
             },
-            "formatPicker": {
+            "characterPicker": {
                 "number": "2.",
+                "title": "Choose a character",
+                "note": "Optional — pick a recurring hero, or let the tale follow the reader directly.",
+                "selectReaderFirst": "Choose a reader first to unlock their character shelf.",
+                "listLabel": "Select a character",
+                "none": "No character — the story follows the reader",
+                "createNew": "+ Create a new character"
+            },
+            "formatPicker": {
+                "number": "3.",
                 "title": "A book, or a comic",
                 "label": "Story format",
                 "book": {
@@ -366,7 +375,7 @@
                 }
             },
             "pageCount": {
-                "number": "3.",
+                "number": "4.",
                 "title": "How long the tale should be",
                 "label": "Page count",
                 "option5": "Short · 5 pp",
@@ -376,17 +385,17 @@
                 "option20": "Bedtime saga · 20 pp"
             },
             "artStylePicker": {
-                "number": "4.",
+                "number": "5.",
                 "title": "A look for the pictures",
                 "note": "All styles are consistent across the book — the fox in chapter 1 is the same fox in chapter 12."
             },
             "languagePicker": {
-                "number": "5.",
+                "number": "6.",
                 "title": "The language of the tale",
                 "label": "Story language"
             },
             "genrePicker": {
-                "number": "6.",
+                "number": "7.",
                 "title": "Pick a genre",
                 "label": "Story genre (optional)",
                 "note": "Optional — sets the mood of the tale.",
@@ -408,7 +417,7 @@
                 }
             },
             "writingStylePicker": {
-                "number": "7.",
+                "number": "8.",
                 "title": "Pick a writing style",
                 "label": "Writing style (optional)",
                 "note": "Optional — shapes how the words sound.",
@@ -430,12 +439,6 @@
             "characterModal": {
                 "editTitle": "Edit character",
                 "addTitle": "Add character"
-            },
-            "characterPicker": {
-                "title": "Choose a character",
-                "listLabel": "Select a character",
-                "none": "No character — the story follows the reader",
-                "createNew": "+ Create a new character"
             }
         },
         "summary": {
@@ -448,10 +451,6 @@
                 "length": "Length",
                 "language": "Language",
                 "style": "Style"
-            },
-            "characterAction": {
-                "choose": "Choose",
-                "change": "Change"
             },
             "lengthValue": "{pageCount} pages",
             "creditCost": "{creditCost} credits",

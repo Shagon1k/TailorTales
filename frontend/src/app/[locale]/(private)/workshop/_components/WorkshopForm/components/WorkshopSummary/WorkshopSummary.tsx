@@ -26,7 +26,6 @@ export interface IWorkshopSummaryProps {
     isValid: boolean;
     isPending: boolean;
     onSubmit: () => void;
-    onCharacterChoose: () => void;
 }
 
 export default function WorkshopSummary({
@@ -40,7 +39,6 @@ export default function WorkshopSummary({
     isValid,
     isPending,
     onSubmit,
-    onCharacterChoose,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
     const t = useTranslations('workshop.summary');
     const hasQuestion = question.trim().length > 0;
@@ -74,17 +72,7 @@ export default function WorkshopSummary({
 
             <ul className={styles.summary__rows}>
                 <SummaryRow label={t('labels.reader')} value={child?.name ?? null} />
-                <SummaryRow
-                    label={t('labels.character')}
-                    value={character?.name ?? null}
-                    action={{
-                        label: character
-                            ? t('characterAction.change')
-                            : t('characterAction.choose'),
-                        onClick: onCharacterChoose,
-                        disabled: child === null,
-                    }}
-                />
+                <SummaryRow label={t('labels.character')} value={character?.name ?? null} />
                 <SummaryRow label={t('labels.format')} value={storyTypeLabel} />
                 <SummaryRow
                     label={t('labels.length')}
@@ -142,19 +130,12 @@ export default function WorkshopSummary({
 
 // ── Private sub-component ─────────────────────────────────────────────────────
 
-interface ISummaryRowAction {
-    label: string;
-    onClick: () => void;
-    disabled?: boolean;
-}
-
 interface ISummaryRowProps {
     label: string;
     value: string | null;
-    action?: ISummaryRowAction;
 }
 
-function SummaryRow({ label, value, action }: Readonly<ISummaryRowProps>): React.ReactElement {
+function SummaryRow({ label, value }: Readonly<ISummaryRowProps>): React.ReactElement {
     return (
         <li className={styles['summary__row']}>
             <span className={styles['summary__row-label']}>{label}</span>
@@ -162,16 +143,6 @@ function SummaryRow({ label, value, action }: Readonly<ISummaryRowProps>): React
                 <span className={styles['summary__row-value']}>
                     {value ?? <span className={styles['summary__row-empty']}>—</span>}
                 </span>
-                {action && (
-                    <button
-                        type="button"
-                        className={styles['summary__row-action']}
-                        onClick={action.onClick}
-                        disabled={action.disabled}
-                    >
-                        {action.label}
-                    </button>
-                )}
             </div>
         </li>
     );

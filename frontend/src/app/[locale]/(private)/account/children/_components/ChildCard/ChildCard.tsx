@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import Card from '@/components/ui/Card/Card';
 import Tag from '@/components/ui/Tag/Tag';
 import Button from '@/components/ui/Button/Button';
@@ -68,6 +69,24 @@ export default function ChildCard({
                         <ul className={styles['character__list']}>
                             {characters.map((character) => (
                                 <li key={character.id} className={styles['character__item']}>
+                                    <div className={styles['character__preview']}>
+                                        {character.previewUrl ? (
+                                            <Image
+                                                src={character.previewUrl}
+                                                alt=""
+                                                fill
+                                                sizes="56px"
+                                                className={styles['character__preview-img']}
+                                            />
+                                        ) : (
+                                            <span
+                                                className={styles['character__preview-fallback']}
+                                                aria-hidden="true"
+                                            >
+                                                {character.name.charAt(0).toUpperCase()}
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className={styles['character__text']}>
                                         <p className={styles['character__name']}>
                                             {character.name}

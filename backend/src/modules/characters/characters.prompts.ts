@@ -26,9 +26,9 @@ export const CHARACTER_PROFILE_SYSTEM_PROMPT = [
  * the same character appears in stories rendered in different art styles
  * (watercolor, cartoon, manga, etc.).
  */
-export function buildCharacterPreviewPrompt(description: string): string {
+export function buildCharacterPreviewPrompt(name: string, description: string): string {
     return [
-        `Character design reference sheet: ${description}.`,
+        `Character design reference sheet for ${name}: ${description}.`,
         'Front-facing full-body pose on a plain white background.',
         'Clean, style-neutral concept art — no heavy stylisation, artistic filters, or texture overlays.',
         'Every distinguishing physical trait rendered with precise, consistent detail:',

@@ -9,6 +9,7 @@ import {
     CHARACTER_PROFILE_MAX_TOKENS,
 } from './characters.constants.js';
 import { buildCharacterPreviewPrompt } from './characters.prompts.js';
+import type { ICharacterResponse } from './characters.types.js';
 import type { CreateCharacterDto } from './dto/create-character.dto.js';
 import type { CreateCharacterFromPromptDto } from './dto/create-character-from-prompt.dto.js';
 import type { UpdateCharacterDto } from './dto/update-character.dto.js';
@@ -23,14 +24,21 @@ export class CharactersService {
         @Inject(AI_CLIENT) private readonly ai: IAiClient,
     ) {}
 
-    findAllByUser(userId: string, childId?: string): Promise<Character[]> {
-        return this.prisma.character.findMany({
+    async findAllByUser(userId: string, childId?: string): Promise<ICharacterResponse[]> {
+        const characters = await this.prisma.character.findMany({
             where: { userId, ...(childId !== undefined && { childId }) },
             orderBy: { createdAt: 'asc' },
         });
+
+        return Promise.all(characters.map((character) => this.toResponse(character)));
     }
 
-    async findOne(id: string, userId: string): Promise<Character> {
+    async findOne(id: string, userId: string): Promise<ICharacterResponse> {
+        const character = await this.findOneEntity(id, userId);
+        return this.toResponse(character);
+    }
+
+    private async findOneEntity(id: string, userId: string): Promise<Character> {
         const character = await this.prisma.character.findFirst({ where: { id, userId } });
         if (!character) throw new NotFoundException(`Character ${id} not found`);
         return character;
@@ -40,10 +48,10 @@ export class CharactersService {
         return this.prisma.character.findFirst({ where: { childId, userId } });
     }
 
-    async create(userId: string, dto: CreateCharacterDto): Promise<Character> {
+    async create(userId: string, dto: CreateCharacterDto): Promise<ICharacterResponse> {
         // Every character belongs to a child; a child may have several.
         // source: free-form (manual/prompt) is IMAGINED; the guided quiz sends QUIZ.
-        return this.prisma.character.create({
+        const character = await this.prisma.character.create({
             data: {
                 userId,
                 childId: dto.childId,
@@ -52,16 +60,21 @@ export class CharactersService {
                 description: dto.description,
             },
         });
+
+        return this.generatePreviewBestEffort(character);
     }
 
     /** Expands a parent's free-text idea into a character profile and saves it (free-form → IMAGINED). */
-    async createFromPrompt(userId: string, dto: CreateCharacterFromPromptDto): Promise<Character> {
+    async createFromPrompt(
+        userId: string,
+        dto: CreateCharacterFromPromptDto,
+    ): Promise<ICharacterResponse> {
         const profile = await this.ai.generateCharacterProfile({
             prompt: dto.prompt,
             maxTokens: CHARACTER_PROFILE_MAX_TOKENS,
         });
 
-        return this.prisma.character.create({
+        const character = await this.prisma.character.create({
             data: {
                 userId,
                 childId: dto.childId,
@@ -70,45 +83,87 @@ export class CharactersService {
                 description: profile.description,
             },
         });
+
+        return this.generatePreviewBestEffort(character);
     }
 
-    async update(id: string, userId: string, dto: UpdateCharacterDto): Promise<Character> {
-        await this.findOne(id, userId);
-        return this.prisma.character.update({
+    async update(id: string, userId: string, dto: UpdateCharacterDto): Promise<ICharacterResponse> {
+        const existing = await this.findOneEntity(id, userId);
+        const updated = await this.prisma.character.update({
             where: { id },
             data: {
                 ...(dto.name !== undefined && { name: dto.name }),
                 ...(dto.description !== undefined && { description: dto.description }),
             },
         });
+
+        const shouldRefreshPreview =
+            dto.name !== undefined ||
+            (dto.description !== undefined && dto.description !== existing.description);
+
+        if (!shouldRefreshPreview) {
+            return this.toResponse(updated);
+        }
+
+        return this.generatePreviewBestEffort(updated);
     }
 
     async remove(id: string, userId: string): Promise<void> {
-        const character = await this.findOne(id, userId);
+        const character = await this.findOneEntity(id, userId);
         if (character.previewKey) {
             await this.storage.delete(character.previewKey);
         }
         await this.prisma.character.delete({ where: { id } });
     }
 
-    async generatePreview(id: string, userId: string): Promise<Character> {
-        const character = await this.findOne(id, userId);
+    async generatePreview(id: string, userId: string): Promise<ICharacterResponse> {
+        const character = await this.findOneEntity(id, userId);
+        const updated = await this.generatePreviewEntity(character);
+        return this.toResponse(updated);
+    }
 
-        this.logger.log(`Generating preview for character ${id}`);
-        const prompt = buildCharacterPreviewPrompt(character.description);
+    private async generatePreviewEntity(character: Character): Promise<Character> {
+        this.logger.log(`Generating preview for character ${character.id}`);
+        const prompt = buildCharacterPreviewPrompt(character.name, character.description);
 
         const imageBuffer = await this.ai.generateImage({
             prompt,
             size: CHARACTER_PREVIEW_IMAGE_SIZE,
         });
 
-        const key = StorageKeys.characterPreview(userId, id);
+        const key = StorageKeys.characterPreview(character.userId, character.id);
         await this.storage.upload(imageBuffer, key, 'image/png');
 
         if (character.previewKey && character.previewKey !== key) {
             await this.storage.delete(character.previewKey);
         }
 
-        return this.prisma.character.update({ where: { id }, data: { previewKey: key } });
+        return this.prisma.character.update({
+            where: { id: character.id },
+            data: { previewKey: key },
+        });
+    }
+
+    private async generatePreviewBestEffort(character: Character): Promise<ICharacterResponse> {
+        try {
+            const updated = await this.generatePreviewEntity(character);
+            return this.toResponse(updated);
+        } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            this.logger.error(
+                `Character ${character.id} preview generation failed; continuing without preview: ${error.message}`,
+                error.stack,
+            );
+            return this.toResponse(character);
+        }
+    }
+
+    private async toResponse(character: Character): Promise<ICharacterResponse> {
+        return {
+            ...character,
+            previewUrl: character.previewKey
+                ? await this.storage.getSignedUrl(character.previewKey)
+                : null,
+        };
     }
 }

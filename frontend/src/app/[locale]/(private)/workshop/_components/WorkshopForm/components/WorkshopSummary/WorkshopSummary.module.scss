@@ -95,25 +95,6 @@
         gap: var(--space-2);
     }
 
-    &__row-action {
-        @include t-body-sm;
-        color: var(--text-accent);
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        min-height: var(--hit-min);
-        min-width: var(--hit-min);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        &:disabled {
-            opacity: var(--opacity-disabled);
-            cursor: default;
-        }
-    }
-
     &__divider {
         border: none;
         border-top: 1px solid var(--border-subtle);

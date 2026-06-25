@@ -35,6 +35,11 @@ interface IGenerateImageMessage {
     images?: unknown;
 }
 
+interface ITextPart {
+    type: 'text';
+    text: string;
+}
+
 @Injectable()
 export class AiClient implements IAiClient {
     private readonly logger = new Logger(AiClient.name);
@@ -154,10 +159,17 @@ export class AiClient implements IAiClient {
         this.logger.log(`Generating image (model: ${this.imageModel}, size: ${input.size})`);
 
         const [width, height] = input.size.split('x').map(Number);
+        const content: Array<ITextPart | IImageUrlPart> = [
+            { type: 'text', text: input.prompt },
+            ...(input.referenceImageUrls?.map((url) => ({
+                type: 'image_url' as const,
+                image_url: { url },
+            })) ?? []),
+        ];
 
         const body = {
             model: this.imageModel,
-            messages: [{ role: 'user', content: input.prompt }],
+            messages: [{ role: 'user', content }],
             modalities: ['image'],
             image_size: { width, height },
         };

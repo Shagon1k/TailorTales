@@ -123,7 +123,6 @@ export default function WorkshopForm({
         useCreateCharacterFromPrompt();
 
     const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
-    const [isCharacterPickerOpen, setIsCharacterPickerOpen] = useState(false);
     const [isCharacterModalOpen, setIsCharacterModalOpen] = useState(false);
 
     const selectedChild = readers.find((r) => r.id === selectedChildId) ?? null;
@@ -151,12 +150,6 @@ export default function WorkshopForm({
 
     function handleCharacterSelect(id: string | null): void {
         setSelectedCharacterId(id);
-        setIsCharacterPickerOpen(false);
-    }
-
-    function handleCreateNewCharacter(): void {
-        setIsCharacterPickerOpen(false);
-        setIsCharacterModalOpen(true);
     }
 
     function handleCharacterSubmit(
@@ -276,6 +269,47 @@ export default function WorkshopForm({
                             ))}
                         </div>
                     </div>
+                </section>
+
+                <section className={styles.workshop__section} aria-labelledby="section-character">
+                    <div className={styles['workshop__section-header']}>
+                        <span className={styles['workshop__section-number']}>
+                            {t('characterPicker.number')}
+                        </span>
+                        <div>
+                            <h2
+                                id="section-character"
+                                className={styles['workshop__section-title']}
+                            >
+                                {t('characterPicker.title')}
+                            </h2>
+                            <p className={styles['workshop__section-sub']}>
+                                {selectedChild !== null
+                                    ? t('characterPicker.note')
+                                    : t('characterPicker.selectReaderFirst')}
+                            </p>
+                        </div>
+                    </div>
+
+                    {selectedChild !== null ? (
+                        <div className={styles.workshop__picker}>
+                            <CharacterSelector
+                                items={childCharacters}
+                                selectedId={selectedCharacterId}
+                                onSelect={handleCharacterSelect}
+                            />
+                            <Button
+                                variant="secondary"
+                                onClick={() => setIsCharacterModalOpen(true)}
+                            >
+                                {t('characterPicker.createNew')}
+                            </Button>
+                        </div>
+                    ) : (
+                        <p className={styles['workshop__section-note']}>
+                            {t('characterPicker.selectReaderFirst')}
+                        </p>
+                    )}
                 </section>
 
                 <section className={styles.workshop__section} aria-labelledby="section-format">
@@ -438,27 +472,7 @@ export default function WorkshopForm({
                 isValid={isValid}
                 isPending={isPending}
                 onSubmit={handleSubmit}
-                onCharacterChoose={() => setIsCharacterPickerOpen(true)}
             />
-
-            <Modal
-                opened={isCharacterPickerOpen}
-                onClose={() => setIsCharacterPickerOpen(false)}
-                title={t('characterPicker.title')}
-            >
-                {isCharacterPickerOpen && (
-                    <div className={styles.workshop__picker}>
-                        <CharacterSelector
-                            items={childCharacters}
-                            selectedId={selectedCharacterId}
-                            onSelect={handleCharacterSelect}
-                        />
-                        <Button variant="quiet" fullWidth onClick={handleCreateNewCharacter}>
-                            {t('characterPicker.createNew')}
-                        </Button>
-                    </div>
-                )}
-            </Modal>
 
             <Modal
                 opened={isCharacterModalOpen}

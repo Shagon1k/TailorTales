@@ -33,8 +33,8 @@ export interface IGenerateImageInput {
     prompt: string;
     /** Pixel dimensions, e.g. '1024x1536'. Read from PageTemplate config. */
     size: string;
-    /** Post-MVP seam for photo-reference character likeness. Ignored for now. */
-    referenceImageKeys?: string[];
+    /** Optional reference images that help preserve recurring character appearance. */
+    referenceImageUrls?: string[];
 }
 
 export interface IGeneratePageTextInput {

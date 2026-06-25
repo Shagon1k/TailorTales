@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import type { Child, Page, Story } from '../../generated/prisma/client.js';
+import type { Character, Child, Page, Story } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { endsWithCompleteSentence } from '../../common/text.utils.js';
 import { StorageService } from '../storage/storage.service.js';
@@ -14,6 +14,7 @@ import type { RegeneratePageDto } from './dto/regenerate-page.dto.js';
 
 type StoryForRegen = Story & {
     child: Pick<Child, 'name'>;
+    character: Pick<Character, 'previewKey'> | null;
 };
 
 @Injectable()
@@ -37,7 +38,10 @@ export class RegenerationService {
         // 1. Ownership + status check
         const story = await this.prisma.story.findFirst({
             where: { id: storyId, userId },
-            include: { child: { select: { name: true } } },
+            include: {
+                child: { select: { name: true } },
+                character: { select: { previewKey: true } },
+            },
         });
         if (!story) throw new NotFoundException(`Story ${storyId} not found`);
         if (story.status !== 'COMPLETED') {
@@ -183,7 +187,11 @@ export class RegenerationService {
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
-        return this.ai.generateImage({ prompt, size: imageSlot.size });
+        const referenceImageUrls = story.character?.previewKey
+            ? [await this.storage.getSignedUrl(story.character.previewKey)]
+            : undefined;
+
+        return this.ai.generateImage({ prompt, size: imageSlot.size, referenceImageUrls });
     }
 
     private async persistPageImage(

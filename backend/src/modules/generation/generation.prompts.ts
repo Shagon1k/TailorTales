@@ -48,6 +48,9 @@ export function buildCharacterPromptSection(name: string, description: string): 
         'CHARACTER (recurring visual identity — inform styleAnchor and every illustration prompt):',
         `  ${name}: ${description}`,
         '  Every illustration of this character must match this description precisely.',
+        '  Treat the character appearance as fixed canon across all pages: do not vary species,',
+        '  face shape, body proportions, colors, signature clothing, hats, accessories, or markings.',
+        '  Repeat those exact recurring traits in the styleAnchor and keep them stable in every scene.',
     ].join('\n');
 }
 

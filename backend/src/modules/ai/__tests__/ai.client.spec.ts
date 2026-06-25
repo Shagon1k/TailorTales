@@ -217,6 +217,52 @@ describe('AiClient', () => {
             expect(buf.toString()).toBe('fox image');
         });
 
+        it('should send reference images alongside the prompt when provided', async () => {
+            const fakeBase64 = Buffer.from('reference image').toString('base64');
+            const fetchMock = vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () =>
+                    Promise.resolve({
+                        choices: [
+                            {
+                                message: { content: `data:image/png;base64,${fakeBase64}` },
+                            },
+                        ],
+                    }),
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await client.generateImage({
+                prompt: 'a fox hero',
+                size: '1024x1536',
+                referenceImageUrls: ['https://signed.test/char-1.png'],
+            });
+
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.any(String),
+                expect.objectContaining({
+                    body: JSON.stringify({
+                        model: 'test-image-model',
+                        messages: [
+                            {
+                                role: 'user',
+                                content: [
+                                    { type: 'text', text: 'a fox hero' },
+                                    {
+                                        type: 'image_url',
+                                        image_url: { url: 'https://signed.test/char-1.png' },
+                                    },
+                                ],
+                            },
+                        ],
+                        modalities: ['image'],
+                        image_size: { width: 1024, height: 1536 },
+                    }),
+                }),
+            );
+        });
+
         it('should throw on unexpected content format', async () => {
             vi.stubGlobal(
                 'fetch',

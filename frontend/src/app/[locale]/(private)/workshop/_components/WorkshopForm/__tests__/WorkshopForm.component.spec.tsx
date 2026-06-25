@@ -101,10 +101,11 @@ describe('WorkshopForm', () => {
     });
 
     describe('given the form is rendered', () => {
-        it('should display all five section headings', () => {
+        it('should display the main workshop sections including character selection', () => {
             renderForm();
 
             expect(screen.getByText(/a question to begin with/i)).toBeInTheDocument();
+            expect(screen.getByText(/choose a character/i)).toBeInTheDocument();
             expect(screen.getByText(/a book, or a comic/i)).toBeInTheDocument();
             expect(screen.getByText(/how long the tale should be/i)).toBeInTheDocument();
             expect(screen.getByText(/a look for the pictures/i)).toBeInTheDocument();

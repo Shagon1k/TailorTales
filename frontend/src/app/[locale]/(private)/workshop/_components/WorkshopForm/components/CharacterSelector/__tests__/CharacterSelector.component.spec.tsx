@@ -11,6 +11,7 @@ const CHARACTER: ICharacter = {
     name: 'Captain Pip',
     description: 'A brave little fox.',
     previewKey: null,
+    previewUrl: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
 };

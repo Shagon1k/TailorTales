@@ -44,7 +44,6 @@ function renderSummary(props: Partial<IWorkshopSummaryProps> = {}): void {
         isValid: true,
         isPending: false,
         onSubmit: vi.fn(),
-        onCharacterChoose: vi.fn(),
     };
     render(
         <MantineProvider>

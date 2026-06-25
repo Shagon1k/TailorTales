@@ -20,6 +20,11 @@ const MOCK_CHARACTER: Character = {
     updatedAt: new Date(),
 };
 
+const MOCK_CHARACTER_RESPONSE = {
+    ...MOCK_CHARACTER,
+    previewUrl: null,
+};
+
 describe('CharactersService', () => {
     let service: CharactersService;
     let characterFindMany: ReturnType<typeof vi.fn>;
@@ -29,6 +34,7 @@ describe('CharactersService', () => {
     let characterDelete: ReturnType<typeof vi.fn>;
     let storageUpload: ReturnType<typeof vi.fn>;
     let storageDelete: ReturnType<typeof vi.fn>;
+    let storageGetSignedUrl: ReturnType<typeof vi.fn>;
     let aiGenerateImage: ReturnType<typeof vi.fn>;
     let aiGenerateCharacterProfile: ReturnType<typeof vi.fn>;
 
@@ -40,6 +46,7 @@ describe('CharactersService', () => {
         characterDelete = vi.fn();
         storageUpload = vi.fn().mockResolvedValue(undefined);
         storageDelete = vi.fn().mockResolvedValue(undefined);
+        storageGetSignedUrl = vi.fn().mockResolvedValue('https://signed.test/char-1.png');
         aiGenerateImage = vi.fn().mockResolvedValue(Buffer.from('fake-image'));
         aiGenerateCharacterProfile = vi.fn();
 
@@ -62,7 +69,11 @@ describe('CharactersService', () => {
                 },
                 {
                     provide: StorageService,
-                    useValue: { upload: storageUpload, delete: storageDelete },
+                    useValue: {
+                        upload: storageUpload,
+                        delete: storageDelete,
+                        getSignedUrl: storageGetSignedUrl,
+                    },
                 },
                 {
                     provide: AI_CLIENT,
@@ -87,7 +98,7 @@ describe('CharactersService', () => {
                 where: { userId: 'user-123' },
                 orderBy: { createdAt: 'asc' },
             });
-            expect(result).toEqual([MOCK_CHARACTER]);
+            expect(result).toEqual([MOCK_CHARACTER_RESPONSE]);
         });
 
         it('should filter by childId when provided', async () => {
@@ -116,7 +127,7 @@ describe('CharactersService', () => {
 
             const result = await service.findOne('char-1', 'user-123');
 
-            expect(result).toBe(MOCK_CHARACTER);
+            expect(result).toEqual(MOCK_CHARACTER_RESPONSE);
         });
 
         it('should throw NotFoundException when character does not exist', async () => {
@@ -155,6 +166,10 @@ describe('CharactersService', () => {
     describe('create', () => {
         it('should default source to IMAGINED for free-form creation', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
                 description: 'A 6-year-old girl with curly red hair and blue overalls.',
@@ -172,11 +187,19 @@ describe('CharactersService', () => {
                     childId: dto.childId,
                 },
             });
-            expect(result).toBe(MOCK_CHARACTER);
+            expect(result).toEqual({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+                previewUrl: 'https://signed.test/char-1.png',
+            });
         });
 
         it('should persist the QUIZ source when the client sets it', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: CreateCharacterDto = {
                 name: 'Pip',
                 description: 'A girl with short brown hair.',
@@ -193,6 +216,10 @@ describe('CharactersService', () => {
 
         it('should not perform a uniqueness lookup — a child may have several characters', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
                 description: 'A brave hero.',
@@ -212,8 +239,12 @@ describe('CharactersService', () => {
                 description: 'A brave little fox in a red scarf.',
             });
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
 
-            await service.createFromPrompt('user-123', {
+            const result = await service.createFromPrompt('user-123', {
                 childId: 'child-1',
                 prompt: 'a brave fox who loves the sea',
             });
@@ -230,6 +261,11 @@ describe('CharactersService', () => {
                     description: 'A brave little fox in a red scarf.',
                 },
             });
+            expect(result).toEqual({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+                previewUrl: 'https://signed.test/char-1.png',
+            });
         });
     });
 
@@ -237,7 +273,10 @@ describe('CharactersService', () => {
         it('should update and return the character', async () => {
             const updated = { ...MOCK_CHARACTER, description: 'Updated look.' };
             characterFindFirst.mockResolvedValue(MOCK_CHARACTER);
-            characterUpdate.mockResolvedValue(updated);
+            characterUpdate.mockResolvedValueOnce(updated).mockResolvedValueOnce({
+                ...updated,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: UpdateCharacterDto = { description: 'Updated look.' };
 
             const result = await service.update('char-1', 'user-123', dto);
@@ -246,7 +285,11 @@ describe('CharactersService', () => {
                 where: { id: 'char-1' },
                 data: { description: 'Updated look.' },
             });
-            expect(result).toEqual(updated);
+            expect(result).toEqual({
+                ...updated,
+                previewKey: 'users/user-123/characters/char-1/preview',
+                previewUrl: 'https://signed.test/char-1.png',
+            });
         });
 
         it('should throw NotFoundException when character belongs to a different user', async () => {
@@ -298,7 +341,7 @@ describe('CharactersService', () => {
             characterFindFirst.mockResolvedValue(MOCK_CHARACTER);
             characterUpdate.mockResolvedValue({ ...MOCK_CHARACTER, previewKey });
 
-            await service.generatePreview('char-1', 'user-123');
+            const result = await service.generatePreview('char-1', 'user-123');
 
             expect(aiGenerateImage).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -309,6 +352,11 @@ describe('CharactersService', () => {
             expect(characterUpdate).toHaveBeenCalledWith({
                 where: { id: 'char-1' },
                 data: { previewKey },
+            });
+            expect(result).toEqual({
+                ...MOCK_CHARACTER,
+                previewKey,
+                previewUrl: 'https://signed.test/char-1.png',
             });
         });
 

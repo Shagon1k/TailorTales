@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import type { ICharacter } from '@/types/character.types';
 import styles from './CharacterSelector.module.scss';
 
@@ -33,12 +34,21 @@ export default function CharacterSelector({
                             type="button"
                             onClick={() => onSelect(option.id)}
                             aria-pressed={isSelected}
+                            aria-label={option.name}
                             className={styles['character-selector__item']}
                             data-selected={isSelected || undefined}
                         >
-                            <span className={styles['character-selector__name']}>
-                                {option.name}
-                            </span>
+                            {option.id === null ? (
+                                <div className={styles['character-selector__content']}>
+                                    <span className={styles['character-selector__name']}>
+                                        {option.name}
+                                    </span>
+                                </div>
+                            ) : (
+                                <CharacterOptionCard
+                                    character={items.find((item) => item.id === option.id)!}
+                                />
+                            )}
                             {isSelected && (
                                 <span
                                     className={styles['character-selector__check']}
@@ -52,5 +62,42 @@ export default function CharacterSelector({
                 );
             })}
         </ul>
+    );
+}
+
+interface ICharacterOptionCardProps {
+    character: ICharacter;
+}
+
+function CharacterOptionCard({
+    character,
+}: Readonly<ICharacterOptionCardProps>): React.ReactElement {
+    return (
+        <div className={styles['character-selector__content']}>
+            <div className={styles['character-selector__thumb']}>
+                {character.previewUrl ? (
+                    <Image
+                        src={character.previewUrl}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        className={styles['character-selector__thumb-img']}
+                    />
+                ) : (
+                    <span
+                        className={styles['character-selector__thumb-fallback']}
+                        aria-hidden="true"
+                    >
+                        {character.name.charAt(0).toUpperCase()}
+                    </span>
+                )}
+            </div>
+            <div className={styles['character-selector__text']}>
+                <span className={styles['character-selector__name']}>{character.name}</span>
+                <span className={styles['character-selector__description']}>
+                    {character.description}
+                </span>
+            </div>
+        </div>
     );
 }

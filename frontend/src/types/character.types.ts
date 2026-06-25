@@ -11,6 +11,7 @@ export interface ICharacter {
     name: string;
     description: string;
     previewKey: string | null;
+    previewUrl: string | null;
     createdAt: string;
     updatedAt: string;
 }

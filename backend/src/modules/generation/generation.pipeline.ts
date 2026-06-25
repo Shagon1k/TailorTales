@@ -24,6 +24,7 @@ import { IMAGE_NO_TEXT_DIRECTIVE } from './generation.prompts.js';
 type StoryWithRelations = Story & {
     child: Pick<Child, 'id' | 'name' | 'birthdate' | 'interests'>;
     artStyle: Pick<ArtStyle, 'id' | 'name' | 'promptPrefix'>;
+    character: Pick<Character, 'id' | 'name' | 'description' | 'previewKey'> | null;
 };
 
 @Injectable()
@@ -125,8 +126,6 @@ export class GenerationPipeline {
 
     private async runPlanning(story: StoryWithRelations): Promise<IStoryPlan> {
         const blueprint = await this.selectBlueprint(story.type);
-        const character = await this.loadCharacterForStory(story);
-
         const systemPrompt = this.promptBuilder.buildSystemPrompt(blueprint);
         const userPrompt = this.promptBuilder.buildUserPrompt({
             child: story.child,
@@ -135,7 +134,7 @@ export class GenerationPipeline {
             question: story.question,
             pageCount: story.pageCount,
             language: story.language,
-            character: character ?? undefined,
+            character: story.character ?? undefined,
             genre: story.genre,
             writingStyle: story.writingStyle,
         });
@@ -284,12 +283,16 @@ export class GenerationPipeline {
         const imageSlot = tpl.images[0];
         const prompt =
             `${story.styleAnchor ?? ''}\n\n${page.illustrationPrompt}\n\n${IMAGE_NO_TEXT_DIRECTIVE}`.trim();
+        const referenceImageUrls = story.character?.previewKey
+            ? [await this.storage.getSignedUrl(story.character.previewKey)]
+            : undefined;
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
         const imageBuffer = await this.ai.generateImage({
             prompt,
             size: imageSlot.size,
+            referenceImageUrls,
         });
 
         const key = StorageKeys.pageIllustration(story.userId, story.id, page.order);
@@ -329,27 +332,15 @@ export class GenerationPipeline {
     // Helpers
     // ---------------------------------------------------------------------------
 
-    /**
-     * Loads the protagonist the user chose for this story (`story.characterId`).
-     * Returns null when none was chosen — the pipeline continues child-led.
-     * Uses PrismaService directly so GenerationModule has no dependency on CharactersModule.
-     */
-    private async loadCharacterForStory(
-        story: Story,
-    ): Promise<Pick<Character, 'id' | 'name' | 'description'> | null> {
-        if (!story.characterId) return null;
-        return this.prisma.character.findFirst({
-            where: { id: story.characterId, userId: story.userId },
-            select: { id: true, name: true, description: true },
-        });
-    }
-
     private async loadStory(storyId: string): Promise<StoryWithRelations> {
         const story = await this.prisma.story.findUnique({
             where: { id: storyId },
             include: {
                 child: { select: { id: true, name: true, birthdate: true, interests: true } },
                 artStyle: { select: { id: true, name: true, promptPrefix: true } },
+                character: {
+                    select: { id: true, name: true, description: true, previewKey: true },
+                },
             },
         });
         if (!story) throw new NotFoundException(`Story ${storyId} not found`);

@@ -30,6 +30,7 @@ const mockStory = {
     writingStyle: null,
     title: null,
     styleAnchor: null,
+    characterId: null,
     isPublic: false,
     coverImageKey: null,
     pdfKey: null,
@@ -37,6 +38,7 @@ const mockStory = {
     updatedAt: new Date(),
     child: { id: 'child-1', name: 'Maya', birthdate: new Date('2019-01-01'), interests: [] },
     artStyle: { id: 'style-1', name: 'Storybook', promptPrefix: 'Warm watercolour style.' },
+    character: null,
 };
 
 const mockBlueprint = {

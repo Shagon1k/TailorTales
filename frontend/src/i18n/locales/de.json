@@ -352,8 +352,17 @@
                 "placeholder": "z.B. Warum atmen Berge Rauch?",
                 "jarLabel": "Oder eine aus dem Glas nehmen"
             },
-            "formatPicker": {
+            "characterPicker": {
                 "number": "2.",
+                "title": "Charakter auswählen",
+                "note": "Optional — wähle einen wiederkehrenden Helden oder lass die Geschichte direkt dem Kind folgen.",
+                "selectReaderFirst": "Wähle zuerst ein Kind aus, um seine Charaktere zu sehen.",
+                "listLabel": "Charakter auswählen",
+                "none": "Kein Charakter — die Geschichte folgt dem Kind",
+                "createNew": "+ Neuen Charakter erstellen"
+            },
+            "formatPicker": {
+                "number": "3.",
                 "title": "Ein Buch oder ein Comic",
                 "label": "Geschichtsformat",
                 "book": {
@@ -366,7 +375,7 @@
                 }
             },
             "pageCount": {
-                "number": "3.",
+                "number": "4.",
                 "title": "Wie lang die Geschichte sein soll",
                 "label": "Seitenanzahl",
                 "option5": "Kurz · 5 S.",
@@ -376,17 +385,17 @@
                 "option20": "Schlafenszeit-Saga · 20 S."
             },
             "artStylePicker": {
-                "number": "4.",
+                "number": "5.",
                 "title": "Ein Look für die Bilder",
                 "note": "Alle Stile sind durchgehend konsistent — der Fuchs in Kapitel 1 ist derselbe Fuchs in Kapitel 12."
             },
             "languagePicker": {
-                "number": "5.",
+                "number": "6.",
                 "title": "Die Sprache der Geschichte",
                 "label": "Geschichtssprache"
             },
             "genrePicker": {
-                "number": "6.",
+                "number": "7.",
                 "title": "Genre wählen",
                 "label": "Genre der Geschichte (optional)",
                 "note": "Optional — bestimmt die Stimmung der Geschichte.",
@@ -408,7 +417,7 @@
                 }
             },
             "writingStylePicker": {
-                "number": "7.",
+                "number": "8.",
                 "title": "Schreibstil wählen",
                 "label": "Schreibstil (optional)",
                 "note": "Optional — prägt den Klang der Worte.",
@@ -430,12 +439,6 @@
             "characterModal": {
                 "editTitle": "Charakter bearbeiten",
                 "addTitle": "Charakter hinzufügen"
-            },
-            "characterPicker": {
-                "title": "Charakter auswählen",
-                "listLabel": "Charakter auswählen",
-                "none": "Kein Charakter — die Geschichte folgt dem Kind",
-                "createNew": "+ Neuen Charakter erstellen"
             }
         },
         "summary": {
@@ -448,10 +451,6 @@
                 "length": "Länge",
                 "language": "Sprache",
                 "style": "Stil"
-            },
-            "characterAction": {
-                "choose": "Auswählen",
-                "change": "Ändern"
             },
             "lengthValue": "{pageCount} Seiten",
             "creditCost": "{creditCost} Credits",
