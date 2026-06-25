@@ -80,6 +80,12 @@ export class DataExportService {
                       currentPeriodEnd: user.subscription.currentPeriodEnd,
                       pagesUsed: user.subscription.pagesUsed,
                       regenerationsUsed: user.subscription.regenerationsUsed,
+                      characterGenerationsUsed:
+                          (
+                              user.subscription as typeof user.subscription & {
+                                  characterGenerationsUsed?: number | null;
+                              }
+                          ).characterGenerationsUsed ?? 0,
                   }
                 : null,
             children: user.children.map((child) => ({

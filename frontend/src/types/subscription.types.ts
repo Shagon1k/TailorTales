@@ -8,7 +8,9 @@ export interface IUsageSummary {
         watermark: boolean;
         pagesPerMonth: number;
         regenerationsPerMonth: number;
+        characterGenerationsPerMonth?: number;
         childrenLimit: number | null;
+        charactersLimit?: number | null;
         retentionDays: number | null;
     };
     status: 'ACTIVE' | 'PAST_DUE' | 'CANCELED';
@@ -16,6 +18,7 @@ export interface IUsageSummary {
     currentPeriodEnd: string | null;
     pagesUsed: number;
     regenerationsUsed: number;
+    characterGenerationsUsed?: number;
     childrenUsed: number;
     talesCount: number;
 }

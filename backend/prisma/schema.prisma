@@ -116,8 +116,11 @@ model PricingTier {
   priceMonthly          Int
   pagesPerMonth         Int
   regenerationsPerMonth Int
+  characterGenerationsPerMonth Int
   /** Null = unlimited. */
   childrenLimit Int?
+  /** Null = unlimited. */
+  charactersLimit Int?
   /** Null = retained forever. */
   retentionDays Int?
   watermark     Boolean @default(false)
@@ -147,6 +150,7 @@ model Subscription {
 
   pagesUsed         Int @default(0)
   regenerationsUsed Int @default(0)
+  characterGenerationsUsed Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

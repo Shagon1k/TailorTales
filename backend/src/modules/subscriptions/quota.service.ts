@@ -64,6 +64,44 @@ export class QuotaService {
         });
     }
 
+    async assertCharacterLimit(userId: string): Promise<void> {
+        const subscription = await this.subscriptions.getOrCreateForUser(userId);
+        const limit = subscription.pricingTier.charactersLimit;
+
+        if (limit === null) {
+            return;
+        }
+
+        const characterCount = await this.prisma.character.count({ where: { userId } });
+        if (characterCount >= limit) {
+            throw new ForbiddenException({
+                code: 'errors.quota.charactersExceeded',
+                params: { limit },
+            } satisfies ILocalizedErrorBody);
+        }
+    }
+
+    async assertCharacterGenerationCredit(userId: string): Promise<void> {
+        const subscription = await this.subscriptions.getOrCreateForUser(userId);
+        const limit = subscription.pricingTier.characterGenerationsPerMonth;
+
+        if (subscription.characterGenerationsUsed >= limit) {
+            throw new ForbiddenException({
+                code: 'errors.quota.characterGenerationsExceeded',
+                params: { limit },
+            } satisfies ILocalizedErrorBody);
+        }
+    }
+
+    async recordCharacterGeneration(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
+        const subscription = await this.subscriptions.getOrCreateForUser(userId);
+
+        await (tx ?? this.prisma).subscription.update({
+            where: { id: subscription.id },
+            data: { characterGenerationsUsed: { increment: 1 } },
+        });
+    }
+
     async getWatermarkForUser(userId: string): Promise<boolean> {
         const subscription = await this.subscriptions.getOrCreateForUser(userId);
         return subscription.pricingTier.watermark;

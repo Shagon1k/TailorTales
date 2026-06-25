@@ -51,7 +51,9 @@ export class SubscriptionsService {
                 watermark: pricingTier.watermark,
                 pagesPerMonth: pricingTier.pagesPerMonth,
                 regenerationsPerMonth: pricingTier.regenerationsPerMonth,
+                characterGenerationsPerMonth: pricingTier.characterGenerationsPerMonth,
                 childrenLimit: pricingTier.childrenLimit,
+                charactersLimit: pricingTier.charactersLimit,
                 retentionDays: pricingTier.retentionDays,
             },
             status: subscription.status,
@@ -59,6 +61,7 @@ export class SubscriptionsService {
             currentPeriodEnd: subscription.currentPeriodEnd,
             pagesUsed: subscription.pagesUsed,
             regenerationsUsed: subscription.regenerationsUsed,
+            characterGenerationsUsed: subscription.characterGenerationsUsed,
             childrenUsed,
             talesCount,
         };
@@ -93,6 +96,7 @@ export class SubscriptionsService {
                 currentPeriodEnd: data.currentPeriodEnd,
                 pagesUsed: 0,
                 regenerationsUsed: 0,
+                characterGenerationsUsed: 0,
             },
         });
     }

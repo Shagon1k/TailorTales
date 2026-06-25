@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 import { type IAiClient, AI_CLIENT } from '../ai/ai.types.js';
 import { StorageService } from '../storage/storage.service.js';
 import { StorageKeys } from '../storage/storage.keys.js';
+import { QuotaService } from '../subscriptions/quota.service.js';
 import {
     CHARACTER_PREVIEW_IMAGE_SIZE,
     CHARACTER_PROFILE_MAX_TOKENS,
@@ -21,6 +22,7 @@ export class CharactersService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly storage: StorageService,
+        private readonly quota: QuotaService,
         @Inject(AI_CLIENT) private readonly ai: IAiClient,
     ) {}
 
@@ -49,6 +51,8 @@ export class CharactersService {
     }
 
     async create(userId: string, dto: CreateCharacterDto): Promise<ICharacterResponse> {
+        await this.quota.assertCharacterLimit(userId);
+
         // Every character belongs to a child; a child may have several.
         // source: free-form (manual/prompt) is IMAGINED; the guided quiz sends QUIZ.
         const character = await this.prisma.character.create({
@@ -61,7 +65,7 @@ export class CharactersService {
             },
         });
 
-        return this.generatePreviewBestEffort(character);
+        return this.toResponse(character);
     }
 
     /** Expands a parent's free-text idea into a character profile and saves it (free-form → IMAGINED). */
@@ -69,19 +73,26 @@ export class CharactersService {
         userId: string,
         dto: CreateCharacterFromPromptDto,
     ): Promise<ICharacterResponse> {
+        await this.quota.assertCharacterLimit(userId);
+        await this.quota.assertCharacterGenerationCredit(userId);
+
         const profile = await this.ai.generateCharacterProfile({
             prompt: dto.prompt,
             maxTokens: CHARACTER_PROFILE_MAX_TOKENS,
         });
 
-        const character = await this.prisma.character.create({
-            data: {
-                userId,
-                childId: dto.childId,
-                source: 'IMAGINED',
-                name: profile.name,
-                description: profile.description,
-            },
+        const character = await this.prisma.$transaction(async (tx) => {
+            const created = await tx.character.create({
+                data: {
+                    userId,
+                    childId: dto.childId,
+                    source: 'IMAGINED',
+                    name: profile.name,
+                    description: profile.description,
+                },
+            });
+            await this.quota.recordCharacterGeneration(userId, tx);
+            return created;
         });
 
         return this.generatePreviewBestEffort(character);
@@ -89,23 +100,34 @@ export class CharactersService {
 
     async update(id: string, userId: string, dto: UpdateCharacterDto): Promise<ICharacterResponse> {
         const existing = await this.findOneEntity(id, userId);
+        const shouldClearPreview =
+            existing.previewKey !== null &&
+            ((dto.name !== undefined && dto.name !== existing.name) ||
+                (dto.description !== undefined && dto.description !== existing.description));
+
         const updated = await this.prisma.character.update({
             where: { id },
             data: {
                 ...(dto.name !== undefined && { name: dto.name }),
                 ...(dto.description !== undefined && { description: dto.description }),
+                ...(shouldClearPreview && { previewKey: null }),
             },
         });
 
-        const shouldRefreshPreview =
-            dto.name !== undefined ||
-            (dto.description !== undefined && dto.description !== existing.description);
-
-        if (!shouldRefreshPreview) {
-            return this.toResponse(updated);
+        if (shouldClearPreview) {
+            const stalePreviewKey = existing.previewKey;
+            if (stalePreviewKey) {
+                this.storage.delete(stalePreviewKey).catch((error: unknown) => {
+                    const err = error instanceof Error ? error : new Error(String(error));
+                    this.logger.error(
+                        `Failed to delete stale preview for character ${existing.id}: ${err.message}`,
+                        err.stack,
+                    );
+                });
+            }
         }
 
-        return this.generatePreviewBestEffort(updated);
+        return this.toResponse(updated);
     }
 
     async remove(id: string, userId: string): Promise<void> {
@@ -117,8 +139,10 @@ export class CharactersService {
     }
 
     async generatePreview(id: string, userId: string): Promise<ICharacterResponse> {
+        await this.quota.assertCharacterGenerationCredit(userId);
         const character = await this.findOneEntity(id, userId);
         const updated = await this.generatePreviewEntity(character);
+        await this.quota.recordCharacterGeneration(userId);
         return this.toResponse(updated);
     }
 

@@ -27,7 +27,12 @@ export class FreeTierResetCron {
                 next.setMonth(next.getMonth() + 1);
                 return this.prisma.subscription.update({
                     where: { id: sub.id },
-                    data: { pagesUsed: 0, regenerationsUsed: 0, currentPeriodEnd: next },
+                    data: {
+                        pagesUsed: 0,
+                        regenerationsUsed: 0,
+                        characterGenerationsUsed: 0,
+                        currentPeriodEnd: next,
+                    },
                 });
             }),
         );

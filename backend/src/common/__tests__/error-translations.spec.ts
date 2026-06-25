@@ -86,6 +86,13 @@ describe('translate', () => {
             const msg = translate('errors.quota.regenerationsExceeded', 'ru', { limit: 10 });
             expect(msg).toContain('10');
         });
+
+        it('should interpolate character-generation limit in English', () => {
+            const msg = translate('errors.quota.characterGenerationsExceeded', 'en', {
+                limit: 3,
+            });
+            expect(msg).toContain('3');
+        });
     });
 
     it('should return undefined for an unknown code', () => {

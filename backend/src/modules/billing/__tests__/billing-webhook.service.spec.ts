@@ -40,6 +40,7 @@ function existingSubscription(overrides: Record<string, unknown> = {}) {
         currentPeriodEnd: PERIOD_END_JUNE,
         pagesUsed: 30,
         regenerationsUsed: 5,
+        characterGenerationsUsed: 4,
         ...overrides,
     };
 }
@@ -104,6 +105,7 @@ describe('BillingWebhookService', () => {
                     currentPeriodEnd: PERIOD_END_JUNE,
                     pagesUsed: 0,
                     regenerationsUsed: 0,
+                    characterGenerationsUsed: 0,
                 },
             });
         });
@@ -156,6 +158,7 @@ describe('BillingWebhookService', () => {
                     currentPeriodEnd: PERIOD_END_JULY,
                     pagesUsed: 0,
                     regenerationsUsed: 0,
+                    characterGenerationsUsed: 0,
                 }),
             });
             expect(subscriptionRenewed).toHaveBeenCalledWith('user-1', STORY_HOUR.name);
@@ -231,6 +234,7 @@ describe('BillingWebhookService', () => {
                     currentPeriodEnd: null,
                     pagesUsed: 0,
                     regenerationsUsed: 0,
+                    characterGenerationsUsed: 0,
                 },
             });
         });

@@ -4,6 +4,7 @@ import type { Character } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { AI_CLIENT } from '../../ai/ai.types.js';
 import { StorageService } from '../../storage/storage.service.js';
+import { QuotaService } from '../../subscriptions/quota.service.js';
 import { CharactersService } from '../characters.service.js';
 import type { CreateCharacterDto } from '../dto/create-character.dto.js';
 import type { UpdateCharacterDto } from '../dto/update-character.dto.js';
@@ -32,11 +33,15 @@ describe('CharactersService', () => {
     let characterCreate: ReturnType<typeof vi.fn>;
     let characterUpdate: ReturnType<typeof vi.fn>;
     let characterDelete: ReturnType<typeof vi.fn>;
+    let prismaTransaction: ReturnType<typeof vi.fn>;
     let storageUpload: ReturnType<typeof vi.fn>;
     let storageDelete: ReturnType<typeof vi.fn>;
     let storageGetSignedUrl: ReturnType<typeof vi.fn>;
     let aiGenerateImage: ReturnType<typeof vi.fn>;
     let aiGenerateCharacterProfile: ReturnType<typeof vi.fn>;
+    let assertCharacterLimit: ReturnType<typeof vi.fn>;
+    let assertCharacterGenerationCredit: ReturnType<typeof vi.fn>;
+    let recordCharacterGeneration: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         characterFindMany = vi.fn();
@@ -44,11 +49,24 @@ describe('CharactersService', () => {
         characterCreate = vi.fn();
         characterUpdate = vi.fn();
         characterDelete = vi.fn();
+        prismaTransaction = vi.fn(async (callback) =>
+            callback({
+                character: {
+                    create: characterCreate,
+                },
+                subscription: {
+                    update: vi.fn(),
+                },
+            }),
+        );
         storageUpload = vi.fn().mockResolvedValue(undefined);
         storageDelete = vi.fn().mockResolvedValue(undefined);
         storageGetSignedUrl = vi.fn().mockResolvedValue('https://signed.test/char-1.png');
         aiGenerateImage = vi.fn().mockResolvedValue(Buffer.from('fake-image'));
         aiGenerateCharacterProfile = vi.fn();
+        assertCharacterLimit = vi.fn().mockResolvedValue(undefined);
+        assertCharacterGenerationCredit = vi.fn().mockResolvedValue(undefined);
+        recordCharacterGeneration = vi.fn().mockResolvedValue(undefined);
 
         const module = await Test.createTestingModule({
             providers: [
@@ -65,6 +83,7 @@ describe('CharactersService', () => {
                             update: characterUpdate,
                             delete: characterDelete,
                         },
+                        $transaction: prismaTransaction,
                     },
                 },
                 {
@@ -80,6 +99,14 @@ describe('CharactersService', () => {
                     useValue: {
                         generateImage: aiGenerateImage,
                         generateCharacterProfile: aiGenerateCharacterProfile,
+                    },
+                },
+                {
+                    provide: QuotaService,
+                    useValue: {
+                        assertCharacterLimit,
+                        assertCharacterGenerationCredit,
+                        recordCharacterGeneration,
                     },
                 },
             ],
@@ -166,10 +193,6 @@ describe('CharactersService', () => {
     describe('create', () => {
         it('should default source to IMAGINED for free-form creation', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
-            characterUpdate.mockResolvedValue({
-                ...MOCK_CHARACTER,
-                previewKey: 'users/user-123/characters/char-1/preview',
-            });
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
                 description: 'A 6-year-old girl with curly red hair and blue overalls.',
@@ -187,19 +210,13 @@ describe('CharactersService', () => {
                     childId: dto.childId,
                 },
             });
-            expect(result).toEqual({
-                ...MOCK_CHARACTER,
-                previewKey: 'users/user-123/characters/char-1/preview',
-                previewUrl: 'https://signed.test/char-1.png',
-            });
+            expect(assertCharacterLimit).toHaveBeenCalledWith('user-123');
+            expect(aiGenerateImage).not.toHaveBeenCalled();
+            expect(result).toEqual(MOCK_CHARACTER_RESPONSE);
         });
 
         it('should persist the QUIZ source when the client sets it', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
-            characterUpdate.mockResolvedValue({
-                ...MOCK_CHARACTER,
-                previewKey: 'users/user-123/characters/char-1/preview',
-            });
             const dto: CreateCharacterDto = {
                 name: 'Pip',
                 description: 'A girl with short brown hair.',
@@ -216,10 +233,6 @@ describe('CharactersService', () => {
 
         it('should not perform a uniqueness lookup — a child may have several characters', async () => {
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
-            characterUpdate.mockResolvedValue({
-                ...MOCK_CHARACTER,
-                previewKey: 'users/user-123/characters/char-1/preview',
-            });
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
                 description: 'A brave hero.',
@@ -252,15 +265,10 @@ describe('CharactersService', () => {
             expect(aiGenerateCharacterProfile).toHaveBeenCalledWith(
                 expect.objectContaining({ prompt: 'a brave fox who loves the sea' }),
             );
-            expect(characterCreate).toHaveBeenCalledWith({
-                data: {
-                    userId: 'user-123',
-                    childId: 'child-1',
-                    source: 'IMAGINED',
-                    name: 'Captain Pip',
-                    description: 'A brave little fox in a red scarf.',
-                },
-            });
+            expect(assertCharacterLimit).toHaveBeenCalledWith('user-123');
+            expect(assertCharacterGenerationCredit).toHaveBeenCalledWith('user-123');
+            expect(prismaTransaction).toHaveBeenCalled();
+            expect(recordCharacterGeneration).toHaveBeenCalledWith('user-123', expect.any(Object));
             expect(result).toEqual({
                 ...MOCK_CHARACTER,
                 previewKey: 'users/user-123/characters/char-1/preview',
@@ -270,13 +278,10 @@ describe('CharactersService', () => {
     });
 
     describe('update', () => {
-        it('should update and return the character', async () => {
+        it('should update and return the character without regenerating preview', async () => {
             const updated = { ...MOCK_CHARACTER, description: 'Updated look.' };
             characterFindFirst.mockResolvedValue(MOCK_CHARACTER);
-            characterUpdate.mockResolvedValueOnce(updated).mockResolvedValueOnce({
-                ...updated,
-                previewKey: 'users/user-123/characters/char-1/preview',
-            });
+            characterUpdate.mockResolvedValue(updated);
             const dto: UpdateCharacterDto = { description: 'Updated look.' };
 
             const result = await service.update('char-1', 'user-123', dto);
@@ -285,10 +290,34 @@ describe('CharactersService', () => {
                 where: { id: 'char-1' },
                 data: { description: 'Updated look.' },
             });
-            expect(result).toEqual({
-                ...updated,
+            expect(aiGenerateImage).not.toHaveBeenCalled();
+            expect(result).toEqual({ ...updated, previewUrl: null });
+        });
+
+        it('should clear and delete a stale preview when the character identity changes', async () => {
+            const withPreview = {
+                ...MOCK_CHARACTER,
                 previewKey: 'users/user-123/characters/char-1/preview',
-                previewUrl: 'https://signed.test/char-1.png',
+            };
+            characterFindFirst.mockResolvedValue(withPreview);
+            characterUpdate.mockResolvedValue({
+                ...withPreview,
+                name: 'Prince Leo',
+                previewKey: null,
+            });
+
+            const result = await service.update('char-1', 'user-123', { name: 'Prince Leo' });
+
+            expect(characterUpdate).toHaveBeenCalledWith({
+                where: { id: 'char-1' },
+                data: { name: 'Prince Leo', previewKey: null },
+            });
+            expect(storageDelete).toHaveBeenCalledWith(withPreview.previewKey);
+            expect(result).toEqual({
+                ...withPreview,
+                name: 'Prince Leo',
+                previewKey: null,
+                previewUrl: null,
             });
         });
 
@@ -348,11 +377,13 @@ describe('CharactersService', () => {
                     prompt: expect.stringContaining(MOCK_CHARACTER.description),
                 }),
             );
+            expect(assertCharacterGenerationCredit).toHaveBeenCalledWith('user-123');
             expect(storageUpload).toHaveBeenCalledWith(expect.any(Buffer), previewKey, 'image/png');
             expect(characterUpdate).toHaveBeenCalledWith({
                 where: { id: 'char-1' },
                 data: { previewKey },
             });
+            expect(recordCharacterGeneration).toHaveBeenCalledWith('user-123');
             expect(result).toEqual({
                 ...MOCK_CHARACTER,
                 previewKey,

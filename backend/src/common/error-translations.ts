@@ -35,6 +35,16 @@ const translations: Record<string, ITranslationEntry> = {
         de: (p) => `Das monatliche Regenerierungslimit von ${p['limit']} wurde erreicht.`,
         ru: (p) => `Достигнут месячный лимит регенерации: ${p['limit']} раз.`,
     },
+    'errors.quota.charactersExceeded': {
+        en: (p) => `Your plan allows up to ${p['limit']} saved characters.`,
+        de: (p) => `Dein Tarif erlaubt bis zu ${p['limit']} gespeicherte Figuren.`,
+        ru: (p) => `Ваш тариф позволяет сохранить до ${p['limit']} персонажей.`,
+    },
+    'errors.quota.characterGenerationsExceeded': {
+        en: (p) => `Monthly character-generation limit of ${p['limit']} has been reached.`,
+        de: (p) => `Das monatliche Limit von ${p['limit']} Charakter-Generierungen wurde erreicht.`,
+        ru: (p) => `Достигнут месячный лимит генерации персонажей: ${p['limit']} раз.`,
+    },
     'errors.ratings.storyNotCompleted': {
         en: 'Only completed stories can be rated.',
         de: 'Nur abgeschlossene Geschichten können bewertet werden.',
