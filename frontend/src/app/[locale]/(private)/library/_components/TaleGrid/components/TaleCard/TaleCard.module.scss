@@ -78,7 +78,7 @@
     padding: 0 var(--space-4);
     border: 1px solid color-mix(in srgb, var(--border-on-card) 65%, transparent);
     border-radius: var(--radius-pill);
-    background: color-mix(in srgb, var(--bg-canvas) 72%, transparent);
+    background: var(--accent-danger);
     box-shadow: 0 8px 20px rgb(0 0 0 / 0.16);
     color: var(--text-inverse);
     font-style: italic;
