@@ -46,4 +46,6 @@ _docs/      Architecture, API, guides, decisions
 Monorepo via pnpm workspaces. Contribution workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 **Docs split:** `_docs/` is **human** documentation (read it). Coding conventions for AI
-agents live in `CLAUDE.md` (root + per-package/module) and `.claude/rules/`.
+agents live in `AGENTS.md` (root + per-package/module) and `.agent-docs/rules/`. Generic
+repo skills live in `.agents/skills/`; harness-specific adapters such as `.claude/` only
+point back to the generic sources.

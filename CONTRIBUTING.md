@@ -55,4 +55,4 @@ TailorTales is built in numbered phases (see [ROADMAP.md](ROADMAP.md)). Per phas
 - Track work via a GitHub Milestone named `Phase N — <name>`.
 - All PRs related to a phase carry that milestone.
 - Phase is complete when: all milestone PRs merged, acceptance checks pass, and the phase's working `_docs/phase-N-<name>.md` is written (per `_docs/TEMPLATE.md`). At documentation phases these get consolidated into the durable docs (`_docs/architecture/`, `api/`, `guides/`) and removed.
-- After each phase, propose updates to `CLAUDE.md` and `.claude/rules/*` — apply only after developer approval.
+- After each phase, propose updates to `AGENTS.md` and `.agent-docs/rules/*` — apply only after developer approval.

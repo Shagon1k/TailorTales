@@ -36,6 +36,7 @@ Thumbs.db
 
 # Test coverage
 coverage/
+.codex-runs/
 
 # TypeScript
 *.tsbuildinfo

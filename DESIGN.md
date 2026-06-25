@@ -267,7 +267,7 @@ Post-MVP: credits_low, marketing, story_expiry_warning (free tier retention)
 
 ## Styling Architecture
 
-Four layers, strictly ordered (SCSS — see [`css.md`](frontend/.claude/rules/css.md) for the full spec):
+Four layers, strictly ordered (SCSS — see [`frontend-css.md`](.agent-docs/rules/frontend-css.md) for the full spec):
 
 | Layer            | File                          | Role                                                                                                                                                                                |
 | ---------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -280,7 +280,7 @@ Components consume **semantic tokens only** (`--text-primary`, `--accent-primary
 
 **Component location** follows Next.js co-location: components live as close as possible to the route that uses them, promoted upward only when a second consumer needs them. `src/components/ui/` for design system atoms, `src/components/shared/` for cross-group structural components (`Header`, `Footer`), `_components/` folders co-located with routes for everything else.
 
-See `frontend/.claude/rules/css.md` for full conventions (including the promotion rule) and `frontend/.claude/rules/design-system.md` for the Figma token → CSS variable mapping.
+See `.agent-docs/rules/frontend-css.md` for full conventions (including the promotion rule) and `.agent-docs/rules/frontend-design-system.md` for the Figma token -> CSS variable mapping.
 
 ---
 

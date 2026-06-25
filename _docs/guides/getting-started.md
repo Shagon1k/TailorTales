@@ -127,9 +127,9 @@ docker compose down                  # stop services (data persists in volumes)
 ## First contribution checklist
 
 1. **Branch** off `main`: `TT-<type>-<short-descriptor>` (e.g. `TT-feat-rating-panel`).
-2. **Follow the project conventions.** They live in `.claude/rules/` (TypeScript, testing,
-   CSS, Prisma, git) — Claude Code applies them automatically; if you're editing by hand,
-   skim that folder for your area.
+2. **Follow the project conventions.** Start with `AGENTS.md`, then read the relevant file in
+   `.agent-docs/rules/` (TypeScript, testing, CSS, Prisma, git). Harness-specific adapters such
+   as `.claude/rules/` may load the same source rules automatically.
 3. **Understand the area** — start at [architecture/](../architecture/README.md), then the
    relevant module.
 4. **Write tests** next to the code (`__tests__/`, Given-When-Then naming).
