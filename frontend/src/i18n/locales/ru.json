@@ -357,6 +357,8 @@
                 "title": "Выберите персонажа",
                 "note": "Необязательно — можно выбрать постоянного героя или оставить историю про самого читателя.",
                 "selectReaderFirst": "Сначала выберите читателя, чтобы увидеть его персонажей.",
+                "noGenerationsLeft": "В этом цикле не осталось генераций персонажей.",
+                "noCharacterSlotsLeft": "На этом тарифе не осталось слотов для сохранённых персонажей.",
                 "listLabel": "Выбор персонажа",
                 "none": "Без персонажа — история про самого читателя",
                 "createNew": "+ Создать нового персонажа"
@@ -467,26 +469,33 @@
         "characterForm": {
             "nameLabel": "Имя",
             "namePlaceholder": "Напр., Принцесса Мия",
+            "nameHint": "Необязательно — оставьте пустым, и мы предложим имя.",
+            "ideaLabel": "Опишите персонажа",
+            "ideaPlaceholder": "Опишите внешность персонажа, цвета, одежду и особые детали. Мы доработаем это в цельного персонажа для истории.",
             "descriptionLabel": "Описание",
             "descriptionPlaceholder": "Опишите внешность персонажа подробно — цвет волос, цвет глаз, одежда, отличительные черты…",
             "cancelButton": "Отмена",
             "saveButton": "Сохранить",
+            "createButton": "Создать персонажа",
             "modeGroupLabel": "Как создать персонажа",
-            "modeManual": "Напишу сам",
-            "modeQuiz": "По подсказкам",
-            "modePrompt": "Сгенерировать по описанию",
-            "promptLabel": "Опишите персонажа",
-            "promptPlaceholder": "напр., храбрый лисёнок, который любит море, в красном шарфе",
-            "generateButton": "Сгенерировать",
+            "modeWrite": "Написать",
+            "modeGuided": "С подсказками",
+            "writeHint": "Мы используем ИИ, чтобы превратить это в цельный профиль персонажа и превью.",
+            "quota": {
+                "generations": "{count, plural, one {# генерация осталась в этом цикле} other {# генераций осталось в этом цикле}}",
+                "characters": "{count, plural, one {# слот персонажа остался на этом тарифе} other {# слотов персонажей осталось на этом тарифе}}",
+                "charactersUnlimited": "Неограниченные слоты персонажей на этом тарифе"
+            },
             "errors": {
                 "nameRequired": "Имя обязательно",
-                "descriptionRequired": "Описание обязательно",
+                "descriptionRequired": "Расскажите, как выглядит персонаж",
                 "promptRequired": "Расскажите немного о персонаже"
             }
         },
         "characterQuiz": {
             "nameLabel": "Имя",
             "namePlaceholder": "напр., Пип",
+            "nameHint": "Необязательно — оставьте пустым, и мы предложим имя.",
             "genderLabel": "Девочка или мальчик",
             "gender": { "girl": "Девочка", "boy": "Мальчик" },
             "hairColorLabel": "Цвет волос",
@@ -526,6 +535,7 @@
             "detailPlaceholder": "напр., веснушки, круглые очки, маленький плащ",
             "cancelButton": "Отмена",
             "createButton": "Создать персонажа",
+            "saveButton": "Сохранить",
             "photoButton": "📷 Использовать фото — скоро",
             "photoTooltip": "Скоро вы сможете загрузить фото своего ребёнка, родителя или кого угодно, чтобы использовать как главного персонажа истории.",
             "descriptionTemplate": "{gender}. Волосы: {hairLength} {hairColor}. Глаза: {eyeColor}. Кожа: {skinTone}. Одежда: {clothing}.",
@@ -627,7 +637,16 @@
         "taleCard": {
             "failedAriaLabel": "{displayTitle} — создание не удалось, попробовать ещё раз",
             "failedOverlay": "Создание не удалось",
-            "retryLabel": "Попробовать снова →",
+            "retryLabel": "Попробовать снова",
+            "deleteButton": "Удалить",
+            "deleteAriaLabel": "Удалить {displayTitle}",
+            "deleteConfirm": "Удалить «{displayTitle}»? Это действие нельзя отменить.",
+            "deleteError": "Не удалось удалить эту сказку. Попробуйте ещё раз.",
+            "deleteModal": {
+                "title": "Удалить сказку",
+                "cancelButton": "Отмена",
+                "deleteButton": "Удалить"
+            },
             "age": "возраст {age}",
             "pageCount": "{pageCount} стр."
         },
@@ -757,6 +776,11 @@
             "addFirstButton": "Добавить первого ребёнка",
             "addButton": "Добавить ребёнка",
             "limitHint": "Вы достигли лимита детей для вашего плана. Улучшите план, чтобы добавить больше.",
+            "characterQuota": "{count, plural, one {# генерация персонажа осталась} other {# генераций персонажей осталось}}",
+            "characterSlots": "{count, plural, one {# слот сохранённого персонажа остался} other {# слотов сохранённых персонажей осталось}}",
+            "characterSlotsUnlimited": "Неограниченные слоты сохранённых персонажей",
+            "characterGenerationLimitHint": "На этом тарифе в текущем цикле не осталось генераций персонажей.",
+            "characterLimitHint": "На этом тарифе не осталось слотов для сохранённых персонажей.",
             "editModal": {
                 "title": "Редактировать ребёнка"
             },
@@ -815,6 +839,7 @@
             "editCharacterAriaLabel": "Редактировать персонажа {characterName}",
             "addCharacterAriaLabel": "Добавить персонажа для {childName}",
             "deleteCharacterAriaLabel": "Удалить персонажа {characterName}",
+            "previewCharacterAriaLabel": "Открыть увеличенное превью для {characterName}",
             "editCharacterButton": "Редактировать",
             "addCharacterButton": "Добавить персонажа",
             "deleteCharacterButton": "Удалить",

@@ -14,7 +14,6 @@ import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/h
 import {
     useCharacters,
     useCreateCharacter,
-    useCreateCharacterFromPrompt,
     useDeleteCharacter,
     useUpdateCharacter,
 } from '@/hooks/characters';
@@ -43,11 +42,20 @@ export default function ChildrenPage(): React.ReactElement {
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
     const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
     const { mutate: deleteCharacter, isPending: isDeletingCharacter } = useDeleteCharacter();
-    const { mutate: createCharacterFromPrompt, isPending: isGeneratingCharacter } =
-        useCreateCharacterFromPrompt();
 
     const childrenLimit = subscription?.tier.childrenLimit ?? null;
     const atChildrenLimit = childrenLimit !== null && children.length >= childrenLimit;
+    const charactersLimit = subscription?.tier.charactersLimit ?? null;
+    const charactersLeft =
+        charactersLimit === null ? null : Math.max(charactersLimit - characters.length, 0);
+    const characterGenerationLimit = subscription?.tier.characterGenerationsPerMonth ?? 0;
+    const characterGenerationsUsed = subscription?.characterGenerationsUsed ?? 0;
+    const characterGenerationsLeft = Math.max(
+        characterGenerationLimit - characterGenerationsUsed,
+        0,
+    );
+    const canCreateCharacter =
+        characterGenerationsLeft > 0 && (charactersLeft === null || charactersLeft > 0);
 
     const [modal, setModal] = useState<TModalState>({ kind: 'closed' });
     const close = (): void => setModal({ kind: 'closed' });
@@ -82,11 +90,6 @@ export default function ChildrenPage(): React.ReactElement {
         } else {
             createCharacter({ ...values, childId: modal.child.id, source }, { onSuccess: close });
         }
-    }
-
-    function handleGenerateCharacter(prompt: string): void {
-        if (modal.kind !== 'character') return;
-        createCharacterFromPrompt({ childId: modal.child.id, prompt }, { onSuccess: close });
     }
 
     if (isLoading) {
@@ -125,6 +128,13 @@ export default function ChildrenPage(): React.ReactElement {
                         {atChildrenLimit && (
                             <p className={styles['add-row__limit-hint']}>{t('limitHint')}</p>
                         )}
+                        <p className={styles['add-row__quota']}>
+                            {t('characterQuota', { count: characterGenerationsLeft })}
+                            {' · '}
+                            {charactersLeft === null
+                                ? t('characterSlotsUnlimited')
+                                : t('characterSlots', { count: charactersLeft })}
+                        </p>
                     </div>
                     <div className={styles.grid}>
                         {children.map((child) => (
@@ -142,6 +152,14 @@ export default function ChildrenPage(): React.ReactElement {
                                 }
                                 onCharacterDelete={(character) =>
                                     setModal({ kind: 'deleteCharacter', character })
+                                }
+                                canAddCharacter={canCreateCharacter}
+                                addCharacterHint={
+                                    !canCreateCharacter
+                                        ? characterGenerationsLeft === 0
+                                            ? t('characterGenerationLimitHint')
+                                            : t('characterLimitHint')
+                                        : null
                                 }
                             />
                         ))}
@@ -199,12 +217,14 @@ export default function ChildrenPage(): React.ReactElement {
                                 ? isUpdatingCharacter
                                 : isCreatingCharacter
                         }
-                        onGenerateFromPrompt={
+                        quota={
                             modal.kind === 'character' && !modal.character
-                                ? handleGenerateCharacter
+                                ? {
+                                      charactersLeft,
+                                      generationsLeft: characterGenerationsLeft,
+                                  }
                                 : undefined
                         }
-                        isGenerating={isGeneratingCharacter}
                     />
                 )}
             </Modal>

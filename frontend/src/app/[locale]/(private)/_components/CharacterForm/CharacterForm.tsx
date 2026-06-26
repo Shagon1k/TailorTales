@@ -17,15 +17,18 @@ export interface ICharacterFormValues {
     description: string;
 }
 
+export interface ICharacterQuotaInfo {
+    charactersLeft: number | null;
+    generationsLeft: number;
+}
+
 interface ICharacterFormProps {
     initialValues?: Partial<ICharacterFormValues>;
     /** `source` reports how it was made: `IMAGINED` (manual) or `QUIZ`. Ignored on edit. */
     onSubmit: (values: ICharacterFormValues, source: IUserCharacterSource) => void;
     onCancel: () => void;
     isSubmitting?: boolean;
-    /** When provided, offers a second mode that asks the AI to draft the character. */
-    onGenerateFromPrompt?: (prompt: string) => void;
-    isGenerating?: boolean;
+    quota?: ICharacterQuotaInfo;
 }
 
 const DEFAULT_VALUES: ICharacterFormValues = {
@@ -33,10 +36,10 @@ const DEFAULT_VALUES: ICharacterFormValues = {
     description: '',
 };
 
-type TMode = 'manual' | 'quiz' | 'prompt';
+type TMode = 'manual' | 'quiz';
 
 function isMode(value: string | null): value is TMode {
-    return value === 'manual' || value === 'quiz' || value === 'prompt';
+    return value === 'manual' || value === 'quiz';
 }
 
 export default function CharacterForm({
@@ -44,38 +47,42 @@ export default function CharacterForm({
     onSubmit,
     onCancel,
     isSubmitting = false,
-    onGenerateFromPrompt,
-    isGenerating = false,
+    quota,
 }: Readonly<ICharacterFormProps>): React.ReactElement {
     const t = useTranslations('workshop.characterForm');
     const [mode, setMode] = useState<TMode>('manual');
-    const canGenerate = onGenerateFromPrompt !== undefined;
+    const isEditing = initialValues !== undefined;
+    const canChooseMode = !isEditing;
 
     const form = useForm<ICharacterFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
         validate: {
-            name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
             description: (v) => (v.trim().length < 1 ? t('errors.descriptionRequired') : null),
-        },
-    });
-
-    const promptForm = useForm<{ prompt: string }>({
-        initialValues: { prompt: '' },
-        validate: {
-            prompt: (v) => (v.trim().length < 1 ? t('errors.promptRequired') : null),
         },
     });
 
     return (
         <Stack gap="sm">
-            {canGenerate && (
+            {quota && !isEditing && (
+                <div className={styles.quota}>
+                    <p className={styles['quota__line']}>
+                        {t('quota.generations', { count: quota.generationsLeft })}
+                    </p>
+                    <p className={styles['quota__line']}>
+                        {quota.charactersLeft === null
+                            ? t('quota.charactersUnlimited')
+                            : t('quota.characters', { count: quota.charactersLeft })}
+                    </p>
+                </div>
+            )}
+
+            {canChooseMode && (
                 <Select
                     label={t('modeGroupLabel')}
                     value={mode}
                     data={[
-                        { value: 'manual', label: t('modeManual') },
-                        { value: 'quiz', label: t('modeQuiz') },
-                        { value: 'prompt', label: t('modePrompt') },
+                        { value: 'manual', label: t('modeWrite') },
+                        { value: 'quiz', label: t('modeGuided') },
                     ]}
                     allowDeselect={false}
                     onChange={(value) => {
@@ -90,22 +97,26 @@ export default function CharacterForm({
                         <Input
                             label={t('nameLabel')}
                             placeholder={t('namePlaceholder')}
+                            description={t('nameHint')}
                             {...form.getInputProps('name')}
                         />
                         <Textarea
-                            label={t('descriptionLabel')}
-                            placeholder={t('descriptionPlaceholder')}
+                            label={isEditing ? t('descriptionLabel') : t('ideaLabel')}
+                            placeholder={
+                                isEditing ? t('descriptionPlaceholder') : t('ideaPlaceholder')
+                            }
                             autosize
                             minRows={4}
                             maxRows={8}
                             {...form.getInputProps('description')}
                         />
+                        {!isEditing && <p className={styles['mode-hint']}>{t('writeHint')}</p>}
                         <div className={styles.actions}>
                             <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                                 {t('cancelButton')}
                             </Button>
                             <Button type="submit" variant="primary" loading={isSubmitting}>
-                                {t('saveButton')}
+                                {isEditing ? t('saveButton') : t('createButton')}
                             </Button>
                         </div>
                     </Stack>
@@ -117,32 +128,8 @@ export default function CharacterForm({
                     onSubmit={(v) => onSubmit(v, 'QUIZ')}
                     onCancel={onCancel}
                     isSubmitting={isSubmitting}
+                    isEditing={isEditing}
                 />
-            )}
-
-            {mode === 'prompt' && (
-                <form
-                    onSubmit={promptForm.onSubmit((v) => onGenerateFromPrompt?.(v.prompt.trim()))}
-                >
-                    <Stack gap="sm">
-                        <Textarea
-                            label={t('promptLabel')}
-                            placeholder={t('promptPlaceholder')}
-                            autosize
-                            minRows={3}
-                            maxRows={6}
-                            {...promptForm.getInputProps('prompt')}
-                        />
-                        <div className={styles.actions}>
-                            <Button variant="quiet" onClick={onCancel} disabled={isGenerating}>
-                                {t('cancelButton')}
-                            </Button>
-                            <Button type="submit" variant="primary" loading={isGenerating}>
-                                {t('generateButton')}
-                            </Button>
-                        </div>
-                    </Stack>
-                </form>
             )}
         </Stack>
     );

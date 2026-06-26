@@ -91,16 +91,7 @@ export class StoriesService {
     }
 
     async create(userId: string, dto: CreateStoryDto): Promise<Story> {
-        // A chosen protagonist must belong to the requester AND to the story's child —
-        // characters are scoped to a child. NotFoundException (not Forbidden) avoids
-        // leaking whether the character id exists for another user/child.
-        if (dto.characterId) {
-            const character = await this.prisma.character.findFirst({
-                where: { id: dto.characterId, userId, childId: dto.childId },
-                select: { id: true },
-            });
-            if (!character) throw new NotFoundException(`Character ${dto.characterId} not found`);
-        }
+        await this.assertCharacterBelongsToChild(userId, dto);
 
         // blueprintId is intentionally absent — the generation pipeline auto-selects
         // the appropriate StoryBlueprint by StoryType in Phase 5.
@@ -118,6 +109,48 @@ export class StoriesService {
                 ...(dto.writingStyle !== undefined && { writingStyle: dto.writingStyle }),
             },
         });
+    }
+
+    async retry(id: string, userId: string, dto: CreateStoryDto): Promise<void> {
+        const story = await this.prisma.story.findFirst({
+            where: { id, userId },
+            include: { pages: { select: { illustrations: true } } },
+        });
+        if (!story) throw new NotFoundException(`Story ${id} not found`);
+
+        await this.assertCharacterBelongsToChild(userId, dto);
+
+        const retryableStatuses = new Set(['FAILED', 'DRAFT']);
+        if (!retryableStatuses.has(story.status)) {
+            throw new NotFoundException(`Story ${id} not found`);
+        }
+
+        await this.purgeStoryAssets(id, story);
+
+        await this.prisma.$transaction([
+            this.prisma.page.deleteMany({ where: { storyId: id } }),
+            this.prisma.story.update({
+                where: { id },
+                data: {
+                    childId: dto.childId,
+                    type: dto.type,
+                    question: dto.question,
+                    pageCount: dto.pageCount,
+                    artStyleId: dto.artStyleId,
+                    language: dto.language,
+                    characterId: dto.characterId ?? null,
+                    genre: dto.genre ?? null,
+                    writingStyle: dto.writingStyle ?? null,
+                    status: 'DRAFT',
+                    blueprintId: null,
+                    title: null,
+                    styleAnchor: null,
+                    coverImageKey: null,
+                    pdfKey: null,
+                    isPublic: false,
+                },
+            }),
+        ]);
     }
 
     /** Admin override of a story's public visibility — no ownership scope. */
@@ -151,6 +184,11 @@ export class StoriesService {
 
     /** Delete a story's S3 assets, then the row. Shared by owner-delete and admin force-delete. */
     private async purgeAndDelete(id: string, story: StoryWithAssetKeys): Promise<void> {
+        await this.purgeStoryAssets(id, story);
+        await this.prisma.story.delete({ where: { id } });
+    }
+
+    private async purgeStoryAssets(id: string, story: StoryWithAssetKeys): Promise<void> {
         const keys = [
             story.pdfKey,
             story.coverImageKey,
@@ -166,8 +204,22 @@ export class StoriesService {
             if (deleted < requested) this.logger.warn(auditLine);
             else this.logger.log(auditLine);
         }
+    }
 
-        await this.prisma.story.delete({ where: { id } });
+    private async assertCharacterBelongsToChild(
+        userId: string,
+        dto: CreateStoryDto,
+    ): Promise<void> {
+        // A chosen protagonist must belong to the requester AND to the story's child —
+        // characters are scoped to a child. NotFoundException (not Forbidden) avoids
+        // leaking whether the character id exists for another user/child.
+        if (!dto.characterId) return;
+
+        const character = await this.prisma.character.findFirst({
+            where: { id: dto.characterId, userId, childId: dto.childId },
+            select: { id: true },
+        });
+        if (!character) throw new NotFoundException(`Character ${dto.characterId} not found`);
     }
 
     /** Paginated moderation list across all users, newest first, optional text search. */

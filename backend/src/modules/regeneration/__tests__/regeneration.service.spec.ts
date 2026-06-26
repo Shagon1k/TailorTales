@@ -65,6 +65,7 @@ function createService(prisma = createPrismaMock()) {
     const storage = {
         upload: vi.fn().mockResolvedValue('uploaded-key'),
         getSignedUrl: vi.fn().mockResolvedValue('https://storage.test/page.png'),
+        downloadBuffer: vi.fn().mockResolvedValue(Buffer.from('reference-image')),
     };
     const pdfBinding = {
         buildAndStore: vi.fn().mockResolvedValue(undefined),

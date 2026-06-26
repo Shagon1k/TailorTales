@@ -93,6 +93,7 @@ function buildMockPrisma() {
 const mockStorage = {
     upload: vi.fn().mockResolvedValue('mock-key'),
     getSignedUrl: vi.fn().mockResolvedValue('https://example.com/image.png'),
+    downloadBuffer: vi.fn().mockResolvedValue(Buffer.from('reference-image')),
 };
 
 const mockPdfBinding = {

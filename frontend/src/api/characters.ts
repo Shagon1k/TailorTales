@@ -2,7 +2,7 @@ import { apiFetch } from '@/lib/api';
 import type { ICharacter, IUserCharacterSource } from '@/types/character.types';
 
 export interface ICreateCharacterPayload {
-    name: string;
+    name?: string;
     description: string;
     /** Owning child — every character belongs to one child. */
     childId: string;

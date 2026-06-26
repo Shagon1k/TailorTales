@@ -50,6 +50,7 @@ export interface IStorySummary {
     id: string;
     userId: string;
     childId: string;
+    characterId: string | null;
     type: IStoryType;
     status: IStoryStatus;
     blueprintId: string | null;

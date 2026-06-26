@@ -34,8 +34,9 @@ UPDATE "Job" SET status = 'FAILED', "updatedAt" = NOW()
 WHERE "storyId" = '<story-id>' AND status IN ('PENDING', 'ACTIVE');
 ```
 
-3. The user can then retry via the Workshop — the form accepts `?storyId=<failedId>` and
-   pre-fills all fields from the failed story to create a new DRAFT.
+3. The user can then retry via the Workshop. The form accepts `?storyId=<failedId>`,
+   pre-fills the fields from the failed story, and `POST /stories/:id/retry` resets that
+   same story in place back to `DRAFT` after purging its old pages and generated assets.
 
 ---
 
@@ -43,17 +44,19 @@ WHERE "storyId" = '<story-id>' AND status IN ('PENDING', 'ACTIVE');
 
 **Symptom:** S3 bucket grows over time even as individual stories are deleted.
 
-**Cause by design:** `DELETE /stories/:id` removes the DB row (cascading to `Page` + `Job`)
-but does **not** enumerate and delete S3 objects (`coverImageKey`, `pdfKey`,
-`Page.illustrations[].key`). Full S3 cleanup only happens during account deletion
-(`DELETE /me`) using prefix listing.
+**Current behavior:** `DELETE /stories/:id` first enumerates and deletes story-owned assets
+(`coverImageKey`, `pdfKey`, `Page.illustrations[].key`), then removes the DB row
+(cascading to `Page` + `Job`). Full account deletion (`DELETE /me`) still performs a broader
+prefix cleanup as a final safety net.
 
-**Recovery (manual):** collect keys from the story's `Page` rows before deletion, then call
-`StorageService.delete(key)` for each, or delete by S3 prefix `<userId>/<storyId>/`.
+**Recovery (manual):** if you still see orphaned files, inspect the delete-path logs for the
+story id. `StoriesService` now logs `expected=<n> deleted=<n>` after each purge; a mismatch
+means some keys were missing or the storage delete partially failed. Re-run cleanup by the
+recorded keys, or delete by S3 prefix `<userId>/<storyId>/`.
 
-> Note: the daily retention cleanup cron (`0 4 * * *`) handles **expired** assets
-> automatically based on `PricingTier.retentionDays` — it does not clean up manually deleted
-> stories.
+> Note: the daily retention cleanup cron (`0 4 * * *`) still handles **expired** assets
+> automatically based on `PricingTier.retentionDays`. The story delete path now cleans up
+> manual deletions immediately instead of leaving them for cron.
 
 ---
 

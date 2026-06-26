@@ -51,7 +51,9 @@ export default async function WorkshopPage({
                 readers={readers}
                 artStyles={artStyles}
                 config={config}
+                initialStoryId={prefillStory?.status === 'FAILED' ? prefillStory.id : null}
                 initialChildId={prefillStory?.childId ?? childId ?? null}
+                initialCharacterId={prefillStory?.characterId ?? null}
                 initialQuestion={prefillStory?.question ?? question ?? ''}
                 initialStoryType={prefillStory?.type ?? null}
                 initialPageCount={prefillStory?.pageCount ?? null}

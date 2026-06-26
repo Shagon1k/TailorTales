@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Card from '@/components/ui/Card/Card';
 import Tag from '@/components/ui/Tag/Tag';
 import Button from '@/components/ui/Button/Button';
+import Modal from '@/components/ui/Modal/Modal';
 import type { IChild } from '@/types/child.types';
 import type { ICharacter } from '@/types/character.types';
 import styles from './ChildCard.module.scss';
@@ -17,6 +19,8 @@ interface IChildCardProps {
     onCharacterAdd: (child: IChild) => void;
     onCharacterEdit: (child: IChild, character: ICharacter) => void;
     onCharacterDelete: (character: ICharacter) => void;
+    canAddCharacter?: boolean;
+    addCharacterHint?: string | null;
 }
 
 function getAge(birthdate: string): number {
@@ -37,11 +41,14 @@ export default function ChildCard({
     onCharacterAdd,
     onCharacterEdit,
     onCharacterDelete,
+    canAddCharacter = true,
+    addCharacterHint = null,
 }: Readonly<IChildCardProps>): React.ReactElement {
     const t = useTranslations('account.childCard');
     const age = getAge(child.birthdate);
     const ageLabel = age === 0 ? t('ageLabel.infant') : t('ageLabel.years', { age });
     const genderLabel = child.gender === 'MALE' ? t('gender.male') : t('gender.female');
+    const [previewCharacter, setPreviewCharacter] = useState<ICharacter | null>(null);
 
     return (
         <Card variant="dark" size="md">
@@ -69,7 +76,19 @@ export default function ChildCard({
                         <ul className={styles['character__list']}>
                             {characters.map((character) => (
                                 <li key={character.id} className={styles['character__item']}>
-                                    <div className={styles['character__preview']}>
+                                    <button
+                                        type="button"
+                                        className={styles['character__preview']}
+                                        onClick={() => {
+                                            if (character.previewUrl) {
+                                                setPreviewCharacter(character);
+                                            }
+                                        }}
+                                        disabled={!character.previewUrl}
+                                        aria-label={t('previewCharacterAriaLabel', {
+                                            characterName: character.name,
+                                        })}
+                                    >
                                         {character.previewUrl ? (
                                             <Image
                                                 src={character.previewUrl}
@@ -87,7 +106,7 @@ export default function ChildCard({
                                                 {character.name.charAt(0).toUpperCase()}
                                             </span>
                                         )}
-                                    </div>
+                                    </button>
                                     <div className={styles['character__text']}>
                                         <p className={styles['character__name']}>
                                             {character.name}
@@ -125,10 +144,14 @@ export default function ChildCard({
                     <Button
                         variant="secondary"
                         onClick={() => onCharacterAdd(child)}
+                        disabled={!canAddCharacter}
                         aria-label={t('addCharacterAriaLabel', { childName: child.name })}
                     >
                         {t('addCharacterButton')}
                     </Button>
+                    {addCharacterHint && (
+                        <p className={styles['character__hint']}>{addCharacterHint}</p>
+                    )}
                 </div>
 
                 <div className={styles.actions}>
@@ -148,6 +171,31 @@ export default function ChildCard({
                     </Button>
                 </div>
             </div>
+
+            <Modal
+                opened={previewCharacter !== null}
+                onClose={() => setPreviewCharacter(null)}
+                title={previewCharacter?.name ?? ''}
+                size="lg"
+            >
+                {previewCharacter?.previewUrl && (
+                    <div className={styles['preview-modal']}>
+                        <div className={styles['preview-modal__image']}>
+                            <Image
+                                src={previewCharacter.previewUrl}
+                                alt={previewCharacter.name}
+                                fill
+                                sizes="min(80vw, 520px)"
+                                unoptimized
+                                className={styles['preview-modal__img']}
+                            />
+                        </div>
+                        <p className={styles['preview-modal__description']}>
+                            {previewCharacter.description}
+                        </p>
+                    </div>
+                )}
+            </Modal>
         </Card>
     );
 }

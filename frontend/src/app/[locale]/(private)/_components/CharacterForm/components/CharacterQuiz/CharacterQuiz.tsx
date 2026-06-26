@@ -13,6 +13,7 @@ interface ICharacterQuizProps {
     onSubmit: (values: ICharacterFormValues) => void;
     onCancel: () => void;
     isSubmitting?: boolean;
+    isEditing?: boolean;
 }
 
 interface IQuizValues {
@@ -53,14 +54,12 @@ export default function CharacterQuiz({
     onSubmit,
     onCancel,
     isSubmitting = false,
+    isEditing = false,
 }: Readonly<ICharacterQuizProps>): React.ReactElement {
     const t = useTranslations('workshop.characterQuiz');
 
     const form = useForm<IQuizValues>({
         initialValues: DEFAULTS,
-        validate: {
-            name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
-        },
     });
 
     const optionsFor = (dimension: keyof typeof OPTIONS): { value: string; label: string }[] =>
@@ -103,6 +102,7 @@ export default function CharacterQuiz({
                 <Input
                     label={t('nameLabel')}
                     placeholder={t('namePlaceholder')}
+                    description={t('nameHint')}
                     {...form.getInputProps('name')}
                 />
                 <SimpleGrid cols={2} spacing="sm">
@@ -152,7 +152,7 @@ export default function CharacterQuiz({
                         {t('cancelButton')}
                     </Button>
                     <Button type="submit" variant="primary" loading={isSubmitting}>
-                        {t('createButton')}
+                        {isEditing ? t('saveButton') : t('createButton')}
                     </Button>
                 </div>
             </Stack>

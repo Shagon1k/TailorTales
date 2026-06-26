@@ -3,21 +3,26 @@
 .tale-card {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    text-decoration: none;
-    border-radius: var(--radius-md);
-    overflow: hidden;
+    gap: var(--space-4);
+    height: 100%;
+    padding: var(--space-4);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    box-shadow: 0 6px 18px rgb(12 4 2 / 0.12);
     transition:
-        transform var(--duration-base) var(--ease-out),
+        background var(--duration-base) var(--ease-out),
+        border-color var(--duration-base) var(--ease-out),
         box-shadow var(--duration-base) var(--ease-out);
+}
 
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
+.tale-card__cover-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
 
     &:focus-visible {
-        outline-offset: 4px;
+        outline: none;
     }
 }
 
@@ -27,6 +32,14 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--gradient-hatch-light);
+    border: 1px solid color-mix(in srgb, var(--border-on-card) 52%, transparent);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--border-on-card) 35%, transparent),
+        0 8px 20px rgb(12 4 2 / 0.14);
+    transition:
+        border-color var(--duration-base) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out),
+        transform var(--duration-base) var(--ease-out);
 
     &::after {
         content: '';
@@ -42,8 +55,23 @@
     }
 }
 
+.tale-card__cover-link:hover .tale-card__cover,
+.tale-card__cover-link:focus-visible .tale-card__cover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent-warm) 48%, var(--border-on-card));
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--border-on-card) 35%, transparent),
+        0 14px 28px rgb(12 4 2 / 0.18);
+}
+
 .tale-card__cover-img {
     object-fit: cover;
+    transition: transform var(--duration-base) var(--ease-out);
+}
+
+.tale-card__cover-link:hover .tale-card__cover-img,
+.tale-card__cover-link:focus-visible .tale-card__cover-img {
+    transform: scale(1.03);
 }
 
 .tale-card__cover-title {
@@ -64,26 +92,50 @@
     z-index: 1;
 }
 
-.tale-card__failed-overlay {
+.tale-card__cover-placeholder {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 22% 18%, rgb(255 248 232 / 0.2), transparent 0 18%),
+        linear-gradient(
+            140deg,
+            color-mix(in srgb, var(--color-bark) 24%, transparent),
+            transparent 38%
+        );
+}
+
+.tale-card__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.tale-card__status {
     @include t-body-sm;
 
-    position: absolute;
-    top: var(--space-4);
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 32px;
-    padding: 0 var(--space-4);
-    border: 1px solid color-mix(in srgb, var(--border-on-card) 65%, transparent);
+    align-self: center;
+    margin: 0;
+    padding: var(--space-1) var(--space-4);
     border-radius: var(--radius-pill);
-    background: var(--accent-danger);
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.16);
-    color: var(--text-inverse);
-    font-style: italic;
-    white-space: nowrap;
-    z-index: 1;
+    border: 1px solid color-mix(in srgb, var(--accent-danger) 42%, var(--border-subtle));
+    background: color-mix(in srgb, var(--accent-danger) 16%, var(--bg-elevated));
+    color: color-mix(in srgb, var(--accent-danger) 68%, var(--text-primary));
+    text-align: center;
+}
+
+.tale-card__title {
+    @include t-lede-lg;
+
+    margin: 0;
+    color: var(--text-primary);
+    transition: color var(--duration-base) var(--ease-out);
+    text-wrap: balance;
+}
+
+.tale-card:hover .tale-card__title,
+.tale-card:focus-within .tale-card__title {
+    color: var(--text-primary);
 }
 
 .tale-card__meta {
@@ -93,9 +145,44 @@
     align-items: center;
     gap: var(--space-2);
     color: var(--text-muted);
-    padding: 0 var(--space-1);
+    padding: 0;
 }
 
-.tale-card__retry-cta {
-    color: var(--accent-warm);
+.tale-card__actions {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    padding-top: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--border-subtle) 82%, transparent);
+}
+
+.tale-card__actions :global(.button) {
+    width: 100%;
+}
+
+.tale-card__error {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-danger);
+}
+
+.delete-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.delete-confirm__text {
+    @include t-body-md;
+
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.delete-confirm__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
 }

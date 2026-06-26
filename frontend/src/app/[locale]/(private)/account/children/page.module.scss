@@ -45,6 +45,12 @@
     }
 }
 
+.add-row__quota {
+    @include t-body-sm;
+    color: var(--text-muted);
+    margin: 0;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

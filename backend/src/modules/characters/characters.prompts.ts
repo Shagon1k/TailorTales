@@ -18,6 +18,34 @@ export const CHARACTER_PROFILE_SYSTEM_PROMPT = [
     'Do not invent a real child; this is a story character.',
 ].join('\n');
 
+interface IBuildCharacterProfilePromptInput {
+    source: 'IMAGINED' | 'QUIZ';
+    name?: string;
+    description: string;
+}
+
+/**
+ * Builds the user prompt for the shared character-creation pipeline.
+ * Both freeform writing and the guided flow land here so the AI always
+ * normalizes the final profile before preview generation.
+ */
+export function buildCharacterProfilePrompt({
+    source,
+    name,
+    description,
+}: Readonly<IBuildCharacterProfilePromptInput>): string {
+    return [
+        source === 'QUIZ'
+            ? 'The parent filled a guided character form. Turn the structured notes into one polished story-character profile.'
+            : 'The parent wrote a freeform character idea. Turn it into one polished story-character profile.',
+        name?.trim()
+            ? `Preferred character name: ${name.trim()}. Keep this exact name unless it is clearly unusable.`
+            : 'No character name was provided. Invent a short, warm, child-friendly name.',
+        `Character idea: ${description.trim()}`,
+        'Return only the final character profile JSON.',
+    ].join('\n');
+}
+
 /**
  * Builds a prompt for generating a style-agnostic character reference image.
  *

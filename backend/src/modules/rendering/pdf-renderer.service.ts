@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Handlebars from 'handlebars';
-import puppeteer, { type Browser } from 'puppeteer';
+import puppeteer, { type Browser, type Page } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
 import { ConfigService } from '@nestjs/config';
 import { PAGE_TEMPLATES } from './page-templates.config.js';
@@ -15,7 +15,8 @@ const TEMPLATES_DIR = join(__dirname, 'templates');
 @Injectable()
 export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(PdfRendererService.name);
-    private browser!: Browser;
+    private browser: Browser | null = null;
+    private launchPromise: Promise<Browser> | null = null;
     private readonly fontsUrl: string;
 
     constructor(config: ConfigService) {
@@ -34,20 +35,13 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     );
 
     async onModuleInit(): Promise<void> {
-        this.browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-gpu',
-                '--disable-dev-shm-usage',
-            ],
-        });
-        this.logger.log('Puppeteer browser started');
+        await this.ensureBrowser();
     }
 
     async onModuleDestroy(): Promise<void> {
+        this.launchPromise = null;
         await this.browser?.close();
+        this.browser = null;
         this.logger.log('Puppeteer browser closed');
     }
 
@@ -82,7 +76,23 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     private async renderPage(page: IPageToRender, story: IStoryToRender): Promise<Buffer> {
         const fullHtml = this.buildPageHtml(page, story);
 
-        const tab = await this.browser.newPage();
+        try {
+            return await this.renderPageOnce(fullHtml);
+        } catch (err: unknown) {
+            if (!this.isRecoverableBrowserDisconnect(err)) throw err;
+
+            const techMessage = err instanceof Error ? err.message : String(err);
+            this.logger.warn(
+                `Puppeteer connection dropped during PDF render; retrying once: ${techMessage}`,
+            );
+            await this.restartBrowser();
+            return this.renderPageOnce(fullHtml);
+        }
+    }
+
+    private async renderPageOnce(fullHtml: string): Promise<Buffer> {
+        const browser = await this.ensureBrowser();
+        const tab = await browser.newPage();
         try {
             await tab.setContent(fullHtml, { waitUntil: 'load' });
             await tab.waitForFunction('document.fonts.status === "loaded"');
@@ -96,7 +106,73 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
 
             return Buffer.from(pdfBytes);
         } finally {
+            await this.closeTabQuietly(tab);
+        }
+    }
+
+    private async ensureBrowser(): Promise<Browser> {
+        if (this.browser && this.browser.connected) return this.browser;
+        if (this.launchPromise) return this.launchPromise;
+
+        this.launchPromise = this.launchBrowser();
+
+        try {
+            this.browser = await this.launchPromise;
+            return this.browser;
+        } finally {
+            this.launchPromise = null;
+        }
+    }
+
+    private async launchBrowser(): Promise<Browser> {
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+            ],
+        });
+
+        browser.on('disconnected', () => {
+            this.logger.warn('Puppeteer browser disconnected');
+            this.browser = null;
+        });
+
+        this.logger.log('Puppeteer browser started');
+        return browser;
+    }
+
+    private async restartBrowser(): Promise<void> {
+        const previousBrowser = this.browser;
+        this.browser = null;
+        this.launchPromise = null;
+
+        try {
+            await previousBrowser?.close();
+        } catch (err: unknown) {
+            const techMessage = err instanceof Error ? err.message : String(err);
+            this.logger.warn(`Failed to close stale Puppeteer browser cleanly: ${techMessage}`);
+        }
+
+        await this.ensureBrowser();
+    }
+
+    private isRecoverableBrowserDisconnect(err: unknown): boolean {
+        if (!(err instanceof Error)) return false;
+        return (
+            err.message.includes('Connection closed') ||
+            err.message.includes('Protocol error') ||
+            err.message.includes('Target closed')
+        );
+    }
+
+    private async closeTabQuietly(tab: Page): Promise<void> {
+        try {
             await tab.close();
+        } catch (err: unknown) {
+            if (!this.isRecoverableBrowserDisconnect(err)) throw err;
         }
     }
 

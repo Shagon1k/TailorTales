@@ -64,6 +64,7 @@ describe('StoriesController', () => {
     let findAllByUser: ReturnType<typeof vi.fn>;
     let findOneByUser: ReturnType<typeof vi.fn>;
     let create: ReturnType<typeof vi.fn>;
+    let retry: ReturnType<typeof vi.fn>;
     let remove: ReturnType<typeof vi.fn>;
     let setPublicVisibility: ReturnType<typeof vi.fn>;
     let upsertRating: ReturnType<typeof vi.fn>;
@@ -73,6 +74,7 @@ describe('StoriesController', () => {
         findAllByUser = vi.fn();
         findOneByUser = vi.fn();
         create = vi.fn();
+        retry = vi.fn();
         remove = vi.fn();
         setPublicVisibility = vi.fn();
         upsertRating = vi.fn();
@@ -87,13 +89,16 @@ describe('StoriesController', () => {
                         findAllByUser,
                         findOneByUser,
                         create,
+                        retry,
                         remove,
                         setPublicVisibility,
                     },
                 },
                 {
                     provide: GenerationService,
-                    useValue: { enqueue: vi.fn() },
+                    useValue: {
+                        enqueue: vi.fn().mockResolvedValue({ jobId: 'job-1', storyId: 'story-1' }),
+                    },
                 },
                 {
                     provide: RegenerationService,
@@ -194,6 +199,25 @@ describe('StoriesController', () => {
             await controller.remove('story-1', MOCK_USER);
 
             expect(remove).toHaveBeenCalledWith('story-1', 'user-123');
+        });
+    });
+
+    describe('retry', () => {
+        it('should reset the failed story and enqueue generation for the same story id', async () => {
+            retry.mockResolvedValue(undefined);
+            const dto = {
+                childId: 'child-1',
+                type: 'BOOK' as const,
+                question: 'Why is the sky blue?',
+                pageCount: 8,
+                artStyleId: 'style-1',
+                language: 'EN' as const,
+            };
+
+            const result = await controller.retry('story-1', MOCK_USER, dto);
+
+            expect(retry).toHaveBeenCalledWith('story-1', 'user-123', dto);
+            expect(result).toEqual({ jobId: 'job-1', storyId: 'story-1' });
         });
     });
 

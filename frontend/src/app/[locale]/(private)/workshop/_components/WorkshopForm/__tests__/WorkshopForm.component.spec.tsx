@@ -32,9 +32,14 @@ vi.mock('@/hooks/subscription', () => ({
 
 const mockStoriesCreate = vi.hoisted(() => vi.fn());
 const mockStoriesGenerate = vi.hoisted(() => vi.fn());
+const mockStoriesRetry = vi.hoisted(() => vi.fn());
 
 vi.mock('@/api/stories', () => ({
-    storiesApi: { create: mockStoriesCreate, generate: mockStoriesGenerate },
+    storiesApi: {
+        create: mockStoriesCreate,
+        generate: mockStoriesGenerate,
+        retry: mockStoriesRetry,
+    },
 }));
 
 // WorkshopForm uses the character hooks — mock the entire module so tests focus on
@@ -97,7 +102,9 @@ describe('WorkshopForm', () => {
         mockRouterPush.mockClear();
         mockStoriesCreate.mockClear();
         mockStoriesGenerate.mockClear();
+        mockStoriesRetry.mockClear();
         mockStoriesGenerate.mockResolvedValue({ jobId: 'job-1', storyId: 'story-new' });
+        mockStoriesRetry.mockResolvedValue({ jobId: 'job-1', storyId: 'story-retry' });
     });
 
     describe('given the form is rendered', () => {
@@ -238,6 +245,44 @@ describe('WorkshopForm', () => {
             await waitFor(() => {
                 expect(mockStoriesGenerate).toHaveBeenCalledWith('story-new');
                 expect(mockRouterPush).toHaveBeenCalledWith('/workshop/story-new');
+            });
+        });
+
+        it('should retry the existing failed story instead of creating a new one', async () => {
+            renderForm({
+                initialStoryId: 'story-failed',
+                initialQuestion: 'Why is the sky blue?',
+            });
+
+            const formatGroup = screen.getByRole('radiogroup', { name: /story format/i });
+            await userEvent.click(within(formatGroup).getByRole('radio', { name: /^Book/i }));
+
+            const lengthGroup = screen.getByRole('radiogroup', { name: /page count/i });
+            await userEvent.click(within(lengthGroup).getByRole('radio', { name: /short/i }));
+
+            const artGroup = screen.getByRole('radiogroup', { name: /art style/i });
+            await userEvent.click(within(artGroup).getByRole('radio', { name: /storybook/i }));
+
+            const langGroup = screen.getByRole('radiogroup', { name: /story language/i });
+            await userEvent.click(within(langGroup).getByRole('radio', { name: /^English/i }));
+
+            await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
+
+            await waitFor(() => {
+                expect(mockStoriesCreate).not.toHaveBeenCalled();
+                expect(mockStoriesGenerate).not.toHaveBeenCalled();
+                expect(mockStoriesRetry).toHaveBeenCalledWith(
+                    'story-failed',
+                    expect.objectContaining({
+                        childId: 'child-1',
+                        type: 'BOOK',
+                        question: 'Why is the sky blue?',
+                        pageCount: 5,
+                        artStyleId: 'style-1',
+                        language: 'EN',
+                    }),
+                );
+                expect(mockRouterPush).toHaveBeenCalledWith('/workshop/story-retry');
             });
         });
 

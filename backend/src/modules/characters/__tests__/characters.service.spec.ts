@@ -191,8 +191,16 @@ describe('CharactersService', () => {
     });
 
     describe('create', () => {
-        it('should default source to IMAGINED for free-form creation', async () => {
+        it('should normalize a free-form idea with AI, record usage, and generate a preview', async () => {
+            aiGenerateCharacterProfile.mockResolvedValue({
+                name: 'Princess Mia',
+                description: 'A 6-year-old girl with curly red hair and blue overalls.',
+            });
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
                 description: 'A 6-year-old girl with curly red hair and blue overalls.',
@@ -201,22 +209,40 @@ describe('CharactersService', () => {
 
             const result = await service.create('user-123', dto);
 
+            expect(aiGenerateCharacterProfile).toHaveBeenCalledWith({
+                prompt: expect.stringContaining('Preferred character name: Princess Mia.'),
+                maxTokens: expect.any(Number),
+            });
             expect(characterCreate).toHaveBeenCalledWith({
                 data: {
                     userId: 'user-123',
-                    name: dto.name,
-                    description: dto.description,
+                    name: 'Princess Mia',
+                    description: 'A 6-year-old girl with curly red hair and blue overalls.',
                     source: 'IMAGINED',
                     childId: dto.childId,
                 },
             });
             expect(assertCharacterLimit).toHaveBeenCalledWith('user-123');
-            expect(aiGenerateImage).not.toHaveBeenCalled();
-            expect(result).toEqual(MOCK_CHARACTER_RESPONSE);
+            expect(assertCharacterGenerationCredit).toHaveBeenCalledWith('user-123');
+            expect(recordCharacterGeneration).toHaveBeenCalledWith('user-123', expect.any(Object));
+            expect(aiGenerateImage).toHaveBeenCalled();
+            expect(result).toEqual({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+                previewUrl: 'https://signed.test/char-1.png',
+            });
         });
 
-        it('should persist the QUIZ source when the client sets it', async () => {
+        it('should preserve the QUIZ source while still using the shared AI pipeline', async () => {
+            aiGenerateCharacterProfile.mockResolvedValue({
+                name: 'Pip',
+                description: 'A girl with short brown hair.',
+            });
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: CreateCharacterDto = {
                 name: 'Pip',
                 description: 'A girl with short brown hair.',
@@ -226,13 +252,25 @@ describe('CharactersService', () => {
 
             await service.create('user-123', dto);
 
+            expect(aiGenerateCharacterProfile).toHaveBeenCalledWith({
+                prompt: expect.stringContaining('guided character form'),
+                maxTokens: expect.any(Number),
+            });
             expect(characterCreate).toHaveBeenCalledWith({
                 data: expect.objectContaining({ source: 'QUIZ' }),
             });
         });
 
         it('should not perform a uniqueness lookup — a child may have several characters', async () => {
+            aiGenerateCharacterProfile.mockResolvedValue({
+                name: 'Princess Mia',
+                description: 'A brave hero.',
+            });
             characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterUpdate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                previewKey: 'users/user-123/characters/char-1/preview',
+            });
             const dto: CreateCharacterDto = {
                 name: 'Princess Mia',
                 description: 'A brave hero.',
@@ -251,9 +289,15 @@ describe('CharactersService', () => {
                 name: 'Captain Pip',
                 description: 'A brave little fox in a red scarf.',
             });
-            characterCreate.mockResolvedValue(MOCK_CHARACTER);
+            characterCreate.mockResolvedValue({
+                ...MOCK_CHARACTER,
+                name: 'Captain Pip',
+                description: 'A brave little fox in a red scarf.',
+            });
             characterUpdate.mockResolvedValue({
                 ...MOCK_CHARACTER,
+                name: 'Captain Pip',
+                description: 'A brave little fox in a red scarf.',
                 previewKey: 'users/user-123/characters/char-1/preview',
             });
 
@@ -271,6 +315,8 @@ describe('CharactersService', () => {
             expect(recordCharacterGeneration).toHaveBeenCalledWith('user-123', expect.any(Object));
             expect(result).toEqual({
                 ...MOCK_CHARACTER,
+                name: 'Captain Pip',
+                description: 'A brave little fox in a red scarf.',
                 previewKey: 'users/user-123/characters/char-1/preview',
                 previewUrl: 'https://signed.test/char-1.png',
             });

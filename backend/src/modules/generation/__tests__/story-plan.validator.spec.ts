@@ -39,6 +39,7 @@ describe('StoryPlanValidator', () => {
             const result = validator.validate(makePlan(), 3, 'BOOK');
             expect(result.structuralErrors).toHaveLength(0);
             expect(result.lengthOverflows).toHaveLength(0);
+            expect(result.sentenceWarnings).toHaveLength(0);
         });
     });
 
@@ -87,11 +88,14 @@ describe('StoryPlanValidator', () => {
     });
 
     describe('given an interior prose page whose text ends mid-sentence', () => {
-        it('should report a structural error', () => {
+        it('should report a non-blocking sentence warning', () => {
             const plan = makePlan();
             plan.pages[1] = { ...plan.pages[1], text: 'The fox ran through the forest' };
             const result = validator.validate(plan, 3, 'BOOK');
-            expect(result.structuralErrors.some((e) => e.includes('complete sentence'))).toBe(true);
+            expect(result.structuralErrors.some((e) => e.includes('complete sentence'))).toBe(
+                false,
+            );
+            expect(result.sentenceWarnings.some((e) => e.includes('complete sentence'))).toBe(true);
         });
 
         it('should not flag a cover page title for missing sentence terminal', () => {
@@ -100,6 +104,9 @@ describe('StoryPlanValidator', () => {
             plan.pages[0] = { ...plan.pages[0], text: 'My Great Adventure' };
             const result = validator.validate(plan, 3, 'BOOK');
             expect(result.structuralErrors.every((e) => !e.includes('complete sentence'))).toBe(
+                true,
+            );
+            expect(result.sentenceWarnings.every((e) => !e.includes('complete sentence'))).toBe(
                 true,
             );
         });
@@ -112,6 +119,7 @@ describe('StoryPlanValidator', () => {
             const result = validator.validate(plan, 3, 'BOOK');
             expect(result.structuralErrors).toHaveLength(0);
             expect(result.lengthOverflows).toHaveLength(1);
+            expect(result.sentenceWarnings).toHaveLength(0);
             expect(result.lengthOverflows[0].page).toBe(2);
         });
     });

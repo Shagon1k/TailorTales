@@ -252,6 +252,19 @@ latest job plus a count of pages that already have illustrations. It emits:
 
 > Polling Postgres instead of pushing from the worker because the worker and the HTTP handler share only Postgres. Push would require Redis Pub/Sub — more moving parts for a latency gain invisible on a ~2-minute generation. Redis Pub/Sub is the post-MVP scale-out path.
 
+## Retry semantics for failed stories
+
+Failed-story recovery is intentionally **in-place**, not "clone and try again". The workshop
+prefills from the failed story, then `POST /stories/:id/retry`:
+
+1. validates the replacement config,
+2. deletes the story's generated assets (`coverImageKey`, `pdfKey`, page illustrations),
+3. deletes existing `Page` rows,
+4. resets the same `Story` row to `DRAFT` and clears generation outputs.
+
+That keeps a stable `storyId`, avoids duplicate failed shells in the library, and guarantees
+the next generation starts from a clean persisted state.
+
 ## Scale envelope (MVP)
 
 These are the known constraints, not benchmarks — no load testing has been done:

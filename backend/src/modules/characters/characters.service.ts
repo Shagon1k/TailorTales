@@ -9,7 +9,7 @@ import {
     CHARACTER_PREVIEW_IMAGE_SIZE,
     CHARACTER_PROFILE_MAX_TOKENS,
 } from './characters.constants.js';
-import { buildCharacterPreviewPrompt } from './characters.prompts.js';
+import { buildCharacterPreviewPrompt, buildCharacterProfilePrompt } from './characters.prompts.js';
 import type { ICharacterResponse } from './characters.types.js';
 import type { CreateCharacterDto } from './dto/create-character.dto.js';
 import type { CreateCharacterFromPromptDto } from './dto/create-character-from-prompt.dto.js';
@@ -52,20 +52,18 @@ export class CharactersService {
 
     async create(userId: string, dto: CreateCharacterDto): Promise<ICharacterResponse> {
         await this.quota.assertCharacterLimit(userId);
+        await this.quota.assertCharacterGenerationCredit(userId);
 
-        // Every character belongs to a child; a child may have several.
-        // source: free-form (manual/prompt) is IMAGINED; the guided quiz sends QUIZ.
-        const character = await this.prisma.character.create({
-            data: {
-                userId,
-                childId: dto.childId,
+        return this.createGeneratedCharacter({
+            userId,
+            childId: dto.childId,
+            source: dto.source ?? 'IMAGINED',
+            prompt: buildCharacterProfilePrompt({
                 source: dto.source ?? 'IMAGINED',
                 name: dto.name,
                 description: dto.description,
-            },
+            }),
         });
-
-        return this.toResponse(character);
     }
 
     /** Expands a parent's free-text idea into a character profile and saves it (free-form → IMAGINED). */
@@ -75,27 +73,12 @@ export class CharactersService {
     ): Promise<ICharacterResponse> {
         await this.quota.assertCharacterLimit(userId);
         await this.quota.assertCharacterGenerationCredit(userId);
-
-        const profile = await this.ai.generateCharacterProfile({
+        return this.createGeneratedCharacter({
+            userId,
+            childId: dto.childId,
+            source: 'IMAGINED',
             prompt: dto.prompt,
-            maxTokens: CHARACTER_PROFILE_MAX_TOKENS,
         });
-
-        const character = await this.prisma.$transaction(async (tx) => {
-            const created = await tx.character.create({
-                data: {
-                    userId,
-                    childId: dto.childId,
-                    source: 'IMAGINED',
-                    name: profile.name,
-                    description: profile.description,
-                },
-            });
-            await this.quota.recordCharacterGeneration(userId, tx);
-            return created;
-        });
-
-        return this.generatePreviewBestEffort(character);
     }
 
     async update(id: string, userId: string, dto: UpdateCharacterDto): Promise<ICharacterResponse> {
@@ -180,6 +163,34 @@ export class CharactersService {
             );
             return this.toResponse(character);
         }
+    }
+
+    private async createGeneratedCharacter(input: {
+        userId: string;
+        childId: string;
+        source: 'IMAGINED' | 'QUIZ';
+        prompt: string;
+    }): Promise<ICharacterResponse> {
+        const profile = await this.ai.generateCharacterProfile({
+            prompt: input.prompt,
+            maxTokens: CHARACTER_PROFILE_MAX_TOKENS,
+        });
+
+        const character = await this.prisma.$transaction(async (tx) => {
+            const created = await tx.character.create({
+                data: {
+                    userId: input.userId,
+                    childId: input.childId,
+                    source: input.source,
+                    name: profile.name,
+                    description: profile.description,
+                },
+            });
+            await this.quota.recordCharacterGeneration(input.userId, tx);
+            return created;
+        });
+
+        return this.generatePreviewBestEffort(character);
     }
 
     private async toResponse(character: Character): Promise<ICharacterResponse> {

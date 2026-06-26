@@ -174,6 +174,12 @@ export class GenerationPipeline {
             );
         }
 
+        if (result.sentenceWarnings.length > 0) {
+            this.logger.warn(
+                `${result.sentenceWarnings.length} sentence completeness warning(s) — keeping the plan usable`,
+            );
+        }
+
         await this.persistStoryPlan(story, plan, blueprint.id);
         return plan;
     }
@@ -284,7 +290,7 @@ export class GenerationPipeline {
         const prompt =
             `${story.styleAnchor ?? ''}\n\n${page.illustrationPrompt}\n\n${IMAGE_NO_TEXT_DIRECTIVE}`.trim();
         const referenceImageUrls = story.character?.previewKey
-            ? [await this.storage.getSignedUrl(story.character.previewKey)]
+            ? [await this.getReferenceImageDataUrl(story.character.previewKey)]
             : undefined;
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
@@ -306,6 +312,11 @@ export class GenerationPipeline {
         });
 
         this.logger.log(`Page ${page.order} illustration stored: ${key}`);
+    }
+
+    private async getReferenceImageDataUrl(key: string): Promise<string> {
+        const buffer = await this.storage.downloadBuffer(key);
+        return `data:image/png;base64,${buffer.toString('base64')}`;
     }
 
     // ---------------------------------------------------------------------------

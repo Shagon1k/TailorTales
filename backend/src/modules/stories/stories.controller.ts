@@ -88,6 +88,17 @@ export class StoriesController {
         return this.storiesService.create(user.id, dto);
     }
 
+    @Post(':id/retry')
+    @HttpCode(202)
+    async retry(
+        @Param('id') id: string,
+        @CurrentUser() user: User,
+        @Body() dto: CreateStoryDto,
+    ): Promise<{ jobId: string; storyId: string }> {
+        await this.storiesService.retry(id, user.id, dto);
+        return this.generationService.enqueue(id, user.id);
+    }
+
     @Post(':id/generate')
     @HttpCode(202)
     generate(

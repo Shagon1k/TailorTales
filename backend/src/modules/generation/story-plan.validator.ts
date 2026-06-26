@@ -17,6 +17,8 @@ export interface IValidationResult {
     structuralErrors: string[];
     /** Length overflows — logged but do not block the story (CSS handles visual clipping). */
     lengthOverflows: Array<{ page: number; zone: string; actual: number; max: number }>;
+    /** Prose polish warnings — logged but do not block the story. */
+    sentenceWarnings: string[];
 }
 
 @Injectable()
@@ -30,6 +32,7 @@ export class StoryPlanValidator {
             return {
                 structuralErrors: this.checkPlanFrame(plan, expectedPageCount),
                 lengthOverflows: [],
+                sentenceWarnings: [],
             };
         }
 
@@ -42,6 +45,9 @@ export class StoryPlanValidator {
             ],
             lengthOverflows: plan.pages.flatMap((page, i) =>
                 this.checkPageLengthOverflow(page, i + 1),
+            ),
+            sentenceWarnings: plan.pages.flatMap((page, i) =>
+                this.checkPageSentenceWarning(page, i + 1),
             ),
         };
     }
@@ -82,7 +88,7 @@ export class StoryPlanValidator {
 
     /**
      * Per-page structural checks: template validity, story-type match, role constraints,
-     * illustration prompt presence, and prose sentence completeness.
+     * and illustration prompt presence.
      */
     private checkPageStructural(
         page: IStoryPlan['pages'][number],
@@ -116,14 +122,17 @@ export class StoryPlanValidator {
             );
         }
 
-        // Cover text is a title, not prose — skip sentence completeness check.
-        if (tpl.role !== 'cover' && page.text?.trim() && !endsWithCompleteSentence(page.text)) {
-            errors.push(
-                `Page ${pageNum}: text does not end with a complete sentence (last character must be ., !, ?, or …).`,
-            );
-        }
-
         return errors;
+    }
+
+    private checkPageSentenceWarning(page: IStoryPlan['pages'][number], pageNum: number): string[] {
+        const tpl = PAGE_TEMPLATES[page.template];
+        if (!tpl || tpl.role === 'cover' || !page.text?.trim()) return [];
+        if (endsWithCompleteSentence(page.text)) return [];
+
+        return [
+            `Page ${pageNum}: text does not end with a complete sentence (last character should be ., !, ?, or …).`,
+        ];
     }
 
     /**

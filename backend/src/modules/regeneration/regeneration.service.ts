@@ -188,10 +188,15 @@ export class RegenerationService {
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
         const referenceImageUrls = story.character?.previewKey
-            ? [await this.storage.getSignedUrl(story.character.previewKey)]
+            ? [await this.getReferenceImageDataUrl(story.character.previewKey)]
             : undefined;
 
         return this.ai.generateImage({ prompt, size: imageSlot.size, referenceImageUrls });
+    }
+
+    private async getReferenceImageDataUrl(key: string): Promise<string> {
+        const buffer = await this.storage.downloadBuffer(key);
+        return `data:image/png;base64,${buffer.toString('base64')}`;
     }
 
     private async persistPageImage(
