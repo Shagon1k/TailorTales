@@ -40,7 +40,8 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const isFailed = story.status === 'FAILED';
-    const hasCoverImage = Boolean(story.coverImageUrl);
+    const coverImageUrl = story.coverImageUrl;
+    const hasCoverImage = coverImageUrl !== null;
     const href = isFailed ? `/workshop?storyId=${story.id}` : `/library/${story.id}`;
     const ariaLabel = isFailed ? t('failedAriaLabel', { displayTitle }) : displayTitle;
 
@@ -74,9 +75,9 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                         style={{ backgroundColor: coverColor }}
                         aria-hidden="true"
                     >
-                        {hasCoverImage ? (
+                        {coverImageUrl ? (
                             <Image
-                                src={story.coverImageUrl}
+                                src={coverImageUrl}
                                 alt=""
                                 fill
                                 sizes="(min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 480px) 33vw, 50vw"
@@ -87,6 +88,12 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                             <div className={styles['tale-card__cover-placeholder']} />
                         )}
 
+                        {isFailed && (
+                            <span className={styles['tale-card__status']} aria-hidden="true">
+                                {t('failedOverlay')}
+                            </span>
+                        )}
+
                         {!hasCoverImage && !isFailed && (
                             <p className={styles['tale-card__cover-title']}>{displayTitle}</p>
                         )}
@@ -94,12 +101,6 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                 </Link>
 
                 <div className={styles['tale-card__content']}>
-                    {isFailed && (
-                        <span className={styles['tale-card__status']} aria-hidden="true">
-                            {t('failedOverlay')}
-                        </span>
-                    )}
-
                     <p className={styles['tale-card__title']}>{displayTitle}</p>
                     <div className={styles['tale-card__meta']}>
                         <span>{t('age', { age })}</span>

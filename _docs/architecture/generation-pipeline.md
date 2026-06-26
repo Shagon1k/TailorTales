@@ -129,9 +129,11 @@ structured call, so only images parallelize.
 
 For each page: the prompt is `styleAnchor + "\n\n" + page.illustrationPrompt + "\n\n" +
 IMAGE_NO_TEXT_DIRECTIVE` (the style anchor is prepended to **every** image for cross-page
-character/style consistency; the no-text directive forbids in-image words on every image —
-including covers and COMIC speech bubbles — since image models render text, especially
-Cyrillic, unreliably),
+character/style consistency; when the selected Character already has a generated preview,
+that preview is also passed as a **reference image** to the image model for stronger visual
+identity carry-over; the no-text directive forbids in-image words on every image — including
+covers and COMIC speech bubbles — since image models render text, especially Cyrillic,
+unreliably),
 the image size comes from the template's `images[0].size`, the bytes are uploaded to
 `StorageKeys.pageIllustration(userId, storyId, order)`, and the key is written back to
 `Page.illustrations` as `[{ key, position }]`.
@@ -189,18 +191,18 @@ cover, last = final, count = requested); the validator enforces them.
 [`StoryPlanValidator.validate()`](../../backend/src/modules/generation/story-plan.validator.ts)
 returns **two separate lists**, treated completely differently:
 
-| Class                 | Examples                                                                                                                                                                         | Handling                                                                                                                  |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **Structural errors** | wrong page count; page 1 not a cover; last page not final; unknown template; template type ≠ story type; interior page using a cover/final template; missing illustration prompt | **One repair retry** — the errors are appended to the prompt and the LLM tries again. Still broken → the story **FAILS**. |
-| **Length overflows**  | `page.text` longer than the template zone's `maxChars`                                                                                                                           | **Logged, never blocks.** CSS (`overflow: hidden`, `word-break`) clips visually.                                          |
+| Class                 | Examples                                                                                                                                                                         | Handling                                                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Structural errors** | wrong page count; page 1 not a cover; last page not final; unknown template; template type ≠ story type; interior page using a cover/final template; missing illustration prompt | **One repair retry** — the errors are appended to the prompt and the LLM tries again. Still broken → the story **FAILS**.     |
+| **Soft warnings**     | `page.text` longer than the template zone's `maxChars`; prose that does not end with a complete sentence                                                                         | **Logged, never blocks.** CSS handles overflow; sentence warnings are kept as usable prose instead of failing the whole plan. |
 
 > **Why not truncate overflowing text?** Truncating mid-narrative on a children's story
 > page can drop the punchline or the emotional payoff. Clipping a few characters visually is
 > recoverable; silently corrupting the story is not. So overflow is a warning, not an error,
 > and the CSS auto-fit safety net handles the rare overrun.
 
-Structural errors are about a plan we _cannot render_; length overflow is about a plan that
-_renders imperfectly_. Only the first is worth a retry or a failure.
+Structural errors are about a plan we _cannot render_; soft warnings are about a plan that
+_renders imperfectly but remains usable_. Only the first is worth a retry or a failure.
 
 ## AiClient vs AiStubClient: the Symbol-token swap
 
