@@ -9,29 +9,29 @@ const STORY_BLUEPRINTS = [
     {
         name: 'Classic Book',
         description:
-            'A warm, narrative-driven storybook with one illustration per page. Ideal for answering "why" and "how" questions through a child protagonist\'s journey of discovery.',
+            'A warm, narrative-driven storybook with one illustration per page. Ideal for answering "why" and "how" questions through a gentle journey of discovery.',
         type: 'BOOK' as const,
         systemPrompt: `
 <intro_prompt>
 Open with a warm, engaging scene that introduces the main subject in a child-friendly way.
 Use simple vocabulary appropriate for the child's age. Set up the central question or wonder
-that the story will explore through the eyes of the child protagonist.
+that the story will explore with warmth and clarity.
 </intro_prompt>
 
 <development_prompt>
 Build the story across 2–3 discovery moments. Each page should reveal one new idea or fact,
-shown through the child protagonist's curiosity. Keep sentences short and vivid. Use sensory
-details — what the character sees, hears, or touches — to make each page feel alive.
+shown through curiosity, observation, or a gentle chain of events. Keep sentences short and
+vivid. Use sensory details — what the scene looks, sounds, or feels like — to make each
+page feel alive.
 </development_prompt>
 
 <climax_prompt>
 Bring the key revelation or "aha" moment. This is where the central question is answered in
-a memorable, emotionally satisfying way. The protagonist should feel — and show — genuine
-wonder or joy at the discovery.
+a memorable, emotionally satisfying way. Let the scene carry genuine wonder or delight.
 </climax_prompt>
 
 <resolution_prompt>
-Close with warmth and a gentle takeaway. The child character reflects on what they learned.
+Close with warmth and a gentle takeaway.
 End on a hopeful or curious note that invites further exploration of the world.
 </resolution_prompt>
         `.trim(),

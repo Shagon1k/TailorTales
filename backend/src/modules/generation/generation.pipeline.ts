@@ -22,7 +22,7 @@ import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
 import { IMAGE_NO_TEXT_DIRECTIVE } from './generation.prompts.js';
 
 type StoryWithRelations = Story & {
-    child: Pick<Child, 'id' | 'name' | 'birthdate' | 'interests'>;
+    child: Pick<Child, 'id' | 'name' | 'birthdate' | 'gender' | 'interests'>;
     artStyle: Pick<ArtStyle, 'id' | 'name' | 'promptPrefix'>;
     character: Pick<Character, 'id' | 'name' | 'description' | 'previewKey'> | null;
 };
@@ -347,7 +347,15 @@ export class GenerationPipeline {
         const story = await this.prisma.story.findUnique({
             where: { id: storyId },
             include: {
-                child: { select: { id: true, name: true, birthdate: true, interests: true } },
+                child: {
+                    select: {
+                        id: true,
+                        name: true,
+                        birthdate: true,
+                        gender: true,
+                        interests: true,
+                    },
+                },
                 artStyle: { select: { id: true, name: true, promptPrefix: true } },
                 character: {
                     select: { id: true, name: true, description: true, previewKey: true },

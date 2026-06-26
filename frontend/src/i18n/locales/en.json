@@ -355,12 +355,12 @@
             "characterPicker": {
                 "number": "2.",
                 "title": "Choose a character",
-                "note": "Optional — pick a recurring hero, or let the tale follow the reader directly.",
+                "note": "Optional — pick a recurring hero, or leave the tale without a fixed hero for now.",
                 "selectReaderFirst": "Choose a reader first to unlock their character shelf.",
                 "noGenerationsLeft": "No character generations left this cycle.",
                 "noCharacterSlotsLeft": "No saved character slots left on this plan.",
                 "listLabel": "Select a character",
-                "none": "No character — the story follows the reader",
+                "none": "No character — no fixed hero for this tale",
                 "createNew": "+ Create a new character"
             },
             "formatPicker": {

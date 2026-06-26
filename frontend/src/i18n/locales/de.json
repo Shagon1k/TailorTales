@@ -355,12 +355,12 @@
             "characterPicker": {
                 "number": "2.",
                 "title": "Charakter auswählen",
-                "note": "Optional — wähle einen wiederkehrenden Helden oder lass die Geschichte direkt dem Kind folgen.",
+                "note": "Optional — wähle einen wiederkehrenden Helden oder lass die Geschichte vorerst ohne festen Helden laufen.",
                 "selectReaderFirst": "Wähle zuerst ein Kind aus, um seine Charaktere zu sehen.",
                 "noGenerationsLeft": "In diesem Zyklus sind keine Charakter-Generierungen mehr übrig.",
                 "noCharacterSlotsLeft": "In diesem Tarif sind keine Speicherplätze für Charaktere mehr übrig.",
                 "listLabel": "Charakter auswählen",
-                "none": "Kein Charakter — die Geschichte folgt dem Kind",
+                "none": "Kein Charakter — diese Geschichte hat keinen festen Helden",
                 "createNew": "+ Neuen Charakter erstellen"
             },
             "formatPicker": {

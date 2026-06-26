@@ -7,7 +7,7 @@ import styles from './CharacterSelector.module.scss';
 
 export interface ICharacterSelectorProps {
     items: ICharacter[];
-    /** null = no character chosen (the story follows the reader). */
+    /** null = no fixed character chosen for the story. */
     selectedId: string | null;
     onSelect: (id: string | null) => void;
 }

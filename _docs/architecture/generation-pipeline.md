@@ -78,11 +78,13 @@ protagonist (`Story.characterId`, if any), builds the system and user prompts vi
 computes a `max_tokens` ceiling, and asks the LLM for a **Story Plan** — a JSON object with
 this shape:
 
-The user prompt composes: the child's name + age (audience targeting) · the chosen Character
-as the protagonist when present (else child-led) · the child's `interests` as an **optional,
-non-forcing hint** (woven in only when they fit) · the optional `genre` and `writingStyle`
-flavour knobs, each injecting a fixed prompt fragment when set (omitted otherwise) · the
-ArtStyle's `promptPrefix`.
+The user prompt composes: the child's name + age + gender (**audience targeting only**) · the
+chosen Character as the protagonist when present (else **no fixed recurring hero**) · the
+child's `interests` as an **optional, non-forcing hint** (woven in only when they fit) · the
+optional `genre` and `writingStyle` flavour knobs, each injecting a fixed prompt fragment
+when set (omitted otherwise) · the ArtStyle's `promptPrefix` · explicit layout-dynamics
+rules that push the model to vary interior templates instead of defaulting every page to the
+same text/image arrangement.
 
 ```json
 {

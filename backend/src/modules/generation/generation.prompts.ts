@@ -35,6 +35,17 @@ export const STORY_OUTPUT_RULES = [
     '  • Every prose page text (interior and final pages) must end with a complete sentence — the last character must be ., !, ?, … or ,',
 ].join('\n');
 
+export const STORY_LAYOUT_DYNAMICS_RULES = [
+    'LAYOUT DYNAMICS:',
+    '  • The child is the audience for the book, not automatically the protagonist.',
+    '  • If a CHARACTER section is present, that character is the recurring hero of the story.',
+    '  • If no CHARACTER section is present, do NOT turn the child into the hero. Keep the child out of the cast unless explicitly needed.',
+    '  • In the no-character case, the story may explain, observe, or gently narrate events without inventing a fixed recurring hero.',
+    '  • Do not default every interior page to the same template.',
+    '  • For stories with 5 or more pages, use at least two different interior templates when the narrative allows it.',
+    '  • Use layout changes to support pacing and emotional rhythm, not randomly.',
+].join('\n');
+
 /**
  * Builds the character identity section injected into the user prompt when a Character
  * is associated with the story's child. The section guides the LLM to use this description
@@ -47,6 +58,7 @@ export function buildCharacterPromptSection(name: string, description: string): 
     return [
         'CHARACTER (recurring visual identity — inform styleAnchor and every illustration prompt):',
         `  ${name}: ${description}`,
+        '  This character is the main hero of the story.',
         '  Every illustration of this character must match this description precisely.',
         '  Treat the character appearance as fixed canon across all pages: do not vary species,',
         '  face shape, body proportions, colors, signature clothing, hats, accessories, or markings.',
