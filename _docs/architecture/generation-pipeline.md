@@ -84,7 +84,10 @@ child's `interests` as an **optional, non-forcing hint** (woven in only when the
 optional `genre` and `writingStyle` flavour knobs, each injecting a fixed prompt fragment
 when set (omitted otherwise) · the ArtStyle's `promptPrefix` · explicit layout-dynamics
 rules that push the model to vary interior templates instead of defaulting every page to the
-same text/image arrangement.
+same text/image arrangement. For longer books the prompt now explicitly asks the model to
+match layout to story beat: text-led layouts for explanation, image-first layouts for
+scene-setting and reveals, centered-image layouts for short transitions, and full-image
+layouts for visual payoff moments.
 
 ```json
 {
@@ -187,6 +190,20 @@ The division of labor: **the LLM is a dramaturge, not a typesetter.** It picks a
 name and writes text + an illustration prompt. It never emits image sizes (looked up from
 the template) or character counts (measured by us). Code fixes the invariants (page 1 =
 cover, last = final, count = requested); the validator enforces them.
+
+Current BOOK interior templates:
+
+| Template            | Beat      | Shape                                                                                                      |
+| ------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `book-text`         | bridge    | prose-only page for quiet reflection, explanation, or a breathing pause                                    |
+| `book-text-image`   | default   | text-led page with the illustration in the lower half                                                      |
+| `book-image-top`    | default   | image-first page with the illustration at the top and prose below                                          |
+| `book-image-middle` | bridge    | centered illustration with prose split above and below; the renderer balances the stored text in two parts |
+| `book-full-image`   | highlight | near full-bleed illustration with minimal captioning for reveals / wonder / dramatic moments               |
+
+The image model also receives the target slot aspect ratio from the same template config, so
+top/bottom/centered layouts can ask for differently-shaped source images instead of cropping
+every illustration from the same generic frame.
 
 ## StoryPlanValidator: two-class failures
 

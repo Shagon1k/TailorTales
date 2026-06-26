@@ -9,7 +9,9 @@ import type { IPageTemplate } from './rendering.types.js';
  * generated image fills its zone without awkward cropping or letterboxing:
  *
  *   book-cover / book-full-image  — full-bleed portrait (148×210 ≈ 2:3) → 1024×1536
- *   book-text-image               — upper zone landscape (148×110 ≈ 4:3) → 1536×1024
+ *   book-text-image               — lower zone landscape (148×100 ≈ 3:2) → 1536×1024
+ *   book-image-top                — upper zone landscape (148×92 ≈ 8:5)    → 1536×1024
+ *   book-image-middle             — centered landscape (128×76 ≈ 5:3)       → 1536×864
  *   book-final                    — small circular inset (1:1)            → 1024×1024
  *
  * Comic templates are Post-MVP stubs — sizes reflect their panel geometry.
@@ -33,6 +35,7 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         htmlFile: 'book-text.hbs',
         type: 'BOOK',
         role: 'interior',
+        interiorBeat: 'bridge',
         narrativePurpose:
             'Use for narrative bridges or emotional beats that need no illustration. Limit to 1–2 pages per story.',
         maxChars: { body: 400 },
@@ -43,18 +46,42 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         htmlFile: 'book-text-image.hbs',
         type: 'BOOK',
         role: 'interior',
+        interiorBeat: 'default',
         narrativePurpose:
-            'Default interior layout. Use for most story pages — combines narrative text with a landscape illustration in the upper half.',
+            'Steady mixed layout with prose first and a landscape illustration in the lower half. Use for explanatory beats, continuous action, or scenes where the words should lead.',
         maxChars: { chapter: 50, body: 300 },
-        images: [{ name: 'main', aspect: '4:3', size: '1536x1024' }],
+        images: [{ name: 'main', aspect: '3:2', size: '1536x1024' }],
+    },
+
+    'book-image-top': {
+        htmlFile: 'book-image-top.hbs',
+        type: 'BOOK',
+        role: 'interior',
+        interiorBeat: 'default',
+        narrativePurpose:
+            'Image-first mixed layout with a landscape illustration at the top and prose below. Use when the page opens with a strong visual setup, discovery, or a scene the reader should see before reading the explanation.',
+        maxChars: { chapter: 50, body: 260 },
+        images: [{ name: 'main', aspect: '3:2', size: '1536x1024' }],
+    },
+
+    'book-image-middle': {
+        htmlFile: 'book-image-middle.hbs',
+        type: 'BOOK',
+        role: 'interior',
+        interiorBeat: 'bridge',
+        narrativePurpose:
+            'Balanced middle-image layout with short prose above and below the illustration. Use for transitions, cause-and-effect beats, or moments where the scene sits between two short thoughts.',
+        maxChars: { chapter: 50, body: 240 },
+        images: [{ name: 'main', aspect: '16:9', size: '1536x864' }],
     },
 
     'book-full-image': {
         htmlFile: 'book-full-image.hbs',
         type: 'BOOK',
         role: 'interior',
+        interiorBeat: 'highlight',
         narrativePurpose:
-            'Use for high-impact visual moments — a reveal, a wide landscape, or a dramatic scene. Minimal or no text.',
+            'Use for high-impact visual moments — a reveal, a wide landscape, a dramatic turn, or a burst of wonder. Minimal or no text.',
         maxChars: { caption: 120 },
         images: [{ name: 'main', aspect: '2:3', size: '1024x1536' }],
     },

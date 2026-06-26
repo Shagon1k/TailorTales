@@ -583,7 +583,7 @@
         },
         "log": {
             "header": "Das Werkstatt-Protokoll",
-            "live": "● LIVE"
+            "live": "LIVE"
         },
         "safety": "Du kannst dieses Fenster ruhig schließen — wir senden {childName}s Geschichte per E-Mail, wenn sie fertig ist."
     },
@@ -675,6 +675,9 @@
         "chapters": {
             "ariaLabel": "Kapitel",
             "eyebrow": "· Kapitel ·",
+            "coverFallback": "Cover",
+            "endingFallback": "Schluss",
+            "sceneFallback": "Szene {order}",
             "pageFallback": "Seite {order}"
         },
         "spread": {

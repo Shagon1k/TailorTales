@@ -12,11 +12,13 @@ import styles from './RegenerationPanel.module.scss';
 export interface IRegenerationPanelProps {
     storyId: string;
     page: IPage;
+    onRegenerated?: () => void;
 }
 
 export default function RegenerationPanel({
     storyId,
     page,
+    onRegenerated,
 }: Readonly<IRegenerationPanelProps>): React.ReactElement {
     const t = useTranslations('storyReader.regeneration');
     const [modalWhat, setModalWhat] = useState<IRegenerateWhat | null>(null);
@@ -74,6 +76,7 @@ export default function RegenerationPanel({
                 what={modalWhat ?? 'text'}
                 opened={modalWhat !== null}
                 onClose={() => setModalWhat(null)}
+                onSuccess={onRegenerated}
             />
         </section>
     );

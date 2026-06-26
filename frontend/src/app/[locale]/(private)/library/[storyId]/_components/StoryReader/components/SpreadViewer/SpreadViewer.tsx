@@ -12,6 +12,7 @@ export interface ISpreadViewerProps {
     storyId: string;
     page: IPage;
     pageIndex: number;
+    pageRefreshToken: number;
     totalPages: number;
     onPrev: () => void;
     onNext: () => void;
@@ -21,6 +22,7 @@ export default function SpreadViewer({
     storyId,
     page,
     pageIndex,
+    pageRefreshToken,
     totalPages,
     onPrev,
     onNext,
@@ -44,7 +46,12 @@ export default function SpreadViewer({
                 className={styles.viewer__page}
                 aria-label={t('pageAriaLabel', { current: currentNumber, total: totalPages })}
             >
-                <StoryPageIframe storyId={storyId} pageOrder={page.order} />
+                <StoryPageIframe
+                    key={`${storyId}:${page.order}:${pageRefreshToken}`}
+                    storyId={storyId}
+                    pageOrder={page.order}
+                    refreshToken={pageRefreshToken}
+                />
             </div>
 
             <div className={styles.viewer__nav} role="group" aria-label={t('navGroupLabel')}>

@@ -8,6 +8,7 @@ import { PdfBindingService } from '../rendering/pdf-binding.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import { AI_CLIENT, type IAiClient } from '../ai/ai.types.js';
 import { CHARS_PER_TOKEN } from '../generation/generation.constants.js';
+import { buildImageSlotPrompt } from '../generation/generation.prompts.js';
 import { QuotaService } from '../subscriptions/quota.service.js';
 import { buildPageTextSystemPrompt, buildPageTextUserPrompt } from './regeneration.prompts.js';
 import type { RegeneratePageDto } from './dto/regenerate-page.dto.js';
@@ -180,6 +181,12 @@ export class RegenerationService {
         const prompt = [
             story.styleAnchor,
             page.illustrationPrompt,
+            buildImageSlotPrompt(
+                page.layout ?? imageSlot.name,
+                tpl.narrativePurpose,
+                imageSlot.aspect,
+                imageSlot.size,
+            ),
             authorNote ? `Requested change: ${authorNote}` : null,
         ]
             .filter(Boolean)
@@ -191,7 +198,12 @@ export class RegenerationService {
             ? [await this.getReferenceImageDataUrl(story.character.previewKey)]
             : undefined;
 
-        return this.ai.generateImage({ prompt, size: imageSlot.size, referenceImageUrls });
+        return this.ai.generateImage({
+            prompt,
+            size: imageSlot.size,
+            aspectRatio: imageSlot.aspect,
+            referenceImageUrls,
+        });
     }
 
     private async getReferenceImageDataUrl(key: string): Promise<string> {

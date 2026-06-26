@@ -128,10 +128,13 @@ describe('RegenerationService', () => {
             prompt: 'Make the moon look friendlier.',
         });
 
-        expect(ai.generateImage).toHaveBeenCalledWith({
-            prompt: expect.stringContaining(mockStory.styleAnchor),
-            size: expect.any(String),
-        });
+        expect(ai.generateImage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining(mockStory.styleAnchor),
+                size: expect.any(String),
+                aspectRatio: '3:2',
+            }),
+        );
         expect(ai.generateImage.mock.calls[0][0].prompt).toContain(mockPage.illustrationPrompt);
         expect(ai.generateImage.mock.calls[0][0].prompt).toContain(
             'Requested change: Make the moon look friendlier.',

@@ -23,21 +23,9 @@ const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 1_000;
 
-interface IImageUrlPart {
-    type: 'image_url';
-    image_url: {
-        url: string;
-    };
-}
-
-interface IGenerateImageMessage {
-    content?: unknown;
-    images?: unknown;
-}
-
-interface ITextPart {
-    type: 'text';
-    text: string;
+interface IImageGenerationRecord {
+    b64_json?: string;
+    url?: string;
 }
 
 @Injectable()
@@ -158,27 +146,21 @@ export class AiClient implements IAiClient {
     async generateImage(input: IGenerateImageInput): Promise<Buffer> {
         this.logger.log(`Generating image (model: ${this.imageModel}, size: ${input.size})`);
 
-        const [width, height] = input.size.split('x').map(Number);
-        const content: Array<ITextPart | IImageUrlPart> = [
-            { type: 'text', text: input.prompt },
-            ...(input.referenceImageUrls?.map((url) => ({
-                type: 'image_url' as const,
-                image_url: { url },
-            })) ?? []),
-        ];
-
         const body = {
             model: this.imageModel,
-            messages: [{ role: 'user', content }],
-            modalities: ['image'],
-            image_size: { width, height },
+            prompt: input.prompt,
+            size: input.size,
+            ...(input.aspectRatio ? { aspect_ratio: input.aspectRatio } : {}),
+            output_format: 'png',
+            input_references: input.referenceImageUrls?.map((url) => ({
+                type: 'image_url',
+                image_url: { url },
+            })),
         };
 
-        const data = await this.post<{
-            choices: { message: IGenerateImageMessage }[];
-        }>('/chat/completions', body);
+        const data = await this.post<{ data: IImageGenerationRecord[] }>('/images', body);
 
-        return this.extractImageBuffer(data.choices[0]?.message, input.size);
+        return this.extractGeneratedImageBuffer(data.data[0], input.size);
     }
 
     async moderateText(text: string): Promise<IModerationResult> {
@@ -226,79 +208,30 @@ export class AiClient implements IAiClient {
         }
     }
 
-    private extractImageBuffer(message: IGenerateImageMessage | undefined, size: string): Buffer {
-        const contentBuffer = this.extractImageBufferFromValue(message?.content);
-        if (contentBuffer) {
-            return contentBuffer;
+    private async extractUrlImageBuffer(url: string): Promise<Buffer> {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`Failed to download generated image: ${res.status} ${res.statusText}`);
         }
 
-        const imagesBuffer = this.extractImageBufferFromValue(message?.images);
-        if (imagesBuffer) {
-            return imagesBuffer;
-        }
-
-        const preview = JSON.stringify({
-            content: message?.content,
-            images: message?.images,
-        }).slice(0, 240);
-        this.logger.error(`Unknown image response format (size: ${size}): ${preview}`);
-        throw new Error(
-            `Unexpected image response format from OpenRouter (size: ${size}). ` +
-                `Content type: ${typeof message?.content}`,
-        );
+        return Buffer.from(await res.arrayBuffer());
     }
 
-    private extractImageBufferFromValue(value: unknown): Buffer | null {
-        if (Array.isArray(value)) {
-            for (const part of value) {
-                const imageUrl = this.getImageUrl(part);
-                if (imageUrl) {
-                    return this.dataUrlToBuffer(imageUrl);
-                }
-            }
-            return null;
+    private async extractGeneratedImageBuffer(
+        image: IImageGenerationRecord | undefined,
+        size: string,
+    ): Promise<Buffer> {
+        if (image?.b64_json) {
+            return Buffer.from(image.b64_json, 'base64');
         }
 
-        if (typeof value === 'string' && value.startsWith('data:')) {
-            return this.dataUrlToBuffer(value);
+        if (image?.url) {
+            return this.extractUrlImageBuffer(image.url);
         }
 
-        const imageUrl = this.getImageUrl(value);
-        if (imageUrl) {
-            return this.dataUrlToBuffer(imageUrl);
-        }
-
-        return null;
-    }
-
-    private getImageUrl(value: unknown): string | null {
-        if (!this.isImageUrlPart(value)) {
-            return null;
-        }
-
-        return value.image_url.url;
-    }
-
-    private isImageUrlPart(value: unknown): value is IImageUrlPart {
-        if (!value || typeof value !== 'object') {
-            return false;
-        }
-
-        if (!('type' in value) || value.type !== 'image_url') {
-            return false;
-        }
-
-        if (!('image_url' in value) || !value.image_url || typeof value.image_url !== 'object') {
-            return false;
-        }
-
-        return 'url' in value.image_url && typeof value.image_url.url === 'string';
-    }
-
-    private dataUrlToBuffer(dataUrl: string): Buffer {
-        const comma = dataUrl.indexOf(',');
-        if (comma === -1) throw new Error('Malformed data URL — no comma separator');
-        return Buffer.from(dataUrl.slice(comma + 1), 'base64');
+        const preview = JSON.stringify(image).slice(0, 240);
+        this.logger.error(`Unknown /images response format (size: ${size}): ${preview}`);
+        throw new Error(`Unexpected /images response format from OpenRouter (size: ${size})`);
     }
 
     private async post<TResponse>(path: string, body: unknown): Promise<TResponse> {

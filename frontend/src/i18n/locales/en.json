@@ -571,7 +571,7 @@
         },
         "log": {
             "header": "The workshop log",
-            "live": "● LIVE"
+            "live": "LIVE"
         },
         "safety": "It's quite safe to close this window — we'll email {childName}'s tale when it's ready."
     },
@@ -663,6 +663,9 @@
         "chapters": {
             "ariaLabel": "Chapters",
             "eyebrow": "· Chapters ·",
+            "coverFallback": "Cover",
+            "endingFallback": "Closing",
+            "sceneFallback": "Scene {order}",
             "pageFallback": "Page {order}"
         },
         "spread": {

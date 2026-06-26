@@ -1,0 +1,75 @@
+<style>
+    .image-middle {
+        width: 148mm;
+        height: 210mm;
+        display: flex;
+        flex-direction: column;
+        background: #fdf6ec;
+        padding: 8mm 10mm;
+        overflow: hidden;
+    }
+    .image-middle__chapter {
+        font-family: 'Nunito', sans-serif;
+        font-size: 8pt;
+        font-weight: 700;
+        color: #c26a2a;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 3mm;
+    }
+    .image-middle__lead,
+    .image-middle__tail {
+        font-family: 'Literata', serif;
+        font-size: 12.4pt;
+        line-height: 1.6;
+        color: #2d1a0e;
+        font-style: italic;
+        hyphens: auto;
+        overflow: hidden;
+    }
+    .image-middle__lead {
+        min-height: 34mm;
+        max-height: 44mm;
+        margin-bottom: 5mm;
+    }
+    .image-middle__lead::first-letter {
+        font-size: 3em;
+        font-style: normal;
+        font-weight: 700;
+        float: left;
+        line-height: 0.8;
+        margin-right: 2mm;
+        margin-top: 0.5mm;
+        color: #c26a2a;
+    }
+    .image-middle__image {
+        width: 128mm;
+        height: 76mm;
+        margin: 0 auto 5mm;
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 4mm;
+        background: #e8d8c4;
+        box-shadow: 0 2mm 4mm rgba(45, 26, 14, 0.12);
+    }
+    .image-middle__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .image-middle__tail {
+        flex: 1;
+    }
+</style>
+
+<div class='image-middle'>
+    {{#if chapterTitle}}<div class='image-middle__chapter text-zone'>{{chapterTitle}}</div>{{/if}}
+    {{#if lead}}<div class='image-middle__lead text-zone'>{{lead}}</div>{{/if}}
+    <div class='image-middle__image'>
+        {{#if imageBase64}}
+            <img src='data:image/png;base64,{{imageBase64}}' alt='' />
+        {{/if}}
+    </div>
+    {{#if tail}}<div class='image-middle__tail text-zone'>{{tail}}</div>{{/if}}
+</div>

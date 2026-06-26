@@ -7,7 +7,7 @@ import puppeteer, { type Browser, type Page } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
 import { ConfigService } from '@nestjs/config';
 import { PAGE_TEMPLATES } from './page-templates.config.js';
-import type { IPageToRender, IStoryToRender } from './rendering.types.js';
+import type { IInteriorTextSplit, IPageToRender, IStoryToRender } from './rendering.types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, 'templates');
@@ -190,6 +190,10 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
                 return { ...base, text: page.text };
             case 'book-text-image':
                 return { ...base, text: page.text };
+            case 'book-image-top':
+                return { ...base, text: page.text };
+            case 'book-image-middle':
+                return { ...base, ...this.splitInteriorText(page.text) };
             case 'book-full-image':
                 return { ...base, caption: page.text };
             case 'book-final':
@@ -197,6 +201,53 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
             default:
                 return { ...base, text: page.text };
         }
+    }
+
+    private splitInteriorText(text: string | null): IInteriorTextSplit {
+        const source = text?.trim() ?? '';
+        if (!source) {
+            return { lead: '', tail: '' };
+        }
+
+        const sentences = source.match(/[^.!?…]+[.!?…]?/g)?.map((part) => part.trim()) ?? [source];
+        if (sentences.length <= 1) {
+            return this.splitByWordBalance(source);
+        }
+
+        const totalLength = sentences.reduce((sum, sentence) => sum + sentence.length, 0);
+        let accumulated = 0;
+        let bestIndex = 1;
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        for (let index = 0; index < sentences.length - 1; index += 1) {
+            accumulated += sentences[index].length;
+            const distance = Math.abs(totalLength / 2 - accumulated);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = index + 1;
+            }
+        }
+
+        const lead = sentences.slice(0, bestIndex).join(' ').trim();
+        const tail = sentences.slice(bestIndex).join(' ').trim();
+        if (!lead || !tail) {
+            return this.splitByWordBalance(source);
+        }
+
+        return { lead, tail };
+    }
+
+    private splitByWordBalance(text: string): IInteriorTextSplit {
+        const words = text.split(/\s+/).filter(Boolean);
+        if (words.length <= 2) {
+            return { lead: text, tail: '' };
+        }
+
+        const midpoint = Math.ceil(words.length / 2);
+        return {
+            lead: words.slice(0, midpoint).join(' '),
+            tail: words.slice(midpoint).join(' '),
+        };
     }
 
     private async stitchPages(pageBuffers: Buffer[]): Promise<Buffer> {

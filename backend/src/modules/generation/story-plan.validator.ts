@@ -8,6 +8,8 @@ const PRIMARY_TEXT_ZONE: Record<string, string> = {
     'book-cover': 'title',
     'book-text': 'body',
     'book-text-image': 'body',
+    'book-image-top': 'body',
+    'book-image-middle': 'body',
     'book-full-image': 'caption',
     'book-final': 'closing',
 };

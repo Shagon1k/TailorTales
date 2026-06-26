@@ -19,7 +19,7 @@ import { QuotaService } from '../subscriptions/quota.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
-import { IMAGE_NO_TEXT_DIRECTIVE } from './generation.prompts.js';
+import { buildImageSlotPrompt } from './generation.prompts.js';
 
 type StoryWithRelations = Story & {
     child: Pick<Child, 'id' | 'name' | 'birthdate' | 'gender' | 'interests'>;
@@ -287,8 +287,18 @@ export class GenerationPipeline {
         if (!page.illustrationPrompt) return;
 
         const imageSlot = tpl.images[0];
-        const prompt =
-            `${story.styleAnchor ?? ''}\n\n${page.illustrationPrompt}\n\n${IMAGE_NO_TEXT_DIRECTIVE}`.trim();
+        const prompt = [
+            story.styleAnchor ?? null,
+            page.illustrationPrompt,
+            buildImageSlotPrompt(
+                page.layout ?? imageSlot.name,
+                tpl.narrativePurpose,
+                imageSlot.aspect,
+                imageSlot.size,
+            ),
+        ]
+            .filter(Boolean)
+            .join('\n\n');
         const referenceImageUrls = story.character?.previewKey
             ? [await this.getReferenceImageDataUrl(story.character.previewKey)]
             : undefined;
@@ -298,6 +308,7 @@ export class GenerationPipeline {
         const imageBuffer = await this.ai.generateImage({
             prompt,
             size: imageSlot.size,
+            aspectRatio: imageSlot.aspect,
             referenceImageUrls,
         });
 

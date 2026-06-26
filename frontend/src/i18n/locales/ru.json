@@ -588,7 +588,7 @@
         },
         "log": {
             "header": "Журнал мастерской",
-            "live": "● LIVE"
+            "live": "LIVE"
         },
         "safety": "Можно смело закрыть это окно — мы отправим сказку для {childName} на email, когда она будет готова."
     },
@@ -680,6 +680,9 @@
         "chapters": {
             "ariaLabel": "Главы",
             "eyebrow": "· Главы ·",
+            "coverFallback": "Обложка",
+            "endingFallback": "Финал",
+            "sceneFallback": "Сцена {order}",
             "pageFallback": "Страница {order}"
         },
         "spread": {

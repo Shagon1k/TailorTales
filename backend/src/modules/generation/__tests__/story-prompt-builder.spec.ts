@@ -16,6 +16,7 @@ function buildPromptWith(opts: {
     writingStyle?: WritingStyle | null;
     character?: { name: string; description: string } | null;
     gender?: 'MALE' | 'FEMALE';
+    pageCount?: number;
 }): string {
     const builder = new StoryPromptBuilder();
     return builder.buildUserPrompt({
@@ -28,7 +29,7 @@ function buildPromptWith(opts: {
         artStyle: { promptPrefix: 'Warm watercolour style.' },
         blueprint: { systemPrompt: "You write warm children's books." },
         question: 'Why do mountains breathe smoke?',
-        pageCount: 5,
+        pageCount: opts.pageCount ?? 5,
         language: 'EN',
         character: opts.character ?? undefined,
         genre: opts.genre,
@@ -148,11 +149,43 @@ describe('StoryPromptBuilder', () => {
                 );
                 expect(prompt).toContain('INTERIOR TEMPLATE USAGE GUIDE:');
                 expect(prompt).toContain(
-                    'book-text-image: Default interior layout. Use for most story pages',
+                    'book-text-image: Steady mixed layout with prose first and a landscape illustration in the lower half.',
+                );
+                expect(prompt).toContain(
+                    'book-image-top: Image-first mixed layout with a landscape illustration at the top and prose below.',
+                );
+                expect(prompt).toContain(
+                    'book-image-middle: Balanced middle-image layout with short prose above and below the illustration.',
                 );
                 expect(prompt).toContain('book-full-image: Use for high-impact visual moments');
                 expect(prompt).toContain(
                     'book-text: Use for narrative bridges or emotional beats that need no illustration.',
+                );
+            });
+        });
+
+        describe('given a longer story needs more visual rhythm', () => {
+            it('should ask for stronger layout distribution across the whole book', () => {
+                const prompt = buildPromptWith({ pageCount: 12 });
+
+                expect(prompt).toContain('LAYOUT DISTRIBUTION:');
+                expect(prompt).toContain(
+                    'Use at least one non-default interior layout so the book does not feel mechanically repetitive.',
+                );
+                expect(prompt).toContain(
+                    'Avoid using "book-text-image", "book-image-top" more than 2 times in a row',
+                );
+                expect(prompt).toContain(
+                    'When a page begins with a strong visual reveal or a new scene, prefer an image-first default layout over a text-led one.',
+                );
+                expect(prompt).toContain(
+                    'include at least 2 meaningful "book-full-image" moments at different parts of the story',
+                );
+                expect(prompt).toContain(
+                    'vary pacing across beginning, middle, and ending so the layout rhythm evolves with the story',
+                );
+                expect(prompt).toContain(
+                    'combine scene-setting pages, text-led explanation pages, visually centered transition pages',
                 );
             });
         });

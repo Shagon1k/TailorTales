@@ -66,6 +66,11 @@ export class StoryPromptBuilder {
             .map((name) => `  • ${name}: ${PAGE_TEMPLATES[name].narrativePurpose}`)
             .join('\n');
 
+        const layoutDistributionRules = this.buildLayoutDistributionRules(
+            ctx.pageCount,
+            interiorTemplates,
+        );
+
         return [
             `Write a ${ctx.pageCount}-page children's book in ${languageName} for a child aged ${age}.`,
             `The intended reader is ${ctx.child.name}, a ${audienceGender} aged ${age}. Use age and gender only to tune clarity, pacing, emotional tone, and relatable details for the audience.`,
@@ -99,6 +104,8 @@ export class StoryPromptBuilder {
             '',
             STORY_LAYOUT_DYNAMICS_RULES,
             '',
+            ...layoutDistributionRules,
+            '',
             'INTERIOR TEMPLATE USAGE GUIDE:',
             layoutUsageGuide,
             '',
@@ -114,5 +121,87 @@ export class StoryPromptBuilder {
 
     private describeAudienceGender(gender: Gender): string {
         return GENDER_AUDIENCE_NAMES[gender];
+    }
+
+    private buildLayoutDistributionRules(pageCount: number, interiorTemplates: string[]): string[] {
+        const interiors = interiorTemplates.map((name) => ({
+            name,
+            beat: PAGE_TEMPLATES[name].interiorBeat ?? 'default',
+        }));
+        const defaultTemplates = interiors
+            .filter((tpl) => tpl.beat === 'default')
+            .map((tpl) => tpl.name);
+        const bridgeTemplates = interiors
+            .filter((tpl) => tpl.beat === 'bridge')
+            .map((tpl) => tpl.name);
+        const highlightTemplates = interiors
+            .filter((tpl) => tpl.beat === 'highlight')
+            .map((tpl) => tpl.name);
+
+        const rules = ['LAYOUT DISTRIBUTION:'];
+
+        if (pageCount >= 5) {
+            rules.push(
+                '  • Use at least one non-default interior layout so the book does not feel mechanically repetitive.',
+            );
+        }
+
+        if (highlightTemplates.length > 0) {
+            rules.push(
+                `  • Reserve ${this.joinTemplateNames(highlightTemplates)} for reveals, wonder beats, emotional peaks, or visually rich scene changes — not just once as a token variation.`,
+            );
+        }
+
+        if (bridgeTemplates.length > 0) {
+            rules.push(
+                `  • Use ${this.joinTemplateNames(bridgeTemplates)} for quieter transitions, breathers, reflections, or short connective beats between bigger scenes.`,
+            );
+        }
+
+        if (defaultTemplates.length > 0) {
+            rules.push(
+                `  • ${this.joinTemplateNames(defaultTemplates)} can carry the steady core of the story, but do not let it dominate every interior page.`,
+            );
+            rules.push(
+                `  • Avoid using ${this.joinTemplateNames(defaultTemplates)} more than 2 times in a row unless the story clearly stays in one continuous explanatory beat.`,
+            );
+            rules.push(
+                '  • When a page begins with a strong visual reveal or a new scene, prefer an image-first default layout over a text-led one.',
+            );
+        }
+
+        if (pageCount >= 8) {
+            rules.push(
+                '  • For longer books, spread visual peaks across the story instead of clustering all the variety into a single moment.',
+            );
+            rules.push(
+                '  • Use at least three distinct interior mood shifts across the book: a steady narrative beat, a visual highlight, and a quieter bridge or pause when the template set allows it.',
+            );
+            rules.push(
+                '  • Let layout rhythm follow story rhythm: setup and explanation pages may be steadier, transitions may compress around an image, and reveals should feel visually expansive.',
+            );
+        }
+
+        if (pageCount >= 10 && highlightTemplates.length > 0) {
+            rules.push(
+                `  • For 10+ pages, include at least 2 meaningful ${this.joinTemplateNames(highlightTemplates)} moments at different parts of the story when the plot allows it.`,
+            );
+        }
+
+        if (pageCount >= 12) {
+            rules.push(
+                '  • For 12+ pages, vary pacing across beginning, middle, and ending so the layout rhythm evolves with the story rather than repeating one composition pattern.',
+            );
+            rules.push(
+                '  • Across the full book, combine scene-setting pages, text-led explanation pages, visually centered transition pages, and at least a couple of full-image payoff moments when the story supports them.',
+            );
+        }
+
+        return rules;
+    }
+
+    private joinTemplateNames(templateNames: string[]): string {
+        if (templateNames.length === 1) return `"${templateNames[0]}"`;
+        return templateNames.map((name) => `"${name}"`).join(', ');
     }
 }

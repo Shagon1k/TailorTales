@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import type { IRegenerateWhat } from '@/types/story.types';
@@ -8,6 +9,7 @@ import Modal from '@/components/ui/Modal/Modal';
 import Button from '@/components/ui/Button/Button';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import { storiesApi } from '@/api/stories';
+import { SUBSCRIPTION_QUERY_KEY } from '@/hooks/subscription';
 import styles from './RegenerationModal.module.scss';
 
 export interface IRegenerationModalProps {
@@ -16,6 +18,7 @@ export interface IRegenerationModalProps {
     what: IRegenerateWhat;
     opened: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
 export default function RegenerationModal({
@@ -24,9 +27,11 @@ export default function RegenerationModal({
     what,
     opened,
     onClose,
+    onSuccess,
 }: Readonly<IRegenerationModalProps>): React.ReactElement {
     const t = useTranslations('storyReader.regeneration');
     const router = useRouter();
+    const queryClient = useQueryClient();
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -39,7 +44,9 @@ export default function RegenerationModal({
                 what,
                 prompt: prompt.trim() || undefined,
             });
+            await queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
             router.refresh();
+            onSuccess?.();
             onClose();
         } catch (err) {
             const message = err instanceof Error ? err.message : t('modal.defaultError');

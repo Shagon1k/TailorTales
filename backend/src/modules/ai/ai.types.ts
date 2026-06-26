@@ -33,6 +33,8 @@ export interface IGenerateImageInput {
     prompt: string;
     /** Pixel dimensions, e.g. '1024x1536'. Read from PageTemplate config. */
     size: string;
+    /** Matching aspect ratio string, e.g. '3:2'. Used by image APIs that honor aspect separately. */
+    aspectRatio?: string;
     /** Optional reference images that help preserve recurring character appearance. */
     referenceImageUrls?: string[];
 }

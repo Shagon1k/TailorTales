@@ -22,7 +22,7 @@ export const STORY_SYSTEM_PROMPT_SUFFIX = [
  * "do not use text". Note: this intentionally also clears COMIC speech bubbles.
  */
 export const IMAGE_NO_TEXT_DIRECTIVE =
-    'A fully wordless illustration: no letters, words, numbers, captions, signage, or speech bubbles of any kind — convey everything through imagery alone.';
+    'A fully wordless illustration: no letters, words, numbers, captions, titles, labels, signage, logos, symbols meant to be read, or speech bubbles of any kind — convey everything through imagery alone.';
 
 export const STORY_STRUCTURE_RULES_HEADER = 'PAGE STRUCTURE (mandatory):';
 export const STORY_OUTPUT_RULES_HEADER = 'OUTPUT RULES:';
@@ -31,9 +31,28 @@ export const STORY_OUTPUT_RULES = [
     '  • text: the story prose for this page (null for illustration-only pages)',
     '  • chapterTitle: short chapter label shown above the text (null if not needed)',
     '  • illustration.prompt: a complete, self-contained image generation prompt',
+    '  • illustration.prompt must describe imagery only — never ask the image to render titles, chapter names, captions, labels, signs, readable symbols, or speech bubbles because page text is rendered separately by the template',
     '  • styleAnchor: describe recurring characters + overall visual style — prepended to every illustration prompt',
     '  • Every prose page text (interior and final pages) must end with a complete sentence — the last character must be ., !, ?, … or ,',
 ].join('\n');
+
+export function buildImageSlotPrompt(
+    templateName: string,
+    narrativePurpose: string,
+    aspect: string,
+    size: string,
+): string {
+    return [
+        'ILLUSTRATION LAYOUT NOTES:',
+        `  • This illustration will be placed into the "${templateName}" template.`,
+        `  • Compose specifically for a ${aspect} frame (${size}).`,
+        `  • Template purpose: ${narrativePurpose}`,
+        '  • Keep the main subject, faces, and important props inside the central safe area.',
+        '  • Avoid placing crucial details near the outer edges where framing or cropping may trim them.',
+        '  • Any title, chapter label, caption, closing text, child name, or other UI text is rendered by the page template separately.',
+        `  • ${IMAGE_NO_TEXT_DIRECTIVE}`,
+    ].join('\n');
+}
 
 export const STORY_LAYOUT_DYNAMICS_RULES = [
     'LAYOUT DYNAMICS:',
@@ -44,6 +63,7 @@ export const STORY_LAYOUT_DYNAMICS_RULES = [
     '  • Do not default every interior page to the same template.',
     '  • For stories with 5 or more pages, use at least two different interior templates when the narrative allows it.',
     '  • Use layout changes to support pacing and emotional rhythm, not randomly.',
+    '  • Match the layout to the beat: text-led pages for explanation, image-first pages for scene reveals, centered-image pages for transitional beats, and full-image pages for major visual payoffs.',
 ].join('\n');
 
 /**
