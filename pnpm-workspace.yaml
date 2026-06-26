@@ -1,3 +1,18 @@
 packages:
     - 'backend'
     - 'frontend'
+allowBuilds:
+    '@datadog/pprof': false
+    '@nestjs/core': true
+    '@newrelic/fn-inspect': false
+    '@newrelic/native-metrics': false
+    '@parcel/watcher': true
+    '@prisma/engines': true
+    '@sentry/cli': false
+    '@swc/core': true
+    esbuild: true
+    msgpackr-extract: true
+    prisma: true
+    protobufjs: true
+    puppeteer: true
+    sharp: false
