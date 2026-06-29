@@ -25,9 +25,8 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         htmlFile: 'book-cover.hbs',
         type: 'BOOK',
         role: 'cover',
-        narrativePurpose:
-            'Use for page 1 only. Full-bleed cover illustration, book title, and child name.',
-        maxChars: { title: 60, subtitle: 80 },
+        narrativePurpose: 'Use for page 1 only. Full-bleed cover illustration and book title.',
+        maxChars: { title: 60, subtitle: 0 },
         images: [{ name: 'cover', aspect: '2:3', size: '1024x1536' }],
     },
 
@@ -36,8 +35,7 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         type: 'BOOK',
         role: 'interior',
         interiorBeat: 'bridge',
-        narrativePurpose:
-            'Use for narrative bridges or emotional beats that need no illustration. Limit to 1–2 pages per story.',
+        narrativePurpose: 'Use for narrative bridges or emotional beats that need no illustration.',
         maxChars: { body: 400 },
         images: [],
     },
@@ -60,7 +58,7 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         interiorBeat: 'default',
         narrativePurpose:
             'Image-first mixed layout with a landscape illustration at the top and prose below. Use when the page opens with a strong visual setup, discovery, or a scene the reader should see before reading the explanation.',
-        maxChars: { chapter: 50, body: 260 },
+        maxChars: { chapter: 50, body: 300 },
         images: [{ name: 'main', aspect: '3:2', size: '1536x1024' }],
     },
 
@@ -71,7 +69,7 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         interiorBeat: 'bridge',
         narrativePurpose:
             'Balanced middle-image layout with short prose above and below the illustration. Use for transitions, cause-and-effect beats, or moments where the scene sits between two short thoughts.',
-        maxChars: { chapter: 50, body: 240 },
+        maxChars: { chapter: 50, body: 250 },
         images: [{ name: 'main', aspect: '16:9', size: '1536x864' }],
     },
 
@@ -92,7 +90,7 @@ export const PAGE_TEMPLATES: Record<string, IPageTemplate> = {
         role: 'final',
         narrativePurpose:
             'Use for the last page only. Warm closing message with an optional small circular illustration.',
-        maxChars: { closing: 200, tagline: 60 },
+        maxChars: { closing: 220, tagline: 60 },
         images: [{ name: 'closing-image', aspect: '1:1', size: '1024x1024' }],
     },
 

@@ -78,6 +78,7 @@ export const STORY_LAYOUT_DYNAMICS_RULES = [
     '  • If a CHARACTER section is present, that character is the recurring hero of the story.',
     '  • If no CHARACTER section is present, do NOT turn the child into the hero. Keep the child out of the cast unless explicitly needed.',
     '  • In the no-character case, the story may explain, observe, or gently narrate events without inventing a fixed recurring hero.',
+    '  • Do not invent a child protagonist just because the audience is a child. Be various in your choice.',
     '  • Do not default every interior page to the same template.',
     '  • For stories with 5 or more pages, use at least two different interior templates when the narrative allows it.',
     '  • Use layout changes to support pacing and emotional rhythm, not randomly.',

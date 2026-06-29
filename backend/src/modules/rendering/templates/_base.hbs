@@ -95,16 +95,21 @@
                               word-break: break-word;
                             }{{#if watermark}}
                 .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%)
-                rotate(-35deg); font-family: 'Nunito', sans-serif; font-size: 36pt; font-weight:
-                700; color: rgba(0, 0, 0, 0.07); white-space: nowrap; pointer-events: none; z-index:
-                9999; letter-spacing: 0.1em; }
+                rotate(-32deg); display: flex; flex-direction: column; align-items: center; gap:
+                0.08em; max-width: 112mm; font-family: 'Nunito', sans-serif; font-size: 34pt;
+                font-weight: 700; color: rgba(45, 26, 14, 0.13); text-align: center; line-height:
+                0.94; pointer-events: none; z-index: 9999; letter-spacing: 0.05em; text-transform:
+                uppercase; }
+                .watermark__line { white-space: nowrap; }
+                .watermark__fox { display: inline-block; margin-left: 0.16em; filter: grayscale(1)
+                brightness(0.2); opacity: 0.75; }
             {{/if}}
         </style>
     </head>
     <body>
         <div class='page'>
             {{{pageContent}}}
-            {{#if watermark}}<div class='watermark'>TailorTales Preview</div>{{/if}}
+            {{#if watermark}}<div class='watermark'><span class='watermark__line'>TailorTales</span><span class='watermark__line'>Preview<span class='watermark__fox'>🦊</span></span></div>{{/if}}
         </div>
     </body>
 </html>

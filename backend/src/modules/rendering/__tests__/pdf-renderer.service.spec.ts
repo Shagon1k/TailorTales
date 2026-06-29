@@ -78,4 +78,18 @@ describe.skipIf(!!process.env.CI)('PdfRendererService', () => {
             expect(html).toContain('Then the garden began to glow around her.');
         });
     });
+
+    describe('given a watermarked page', () => {
+        it('should render a compact two-line watermark with the fox mark', () => {
+            const html = service.buildPageHtml(
+                FIVE_PAGE_STORY_FIXTURE.pages[0],
+                FIVE_PAGE_STORY_FIXTURE,
+            );
+
+            expect(html).toContain("class='watermark'");
+            expect(html).toContain('TailorTales');
+            expect(html).toContain('Preview');
+            expect(html).toContain('🦊');
+        });
+    });
 });

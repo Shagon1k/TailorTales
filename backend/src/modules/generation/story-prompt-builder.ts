@@ -73,7 +73,7 @@ export class StoryPromptBuilder {
 
         return [
             `Write a ${ctx.pageCount}-page children's book in ${languageName} for a child aged ${age}.`,
-            `The intended reader is ${ctx.child.name}, a ${audienceGender} aged ${age}. Use age and gender only to tune clarity, pacing, emotional tone, and relatable details for the audience.`,
+            `Audience profile only: ${audienceGender}, age ${age}. Use this only to tune clarity, pacing, emotional tone, and relatable details for the reader.`,
             '',
             `QUESTION TO ANSWER: "${ctx.question}"`,
             '',

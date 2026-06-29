@@ -99,11 +99,13 @@ describe('StoryPromptBuilder', () => {
             it('should keep the child as audience-only and forbid turning them into the hero by default', () => {
                 const prompt = buildPromptWith({});
 
-                expect(prompt).toContain('The intended reader is Maya, a girl aged 7.');
+                expect(prompt).toContain('Audience profile only: girl, age 7.');
                 expect(prompt).toContain('The child is the audience for the book');
                 expect(prompt).toContain(
                     'If no CHARACTER section is present, do NOT turn the child into the hero.',
                 );
+                expect(prompt).toContain("Treat the reader's name as private audience metadata");
+                expect(prompt).not.toContain('The intended reader is Maya');
                 expect(prompt).not.toContain('CHARACTER (recurring visual identity');
             });
         });
@@ -112,9 +114,9 @@ describe('StoryPromptBuilder', () => {
             it('should include it as audience-targeting context', () => {
                 const prompt = buildPromptWith({ gender: 'MALE' });
 
-                expect(prompt).toContain('The intended reader is Maya, a boy aged 7.');
+                expect(prompt).toContain('Audience profile only: boy, age 7.');
                 expect(prompt).toContain(
-                    'Use age and gender only to tune clarity, pacing, emotional tone, and relatable details for the audience.',
+                    'Use this only to tune clarity, pacing, emotional tone, and relatable details for the reader.',
                 );
             });
         });
