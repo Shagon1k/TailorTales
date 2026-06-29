@@ -40,10 +40,15 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const isFailed = story.status === 'FAILED';
+    const isDraft = story.status === 'DRAFT';
     const coverImageUrl = story.coverImageUrl;
     const hasCoverImage = coverImageUrl !== null;
-    const href = isFailed ? `/workshop?storyId=${story.id}` : `/library/${story.id}`;
-    const ariaLabel = isFailed ? t('failedAriaLabel', { displayTitle }) : displayTitle;
+    const href = isFailed || isDraft ? `/workshop?storyId=${story.id}` : `/library/${story.id}`;
+    const ariaLabel = isFailed
+        ? t('failedAriaLabel', { displayTitle })
+        : isDraft
+          ? t('draftAriaLabel', { displayTitle })
+          : displayTitle;
 
     async function handleDelete(): Promise<void> {
         if (isDeleting) return;
@@ -88,13 +93,17 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                             <div className={styles['tale-card__cover-placeholder']} />
                         )}
 
-                        {isFailed && (
-                            <span className={styles['tale-card__status']} aria-hidden="true">
-                                {t('failedOverlay')}
+                        {(isFailed || isDraft) && (
+                            <span
+                                className={styles['tale-card__status']}
+                                data-draft={isDraft || undefined}
+                                aria-hidden="true"
+                            >
+                                {isDraft ? t('draftOverlay') : t('failedOverlay')}
                             </span>
                         )}
 
-                        {!hasCoverImage && !isFailed && (
+                        {!hasCoverImage && !isFailed && !isDraft && (
                             <p className={styles['tale-card__cover-title']}>{displayTitle}</p>
                         )}
                     </div>
@@ -115,6 +124,11 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                     {isFailed && (
                         <ButtonLink href={href} variant="secondary">
                             {t('retryLabel')}
+                        </ButtonLink>
+                    )}
+                    {isDraft && (
+                        <ButtonLink href={href} variant="secondary">
+                            {t('continueDraftLabel')}
                         </ButtonLink>
                     )}
                     <Button

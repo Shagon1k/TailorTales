@@ -22,6 +22,7 @@ import type {
     ILanguage,
     IStoryGenre,
     IWritingStyle,
+    ICreateStoryPayload,
 } from '@/types/story.types';
 import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
 import ReaderChip from './components/ReaderChip/ReaderChip';
@@ -184,26 +185,32 @@ export default function WorkshopForm({
         );
     }
 
-    async function handleSubmit(): Promise<void> {
+    function buildStoryPayload(): ICreateStoryPayload | null {
+        if (!isValid || !selectedChildId || !storyType || !pageCount || !artStyleId || !language) {
+            return null;
+        }
+
+        return {
+            childId: selectedChildId,
+            ...(selectedCharacterId !== null && { characterId: selectedCharacterId }),
+            type: storyType,
+            question: question.trim(),
+            pageCount: Number(pageCount),
+            artStyleId,
+            language,
+            ...(genre !== null && { genre }),
+            ...(writingStyle !== null && { writingStyle }),
+        };
+    }
+
+    async function handleGenerate(): Promise<void> {
         if (!isValid || isPending) return;
-        // Type guard — isValid already ensures these are non-null.
-        if (!selectedChildId || !storyType || !pageCount || !artStyleId || !language) return;
+        const payload = buildStoryPayload();
+        if (!payload) return;
 
         setSubmitError(null);
         setIsPending(true);
         try {
-            const payload = {
-                childId: selectedChildId,
-                ...(selectedCharacterId !== null && { characterId: selectedCharacterId }),
-                type: storyType,
-                question: question.trim(),
-                pageCount: Number(pageCount),
-                artStyleId,
-                language,
-                ...(genre !== null && { genre }),
-                ...(writingStyle !== null && { writingStyle }),
-            };
-
             const job =
                 initialStoryId !== null
                     ? await storiesApi.retry(initialStoryId, payload)
@@ -214,6 +221,24 @@ export default function WorkshopForm({
             router.push(`/workshop/${job.storyId}`);
         } catch (err: unknown) {
             console.error('Failed to start generation', err);
+            setSubmitError(t('submitError'));
+        } finally {
+            setIsPending(false);
+        }
+    }
+
+    async function handleSaveDraft(): Promise<void> {
+        if (!isValid || isPending) return;
+        const payload = buildStoryPayload();
+        if (!payload) return;
+
+        setSubmitError(null);
+        setIsPending(true);
+        try {
+            await storiesApi.create(payload);
+            router.push('/library');
+        } catch (err: unknown) {
+            console.error('Failed to save draft', err);
             setSubmitError(t('submitError'));
         } finally {
             setIsPending(false);
@@ -293,9 +318,7 @@ export default function WorkshopForm({
                                 {t('characterPicker.title')}
                             </h2>
                             <p className={styles['workshop__section-sub']}>
-                                {selectedChild !== null
-                                    ? t('characterPicker.note')
-                                    : t('characterPicker.selectReaderFirst')}
+                                {t('characterPicker.note')}
                             </p>
                         </div>
                     </div>
@@ -323,7 +346,7 @@ export default function WorkshopForm({
                             )}
                         </div>
                     ) : (
-                        <p className={styles['workshop__section-note']}>
+                        <p className={styles['workshop__empty-guidance']}>
                             {t('characterPicker.selectReaderFirst')}
                         </p>
                     )}
@@ -488,7 +511,8 @@ export default function WorkshopForm({
                 question={question}
                 isValid={isValid}
                 isPending={isPending}
-                onSubmit={handleSubmit}
+                onGenerate={handleGenerate}
+                onSaveDraft={handleSaveDraft}
             />
 
             <Modal

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import type { IUsageSummary } from '@/types/subscription.types';
 import WorkshopSummary, { type IWorkshopSummaryProps } from '../WorkshopSummary';
@@ -43,7 +44,8 @@ function renderSummary(props: Partial<IWorkshopSummaryProps> = {}): void {
         question: 'Why is the sky blue?',
         isValid: true,
         isPending: false,
-        onSubmit: vi.fn(),
+        onGenerate: vi.fn(),
+        onSaveDraft: vi.fn(),
     };
     render(
         <MantineProvider>
@@ -81,7 +83,20 @@ describe('WorkshopSummary', () => {
         renderSummary({ pageCount: '12' });
 
         expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /save as draft/i })).toBeEnabled();
         expect(screen.getByText(/only 4 remain this cycle/i)).toBeInTheDocument();
+    });
+
+    it('should route each action through its own handler', async () => {
+        const onGenerate = vi.fn();
+        const onSaveDraft = vi.fn();
+        renderSummary({ onGenerate, onSaveDraft });
+
+        await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
+        await userEvent.click(screen.getByRole('button', { name: /save as draft/i }));
+
+        expect(onGenerate).toHaveBeenCalledOnce();
+        expect(onSaveDraft).toHaveBeenCalledOnce();
     });
 
     it('should fall back to placeholders while the subscription is loading', () => {
@@ -90,6 +105,7 @@ describe('WorkshopSummary', () => {
         renderSummary({ pageCount: '8' });
 
         expect(screen.getByText(/· -- remaining/)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /light the lantern/i })).toBeEnabled();
+        expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /save as draft/i })).toBeEnabled();
     });
 });

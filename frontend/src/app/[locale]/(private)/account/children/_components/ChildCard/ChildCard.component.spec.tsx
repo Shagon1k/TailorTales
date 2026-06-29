@@ -39,6 +39,7 @@ function renderCard(
         onCharacterAdd?: () => void;
         onCharacterEdit?: (child: IChild, character: ICharacter) => void;
         onCharacterDelete?: (character: ICharacter) => void;
+        onCharacterGeneratePreview?: (character: ICharacter) => void;
     } = {},
 ): ReturnType<typeof render> {
     return render(
@@ -51,6 +52,7 @@ function renderCard(
                 onCharacterAdd={handlers.onCharacterAdd ?? vi.fn()}
                 onCharacterEdit={handlers.onCharacterEdit ?? vi.fn()}
                 onCharacterDelete={handlers.onCharacterDelete ?? vi.fn()}
+                onCharacterGeneratePreview={handlers.onCharacterGeneratePreview ?? vi.fn()}
             />
         </MantineProvider>,
     );
@@ -170,6 +172,33 @@ describe('ChildCard', () => {
             expect(onCharacterDelete).toHaveBeenCalledWith(
                 expect.objectContaining({ id: 'char-1' }),
             );
+        });
+
+        it('should call onCharacterGeneratePreview when Generate preview is clicked', async () => {
+            const onCharacterGeneratePreview = vi.fn();
+            renderCard({}, [MOCK_CHARACTER], { onCharacterGeneratePreview });
+
+            await userEvent.click(
+                screen.getByRole('button', { name: 'Generate preview for Princess Mia' }),
+            );
+
+            expect(onCharacterGeneratePreview).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 'char-1' }),
+            );
+        });
+
+        it('should render Regenerate when the character already has a preview', () => {
+            renderCard({}, [
+                {
+                    ...MOCK_CHARACTER,
+                    previewKey: 'users/user-123/characters/char-1/preview',
+                    previewUrl: 'https://signed.test/char-1.png',
+                },
+            ]);
+
+            expect(
+                screen.getByRole('button', { name: 'Regenerate preview for Princess Mia' }),
+            ).toBeInTheDocument();
         });
     });
 });

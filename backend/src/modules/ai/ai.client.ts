@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppError } from '../../common/errors.js';
+import { AppError, ImageProhibitedContentError } from '../../common/errors.js';
 import {
     type IAiClient,
     type ICharacterProfile,
@@ -26,6 +26,32 @@ const RETRY_BASE_MS = 1_000;
 interface IImageGenerationRecord {
     b64_json?: string;
     url?: string;
+}
+
+function readOpenRouterErrorCode(text: string): string | null {
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(text);
+    } catch {
+        return null;
+    }
+
+    if (
+        typeof parsed === 'object' &&
+        parsed !== null &&
+        'error' in parsed &&
+        typeof parsed.error === 'object' &&
+        parsed.error !== null &&
+        'metadata' in parsed.error &&
+        typeof parsed.error.metadata === 'object' &&
+        parsed.error.metadata !== null &&
+        'code' in parsed.error.metadata &&
+        typeof parsed.error.metadata.code === 'string'
+    ) {
+        return parsed.error.metadata.code;
+    }
+
+    return null;
 }
 
 @Injectable()
@@ -149,9 +175,7 @@ export class AiClient implements IAiClient {
         const body = {
             model: this.imageModel,
             prompt: input.prompt,
-            size: input.size,
-            ...(input.aspectRatio ? { aspect_ratio: input.aspectRatio } : {}),
-            output_format: 'png',
+            aspect_ratio: input.aspectRatio ?? this.aspectRatioFromSize(input.size),
             input_references: input.referenceImageUrls?.map((url) => ({
                 type: 'image_url',
                 image_url: { url },
@@ -161,6 +185,32 @@ export class AiClient implements IAiClient {
         const data = await this.post<{ data: IImageGenerationRecord[] }>('/images', body);
 
         return this.extractGeneratedImageBuffer(data.data[0], input.size);
+    }
+
+    private aspectRatioFromSize(size: string): string {
+        const match = /^(\d+)x(\d+)$/.exec(size);
+        if (!match) {
+            throw new Error(`Invalid image size format: ${size}`);
+        }
+
+        const width = Number.parseInt(match[1], 10);
+        const height = Number.parseInt(match[2], 10);
+        const divisor = this.greatestCommonDivisor(width, height);
+
+        return `${width / divisor}:${height / divisor}`;
+    }
+
+    private greatestCommonDivisor(a: number, b: number): number {
+        let x = a;
+        let y = b;
+
+        while (y !== 0) {
+            const next = x % y;
+            x = y;
+            y = next;
+        }
+
+        return x;
     }
 
     async moderateText(text: string): Promise<IModerationResult> {
@@ -258,6 +308,14 @@ export class AiClient implements IAiClient {
                 if (res.status >= 400 && res.status < 500) {
                     const text = await res.text();
                     this.logger.error(`OpenRouter ${res.status} on ${path}: ${text.slice(0, 500)}`);
+                    if (
+                        path === '/images' &&
+                        readOpenRouterErrorCode(text) === 'IMAGE_PROHIBITED_CONTENT'
+                    ) {
+                        throw Object.assign(new ImageProhibitedContentError(), {
+                            permanent: true,
+                        });
+                    }
                     const userMessage =
                         res.status === 429
                             ? 'AI service rate limit reached. Please try again in a moment.'

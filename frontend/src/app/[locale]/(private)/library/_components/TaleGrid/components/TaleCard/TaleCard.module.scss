@@ -126,6 +126,12 @@
     box-shadow: 0 10px 24px rgb(12 4 2 / 0.2);
     color: color-mix(in srgb, var(--accent-danger) 88%, white);
     text-align: center;
+
+    &[data-draft] {
+        border-color: color-mix(in srgb, var(--accent-gold) 58%, var(--border-on-card));
+        background: color-mix(in srgb, var(--color-bark) 78%, var(--accent-gold));
+        color: var(--text-primary);
+    }
 }
 
 .tale-card__title {

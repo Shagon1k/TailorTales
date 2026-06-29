@@ -39,11 +39,7 @@ export default function CharacterSelector({
                             data-selected={isSelected || undefined}
                         >
                             {option.id === null ? (
-                                <div className={styles['character-selector__content']}>
-                                    <span className={styles['character-selector__name']}>
-                                        {option.name}
-                                    </span>
-                                </div>
+                                <NoCharacterOption label={option.name} />
                             ) : (
                                 <CharacterOptionCard
                                     character={items.find((item) => item.id === option.id)!}
@@ -62,6 +58,24 @@ export default function CharacterSelector({
                 );
             })}
         </ul>
+    );
+}
+
+function NoCharacterOption({ label }: Readonly<{ label: string }>): React.ReactElement {
+    const [name, description] = label.split(/\s+[—-]\s+/, 2);
+
+    return (
+        <div className={styles['character-selector__content']}>
+            <div className={styles['character-selector__thumb']} aria-hidden="true">
+                <span className={styles['character-selector__thumb-fallback']}>—</span>
+            </div>
+            <div className={styles['character-selector__text']}>
+                <span className={styles['character-selector__name']}>{name}</span>
+                {description && (
+                    <span className={styles['character-selector__description']}>{description}</span>
+                )}
+            </div>
+        </div>
     );
 }
 

@@ -15,6 +15,7 @@ import {
     useCharacters,
     useCreateCharacter,
     useDeleteCharacter,
+    useGenerateCharacterPreview,
     useUpdateCharacter,
 } from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
@@ -42,6 +43,7 @@ export default function ChildrenPage(): React.ReactElement {
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
     const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
     const { mutate: deleteCharacter, isPending: isDeletingCharacter } = useDeleteCharacter();
+    const { mutate: generateCharacterPreview } = useGenerateCharacterPreview();
 
     const childrenLimit = subscription?.tier.childrenLimit ?? null;
     const atChildrenLimit = childrenLimit !== null && children.length >= childrenLimit;
@@ -58,19 +60,22 @@ export default function ChildrenPage(): React.ReactElement {
         characterGenerationsLeft > 0 && (charactersLeft === null || charactersLeft > 0);
 
     const [modal, setModal] = useState<TModalState>({ kind: 'closed' });
+    const [generatingCharacterPreviewId, setGeneratingCharacterPreviewId] = useState<string | null>(
+        null,
+    );
     const close = (): void => setModal({ kind: 'closed' });
 
     // A child may own several characters — group them all (Model B).
     const charactersByChildId = new Map<string, ICharacter[]>();
     for (const character of characters) {
-        if (character.childId === null) continue;
         const list = charactersByChildId.get(character.childId) ?? [];
         list.push(character);
         charactersByChildId.set(character.childId, list);
     }
 
     const isFormOpen = modal.kind === 'add' || modal.kind === 'edit';
-    const isCharacterFormOpen = modal.kind === 'character';
+    const activeCharacterModal = modal.kind === 'character' ? modal : null;
+    const isCharacterFormOpen = activeCharacterModal !== null;
 
     function handleChildSubmit(values: IChildFormValues): void {
         if (modal.kind === 'edit') {
@@ -84,12 +89,25 @@ export default function ChildrenPage(): React.ReactElement {
         values: ICharacterFormValues,
         source: IUserCharacterSource,
     ): void {
-        if (modal.kind !== 'character') return;
-        if (modal.character) {
-            updateCharacter({ id: modal.character.id, payload: values }, { onSuccess: close });
+        if (!activeCharacterModal) return;
+        if (activeCharacterModal.character) {
+            updateCharacter(
+                { id: activeCharacterModal.character.id, payload: values },
+                { onSuccess: close },
+            );
         } else {
-            createCharacter({ ...values, childId: modal.child.id, source }, { onSuccess: close });
+            createCharacter(
+                { ...values, childId: activeCharacterModal.child.id, source },
+                { onSuccess: close },
+            );
         }
+    }
+
+    function handleCharacterPreviewGenerate(character: ICharacter): void {
+        setGeneratingCharacterPreviewId(character.id);
+        generateCharacterPreview(character.id, {
+            onSettled: () => setGeneratingCharacterPreviewId(null),
+        });
     }
 
     if (isLoading) {
@@ -153,7 +171,10 @@ export default function ChildrenPage(): React.ReactElement {
                                 onCharacterDelete={(character) =>
                                     setModal({ kind: 'deleteCharacter', character })
                                 }
+                                onCharacterGeneratePreview={handleCharacterPreviewGenerate}
                                 canAddCharacter={canCreateCharacter}
+                                canGenerateCharacterPreview={characterGenerationsLeft > 0}
+                                generatingCharacterPreviewId={generatingCharacterPreviewId}
                                 addCharacterHint={
                                     !canCreateCharacter
                                         ? characterGenerationsLeft === 0
@@ -195,30 +216,30 @@ export default function ChildrenPage(): React.ReactElement {
                 opened={isCharacterFormOpen}
                 onClose={close}
                 title={
-                    modal.kind === 'character' && modal.character
+                    activeCharacterModal?.character
                         ? tCharModal('editTitle')
                         : tCharModal('addTitle')
                 }
             >
-                {isCharacterFormOpen && (
+                {activeCharacterModal && (
                     <CharacterForm
                         initialValues={
-                            modal.character
+                            activeCharacterModal.character
                                 ? {
-                                      name: modal.character.name,
-                                      description: modal.character.description,
+                                      name: activeCharacterModal.character.name,
+                                      description: activeCharacterModal.character.description,
                                   }
                                 : undefined
                         }
                         onSubmit={handleCharacterSubmit}
                         onCancel={close}
                         isSubmitting={
-                            modal.kind === 'character' && modal.character
+                            activeCharacterModal.character
                                 ? isUpdatingCharacter
                                 : isCreatingCharacter
                         }
                         quota={
-                            modal.kind === 'character' && !modal.character
+                            !activeCharacterModal.character
                                 ? {
                                       charactersLeft,
                                       generationsLeft: characterGenerationsLeft,

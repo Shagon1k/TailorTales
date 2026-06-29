@@ -88,7 +88,7 @@ describe('ArtStylesTable', () => {
         renderTable({ onGenerateThumbnail });
 
         await userEvent.click(
-            within(rowFor('Watercolor')).getByRole('button', { name: 'Generate thumbnail' }),
+            within(rowFor('Watercolor')).getByRole('button', { name: 'Generate' }),
         );
 
         expect(onGenerateThumbnail).toHaveBeenCalledWith(STYLE_A);
@@ -102,5 +102,26 @@ describe('ArtStylesTable', () => {
         expect(
             within(rowFor('Watercolor')).getByRole('button', { name: 'Regenerate' }),
         ).toBeInTheDocument();
+    });
+
+    it('should open a larger preview when the thumbnail is clicked', async () => {
+        renderTable({
+            artStyles: [{ ...STYLE_A, thumbnailUrl: 'https://example.com/thumb.jpg' }, STYLE_B],
+        });
+
+        await userEvent.click(
+            within(rowFor('Watercolor')).getByRole('button', {
+                name: 'Open larger thumbnail preview for Watercolor',
+            }),
+        );
+
+        const dialog = screen.getByRole('dialog', { name: 'Watercolor' });
+
+        expect(dialog).toBeInTheDocument();
+        expect(within(dialog).getByRole('img', { name: 'Watercolor' })).toHaveAttribute(
+            'src',
+            'https://example.com/thumb.jpg',
+        );
+        expect(within(dialog).getByText('in a soft watercolor style')).toBeInTheDocument();
     });
 });

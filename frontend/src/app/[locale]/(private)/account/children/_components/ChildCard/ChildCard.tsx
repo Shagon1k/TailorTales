@@ -19,7 +19,10 @@ interface IChildCardProps {
     onCharacterAdd: (child: IChild) => void;
     onCharacterEdit: (child: IChild, character: ICharacter) => void;
     onCharacterDelete: (character: ICharacter) => void;
+    onCharacterGeneratePreview: (character: ICharacter) => void;
     canAddCharacter?: boolean;
+    canGenerateCharacterPreview?: boolean;
+    generatingCharacterPreviewId?: string | null;
     addCharacterHint?: string | null;
 }
 
@@ -41,7 +44,10 @@ export default function ChildCard({
     onCharacterAdd,
     onCharacterEdit,
     onCharacterDelete,
+    onCharacterGeneratePreview,
     canAddCharacter = true,
+    canGenerateCharacterPreview = true,
+    generatingCharacterPreviewId = null,
     addCharacterHint = null,
 }: Readonly<IChildCardProps>): React.ReactElement {
     const t = useTranslations('account.childCard');
@@ -116,6 +122,28 @@ export default function ChildCard({
                                         </p>
                                     </div>
                                     <div className={styles['character__item-actions']}>
+                                        <Button
+                                            variant="quiet"
+                                            loading={generatingCharacterPreviewId === character.id}
+                                            disabled={
+                                                !canGenerateCharacterPreview ||
+                                                generatingCharacterPreviewId !== null
+                                            }
+                                            onClick={() => onCharacterGeneratePreview(character)}
+                                            aria-label={
+                                                character.previewUrl
+                                                    ? t('regenerateCharacterPreviewAriaLabel', {
+                                                          characterName: character.name,
+                                                      })
+                                                    : t('generateCharacterPreviewAriaLabel', {
+                                                          characterName: character.name,
+                                                      })
+                                            }
+                                        >
+                                            {character.previewUrl
+                                                ? t('regenerateCharacterPreviewButton')
+                                                : t('generateCharacterPreviewButton')}
+                                        </Button>
                                         <Button
                                             variant="quiet"
                                             onClick={() => onCharacterEdit(child, character)}

@@ -1,10 +1,65 @@
 @use 'styles/typography' as *;
 
+.table {
+    width: 100%;
+    min-width: 0;
+
+    table {
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        padding-inline: var(--space-3);
+    }
+}
+
+.table__colThumbnail {
+    width: 11%;
+}
+
+.table__colName {
+    width: 14%;
+}
+
+.table__colPrompt {
+    width: 30%;
+}
+
+.table__colActive {
+    width: 12%;
+}
+
+.table__colOrder {
+    width: 8%;
+}
+
+.table__colActions {
+    width: 25%;
+}
+
 .table__thumbnail {
+    position: relative;
     width: 48px;
     height: 48px;
-    object-fit: cover;
+    display: block;
+    padding: 0;
+    overflow: hidden;
     border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-elevated);
+    cursor: pointer;
+
+    img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+    }
+
+    &:hover {
+        border-color: var(--border-strong);
+    }
 }
 
 .table__thumbnail-placeholder {
@@ -38,11 +93,11 @@
 
 .table__prompt {
     display: block;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 100%;
     color: var(--text-muted);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 .table__reorder {
@@ -56,5 +111,45 @@
     display: flex;
     gap: var(--space-2);
     align-items: center;
-    white-space: nowrap;
+    flex-wrap: nowrap;
+
+    button {
+        height: 40px;
+        min-width: 0;
+        padding-inline: var(--space-4);
+    }
+
+    button span {
+        white-space: nowrap;
+        text-align: center;
+    }
+}
+
+.preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.preview__image {
+    width: min(100%, 560px);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--bg-card-2);
+    border: 1px solid var(--border-subtle);
+}
+
+.preview__img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.preview__description {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
 }

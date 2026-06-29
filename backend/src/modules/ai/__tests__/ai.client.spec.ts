@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { ImageProhibitedContentError } from '../../../common/errors.js';
 import { AiClient } from '../ai.client.js';
 
 const mockConfig = (overrides: Record<string, unknown> = {}): ConfigService => {
@@ -194,8 +195,7 @@ describe('AiClient', () => {
                     body: JSON.stringify({
                         model: 'test-image-model',
                         prompt: 'a fox hero',
-                        size: '1024x1536',
-                        output_format: 'png',
+                        aspect_ratio: '2:3',
                         input_references: [
                             {
                                 type: 'image_url',
@@ -205,6 +205,58 @@ describe('AiClient', () => {
                     }),
                 }),
             );
+        });
+
+        it('should prefer the explicit aspect ratio when provided', async () => {
+            const fetchMock = vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () =>
+                    Promise.resolve({
+                        data: [{ b64_json: Buffer.from('wide image').toString('base64') }],
+                    }),
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await client.generateImage({
+                prompt: 'a wide scene',
+                size: '1024x1536',
+                aspectRatio: '16:9',
+            });
+
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.any(String),
+                expect.objectContaining({
+                    body: JSON.stringify({
+                        model: 'test-image-model',
+                        prompt: 'a wide scene',
+                        aspect_ratio: '16:9',
+                    }),
+                }),
+            );
+        });
+
+        it('should throw ImageProhibitedContentError when the image provider blocks the request', async () => {
+            const fetchMock = vi.fn().mockResolvedValue({
+                ok: false,
+                status: 400,
+                text: () =>
+                    Promise.resolve(
+                        JSON.stringify({
+                            error: {
+                                message: 'Gemini blocked the request (IMAGE_PROHIBITED_CONTENT)',
+                                metadata: { code: 'IMAGE_PROHIBITED_CONTENT' },
+                            },
+                        }),
+                    ),
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await expect(
+                client.generateImage({ prompt: 'a blocked scene', size: '1024x1536' }),
+            ).rejects.toThrow(ImageProhibitedContentError);
+
+            expect(fetchMock).toHaveBeenCalledTimes(1);
         });
 
         it('should throw on unexpected content format', async () => {

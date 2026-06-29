@@ -46,6 +46,8 @@
         @include t-body-base;
         color: var(--text-accent);
         font-style: italic;
+        width: 2rem;
+        text-align: right;
         flex-shrink: 0;
     }
 
@@ -69,6 +71,17 @@
         @include t-body-sm;
         color: var(--text-muted);
         margin: 0;
+    }
+
+    &__empty-guidance {
+        @include t-body-sm;
+
+        color: var(--text-muted);
+        margin: 0 0 0 calc(2rem + var(--space-3));
+        padding: var(--space-3) var(--space-4);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: rgba(248, 234, 206, 0.06);
     }
 
     // ── Suggestion jar ──────────────────────────────────────────────────────

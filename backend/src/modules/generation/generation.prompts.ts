@@ -54,6 +54,24 @@ export function buildImageSlotPrompt(
     ].join('\n');
 }
 
+export function buildSafeImageFallbackPrompt(
+    artStylePrompt: string,
+    templateName: string,
+    narrativePurpose: string,
+    aspect: string,
+    size: string,
+): string {
+    return [
+        artStylePrompt,
+        'SAFE FALLBACK ILLUSTRATION:',
+        '  • Create a calm, gentle, child-friendly storybook scene.',
+        '  • Use peaceful nature, soft light, cozy shapes, and harmless whimsical props.',
+        '  • Avoid danger, fear, injury, conflict, weapons, medical details, disturbing imagery, or realistic children.',
+        '  • Do not include readable text or symbols.',
+        buildImageSlotPrompt(templateName, narrativePurpose, aspect, size),
+    ].join('\n\n');
+}
+
 export const STORY_LAYOUT_DYNAMICS_RULES = [
     'LAYOUT DYNAMICS:',
     '  • The child is the audience for the book, not automatically the protagonist.',

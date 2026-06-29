@@ -143,6 +143,10 @@ the image size comes from the template's `images[0].size`, the bytes are uploade
 `StorageKeys.pageIllustration(userId, storyId, order)`, and the key is written back to
 `Page.illustrations` as `[{ key, position }]`.
 
+If the image provider blocks a page prompt as prohibited content, Pictures retries that page
+once with a neutral safe fallback prompt (peaceful child-friendly scene, no reference image).
+If the fallback is also blocked or any other image error occurs, the story still fails.
+
 > `coverImageKey` is set here because the cover is page 1's illustration — already known by the end of Pictures. Ready is only about the finished PDF.
 
 Each completed image becomes a **per-page SSE event** (see [progress](#real-time-progress-sse)) —

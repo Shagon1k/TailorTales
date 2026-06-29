@@ -19,7 +19,8 @@ export default async function LibraryPage(): Promise<React.ReactElement> {
     ]);
 
     const stories = allStories.filter(
-        (story) => story.status === 'COMPLETED' || story.status === 'FAILED',
+        (story) =>
+            story.status === 'COMPLETED' || story.status === 'FAILED' || story.status === 'DRAFT',
     );
 
     return (

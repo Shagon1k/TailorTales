@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { IChild } from '@/types/child.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig } from '@/types/story.types';
+import type { IUsageSummary } from '@/types/subscription.types';
 import WorkshopForm from '../WorkshopForm';
 
 const mockRouterPush = vi.hoisted(() => vi.fn());
@@ -26,8 +27,31 @@ vi.mock('@/i18n/navigation', () => ({
     useRouter: vi.fn().mockReturnValue({ push: mockRouterPush }),
 }));
 
+const SUBSCRIPTION: IUsageSummary = {
+    tier: {
+        id: 'tier-free',
+        name: 'Free Chapter',
+        priceMonthly: 0,
+        watermark: true,
+        pagesPerMonth: 12,
+        regenerationsPerMonth: 3,
+        childrenLimit: 1,
+        charactersLimit: 3,
+        characterGenerationsPerMonth: 3,
+        retentionDays: 30,
+    },
+    status: 'ACTIVE',
+    cancelAtPeriodEnd: false,
+    currentPeriodEnd: null,
+    pagesUsed: 0,
+    regenerationsUsed: 0,
+    characterGenerationsUsed: 0,
+    childrenUsed: 1,
+    talesCount: 2,
+};
+
 vi.mock('@/hooks/subscription', () => ({
-    useSubscription: () => ({ data: undefined }),
+    useSubscription: () => ({ data: SUBSCRIPTION }),
 }));
 
 const mockStoriesCreate = vi.hoisted(() => vi.fn());
@@ -139,6 +163,15 @@ describe('WorkshopForm', () => {
             expect(screen.getByText('Why is the sky blue?')).toBeInTheDocument();
             expect(screen.getByText('How do bees find flowers?')).toBeInTheDocument();
         });
+
+        it('should render art style thumbnails when they are available', () => {
+            renderForm();
+
+            expect(screen.getByRole('img', { name: 'Storybook' })).toHaveAttribute(
+                'src',
+                'https://example.com/thumb.jpg',
+            );
+        });
     });
 
     describe('given the form is empty', () => {
@@ -173,7 +206,10 @@ describe('WorkshopForm', () => {
     });
 
     describe('given all required fields are filled', () => {
-        async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
+        async function fillAndClick(
+            buttonName: RegExp,
+            beforeSubmit?: () => Promise<void>,
+        ): Promise<void> {
             renderForm({ initialQuestion: 'Why is the sky blue?' });
 
             // Format — RadioCard accessible name = title + description; use ^Book to anchor the match
@@ -195,8 +231,11 @@ describe('WorkshopForm', () => {
             // Optional flavour knobs, selected by individual tests before submit.
             if (beforeSubmit) await beforeSubmit();
 
-            // Submit
-            await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
+            await userEvent.click(screen.getByRole('button', { name: buttonName }));
+        }
+
+        async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
+            await fillAndClick(/light the lantern/i, beforeSubmit);
         }
 
         it('should call storiesApi.create with the correct payload', async () => {
@@ -245,6 +284,28 @@ describe('WorkshopForm', () => {
             await waitFor(() => {
                 expect(mockStoriesGenerate).toHaveBeenCalledWith('story-new');
                 expect(mockRouterPush).toHaveBeenCalledWith('/workshop/story-new');
+            });
+        });
+
+        it('should save a draft without starting generation', async () => {
+            mockStoriesCreate.mockResolvedValue({ id: 'story-draft' });
+
+            await fillAndClick(/save as draft/i);
+
+            await waitFor(() => {
+                expect(mockStoriesCreate).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        childId: 'child-1',
+                        type: 'BOOK',
+                        question: 'Why is the sky blue?',
+                        pageCount: 5,
+                        artStyleId: 'style-1',
+                        language: 'EN',
+                    }),
+                );
+                expect(mockStoriesGenerate).not.toHaveBeenCalled();
+                expect(mockStoriesRetry).not.toHaveBeenCalled();
+                expect(mockRouterPush).toHaveBeenCalledWith('/library');
             });
         });
 

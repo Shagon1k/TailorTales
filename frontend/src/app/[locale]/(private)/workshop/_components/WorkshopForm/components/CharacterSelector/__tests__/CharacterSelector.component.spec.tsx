@@ -6,7 +6,7 @@ import CharacterSelector from '../CharacterSelector';
 const CHARACTER: ICharacter = {
     id: 'char-1',
     userId: 'user-1',
-    childId: null,
+    childId: 'child-1',
     source: 'IMAGINED',
     name: 'Captain Pip',
     description: 'A brave little fox.',

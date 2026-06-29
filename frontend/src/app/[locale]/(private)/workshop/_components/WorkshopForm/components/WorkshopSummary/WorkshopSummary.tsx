@@ -25,7 +25,8 @@ export interface IWorkshopSummaryProps {
     question: string;
     isValid: boolean;
     isPending: boolean;
-    onSubmit: () => void;
+    onGenerate: () => void;
+    onSaveDraft: () => void;
 }
 
 export default function WorkshopSummary({
@@ -38,7 +39,8 @@ export default function WorkshopSummary({
     question,
     isValid,
     isPending,
-    onSubmit,
+    onGenerate,
+    onSaveDraft,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
     const t = useTranslations('workshop.summary');
     const hasQuestion = question.trim().length > 0;
@@ -48,6 +50,7 @@ export default function WorkshopSummary({
 
     const { data: subscription } = useSubscription();
     const creditCost = pageCount ? Number(pageCount) * CREDITS_PER_BOOK_PAGE : 0;
+    const isCreditsLoading = subscription === undefined;
     const creditsRemaining = subscription
         ? Math.max(subscription.tier.pagesPerMonth - subscription.pagesUsed, 0)
         : null;
@@ -109,9 +112,9 @@ export default function WorkshopSummary({
                     variant="primary"
                     size="lg"
                     fullWidth
-                    disabled={!isValid || isPending || overBudget}
+                    disabled={!isValid || isPending || overBudget || isCreditsLoading}
                     loading={isPending}
-                    onClick={onSubmit}
+                    onClick={onGenerate}
                 >
                     {t('generateButton')}
                 </Button>
@@ -119,7 +122,7 @@ export default function WorkshopSummary({
                     variant="quiet"
                     fullWidth
                     disabled={!isValid || isPending}
-                    onClick={onSubmit}
+                    onClick={onSaveDraft}
                 >
                     {t('draftButton')}
                 </Button>

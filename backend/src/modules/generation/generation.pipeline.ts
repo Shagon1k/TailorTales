@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { AppError } from '../../common/errors.js';
+import { AppError, ImageProhibitedContentError } from '../../common/errors.js';
 import type {
     ArtStyle,
     Character,
@@ -19,7 +19,7 @@ import { QuotaService } from '../subscriptions/quota.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
-import { buildImageSlotPrompt } from './generation.prompts.js';
+import { buildImageSlotPrompt, buildSafeImageFallbackPrompt } from './generation.prompts.js';
 
 type StoryWithRelations = Story & {
     child: Pick<Child, 'id' | 'name' | 'birthdate' | 'gender' | 'interests'>;
@@ -305,12 +305,35 @@ export class GenerationPipeline {
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
-        const imageBuffer = await this.ai.generateImage({
-            prompt,
-            size: imageSlot.size,
-            aspectRatio: imageSlot.aspect,
-            referenceImageUrls,
-        });
+        let imageBuffer: Buffer;
+        try {
+            imageBuffer = await this.ai.generateImage({
+                prompt,
+                size: imageSlot.size,
+                aspectRatio: imageSlot.aspect,
+                referenceImageUrls,
+            });
+        } catch (err: unknown) {
+            if (!(err instanceof ImageProhibitedContentError)) {
+                throw err;
+            }
+
+            this.logger.warn(
+                `Image prompt for page ${page.order} was blocked by provider safety; retrying with safe fallback prompt`,
+            );
+
+            imageBuffer = await this.ai.generateImage({
+                prompt: buildSafeImageFallbackPrompt(
+                    story.artStyle.promptPrefix,
+                    page.layout ?? imageSlot.name,
+                    tpl.narrativePurpose,
+                    imageSlot.aspect,
+                    imageSlot.size,
+                ),
+                size: imageSlot.size,
+                aspectRatio: imageSlot.aspect,
+            });
+        }
 
         const key = StorageKeys.pageIllustration(story.userId, story.id, page.order);
         await this.storage.upload(imageBuffer, key, 'image/png');
