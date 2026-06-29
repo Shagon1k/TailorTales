@@ -58,21 +58,34 @@ describe('RatingPanel', () => {
     });
 
     describe('given an existing rating', () => {
-        it('should pre-fill the note and enable saving', () => {
+        it('should render the saved rating in read-only mode', () => {
             renderPanel({ initialRating: { score: 4, comment: 'Loved it' } });
 
+            expect(screen.getByText('Loved it')).toBeInTheDocument();
+            expect(screen.getByText(/only you can see this rating/i)).toBeInTheDocument();
+            expect(screen.queryByLabelText(/rating note/i)).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /edit rating/i })).toBeInTheDocument();
+        });
+
+        it('should switch to edit mode with the saved note', async () => {
+            const user = userEvent.setup();
+            renderPanel({ initialRating: { score: 4, comment: 'Loved it' } });
+
+            await user.click(screen.getByRole('button', { name: /edit rating/i }));
+
             expect(screen.getByLabelText(/rating note/i)).toHaveValue('Loved it');
-            expect(screen.getByRole('button', { name: /save rating/i })).toBeEnabled();
+            expect(screen.getByRole('button', { name: /save changes/i })).toBeEnabled();
         });
     });
 
     describe('when saving a rating', () => {
-        it('should submit the score and public toggle, then confirm', async () => {
+        it('should submit the score and public toggle, then show the saved read-only state', async () => {
             const user = userEvent.setup();
             renderPanel({ initialRating: { score: 3, comment: null } });
 
+            await user.click(screen.getByRole('button', { name: /edit rating/i }));
             await user.click(screen.getByLabelText(/share this story as an example/i));
-            await user.click(screen.getByRole('button', { name: /save rating/i }));
+            await user.click(screen.getByRole('button', { name: /save changes/i }));
 
             await waitFor(() =>
                 expect(mockSubmitRating).toHaveBeenCalledWith('story-1', {
@@ -83,6 +96,9 @@ describe('RatingPanel', () => {
             );
             expect(mockRouterRefresh).toHaveBeenCalledTimes(1);
             expect(await screen.findByText(/saved — thank you/i)).toBeInTheDocument();
+            expect(screen.queryByLabelText(/rating note/i)).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /edit rating/i })).toBeInTheDocument();
+            expect(screen.getByText(/shared as an example/i)).toBeInTheDocument();
         });
     });
 });

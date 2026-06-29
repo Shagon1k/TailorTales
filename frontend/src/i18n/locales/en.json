@@ -706,7 +706,11 @@
             "notePlaceholder": "Write a small note (optional)…",
             "shareLabel": "Share this story as an example for other families",
             "saveButton": "Save rating",
+            "updateButton": "Save changes",
+            "editButton": "Edit rating",
             "savedStatus": "Saved — thank you!",
+            "sharedStatus": "Shared as an example for other families.",
+            "privateStatus": "Only you can see this rating.",
             "defaultError": "Something went wrong. Please try again."
         },
         "regeneration": {

@@ -718,7 +718,11 @@
             "notePlaceholder": "Eine kleine Notiz schreiben (optional)…",
             "shareLabel": "Diese Geschichte als Beispiel für andere Familien teilen",
             "saveButton": "Bewertung speichern",
+            "updateButton": "Änderungen speichern",
+            "editButton": "Bewertung bearbeiten",
             "savedStatus": "Gespeichert — danke!",
+            "sharedStatus": "Als Beispiel für andere Familien geteilt.",
+            "privateStatus": "Nur du kannst diese Bewertung sehen.",
             "defaultError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
         },
         "regeneration": {
