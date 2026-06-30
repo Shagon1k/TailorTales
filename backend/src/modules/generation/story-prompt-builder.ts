@@ -104,6 +104,8 @@ export class StoryPromptBuilder {
             '',
             STORY_LAYOUT_DYNAMICS_RULES,
             '',
+            ...this.buildChapterRules(ctx.pageCount),
+            '',
             ...layoutDistributionRules,
             '',
             'INTERIOR TEMPLATE USAGE GUIDE:',
@@ -196,6 +198,36 @@ export class StoryPromptBuilder {
                 '  • Across the full book, combine scene-setting pages, text-led explanation pages, visually centered transition pages, and at least a couple of full-image payoff moments when the story supports them.',
             );
         }
+
+        return rules;
+    }
+
+    private buildChapterRules(pageCount: number): string[] {
+        const rules = ['CHAPTER STRUCTURE:'];
+
+        if (pageCount < 5) {
+            rules.push('  • For this book length, use 0-1 chapters.');
+        } else if (pageCount <= 8) {
+            rules.push('  • For this book length, use 1-3 chapters.');
+        } else if (pageCount <= 12) {
+            rules.push('  • For this book length, use 2-4 chapters.');
+        } else if (pageCount <= 16) {
+            rules.push('  • For this book length, use 3-5 chapters.');
+        } else if (pageCount <= 20) {
+            rules.push('  • For this book length, use 4-6 chapters.');
+        } else {
+            rules.push('  • For this book length, use 6-8 chapters.');
+        }
+
+        rules.push('  • Chapters are optional, not mandatory on every page.');
+        rules.push('  • Keep chapterTitle null by default.');
+        rules.push('  • Do not treat each page as a separate chapter.');
+        rules.push(
+            '  • Do not place chapter headings on consecutive interior pages unless there is a strong structural reason.',
+        );
+        rules.push(
+            '  • Use chapter headings only for meaningful shifts in story phase, setting, tone, or explanation.',
+        );
 
         return rules;
     }

@@ -29,7 +29,7 @@ export const STORY_OUTPUT_RULES_HEADER = 'OUTPUT RULES:';
 
 export const STORY_OUTPUT_RULES = [
     '  • text: the story prose for this page (null for illustration-only pages)',
-    '  • chapterTitle: short chapter label shown above the text (null if not needed)',
+    '  • chapterTitle: short chapter label shown above the text (null by default; use only for meaningful chapter breaks)',
     '  • illustration.prompt: a complete, self-contained image generation prompt',
     '  • illustration.prompt must describe imagery only — never ask the image to render titles, chapter names, captions, labels, signs, readable symbols, or speech bubbles because page text is rendered separately by the template',
     '  • styleAnchor: describe recurring characters + overall visual style — prepended to every illustration prompt',
@@ -75,10 +75,12 @@ export function buildSafeImageFallbackPrompt(
 export const STORY_LAYOUT_DYNAMICS_RULES = [
     'LAYOUT DYNAMICS:',
     '  • The child is the audience for the book, not automatically the protagonist.',
+    "  • Treat the reader's name as private audience metadata, not story material.",
     '  • If a CHARACTER section is present, that character is the recurring hero of the story.',
     '  • If no CHARACTER section is present, do NOT turn the child into the hero. Keep the child out of the cast unless explicitly needed.',
     '  • In the no-character case, the story may explain, observe, or gently narrate events without inventing a fixed recurring hero.',
     '  • Do not invent a child protagonist just because the audience is a child. Be various in your choice.',
+    "  • Never use the reader's name in page text, chapter titles, cover subtitle text, styleAnchor, or illustration prompts unless a CHARACTER section explicitly makes that named person the hero.",
     '  • Do not default every interior page to the same template.',
     '  • For stories with 5 or more pages, use at least two different interior templates when the narrative allows it.',
     '  • Use layout changes to support pacing and emotional rhythm, not randomly.',

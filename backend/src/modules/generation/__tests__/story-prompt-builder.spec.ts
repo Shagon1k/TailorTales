@@ -97,8 +97,10 @@ describe('StoryPromptBuilder', () => {
 
         describe('given no character is selected', () => {
             it('should keep the child as audience-only and forbid turning them into the hero by default', () => {
+                // Arrange + Act
                 const prompt = buildPromptWith({});
 
+                // Assert
                 expect(prompt).toContain('Audience profile only: girl, age 7.');
                 expect(prompt).toContain('The child is the audience for the book');
                 expect(prompt).toContain(
@@ -112,8 +114,10 @@ describe('StoryPromptBuilder', () => {
 
         describe('given the reader gender is known', () => {
             it('should include it as audience-targeting context', () => {
+                // Arrange + Act
                 const prompt = buildPromptWith({ gender: 'MALE' });
 
+                // Assert
                 expect(prompt).toContain('Audience profile only: boy, age 7.');
                 expect(prompt).toContain(
                     'Use this only to tune clarity, pacing, emotional tone, and relatable details for the reader.',
@@ -123,6 +127,7 @@ describe('StoryPromptBuilder', () => {
 
         describe('given a character is selected', () => {
             it('should state that the selected character is the recurring hero', () => {
+                // Arrange + Act
                 const prompt = buildPromptWith({
                     character: {
                         name: 'Foxy Blue',
@@ -130,6 +135,7 @@ describe('StoryPromptBuilder', () => {
                     },
                 });
 
+                // Assert
                 expect(prompt).toContain('CHARACTER (recurring visual identity');
                 expect(prompt).toContain('Foxy Blue: A small blue fox in a green top hat.');
                 expect(prompt).toContain('This character is the main hero of the story.');
@@ -166,10 +172,42 @@ describe('StoryPromptBuilder', () => {
             });
         });
 
+        describe('given chapter rhythm should stay sparse and meaningful', () => {
+            it('should tell the model not to treat every page as a separate chapter', () => {
+                // Arrange + Act
+                const prompt = buildPromptWith({ pageCount: 8 });
+
+                // Assert
+                expect(prompt).toContain('CHAPTER STRUCTURE:');
+                expect(prompt).toContain('For this book length, use 1-3 chapters.');
+                expect(prompt).toContain('Chapters are optional, not mandatory on every page.');
+                expect(prompt).toContain('Keep chapterTitle null by default.');
+                expect(prompt).toContain('Do not treat each page as a separate chapter.');
+                expect(prompt).toContain(
+                    'Do not place chapter headings on consecutive interior pages unless there is a strong structural reason.',
+                );
+                expect(prompt).toContain(
+                    'Use chapter headings only for meaningful shifts in story phase, setting, tone, or explanation.',
+                );
+            });
+        });
+
+        describe('given longer books need a larger chapter budget', () => {
+            it('should scale the allowed chapter count with page count', () => {
+                // Arrange + Act
+                const prompt = buildPromptWith({ pageCount: 18 });
+
+                // Assert
+                expect(prompt).toContain('For this book length, use 4-6 chapters.');
+            });
+        });
+
         describe('given a longer story needs more visual rhythm', () => {
             it('should ask for stronger layout distribution across the whole book', () => {
+                // Arrange + Act
                 const prompt = buildPromptWith({ pageCount: 12 });
 
+                // Assert
                 expect(prompt).toContain('LAYOUT DISTRIBUTION:');
                 expect(prompt).toContain(
                     'Use at least one non-default interior layout so the book does not feel mechanically repetitive.',
