@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import RadioCardGroup from '@/components/ui/RadioCard/RadioCardGroup';
 import RadioCard from '@/components/ui/RadioCard/RadioCard';
@@ -9,7 +9,6 @@ import OptionPillGroup from '@/components/ui/OptionPill/OptionPillGroup';
 import OptionPill from '@/components/ui/OptionPill/OptionPill';
 import SuggestionChip from '@/components/ui/SuggestionChip/SuggestionChip';
 import Textarea from '@/components/ui/Textarea/Textarea';
-import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import { storiesApi } from '@/api/stories';
 import { useCharacters, useCreateCharacter } from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
@@ -24,7 +23,11 @@ import type {
     IWritingStyle,
     ICreateStoryPayload,
 } from '@/types/story.types';
-import { LANGUAGES, LANGUAGE_CODES } from '@/constants/languages';
+import { LANGUAGES, LANGUAGE_CODES, LOCALE_TO_LANGUAGE } from '@/constants/languages';
+import {
+    getLocalizedQuestionSuggestions,
+    getRandomQuestionSuggestions,
+} from '@/utils/question-suggestions.utils';
 import ReaderChip from './components/ReaderChip/ReaderChip';
 import ReaderSelector from './components/ReaderSelector/ReaderSelector';
 import CharacterSelector from './components/CharacterSelector/CharacterSelector';
@@ -46,8 +49,8 @@ const GENRES: { value: IStoryGenre; key: string }[] = [
 ];
 
 const WRITING_STYLES: { value: IWritingStyle; key: string }[] = [
-    { value: 'POETIC', key: 'poetic' },
     { value: 'SIMPLE', key: 'simple' },
+    { value: 'POETIC', key: 'poetic' },
     { value: 'IMAGINATIVE', key: 'imaginative' },
 ];
 
@@ -93,7 +96,13 @@ export default function WorkshopForm({
     initialWritingStyle = 'SIMPLE',
 }: Readonly<IWorkshopFormProps>): React.ReactElement {
     const t = useTranslations('workshop.form');
+    const tStoryOptions = useTranslations('storyOptions');
+    const locale = useLocale();
     const router = useRouter();
+    const questionSuggestions = useMemo(
+        () => getRandomQuestionSuggestions(getLocalizedQuestionSuggestions((key) => t(key))),
+        [locale, t],
+    );
 
     const pageCountLabels: Record<number, string> = {
         5: t('pageCount.option5'),
@@ -112,7 +121,9 @@ export default function WorkshopForm({
         initialPageCount !== null ? String(initialPageCount) : null,
     );
     const [artStyleId, setArtStyleId] = useState<string | null>(initialArtStyleId);
-    const [language, setLanguage] = useState<ILanguage | null>(initialLanguage);
+    const [language, setLanguage] = useState<ILanguage | null>(
+        initialLanguage ?? LOCALE_TO_LANGUAGE[locale] ?? null,
+    );
     // Optional flavour knobs. Genre defaults to none; writing style defaults to a clear, simple
     // voice. Both restore from a failed-story retry via the initial props.
     const [genre, setGenre] = useState<IStoryGenre | null>(initialGenre);
@@ -291,9 +302,11 @@ export default function WorkshopForm({
                     />
 
                     <div className={styles.workshop__jar}>
-                        <CapsLabel>{t('questionInput.jarLabel')}</CapsLabel>
+                        <p className={styles['workshop__jar-label']}>
+                            {t('questionInput.jarLabel')}
+                        </p>
                         <div className={styles.workshop__chips}>
-                            {config.questionSuggestions.map((suggestion) => (
+                            {questionSuggestions.map((suggestion) => (
                                 <SuggestionChip
                                     key={suggestion}
                                     label={suggestion}
@@ -457,7 +470,7 @@ export default function WorkshopForm({
                     >
                         {GENRES.map(({ value, key }) => (
                             <OptionPill key={value} value={value}>
-                                {t(`genrePicker.${key}.label`)}
+                                {tStoryOptions(`genres.${key}`)}
                             </OptionPill>
                         ))}
                     </OptionPillGroup>
@@ -484,7 +497,7 @@ export default function WorkshopForm({
                     >
                         {WRITING_STYLES.map(({ value, key }) => (
                             <OptionPill key={value} value={value}>
-                                {t(`writingStylePicker.${key}.label`)}
+                                {tStoryOptions(`writingStyles.${key}`)}
                             </OptionPill>
                         ))}
                     </OptionPillGroup>

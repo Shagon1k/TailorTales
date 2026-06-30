@@ -101,11 +101,45 @@
         },
         "tales": {
             "heading": "Tales lit recently.",
-            "browseLink": "Browse the library →",
             "card": {
-                "meta": "for {childName}, {age} · {pages} pages",
-                "comicSuffix": " · comic"
+                "meta": "age {age} · {pages} pages",
+                "comicSuffix": " · comic",
+                "untitled": "Untitled tale",
+                "previewButton": "Peek inside",
+                "previewPdfLink": "Preview sample PDF",
+                "details": {
+                    "age": "Reader age",
+                    "ageValue": "{age} years old",
+                    "format": "Format",
+                    "pages": "Length",
+                    "language": "Language",
+                    "genre": "Genre",
+                    "writingStyle": "Writing style",
+                    "artStyle": "Art style",
+                    "hero": "Recurring hero"
+                },
+                "formats": {
+                    "book": "Book",
+                    "comic": "Comic"
+                },
+                "hero": {
+                    "selected": "Character selected",
+                    "none": "No fixed hero"
+                }
             }
+        }
+    },
+    "storyOptions": {
+        "genres": {
+            "fairyTale": "Fairy tale",
+            "bedtime": "Bedtime",
+            "educational": "Educational",
+            "adventure": "Adventure"
+        },
+        "writingStyles": {
+            "simple": "Simple",
+            "poetic": "Poetic",
+            "imaginative": "Imaginative"
         }
     },
     "howItWorks": {
@@ -350,7 +384,25 @@
                 "title": "A question to begin with",
                 "subheading": "Type their question, or pluck one from the jar below.",
                 "placeholder": "e.g. Why do mountains breathe smoke?",
-                "jarLabel": "Or pluck one from the jar"
+                "jarLabel": "Or pluck one from the jar",
+                "suggestions": {
+                    "moonFollows": "Why does the moon follow me?",
+                    "beesFindFlowers": "How do bees find their flowers?",
+                    "rainGoes": "Where does the rain go?",
+                    "skyBlue": "Why is the sky blue?",
+                    "deepestSea": "Who lives in the deepest sea?",
+                    "seedKnowsUp": "How does a seed know the way up?",
+                    "starsTwinkle": "Why do stars twinkle?",
+                    "leavesChangeColor": "Why do leaves change color?",
+                    "catsPurr": "Why do cats purr?",
+                    "windInvisible": "Why can't we see the wind?",
+                    "spidersSpinWebs": "How do spiders spin webs?",
+                    "cloudsFloat": "Why don't clouds fall down?",
+                    "owlsAwakeAtNight": "Why are owls awake at night?",
+                    "snailsCarryHomes": "Why do snails carry their homes?",
+                    "echoComesBack": "Why does an echo come back?",
+                    "iceSlippery": "Why is ice so slippery?"
+                }
             },
             "characterPicker": {
                 "number": "2.",
@@ -384,7 +436,7 @@
                 "option8": "Medium · 8 pp",
                 "option12": "Long · 12 pp",
                 "option16": "Big · 16 pp",
-                "option20": "Bedtime saga · 20 pp"
+                "option20": "Extra long · 20 pp"
             },
             "artStylePicker": {
                 "number": "5.",
@@ -402,19 +454,15 @@
                 "label": "Story genre (optional)",
                 "note": "Optional — sets the mood of the tale.",
                 "fairyTale": {
-                    "label": "Fairy tale",
                     "hint": "A magical story full of wonder, kindness, and a gentle moral."
                 },
                 "bedtime": {
-                    "label": "Bedtime",
                     "hint": "Calm and soothing, winding gently down toward sleep."
                 },
                 "educational": {
-                    "label": "Educational",
                     "hint": "Explains how and why things work through the child’s discovery."
                 },
                 "adventure": {
-                    "label": "Adventure",
                     "hint": "A brave little journey about courage and solving a problem."
                 }
             },
@@ -423,16 +471,13 @@
                 "title": "Pick a writing style",
                 "label": "Writing style (optional)",
                 "note": "Optional — shapes how the words sound.",
-                "poetic": {
-                    "label": "Poetic",
-                    "hint": "Lyrical and rhythmic."
-                },
                 "simple": {
-                    "label": "Simple",
                     "hint": "Clean and easy."
                 },
+                "poetic": {
+                    "hint": "Lyrical and rhythmic."
+                },
                 "imaginative": {
-                    "label": "Imaginative",
                     "hint": "Creative and vivid."
                 }
             },
@@ -705,6 +750,7 @@
             "noteAriaLabel": "Rating note",
             "notePlaceholder": "Write a small note (optional)…",
             "shareLabel": "Share this story as an example for other families",
+            "shareHint": "Only tales rated 4 or 5 stars appear in the public showcase.",
             "saveButton": "Save rating",
             "updateButton": "Save changes",
             "editButton": "Edit rating",

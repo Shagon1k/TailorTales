@@ -11,7 +11,7 @@ import {
     STORY_QUESTION_MAX_LENGTH,
     STORY_QUESTION_MIN_LENGTH,
 } from '../stories.constants.js';
-import type { IStoryDetail, IStorySummary } from '../stories.types.js';
+import type { IPublicStorySummary, IStoryDetail, IStorySummary } from '../stories.types.js';
 
 const MOCK_USER: User = {
     id: 'user-123',
@@ -57,6 +57,27 @@ const MOCK_SUMMARY: IStorySummary = {
 };
 
 const MOCK_DETAIL: IStoryDetail = { ...MOCK_SUMMARY, pages: [], pdfUrl: null, myRating: null };
+const MOCK_PUBLIC_SUMMARY: IPublicStorySummary = {
+    id: 'story-1',
+    type: 'BOOK',
+    question: 'Why is the sky blue?',
+    pageCount: 8,
+    language: 'EN',
+    genre: null,
+    writingStyle: null,
+    title: null,
+    rating: 5,
+    readerAge: 6,
+    hasCharacter: false,
+    artStyle: {
+        id: 'style-1',
+        name: 'Storybook',
+        slug: 'storybook',
+        thumbnailUrl: 'https://example.com/thumb.jpg',
+    },
+    coverImageUrl: null,
+    pdfUrl: 'https://example.com/story.pdf',
+};
 
 describe('StoriesController', () => {
     let controller: StoriesController;
@@ -116,12 +137,12 @@ describe('StoriesController', () => {
 
     describe('findPublic', () => {
         it('should return public stories without requiring authentication', async () => {
-            findPublic.mockResolvedValue([MOCK_SUMMARY]);
+            findPublic.mockResolvedValue([MOCK_PUBLIC_SUMMARY]);
 
             const result = await controller.findPublic();
 
             expect(findPublic).toHaveBeenCalledTimes(1);
-            expect(result).toEqual([MOCK_SUMMARY]);
+            expect(result).toEqual([MOCK_PUBLIC_SUMMARY]);
         });
     });
 

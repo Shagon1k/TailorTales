@@ -66,6 +66,19 @@ vi.mock('@/api/stories', () => ({
     },
 }));
 
+vi.mock('@/utils/question-suggestions.utils', () => ({
+    QUESTION_SUGGESTION_COUNT: 6,
+    getLocalizedQuestionSuggestions: () => [
+        'Why is the sky blue?',
+        'How do bees find their flowers?',
+        'Where does the rain go?',
+        'Why do stars twinkle?',
+        'Why do cats purr?',
+        'How do spiders spin webs?',
+    ],
+    getRandomQuestionSuggestions: (suggestions: string[]) => suggestions,
+}));
+
 // WorkshopForm uses the character hooks — mock the entire module so tests focus on
 // WorkshopForm behaviour and don't need a real API.
 vi.mock('@/hooks/characters', () => ({
@@ -157,11 +170,11 @@ describe('WorkshopForm', () => {
             );
         });
 
-        it('should render suggestion chips from config', () => {
+        it('should render localized suggestion chips', () => {
             renderForm();
 
             expect(screen.getByText('Why is the sky blue?')).toBeInTheDocument();
-            expect(screen.getByText('How do bees find flowers?')).toBeInTheDocument();
+            expect(screen.getByText('How do bees find their flowers?')).toBeInTheDocument();
         });
 
         it('should render art style thumbnails when they are available', () => {
@@ -171,6 +184,13 @@ describe('WorkshopForm', () => {
                 'src',
                 'https://example.com/thumb.jpg',
             );
+        });
+
+        it('should pre-select the current app locale as the story language', () => {
+            renderForm();
+
+            const langGroup = screen.getByRole('radiogroup', { name: /story language/i });
+            expect(within(langGroup).getByRole('radio', { name: /^English/i })).toBeChecked();
         });
     });
 

@@ -33,7 +33,12 @@ import {
     STORY_QUESTION_MIN_LENGTH,
 } from './stories.constants.js';
 import { StoriesService } from './stories.service.js';
-import type { IStoryConfig, IStoryDetail, IStorySummary } from './stories.types.js';
+import type {
+    IPublicStorySummary,
+    IStoryConfig,
+    IStoryDetail,
+    IStorySummary,
+} from './stories.types.js';
 
 @Controller('stories')
 export class StoriesController {
@@ -47,7 +52,7 @@ export class StoriesController {
     // Static routes must be declared before :id to avoid being matched as an id param.
     @Get('public')
     @Public()
-    findPublic(): Promise<IStorySummary[]> {
+    findPublic(): Promise<IPublicStorySummary[]> {
         return this.storiesService.findPublic();
     }
 

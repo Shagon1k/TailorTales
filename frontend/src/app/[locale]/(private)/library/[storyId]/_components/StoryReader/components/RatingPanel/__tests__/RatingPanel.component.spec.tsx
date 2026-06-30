@@ -79,7 +79,7 @@ describe('RatingPanel', () => {
     });
 
     describe('when saving a rating', () => {
-        it('should submit the score and public toggle, then show the saved read-only state', async () => {
+        it('should keep the story private when share is checked below 4 stars', async () => {
             const user = userEvent.setup();
             renderPanel({ initialRating: { score: 3, comment: null } });
 
@@ -91,13 +91,31 @@ describe('RatingPanel', () => {
                 expect(mockSubmitRating).toHaveBeenCalledWith('story-1', {
                     score: 3,
                     comment: undefined,
-                    isPublic: true,
+                    isPublic: false,
                 }),
             );
             expect(mockRouterRefresh).toHaveBeenCalledTimes(1);
             expect(await screen.findByText(/saved — thank you/i)).toBeInTheDocument();
             expect(screen.queryByLabelText(/rating note/i)).not.toBeInTheDocument();
             expect(screen.getByRole('button', { name: /edit rating/i })).toBeInTheDocument();
+            expect(screen.getByText(/only you can see this rating/i)).toBeInTheDocument();
+        });
+
+        it('should submit the shared state for a 4-star or 5-star story', async () => {
+            const user = userEvent.setup();
+            renderPanel({ initialRating: { score: 5, comment: null } });
+
+            await user.click(screen.getByRole('button', { name: /edit rating/i }));
+            await user.click(screen.getByLabelText(/share this story as an example/i));
+            await user.click(screen.getByRole('button', { name: /save changes/i }));
+
+            await waitFor(() =>
+                expect(mockSubmitRating).toHaveBeenCalledWith('story-1', {
+                    score: 5,
+                    comment: undefined,
+                    isPublic: true,
+                }),
+            );
             expect(screen.getByText(/shared as an example/i)).toBeInTheDocument();
         });
     });

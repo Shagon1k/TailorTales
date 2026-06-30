@@ -91,6 +91,13 @@
         gap: var(--space-3);
     }
 
+    &__jar-label {
+        @include t-body-sm;
+
+        color: var(--text-muted);
+        margin: 0;
+    }
+
     &__chips {
         display: flex;
         flex-wrap: wrap;

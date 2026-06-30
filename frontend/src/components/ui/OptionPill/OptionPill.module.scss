@@ -3,6 +3,7 @@
 .option-pill {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: var(--hit-min);
     padding: 0 var(--space-5);
     border-radius: var(--radius-pill);
@@ -11,7 +12,9 @@
     @include t-body-base;
     color: var(--text-primary);
     cursor: pointer;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    line-height: var(--lh-snug);
     transition: border-color 100ms ease;
 
     &:not([disabled]):not(.m-selected):hover {

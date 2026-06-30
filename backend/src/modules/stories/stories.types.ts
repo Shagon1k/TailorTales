@@ -28,6 +28,24 @@ export interface IStorySummary extends StoryWithoutKeys {
     rating: number | null;
 }
 
+/** Public-safe story showcase card — excludes child identity and includes only safe metadata. */
+export interface IPublicStorySummary {
+    id: string;
+    type: StoryType;
+    question: string;
+    pageCount: number;
+    language: Story['language'];
+    genre: Story['genre'];
+    writingStyle: Story['writingStyle'];
+    title: string | null;
+    rating: number;
+    readerAge: number;
+    hasCharacter: boolean;
+    artStyle: IStoryArtStyle;
+    coverImageUrl: string | null;
+    pdfUrl: string | null;
+}
+
 export interface IStoryDetail extends IStorySummary {
     pages: Page[];
     /** Pre-signed S3 URL valid for 1 hour. Null until generation completes (Phase 5). */

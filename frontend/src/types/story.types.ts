@@ -46,6 +46,23 @@ export interface IStoryArtStyle {
     thumbnailUrl: string | null;
 }
 
+export interface IPublicStorySummary {
+    id: string;
+    type: IStoryType;
+    question: string;
+    pageCount: number;
+    language: ILanguage;
+    genre: IStoryGenre | null;
+    writingStyle: IWritingStyle | null;
+    title: string | null;
+    rating: number;
+    readerAge: number;
+    hasCharacter: boolean;
+    artStyle: IStoryArtStyle;
+    coverImageUrl: string | null;
+    pdfUrl: string | null;
+}
+
 export interface IStorySummary {
     id: string;
     userId: string;

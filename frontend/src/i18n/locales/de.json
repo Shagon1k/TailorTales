@@ -101,11 +101,45 @@
         },
         "tales": {
             "heading": "Zuletzt entstandene Geschichten.",
-            "browseLink": "Bibliothek durchstöbern →",
             "card": {
-                "meta": "für {childName}, {age} · {pages} Seiten",
-                "comicSuffix": " · Comic"
+                "meta": "{age} Jahre · {pages} Seiten",
+                "comicSuffix": " · Comic",
+                "untitled": "Unbenannte Geschichte",
+                "previewButton": "Hineinschauen",
+                "previewPdfLink": "Beispiel-PDF öffnen",
+                "details": {
+                    "age": "Alter des Lesers",
+                    "ageValue": "{age} Jahre",
+                    "format": "Format",
+                    "pages": "Länge",
+                    "language": "Sprache",
+                    "genre": "Genre",
+                    "writingStyle": "Schreibstil",
+                    "artStyle": "Bildstil",
+                    "hero": "Wiederkehrender Held"
+                },
+                "formats": {
+                    "book": "Buch",
+                    "comic": "Comic"
+                },
+                "hero": {
+                    "selected": "Charakter ausgewählt",
+                    "none": "Kein fester Held"
+                }
             }
+        }
+    },
+    "storyOptions": {
+        "genres": {
+            "fairyTale": "Märchen",
+            "bedtime": "Gute-Nacht",
+            "educational": "Lehrreich",
+            "adventure": "Abenteuer"
+        },
+        "writingStyles": {
+            "simple": "Einfach",
+            "poetic": "Poetisch",
+            "imaginative": "Fantasievoll"
         }
     },
     "howItWorks": {
@@ -350,7 +384,25 @@
                 "title": "Eine Frage zum Anfangen",
                 "subheading": "Schreib ihre Frage, oder nimm eine aus dem Glas unten.",
                 "placeholder": "z.B. Warum atmen Berge Rauch?",
-                "jarLabel": "Oder eine aus dem Glas nehmen"
+                "jarLabel": "Oder eine aus dem Glas nehmen",
+                "suggestions": {
+                    "moonFollows": "Warum folgt mir der Mond?",
+                    "beesFindFlowers": "Wie finden Bienen ihre Blumen?",
+                    "rainGoes": "Wohin geht der Regen?",
+                    "skyBlue": "Warum ist der Himmel blau?",
+                    "deepestSea": "Wer lebt im tiefsten Meer?",
+                    "seedKnowsUp": "Woher weiß ein Samen, wo oben ist?",
+                    "starsTwinkle": "Warum funkeln Sterne?",
+                    "leavesChangeColor": "Warum wechseln Blätter ihre Farbe?",
+                    "catsPurr": "Warum schnurren Katzen?",
+                    "windInvisible": "Warum können wir den Wind nicht sehen?",
+                    "spidersSpinWebs": "Wie spinnen Spinnen ihre Netze?",
+                    "cloudsFloat": "Warum fallen Wolken nicht herunter?",
+                    "owlsAwakeAtNight": "Warum sind Eulen nachts wach?",
+                    "snailsCarryHomes": "Warum tragen Schnecken ihr Haus mit sich?",
+                    "echoComesBack": "Warum kommt ein Echo zurück?",
+                    "iceSlippery": "Warum ist Eis so rutschig?"
+                }
             },
             "characterPicker": {
                 "number": "2.",
@@ -384,7 +436,7 @@
                 "option8": "Mittel · 8 S.",
                 "option12": "Lang · 12 S.",
                 "option16": "Groß · 16 S.",
-                "option20": "Schlafenszeit-Saga · 20 S."
+                "option20": "Extra lang · 20 S."
             },
             "artStylePicker": {
                 "number": "5.",
@@ -402,19 +454,15 @@
                 "label": "Genre der Geschichte (optional)",
                 "note": "Optional — bestimmt die Stimmung der Geschichte.",
                 "fairyTale": {
-                    "label": "Märchen",
                     "hint": "Eine magische Geschichte voller Wunder, Güte und einer sanften Moral."
                 },
                 "bedtime": {
-                    "label": "Gute-Nacht",
                     "hint": "Ruhig und beruhigend, sanft dem Schlaf entgegen."
                 },
                 "educational": {
-                    "label": "Lehrreich",
                     "hint": "Erklärt durch die Entdeckungen des Kindes, wie und warum Dinge funktionieren."
                 },
                 "adventure": {
-                    "label": "Abenteuer",
                     "hint": "Eine mutige kleine Reise über Mut und das Lösen eines Problems."
                 }
             },
@@ -423,16 +471,13 @@
                 "title": "Schreibstil wählen",
                 "label": "Schreibstil (optional)",
                 "note": "Optional — prägt den Klang der Worte.",
-                "poetic": {
-                    "label": "Poetisch",
-                    "hint": "Lyrisch und rhythmisch."
-                },
                 "simple": {
-                    "label": "Einfach",
                     "hint": "Klar und leicht."
                 },
+                "poetic": {
+                    "hint": "Lyrisch und rhythmisch."
+                },
                 "imaginative": {
-                    "label": "Fantasievoll",
                     "hint": "Kreativ und lebendig."
                 }
             },
@@ -717,6 +762,7 @@
             "noteAriaLabel": "Bewertungsnotiz",
             "notePlaceholder": "Eine kleine Notiz schreiben (optional)…",
             "shareLabel": "Diese Geschichte als Beispiel für andere Familien teilen",
+            "shareHint": "Nur Geschichten mit 4 oder 5 Sternen erscheinen in der öffentlichen Auswahl.",
             "saveButton": "Bewertung speichern",
             "updateButton": "Änderungen speichern",
             "editButton": "Bewertung bearbeiten",

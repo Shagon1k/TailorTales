@@ -189,16 +189,29 @@ describe('StoriesService', () => {
     });
 
     describe('findPublic', () => {
-        it('should return only COMPLETED public stories', async () => {
+        it('should return only completed public stories rated 4 stars or higher', async () => {
             storyFindMany.mockResolvedValue([MOCK_STORY_WITH_RELATIONS]);
 
-            await service.findPublic();
+            const result = await service.findPublic();
 
             expect(storyFindMany).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    where: { isPublic: true, status: 'COMPLETED' },
+                    where: {
+                        isPublic: true,
+                        status: 'COMPLETED',
+                        ratings: { some: { score: { gte: 4 } } },
+                    },
                 }),
             );
+            expect(result[0]).toMatchObject({
+                question: 'Why is the sky blue?',
+                pageCount: 8,
+                rating: 0,
+                readerAge: expect.any(Number),
+                hasCharacter: false,
+                pdfUrl: null,
+            });
+            expect(result[0]).not.toHaveProperty('child');
         });
     });
 

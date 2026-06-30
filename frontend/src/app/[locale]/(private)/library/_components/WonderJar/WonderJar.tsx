@@ -1,18 +1,24 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { IChild } from '@/types/child.types';
+import {
+    getLocalizedQuestionSuggestions,
+    getRandomQuestionSuggestions,
+} from '@/utils/question-suggestions.utils';
 import styles from './WonderJar.module.scss';
 
 export interface IWonderJarProps {
     readers: IChild[];
-    suggestions: string[];
 }
 
 export default async function WonderJar({
     readers,
-    suggestions,
 }: Readonly<IWonderJarProps>): Promise<React.ReactElement> {
     const t = await getTranslations('library.wonderJar');
+    const tWorkshop = await getTranslations('workshop.form');
+    const suggestions = getRandomQuestionSuggestions(
+        getLocalizedQuestionSuggestions((key) => tWorkshop(key)),
+    );
     const readerNames = readers.map((r) => r.name);
     const namesPhrase =
         readerNames.length === 0

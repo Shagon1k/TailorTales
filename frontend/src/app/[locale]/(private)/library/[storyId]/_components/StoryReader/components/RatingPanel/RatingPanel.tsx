@@ -61,14 +61,15 @@ export default function RatingPanel({
         setError(null);
         setSaved(false);
         const trimmedNote = note.trim();
+        const effectiveIsPublic = isPublic && score >= 4;
         try {
             await storiesApi.submitRating(storyId, {
                 score,
                 comment: trimmedNote || undefined,
-                isPublic,
+                isPublic: effectiveIsPublic,
             });
             setSavedRating({ score, comment: trimmedNote || null });
-            setSavedIsPublic(isPublic);
+            setSavedIsPublic(effectiveIsPublic);
             setMode('view');
             setSaved(true);
             // Refresh so the detail (myRating, isPublic) reflects the saved state.
@@ -135,6 +136,7 @@ export default function RatingPanel({
                         }}
                         label={t('shareLabel')}
                     />
+                    <p className={styles.rating__visibility}>{t('shareHint')}</p>
 
                     <Button
                         variant="primary"

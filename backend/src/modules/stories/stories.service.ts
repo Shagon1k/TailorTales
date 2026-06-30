@@ -15,6 +15,7 @@ import { PUBLIC_STORIES_LIMIT } from './stories.constants.js';
 import type {
     IAdminStoryListPage,
     IAdminStorySummary,
+    IPublicStorySummary,
     IStoryArtStyle,
     IStoryDetail,
     IStorySummary,
@@ -79,15 +80,19 @@ export class StoriesService {
         return this.toDetail(story);
     }
 
-    async findPublic(): Promise<IStorySummary[]> {
+    async findPublic(): Promise<IPublicStorySummary[]> {
         const stories = await this.prisma.story.findMany({
-            where: { isPublic: true, status: 'COMPLETED' },
+            where: {
+                isPublic: true,
+                status: 'COMPLETED',
+                ratings: { some: { score: { gte: 4 } } },
+            },
             include: STORY_LIST_INCLUDE,
             orderBy: { updatedAt: 'desc' },
             take: PUBLIC_STORIES_LIMIT,
         });
 
-        return Promise.all(stories.map((s) => this.toSummary(s)));
+        return Promise.all(stories.map((s) => this.toPublicSummary(s)));
     }
 
     async create(userId: string, dto: CreateStoryDto): Promise<Story> {
@@ -329,6 +334,28 @@ export class StoriesService {
         };
     }
 
+    private async toPublicSummary(story: StoryWithRelations): Promise<IPublicStorySummary> {
+        const { coverImageKey, pdfKey, ratings, artStyle, child, ...rest } = story;
+        const score = ratings[0]?.score ?? 0;
+
+        return {
+            id: rest.id,
+            type: rest.type,
+            question: rest.question,
+            pageCount: rest.pageCount,
+            language: rest.language,
+            genre: rest.genre,
+            writingStyle: rest.writingStyle,
+            title: rest.title,
+            rating: score,
+            readerAge: this.computeAge(child.birthdate),
+            hasCharacter: rest.characterId !== null,
+            artStyle: await this.toArtStyleEmbed(artStyle),
+            coverImageUrl: coverImageKey ? await this.storage.getSignedUrl(coverImageKey) : null,
+            pdfUrl: pdfKey ? await this.storage.getSignedUrl(pdfKey) : null,
+        };
+    }
+
     private async toArtStyleEmbed(
         artStyle: StoryWithRelations['artStyle'],
     ): Promise<IStoryArtStyle> {
@@ -371,5 +398,9 @@ export class StoriesService {
             rating: rating?.score ?? null,
             myRating: rating ? { score: rating.score, comment: rating.comment } : null,
         };
+    }
+
+    private computeAge(birthdate: Date): number {
+        return Math.floor((Date.now() - birthdate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
     }
 }
