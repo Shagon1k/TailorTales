@@ -154,7 +154,7 @@ export default function AccountSidebar(): React.ReactElement {
                 <button
                     type="button"
                     className={styles['sidebar__sign-out']}
-                    onClick={() => void handleSignOut()}
+                    onClick={() => handleSignOut()}
                 >
                     <span className={styles['sidebar__nav-icon']}>
                         <SidebarIcon name="signOut" />

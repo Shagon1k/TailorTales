@@ -79,7 +79,7 @@ export default function DeleteAccountSection({
                             variant="primary"
                             disabled={confirmText !== confirmWord}
                             loading={isDeleting}
-                            onClick={() => void handleDelete()}
+                            onClick={() => handleDelete()}
                         >
                             {t('modal.confirmButton')}
                         </Button>

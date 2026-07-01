@@ -106,7 +106,7 @@ export function useUpdateArtStyle(): ReturnType<
             }
         },
         onSettled: () => {
-            void queryClient.invalidateQueries({ queryKey: ADMIN_ART_STYLES_QUERY_KEY });
+            queryClient.invalidateQueries({ queryKey: ADMIN_ART_STYLES_QUERY_KEY });
         },
     });
 }

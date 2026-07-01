@@ -88,7 +88,7 @@ export default function HeaderUserChip(): React.ReactElement {
                     <button
                         type="button"
                         className={clsx(styles.menu__item, styles['m-sign-out'])}
-                        onClick={() => void handleSignOut()}
+                        onClick={() => handleSignOut()}
                     >
                         {t('userMenu.signOut')}
                     </button>
