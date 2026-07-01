@@ -1210,6 +1210,11 @@
                 "create": "Create blueprint",
                 "saving": "Saving…",
                 "saveError": "Could not save the blueprint. Please try again.",
+                "deleteModal": {
+                    "title": "Delete blueprint",
+                    "cancel": "Keep blueprint",
+                    "confirm": "Delete"
+                },
                 "deleteConfirm": "Delete \"{name}\"? This cannot be undone.",
                 "nameLabel": "Blueprint name",
                 "namePlaceholder": "My blueprint",

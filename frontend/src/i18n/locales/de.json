@@ -1222,6 +1222,11 @@
                 "create": "Vorlage erstellen",
                 "saving": "Wird gespeichert…",
                 "saveError": "Vorlage konnte nicht gespeichert werden. Bitte erneut versuchen.",
+                "deleteModal": {
+                    "title": "Vorlage löschen",
+                    "cancel": "Vorlage behalten",
+                    "confirm": "Löschen"
+                },
                 "deleteConfirm": "\"{name}\" löschen? Dies kann nicht rückgängig gemacht werden.",
                 "nameLabel": "Vorlagenname",
                 "namePlaceholder": "Meine Vorlage",
