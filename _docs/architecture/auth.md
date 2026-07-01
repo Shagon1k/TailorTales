@@ -79,3 +79,12 @@ The JWT payload stores only `sub` (user id). Loading the full `User` on every re
 - Controllers always receive a fresh, accurate `User` object.
 
 Embedding sensitive fields in the JWT would create a window where stale data is trusted.
+
+## Google profile sync
+
+Google OAuth uses the `email` and `profile` scopes. On every successful Google sign-in, the
+backend refreshes the stored Google profile basics (`email`, `name`, `avatarUrl`) from the
+provider payload before issuing the session cookie.
+
+Custom uploaded avatars are stored separately in S3 and take precedence in the UI, so refreshing
+the Google avatar does not overwrite a user's manually chosen avatar.

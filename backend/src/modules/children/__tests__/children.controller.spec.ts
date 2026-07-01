@@ -9,6 +9,7 @@ const MOCK_USER: User = {
     email: 'alice@example.com',
     name: 'Alice',
     avatarUrl: null,
+    avatarKey: null,
     notificationPreferences: null,
     role: 'USER',
     suspendedAt: null,

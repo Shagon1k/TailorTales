@@ -12,6 +12,7 @@ function buildUser(overrides: Record<string, unknown> = {}) {
         email: 'alice@example.com',
         name: 'Alice',
         avatarUrl: null,
+        avatarKey: null,
         role: 'USER',
         createdAt: new Date('2026-01-01'),
         updatedAt: new Date('2026-01-01'),

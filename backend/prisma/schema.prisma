@@ -88,6 +88,7 @@ model User {
   googleId  String   @unique
   name      String
   avatarUrl String?
+  avatarKey String?
   role      Role     @default(USER)
   /** Set when an admin suspends the account; blocks auth while non-null. */
   suspendedAt DateTime?

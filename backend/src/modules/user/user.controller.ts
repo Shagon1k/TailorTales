@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Header, Patch, Res } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Header,
+    Patch,
+    Post,
+    Res,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { type User } from '../../generated/prisma/client.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
@@ -6,6 +18,7 @@ import { AccountDeletionService } from './account-deletion.service.js';
 import { DataExportService } from './data-export.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserService } from './user.service.js';
+import type { ICurrentUserResponse, IUploadedAvatarFile } from './user.types.js';
 
 const COOKIE_NAME = 'access_token';
 
@@ -18,13 +31,31 @@ export class UserController {
     ) {}
 
     @Get()
-    getMe(@CurrentUser() user: User): User {
-        return user;
+    getMe(@CurrentUser() user: User): Promise<ICurrentUserResponse> {
+        return this.userService.presentUser(user);
     }
 
     @Patch()
-    updateMe(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<User> {
-        return this.userService.updateName(user.id, dto.name);
+    async updateMe(
+        @CurrentUser() user: User,
+        @Body() dto: UpdateUserDto,
+    ): Promise<ICurrentUserResponse> {
+        const updatedUser = await this.userService.updateName(user.id, dto.name);
+        return this.userService.presentUser(updatedUser);
+    }
+
+    @Post('avatar')
+    @UseInterceptors(FileInterceptor('avatar'))
+    uploadAvatar(
+        @CurrentUser() user: User,
+        @UploadedFile() file: IUploadedAvatarFile | undefined,
+    ): Promise<ICurrentUserResponse> {
+        return this.userService.uploadAvatar(user.id, file);
+    }
+
+    @Delete('avatar')
+    deleteAvatar(@CurrentUser() user: User): Promise<ICurrentUserResponse> {
+        return this.userService.clearAvatar(user.id);
     }
 
     /** GDPR data export — structured JSON download with signed asset links. */

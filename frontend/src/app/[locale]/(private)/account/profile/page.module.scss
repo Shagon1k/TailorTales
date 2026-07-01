@@ -1,5 +1,9 @@
 @use 'styles/typography' as *;
 
+.profile__file-input {
+    display: none;
+}
+
 .name {
     @include t-heading-2xl;
     color: var(--text-primary);

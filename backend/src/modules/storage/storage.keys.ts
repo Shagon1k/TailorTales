@@ -4,6 +4,9 @@
  * The URL is derived at serve time via StorageService.getSignedUrl().
  */
 export const StorageKeys = {
+    /** User-uploaded account avatar. Private — signed URL after ownership check. */
+    userAvatar: (userId: string): string => `users/${userId}/profile/avatar`,
+
     /** Full PDF of a completed story. Private — signed URL after ownership check. */
     storyPdf: (userId: string, storyId: string): string =>
         `users/${userId}/stories/${storyId}/story.pdf`,

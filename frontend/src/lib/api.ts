@@ -16,13 +16,14 @@ export class ApiError extends Error {
 
 export async function apiFetch<T = void>(path: string, init?: RequestInit): Promise<T> {
     const locale = typeof document !== 'undefined' ? document.documentElement.lang : undefined;
+    const isFormData = init?.body instanceof FormData;
 
     const res = await fetch(`${BACKEND_URL}${path}`, {
         ...init,
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
             ...(locale ? { 'Accept-Language': locale } : {}),
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             ...init?.headers,
         },
     });

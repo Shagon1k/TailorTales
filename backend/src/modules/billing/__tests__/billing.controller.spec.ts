@@ -11,6 +11,7 @@ const TEST_USER = {
     googleId: 'google-1',
     name: 'Ada',
     avatarUrl: null,
+    avatarKey: null,
     role: 'USER',
     suspendedAt: null,
     notificationPreferences: null,

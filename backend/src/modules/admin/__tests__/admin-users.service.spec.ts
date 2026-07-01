@@ -12,6 +12,7 @@ function buildUserRow(overrides: Record<string, unknown> = {}): Record<string, u
         email: 'user@b.com',
         name: 'User Two',
         avatarUrl: null,
+        avatarKey: null,
         role: 'USER',
         suspendedAt: null,
         createdAt: new Date('2026-01-01'),

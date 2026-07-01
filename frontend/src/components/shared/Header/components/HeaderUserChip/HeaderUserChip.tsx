@@ -58,7 +58,13 @@ export default function HeaderUserChip(): React.ReactElement {
                     aria-expanded={opened}
                     onClick={() => setOpened((value) => !value)}
                 >
-                    <Avatar size="sm" name={user?.name ?? '?'} aria-hidden="true" />
+                    <Avatar
+                        size="sm"
+                        name={user?.name ?? '?'}
+                        src={user?.avatarUrl ?? undefined}
+                        alt={user?.name ?? 'User avatar'}
+                        aria-hidden="true"
+                    />
                     <span className={styles.chip__info}>
                         <span className={styles.chip__name}>{firstName}</span>
                         <span className={styles.chip__plan}>{subscription?.tier.name ?? '…'}</span>

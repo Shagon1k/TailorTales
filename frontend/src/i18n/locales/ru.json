@@ -820,6 +820,8 @@
             "deleteAccount": "Удалить аккаунт"
         },
         "profile": {
+            "changeAvatarButton": "Сменить аватар",
+            "removeAvatarButton": "Убрать свой аватар",
             "editButton": "Изменить имя",
             "nameLabel": "Имя",
             "saveButton": "Сохранить",

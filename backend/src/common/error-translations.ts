@@ -75,6 +75,21 @@ const translations: Record<string, ITranslationEntry> = {
         de: 'Für dieses Kind existiert bereits eine Figur.',
         ru: 'Для этого ребёнка уже существует персонаж.',
     },
+    'errors.user.avatarMissing': {
+        en: 'Please choose an image to upload.',
+        de: 'Bitte wähle ein Bild zum Hochladen aus.',
+        ru: 'Пожалуйста, выберите изображение для загрузки.',
+    },
+    'errors.user.avatarUnsupportedType': {
+        en: 'Avatar must be a JPG, PNG, or WebP image.',
+        de: 'Der Avatar muss ein JPG-, PNG- oder WebP-Bild sein.',
+        ru: 'Аватар должен быть изображением JPG, PNG или WebP.',
+    },
+    'errors.user.avatarTooLarge': {
+        en: (p) => `Avatar image must be ${p['limitMb']} MB or smaller.`,
+        de: (p) => `Das Avatarbild muss ${p['limitMb']} MB oder kleiner sein.`,
+        ru: (p) => `Размер аватара должен быть не больше ${p['limitMb']} МБ.`,
+    },
 };
 
 export function resolveLocale(acceptLanguage: string | undefined): ILocale {

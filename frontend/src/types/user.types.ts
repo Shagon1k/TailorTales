@@ -5,6 +5,7 @@ export interface IUser {
     email: string;
     name: string;
     avatarUrl: string | null;
+    hasCustomAvatar: boolean;
     role: TUserRole;
     createdAt: string;
     updatedAt: string;

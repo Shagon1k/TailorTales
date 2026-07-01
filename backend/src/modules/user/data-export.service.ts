@@ -30,6 +30,10 @@ export class DataExportService {
         const signIfPresent = async (key: string | null): Promise<string | null> =>
             key ? this.storage.getSignedUrl(key) : null;
 
+        const profileAvatarUrl = user.avatarKey
+            ? await signIfPresent(user.avatarKey)
+            : user.avatarUrl;
+
         const stories = await Promise.all(
             user.stories.map(async (story) => ({
                 id: story.id,
@@ -69,7 +73,7 @@ export class DataExportService {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                avatarUrl: user.avatarUrl,
+                avatarUrl: profileAvatarUrl,
                 role: user.role,
                 createdAt: user.createdAt,
             },

@@ -815,6 +815,8 @@
             "deleteAccount": "Konto löschen"
         },
         "profile": {
+            "changeAvatarButton": "Avatar ändern",
+            "removeAvatarButton": "Eigenen Avatar entfernen",
             "editButton": "Name bearbeiten",
             "nameLabel": "Name",
             "saveButton": "Speichern",

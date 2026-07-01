@@ -58,8 +58,10 @@
 
 | Method | Path         | Auth | Body       | Response                                                                                                                                                                                                        |
 | ------ | ------------ | ---- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/me`        | user | —          | The current `User`.                                                                                                                                                                                             |
-| PATCH  | `/me`        | user | `{ name }` | Updated `User`. `name`: 1–100 chars.                                                                                                                                                                            |
+| GET    | `/me`        | user | —          | Current account profile: `{ id, email, name, avatarUrl, hasCustomAvatar, role, createdAt, updatedAt }`. `avatarUrl` is either the user's Google avatar URL or a signed URL for the uploaded custom avatar.      |
+| PATCH  | `/me`        | user | `{ name }` | Same profile shape as `GET /me`. `name`: 1–100 chars.                                                                                                                                                           |
+| POST   | `/me/avatar` | user | multipart  | Same profile shape as `GET /me`. Upload field: `avatar` (`image/jpeg`, `image/png`, `image/webp`, max 5 MB). Stores a custom avatar in S3 and makes it the active avatar.                                       |
+| DELETE | `/me/avatar` | user | —          | Same profile shape as `GET /me`. Clears the custom avatar and falls back to the Google avatar (if available) or initials.                                                                                       |
 | GET    | `/me/export` | user | —          | GDPR data export: profile, children, characters, stories + pages, ratings, notifications, subscription state, and signed links to any retained files.                                                           |
 | DELETE | `/me`        | user | —          | Cancel active Paddle subscription, delete all owned S3 objects, cascade-delete all DB rows. **Irreversible.** Blocked while a paid subscription is active (user must cancel first and wait for the period end). |
 
