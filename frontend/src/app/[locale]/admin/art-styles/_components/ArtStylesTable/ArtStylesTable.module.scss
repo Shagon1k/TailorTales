@@ -10,7 +10,11 @@
 
     th,
     td {
-        padding-inline: var(--space-3);
+        padding-inline: var(--space-2);
+    }
+
+    th {
+        text-align: center;
     }
 }
 
@@ -19,11 +23,11 @@
 }
 
 .table__colName {
-    width: 14%;
+    width: 18%;
 }
 
 .table__colPrompt {
-    width: 30%;
+    width: 26%;
 }
 
 .table__colActive {
@@ -35,7 +39,7 @@
 }
 
 .table__colActions {
-    width: 25%;
+    width: 22%;
 }
 
 .table__thumbnail {
@@ -81,6 +85,9 @@
     display: block;
     color: var(--text-primary);
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .table__slug {
@@ -96,8 +103,11 @@
     max-width: 100%;
     color: var(--text-muted);
     line-height: 1.35;
-    overflow-wrap: anywhere;
-    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    word-break: break-word;
 }
 
 .table__reorder {
@@ -107,19 +117,36 @@
     align-items: center;
 }
 
+.table__activeControl {
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+}
+
 .table__actions {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap: var(--space-2);
-    align-items: center;
-    flex-wrap: nowrap;
+    align-items: stretch;
+    min-width: 0;
 
     button {
         height: 40px;
         min-width: 0;
-        padding-inline: var(--space-4);
+        width: calc(100% - var(--space-3));
+        max-width: 132px;
+        margin-left: auto;
+        padding-inline: var(--space-2);
     }
 
     button span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
         text-align: center;
     }

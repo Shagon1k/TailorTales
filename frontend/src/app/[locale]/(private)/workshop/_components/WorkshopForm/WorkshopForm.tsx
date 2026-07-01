@@ -129,6 +129,7 @@ export default function WorkshopForm({
     const [genre, setGenre] = useState<IStoryGenre | null>(initialGenre);
     const [writingStyle, setWritingStyle] = useState<IWritingStyle | null>(initialWritingStyle);
     const [question, setQuestion] = useState(initialQuestion);
+    const [isQuestionTouched, setIsQuestionTouched] = useState(initialQuestion.trim().length > 0);
     const [isPending, setIsPending] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -159,14 +160,21 @@ export default function WorkshopForm({
     const selectedCharacter = childCharacters.find((c) => c.id === selectedCharacterId) ?? null;
     const selectedGenreKey = GENRES.find((g) => g.value === genre)?.key ?? null;
     const selectedStyleKey = WRITING_STYLES.find((s) => s.value === writingStyle)?.key ?? null;
-
+    const trimmedQuestion = question.trim();
+    const isQuestionTooShort = trimmedQuestion.length < config.questionMinLength;
+    const questionError =
+        isQuestionTouched && isQuestionTooShort
+            ? trimmedQuestion.length === 0
+                ? t('questionInput.errors.required')
+                : t('questionInput.errors.tooShort', { min: config.questionMinLength })
+            : null;
     const isValid =
         selectedChildId !== null &&
         storyType !== null &&
         pageCount !== null &&
         artStyleId !== null &&
         language !== null &&
-        question.trim().length >= config.questionMinLength;
+        !isQuestionTooShort;
 
     function handleReaderSelect(id: string): void {
         setSelectedChildId(id);
@@ -293,10 +301,13 @@ export default function WorkshopForm({
                     <Textarea
                         value={question}
                         onChange={(e) => setQuestion(e.currentTarget.value)}
+                        onBlur={() => setIsQuestionTouched(true)}
                         placeholder={t('questionInput.placeholder')}
                         minRows={3}
                         maxRows={6}
                         maxLength={config.questionMaxLength}
+                        required
+                        error={questionError}
                         aria-label="Story question"
                         aria-describedby="section-question"
                     />
@@ -391,6 +402,9 @@ export default function WorkshopForm({
                             disabled
                         />
                     </RadioCardGroup>
+                    <p className={styles['workshop__section-note']}>
+                        {t('formatPicker.comicDeferredNote')}
+                    </p>
                 </section>
 
                 <section className={styles.workshop__section} aria-labelledby="section-length">

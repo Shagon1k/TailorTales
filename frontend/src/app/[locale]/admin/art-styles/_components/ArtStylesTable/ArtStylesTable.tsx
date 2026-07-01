@@ -56,9 +56,7 @@ export default function ArtStylesTable({
                             <Table.HeaderCell>{t('promptPrefix')}</Table.HeaderCell>
                             <Table.HeaderCell>{t('active')}</Table.HeaderCell>
                             <Table.HeaderCell>{t('order')}</Table.HeaderCell>
-                            <Table.HeaderCell>
-                                <span className="sr-only">{t('actions')}</span>
-                            </Table.HeaderCell>
+                            <Table.HeaderCell>{t('actions')}</Table.HeaderCell>
                         </Table.Row>
                     </Table.Head>
                     <Table.Body>
@@ -92,12 +90,15 @@ export default function ArtStylesTable({
                                     </span>
                                 </Table.Cell>
                                 <Table.Cell>
-                                    <Switch
-                                        checked={artStyle.isActive}
-                                        onChange={() => onToggleActive(artStyle)}
-                                        label={t('activeLabel')}
-                                        disabled={updatingId === artStyle.id}
-                                    />
+                                    <div className={styles.table__activeControl}>
+                                        <Switch
+                                            checked={artStyle.isActive}
+                                            onChange={() => onToggleActive(artStyle)}
+                                            label={t('activeLabel')}
+                                            hideLabel
+                                            disabled={updatingId === artStyle.id}
+                                        />
+                                    </div>
                                 </Table.Cell>
                                 <Table.Cell>
                                     <div className={styles.table__reorder}>

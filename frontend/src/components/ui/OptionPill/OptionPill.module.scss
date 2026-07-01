@@ -1,3 +1,4 @@
+@use 'styles/interactions' as *;
 @use 'styles/typography' as *;
 
 .option-pill {
@@ -15,19 +16,11 @@
     white-space: normal;
     text-align: center;
     line-height: var(--lh-snug);
-    transition: border-color 100ms ease;
-
-    &:not([disabled]):not(.m-selected):hover {
-        border-color: var(--text-muted);
-    }
-
-    &:disabled {
-        opacity: var(--opacity-disabled);
-        cursor: not-allowed;
-    }
+    @include selectable-interaction-shell(
+        color-mix(in srgb, var(--accent-primary) 10%, transparent)
+    );
 
     &.m-selected {
-        border: 1.5px solid var(--accent-primary);
-        font-weight: 600;
+        border-width: 1.5px;
     }
 }

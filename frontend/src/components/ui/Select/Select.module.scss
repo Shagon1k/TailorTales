@@ -44,7 +44,7 @@
     }
 
     .select__error {
-        color: var(--accent-warm);
+        color: var(--accent-danger);
     }
 
     // ── Twilight surface (dark background) ──────────────────────────────
@@ -60,7 +60,7 @@
         }
 
         .select__wrapper[data-error] .select__field {
-            border-color: var(--accent-warm);
+            border-color: var(--accent-danger);
         }
 
         .select__label {
@@ -84,7 +84,7 @@
         }
 
         .select__wrapper[data-error] .select__field {
-            border-color: var(--accent-warm);
+            border-color: var(--accent-danger);
         }
 
         .select__label {

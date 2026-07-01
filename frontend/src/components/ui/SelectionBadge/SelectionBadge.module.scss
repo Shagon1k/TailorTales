@@ -1,0 +1,17 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-pill);
+    background: var(--accent-primary);
+    color: var(--text-inverse);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+    flex-shrink: 0;
+
+    svg {
+        width: 11px;
+        height: 11px;
+    }
+}

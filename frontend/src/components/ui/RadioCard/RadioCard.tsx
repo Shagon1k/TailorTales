@@ -1,18 +1,7 @@
 'use client';
 
-import { createContext, use } from 'react';
-import clsx from 'clsx';
+import SelectableCard from '@/components/ui/SelectableCard/SelectableCard';
 import styles from './RadioCard.module.scss';
-
-// ── Group context ────────────────────────────────────────────────────────────
-
-interface IRadioCardGroupContext {
-    value: string | null;
-    onChange: (value: string) => void;
-    disabled: boolean;
-}
-
-export const RadioCardGroupContext = createContext<IRadioCardGroupContext | null>(null);
 
 // ── Atom ─────────────────────────────────────────────────────────────────────
 
@@ -28,20 +17,6 @@ export interface IRadioCardProps {
     disabled?: boolean;
 }
 
-function CheckIcon(): React.ReactElement {
-    return (
-        <svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true">
-            <path
-                d="M1 4l3 3 5-5"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-}
-
 export default function RadioCard({
     title,
     description,
@@ -50,28 +25,21 @@ export default function RadioCard({
     onChange,
     disabled = false,
 }: Readonly<IRadioCardProps>): React.ReactElement {
-    const group = use(RadioCardGroupContext);
-
-    const isSelected = group ? group.value === value : selected;
-    const isDisabled = disabled || (group?.disabled ?? false);
-    const handleChange = group && value ? (): void => group.onChange(value) : onChange;
-
     return (
-        <button
-            type="button"
-            role="radio"
-            aria-checked={isSelected}
-            disabled={isDisabled}
-            onClick={handleChange}
-            className={clsx(styles['radio-card'], { [styles['m-selected']]: isSelected })}
+        <SelectableCard
+            value={value}
+            selected={selected}
+            onSelect={onChange}
+            disabled={disabled}
+            ariaLabel={typeof title === 'string' ? title : undefined}
+            showBadgePlaceholder
         >
-            <div className={styles['radio-card__header']}>
-                <span className={styles['radio-card__title']}>{title}</span>
-                <span className={styles['radio-card__indicator']} aria-hidden="true">
-                    {isSelected && <CheckIcon />}
-                </span>
+            <div className={styles['radio-card__body']}>
+                <div className={styles['radio-card__header']}>
+                    <span className={styles['radio-card__title']}>{title}</span>
+                </div>
+                {description && <p className={styles['radio-card__description']}>{description}</p>}
             </div>
-            {description && <p className={styles['radio-card__description']}>{description}</p>}
-        </button>
+        </SelectableCard>
     );
 }

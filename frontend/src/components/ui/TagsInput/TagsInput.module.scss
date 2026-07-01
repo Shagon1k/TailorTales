@@ -71,7 +71,7 @@
     }
 
     .tags-input__error {
-        color: var(--accent-warm);
+        color: var(--accent-danger);
     }
 
     // ── Twilight surface (dark background) ──────────────────────────────
@@ -86,7 +86,7 @@
         }
 
         .tags-input__wrapper[data-error] {
-            border-color: var(--accent-warm);
+            border-color: var(--accent-danger);
         }
 
         .tags-input__pill {
@@ -122,7 +122,7 @@
         }
 
         .tags-input__wrapper[data-error] {
-            border-color: var(--accent-warm);
+            border-color: var(--accent-danger);
         }
 
         .tags-input__pill {

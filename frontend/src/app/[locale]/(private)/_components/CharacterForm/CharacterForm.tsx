@@ -56,6 +56,7 @@ export default function CharacterForm({
 
     const form = useForm<ICharacterFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
+        validateInputOnBlur: true,
         validate: {
             description: (v) => (v.trim().length < 1 ? t('errors.descriptionRequired') : null),
         },
@@ -105,6 +106,7 @@ export default function CharacterForm({
                             placeholder={
                                 isEditing ? t('descriptionPlaceholder') : t('ideaPlaceholder')
                             }
+                            required
                             autosize
                             minRows={4}
                             maxRows={8}

@@ -385,6 +385,10 @@
                 "subheading": "Введите вопрос ребёнка или выберите из банка ниже.",
                 "placeholder": "Напр., Почему горы дышат дымом?",
                 "jarLabel": "Или выберите из банка",
+                "errors": {
+                    "required": "Сначала нужен вопрос для истории",
+                    "tooShort": "Нужно чуть больше деталей — минимум {min} символа(ов)."
+                },
                 "suggestions": {
                     "moonFollows": "Почему луна будто идёт за мной?",
                     "beesFindFlowers": "Как пчёлы находят свои цветы?",
@@ -426,7 +430,8 @@
                 "comic": {
                     "title": "Комикс — скоро",
                     "description": "Панели, пузыри с речью, больше динамики. Отлично для читателей от 6 лет. 2 кредита / стр."
-                }
+                },
+                "comicDeferredNote": "Комиксы пока отключены, пока мы доделываем панели и реплики в облачках."
             },
             "pageCount": {
                 "number": "4.",
@@ -482,6 +487,14 @@
                 }
             },
             "submitError": "Не удалось запустить создание. Пожалуйста, попробуйте ещё раз.",
+            "validation": {
+                "reader": "читатель",
+                "question": "вопрос",
+                "format": "формат",
+                "length": "длина",
+                "artStyle": "стиль иллюстраций",
+                "language": "язык"
+            },
             "artStyleLabel": "Стиль иллюстраций",
             "characterModal": {
                 "editTitle": "Редактировать персонажа",
@@ -504,6 +517,10 @@
             "creditsRemaining": " · {creditsRemaining} осталось",
             "quotaExhausted": "Для этой сказки нужно {creditCost} кредитов, а в этом цикле осталось только {creditsRemaining} — выберите меньше страниц или улучшите план.",
             "quotaInfo": "{pageCount} страниц используют {creditCost} из ваших {creditsRemaining} оставшихся кредитов этого цикла.",
+            "validation": {
+                "title": "Перед сохранением или генерацией ещё нужно заполнить",
+                "fields": "{fields}."
+            },
             "generateButton": "Зажечь фонарь →",
             "draftButton": "Сохранить как черновик",
             "format": {
@@ -583,6 +600,7 @@
             "saveButton": "Сохранить",
             "photoButton": "📷 Использовать фото — скоро",
             "photoTooltip": "Скоро вы сможете загрузить фото своего ребёнка, родителя или кого угодно, чтобы использовать как главного персонажа истории.",
+            "photoDeferredNote": "Создание персонажа по фото пока отложено, поэтому эта опция остаётся выключенной.",
             "descriptionTemplate": "{gender}. Волосы: {hairLength} {hairColor}. Глаза: {eyeColor}. Кожа: {skinTone}. Одежда: {clothing}.",
             "descriptionClothing": "{color}, {item}",
             "descriptionClothingGeneric": "{color}",

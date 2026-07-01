@@ -385,6 +385,10 @@
                 "subheading": "Schreib ihre Frage, oder nimm eine aus dem Glas unten.",
                 "placeholder": "z.B. Warum atmen Berge Rauch?",
                 "jarLabel": "Oder eine aus dem Glas nehmen",
+                "errors": {
+                    "required": "Wir brauchen zuerst eine Frage für die Geschichte",
+                    "tooShort": "Gib uns bitte etwas mehr Stoff — mindestens {min} Zeichen."
+                },
                 "suggestions": {
                     "moonFollows": "Warum folgt mir der Mond?",
                     "beesFindFlowers": "Wie finden Bienen ihre Blumen?",
@@ -426,7 +430,8 @@
                 "comic": {
                     "title": "Comic — kommt bald",
                     "description": "Panels, Sprechblasen, mehr Schwung. Toll für Leser ab 6 Jahren. 2 Credits / Seite"
-                }
+                },
+                "comicDeferredNote": "Comics bleiben vorerst deaktiviert, bis wir Panels und Sprechblasen fertig haben."
             },
             "pageCount": {
                 "number": "4.",
@@ -482,6 +487,14 @@
                 }
             },
             "submitError": "Generierung konnte nicht gestartet werden. Bitte erneut versuchen.",
+            "validation": {
+                "reader": "Kind",
+                "question": "Frage",
+                "format": "Format",
+                "length": "Länge",
+                "artStyle": "Illustrationsstil",
+                "language": "Sprache"
+            },
             "artStyleLabel": "Kunststil",
             "characterModal": {
                 "editTitle": "Charakter bearbeiten",
@@ -504,6 +517,10 @@
             "creditsRemaining": " · {creditsRemaining} verbleibend",
             "quotaExhausted": "Diese Geschichte benötigt {creditCost} Credits, aber nur {creditsRemaining} verbleiben in diesem Zyklus — wähle eine kürzere Länge oder upgrade deinen Plan.",
             "quotaInfo": "{pageCount} Seiten verwenden {creditCost} deiner {creditsRemaining} verbleibenden Credits in diesem Zyklus.",
+            "validation": {
+                "title": "Vor dem Speichern oder Generieren fehlt noch",
+                "fields": "{fields}."
+            },
             "generateButton": "Die Laterne anzünden →",
             "draftButton": "Als Entwurf speichern",
             "format": {
@@ -578,6 +595,7 @@
             "saveButton": "Speichern",
             "photoButton": "📷 Foto verwenden — bald verfügbar",
             "photoTooltip": "Bald kannst du ein Foto deines Kindes, eines Elternteils oder einer anderen Person hochladen, um sie als Hauptfigur der Geschichte zu verwenden.",
+            "photoDeferredNote": "Die Charaktererstellung per Foto ist vorerst zurückgestellt, deshalb bleibt diese Option deaktiviert.",
             "descriptionTemplate": "{gender}. Haare: {hairLength} {hairColor}. Augen: {eyeColor}. Haut: {skinTone}. Kleidung: {clothing}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} Kleidung",

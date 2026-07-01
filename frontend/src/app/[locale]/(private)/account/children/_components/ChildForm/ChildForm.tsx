@@ -48,6 +48,7 @@ export default function ChildForm({
 
     const form = useForm<IChildFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
+        validateInputOnBlur: true,
         validate: {
             name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
             birthdate: (v) => {
@@ -67,17 +68,20 @@ export default function ChildForm({
                 <Input
                     label={t('nameLabel')}
                     placeholder={t('namePlaceholder')}
+                    required
                     {...form.getInputProps('name')}
                 />
                 <Input
                     label={t('birthdateLabel')}
                     type="date"
                     max={TODAY}
+                    required
                     {...form.getInputProps('birthdate')}
                 />
                 <Select
                     label={t('genderLabel')}
                     data={genderOptions}
+                    required
                     {...form.getInputProps('gender')}
                 />
                 <TagsInput

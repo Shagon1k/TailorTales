@@ -99,6 +99,7 @@ export default function CharacterQuiz({
                         </Button>
                     </div>
                 </Tooltip>
+                <p className={styles['photo__note']}>{t('photoDeferredNote')}</p>
                 <Input
                     label={t('nameLabel')}
                     placeholder={t('namePlaceholder')}

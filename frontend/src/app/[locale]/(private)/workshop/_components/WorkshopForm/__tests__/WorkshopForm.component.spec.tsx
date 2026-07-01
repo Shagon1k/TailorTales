@@ -201,6 +201,24 @@ describe('WorkshopForm', () => {
             // Reader is auto-selected (only 1), but format/length/style/language/question are all empty
             expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
         });
+
+        it('should show a useful question validation message after blur', async () => {
+            renderForm();
+
+            const textarea = screen.getByRole('textbox', { name: /story question/i });
+            await userEvent.click(textarea);
+            await userEvent.tab();
+
+            expect(screen.getByText(/start with a question for the tale/i)).toBeInTheDocument();
+        });
+
+        it('should show that comics are disabled on purpose for now', () => {
+            renderForm();
+
+            expect(
+                screen.getByText(/comic stays disabled for now while we finish panel layouts/i),
+            ).toBeInTheDocument();
+        });
     });
 
     describe('given a suggestion chip is clicked', () => {

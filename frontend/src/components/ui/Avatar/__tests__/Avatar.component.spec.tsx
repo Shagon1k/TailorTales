@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import Avatar from '../Avatar';
 
@@ -23,6 +23,15 @@ describe('Avatar', () => {
                 'src',
                 '/avatar.jpg',
             );
+        });
+
+        it('should fall back to initials when the image fails to load', async () => {
+            renderAvatar({ src: '/broken-avatar.jpg', alt: 'Alice', name: 'Alice Baker' });
+
+            const image = screen.getByRole('img', { name: /alice/i });
+            fireEvent.error(image);
+
+            expect(screen.getByText('AB')).toBeInTheDocument();
         });
     });
 });

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import type { ICharacter } from '@/types/character.types';
+import SelectableCard, { SelectableCardGroup } from '@/components/ui/SelectableCard/SelectableCard';
 import styles from './CharacterSelector.module.scss';
 
 export interface ICharacterSelectorProps {
@@ -25,19 +26,11 @@ export default function CharacterSelector({
     ];
 
     return (
-        <ul className={styles['character-selector']} aria-label={t('listLabel')}>
-            {options.map((option) => {
-                const isSelected = selectedId === option.id;
-                return (
+        <SelectableCardGroup value={selectedId} onChange={onSelect} label={t('listLabel')}>
+            <ul className={styles['character-selector']}>
+                {options.map((option) => (
                     <li key={option.id ?? '__none__'}>
-                        <button
-                            type="button"
-                            onClick={() => onSelect(option.id)}
-                            aria-pressed={isSelected}
-                            aria-label={option.name}
-                            className={styles['character-selector__item']}
-                            data-selected={isSelected || undefined}
-                        >
+                        <SelectableCard value={option.id} ariaLabel={option.name}>
                             {option.id === null ? (
                                 <NoCharacterOption label={option.name} />
                             ) : (
@@ -45,19 +38,11 @@ export default function CharacterSelector({
                                     character={items.find((item) => item.id === option.id)!}
                                 />
                             )}
-                            {isSelected && (
-                                <span
-                                    className={styles['character-selector__check']}
-                                    aria-hidden="true"
-                                >
-                                    ✓
-                                </span>
-                            )}
-                        </button>
+                        </SelectableCard>
                     </li>
-                );
-            })}
-        </ul>
+                ))}
+            </ul>
+        </SelectableCardGroup>
     );
 }
 
@@ -65,11 +50,11 @@ function NoCharacterOption({ label }: Readonly<{ label: string }>): React.ReactE
     const [name, description] = label.split(/\s+[—-]\s+/, 2);
 
     return (
-        <div className={styles['character-selector__content']}>
+        <div className={styles['character-selector__body']}>
             <div className={styles['character-selector__thumb']} aria-hidden="true">
                 <span className={styles['character-selector__thumb-fallback']}>—</span>
             </div>
-            <div className={styles['character-selector__text']}>
+            <div className={styles['character-selector__content']}>
                 <span className={styles['character-selector__name']}>{name}</span>
                 {description && (
                     <span className={styles['character-selector__description']}>{description}</span>
@@ -87,7 +72,7 @@ function CharacterOptionCard({
     character,
 }: Readonly<ICharacterOptionCardProps>): React.ReactElement {
     return (
-        <div className={styles['character-selector__content']}>
+        <div className={styles['character-selector__body']}>
             <div className={styles['character-selector__thumb']}>
                 {character.previewUrl ? (
                     <Image
@@ -107,7 +92,7 @@ function CharacterOptionCard({
                     </span>
                 )}
             </div>
-            <div className={styles['character-selector__text']}>
+            <div className={styles['character-selector__content']}>
                 <span className={styles['character-selector__name']}>{character.name}</span>
                 <span className={styles['character-selector__description']}>
                     {character.description}

@@ -49,6 +49,16 @@ describe('ChildForm', () => {
         expect(screen.getByText(/name is required/i)).toBeInTheDocument();
     });
 
+    it('should show validation on blur for required fields', async () => {
+        renderForm();
+
+        const nameInput = screen.getByLabelText(/name/i);
+        await userEvent.click(nameInput);
+        await userEvent.tab();
+
+        expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+    });
+
     it('should call onSubmit with correct values when form is valid', async () => {
         const onSubmit = vi.fn();
         renderForm(onSubmit, vi.fn(), {

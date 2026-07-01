@@ -63,4 +63,16 @@ $thumb-inset: 2px;
 .switch__label {
     @include t-body-base;
     color: var(--text-primary);
+
+    &.m-sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
 }

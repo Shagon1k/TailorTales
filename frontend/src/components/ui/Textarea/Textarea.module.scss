@@ -40,7 +40,7 @@
     }
 
     .textarea__error {
-        color: var(--accent-warm);
+        color: var(--accent-danger);
     }
 
     // ── Twilight surface (dark background) ──────────────────────────────
@@ -61,7 +61,7 @@
 
         // Mantine adds [data-error] to the wrapper when error prop is set
         .textarea__wrapper[data-error] .textarea__field {
-            border-color: var(--accent-warm);
+            border-color: var(--accent-danger);
         }
 
         .textarea__label {
@@ -89,7 +89,7 @@
         }
 
         .textarea__wrapper[data-error] .textarea__field {
-            border-color: var(--accent-warm);
+            border-color: var(--accent-danger);
         }
 
         .textarea__label {

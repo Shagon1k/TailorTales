@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { Avatar as MantineAvatar, type AvatarProps as IMantineAvatarProps } from '@mantine/core';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Avatar.module.scss';
@@ -20,11 +23,17 @@ export interface IAvatarProps extends OmitStyling<
 
 export default function Avatar({
     size = 'md',
+    src,
     ...props
 }: Readonly<IAvatarProps>): React.ReactElement {
+    const [failedSrc, setFailedSrc] = useState<string | null>(null);
+    const resolvedSrc = src && failedSrc !== src ? src : undefined;
+
     return (
         <MantineAvatar
             size={SIZE_PX[size]}
+            src={resolvedSrc}
+            imageProps={{ onError: () => setFailedSrc(src ?? null) }}
             classNames={{
                 root: styles.avatar,
                 placeholder: styles['avatar__placeholder'],
