@@ -1,0 +1,51 @@
+@use 'styles/typography' as *;
+
+.cropper__description {
+    @include t-body-sm;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.cropper__viewport {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: rgba(20, 12, 9, 0.9);
+    border: 1px solid var(--border-subtle);
+}
+
+.cropper__controls {
+    padding: 0 var(--space-1);
+}
+
+.cropper__slider-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.cropper__slider-label {
+    @include t-caps-xs;
+    color: var(--text-secondary);
+}
+
+.cropper__slider {
+    width: 100%;
+}
+
+.cropper__slider-track {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.cropper__slider-thumb {
+    border: 2px solid rgba(255, 255, 255, 0.88);
+    background: var(--accent-primary);
+}
+
+.cropper__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}

@@ -821,11 +821,17 @@
         },
         "profile": {
             "changeAvatarButton": "Сменить аватар",
-            "removeAvatarButton": "Убрать свой аватар",
             "editButton": "Изменить имя",
             "nameLabel": "Имя",
             "saveButton": "Сохранить",
-            "cancelButton": "Отмена"
+            "cancelButton": "Отмена",
+            "cropper": {
+                "title": "Настроить аватар",
+                "description": "Подвиньте и приблизьте изображение, чтобы оно хорошо смотрелось в круге.",
+                "zoomLabel": "Масштаб",
+                "cancelButton": "Отмена",
+                "saveButton": "Сохранить аватар"
+            }
         },
         "children": {
             "heading": "Дети",

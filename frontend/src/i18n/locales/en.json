@@ -804,11 +804,17 @@
         },
         "profile": {
             "changeAvatarButton": "Change avatar",
-            "removeAvatarButton": "Remove custom avatar",
             "editButton": "Edit name",
             "nameLabel": "Name",
             "saveButton": "Save",
-            "cancelButton": "Cancel"
+            "cancelButton": "Cancel",
+            "cropper": {
+                "title": "Adjust avatar",
+                "description": "Move and scale the image so it sits nicely in the circle.",
+                "zoomLabel": "Zoom",
+                "cancelButton": "Cancel",
+                "saveButton": "Save avatar"
+            }
         },
         "children": {
             "heading": "Children",

@@ -816,11 +816,17 @@
         },
         "profile": {
             "changeAvatarButton": "Avatar ändern",
-            "removeAvatarButton": "Eigenen Avatar entfernen",
             "editButton": "Name bearbeiten",
             "nameLabel": "Name",
             "saveButton": "Speichern",
-            "cancelButton": "Abbrechen"
+            "cancelButton": "Abbrechen",
+            "cropper": {
+                "title": "Avatar anpassen",
+                "description": "Verschiebe und skaliere das Bild so, dass es sauber in den Kreis passt.",
+                "zoomLabel": "Zoom",
+                "cancelButton": "Abbrechen",
+                "saveButton": "Avatar speichern"
+            }
         },
         "children": {
             "heading": "Kinder",
