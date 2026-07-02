@@ -135,6 +135,19 @@ Wire them up in the component via `classNames`:
 
 **Atom components do not expose `className`, `classNames`, `style`, `styles`, or `vars` props.** Atoms are closed — all visual variation comes from semantic props (`variant`, `size`, etc.) that map to modifier classes internally.
 
+### Closed atoms
+
+Treat design-system atoms (`Button`, `Tag`, etc.) as visually closed unless the component API
+explicitly says otherwise.
+
+- Do not restyle atoms from the outside with ad hoc `className` assumptions or overrides that
+  depend on third-party DOM details.
+- If a special layout is needed (for example icon-only actions, fixed-width utility controls, or
+  grid alignment), solve it with an outer wrapper or an explicit semantic prop/variant on the
+  atom itself.
+- If the same need repeats, promote it into the atom API instead of stacking local CSS hacks
+  around rendered internals.
+
 **3. `classNames` prop — sub-element slot overrides**
 
 For Mantine components whose internal slots (label, input, error, dropdown, etc.) need precise visual control:
@@ -151,6 +164,22 @@ For Mantine components whose internal slots (label, input, error, dropdown, etc.
 ```
 
 Never use the `styles` prop (Mantine's inline CSS API) for static values — those go in the module file.
+
+## Shared interaction primitives
+
+When the same interaction pattern appears in more than one place, reuse the existing UI primitive
+instead of restyling each screen independently.
+
+- **Selectable surfaces** use the shared selection stack:
+    - `SelectableCard`
+    - `SelectionBadge`
+    - `RadioCard` / `RadioCardGroup`
+    - `OptionPill` / `OptionPillGroup`
+- Shared hover and selected behavior belongs in `src/styles/_interactions.scss`.
+- Do not recreate one-off selected outlines, orange hover borders, or checked badges in route
+  stylesheets if an existing primitive already expresses that pattern.
+- If a new screen needs the same interaction with different content density, extend the primitive
+  with props or layout wrappers instead of cloning the visual logic.
 
 ---
 
