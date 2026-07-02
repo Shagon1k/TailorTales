@@ -101,7 +101,7 @@ export default function WorkshopForm({
     const router = useRouter();
     const questionSuggestions = useMemo(
         () => getRandomQuestionSuggestions(getLocalizedQuestionSuggestions((key) => t(key))),
-        [locale, t],
+        [t],
     );
 
     const pageCountLabels: Record<number, string> = {
