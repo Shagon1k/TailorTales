@@ -46,27 +46,22 @@ export default function ReaderHeader({ story }: Readonly<IReaderHeaderProps>): R
             <div className={styles.header__row}>
                 <h1 className={styles.header__title}>{story.title ?? `"${story.question}"`}</h1>
 
-                <div className={styles.header__actions}>
-                    <Button variant="secondary" disabled>
-                        {t('shareButton')}
+                {story.pdfUrl ? (
+                    <Button
+                        variant="primary"
+                        component="a"
+                        href={story.pdfUrl}
+                        download={`${story.title ?? 'story'}.pdf`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {t('downloadButton')}
                     </Button>
-                    {story.pdfUrl ? (
-                        <Button
-                            variant="primary"
-                            component="a"
-                            href={story.pdfUrl}
-                            download={`${story.title ?? 'story'}.pdf`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {t('downloadButton')}
-                        </Button>
-                    ) : (
-                        <Button variant="primary" disabled>
-                            {t('downloadButton')}
-                        </Button>
-                    )}
-                </div>
+                ) : (
+                    <Button variant="primary" disabled>
+                        {t('downloadButton')}
+                    </Button>
+                )}
             </div>
 
             <p className={styles.header__meta}>

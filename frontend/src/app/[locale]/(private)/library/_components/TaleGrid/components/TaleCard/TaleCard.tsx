@@ -126,11 +126,6 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                             {t('retryLabel')}
                         </ButtonLink>
                     )}
-                    {isDraft && (
-                        <ButtonLink href={href} variant="secondary">
-                            {t('continueDraftLabel')}
-                        </ButtonLink>
-                    )}
                     <Button
                         variant="quiet"
                         onClick={() => setIsDeleteOpen(true)}

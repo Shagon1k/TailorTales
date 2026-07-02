@@ -85,7 +85,7 @@ export default function RatingPanel({
     return (
         <section className={styles.rating} aria-labelledby="rating-heading">
             <div className={styles.rating__header}>
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
             </div>
 
             <p id="rating-heading" className={styles.rating__sub}>

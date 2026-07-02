@@ -47,7 +47,7 @@ export default function DetailsPanel({ story }: Readonly<IDetailsPanelProps>): R
     return (
         <section className={styles.details} aria-labelledby="details-heading">
             <div className={styles.details__header}>
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
             </div>
 
             <dl className={styles.details__list}>

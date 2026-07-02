@@ -683,6 +683,7 @@
             "lastTale": "последняя сказка {relativeTime}",
             "noTales": "сказок пока нет",
             "loves": "любит:",
+            "taleCountMetricLabel": "{count, plural, one {история} few {истории} many {историй} other {истории}}",
             "newTaleButton": "+ Новая сказка",
             "taleCount": "{count, plural, one {# история} few {# истории} many {# историй} other {# истории}}"
         },
@@ -705,7 +706,6 @@
             "failedOverlay": "Создание не удалось",
             "draftOverlay": "Черновик",
             "retryLabel": "Попробовать снова",
-            "continueDraftLabel": "Продолжить",
             "deleteButton": "Удалить",
             "deleteAriaLabel": "Удалить {displayTitle}",
             "deleteConfirm": "Удалить «{displayTitle}»? Это действие нельзя отменить.",

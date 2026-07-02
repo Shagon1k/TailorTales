@@ -23,7 +23,7 @@ export default function ChapterList({
     return (
         <nav className={styles['chapter-list']} aria-label={t('ariaLabel')}>
             <div className={styles['chapter-list__header']}>
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
             </div>
 
             <ol className={styles['chapter-list__items']}>

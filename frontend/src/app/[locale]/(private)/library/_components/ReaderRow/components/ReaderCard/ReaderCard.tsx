@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import Avatar from '@/components/ui/Avatar/Avatar';
+import InlineMetrics from '@/components/ui/InlineMetrics/InlineMetrics';
+import Tag from '@/components/ui/Tag/Tag';
 import type { IChild } from '@/types/child.types';
 import type { IStorySummary } from '@/types/story.types';
 import { getAge, getRelativeTime } from '@/utils/date.utils';
@@ -16,6 +17,7 @@ export default async function ReaderCard({
     stories,
 }: Readonly<IReaderCardProps>): Promise<React.ReactElement> {
     const t = await getTranslations('library.readerCard');
+    const newTaleLabel = t('newTaleButton').replace(/^\+\s*/, '');
     const childStories = stories.filter((s) => s.childId === child.id);
     const lastStory = childStories.toSorted(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -27,10 +29,12 @@ export default async function ReaderCard({
             aria-label={t('ariaLabel', { childName: child.name })}
         >
             <div className={styles['reader-card__top']}>
-                <Avatar size="lg" name={child.name} />
                 <div className={styles['reader-card__info']}>
-                    <p className={styles['reader-card__name']}>
-                        {child.name} · {getAge(child.birthdate)}
+                    <p className={styles['reader-card__name-row']}>
+                        <span className={styles['reader-card__name']}>{child.name}</span>
+                        <span className={styles['reader-card__age']}>
+                            , {getAge(child.birthdate)}
+                        </span>
                     </p>
                     {lastStory ? (
                         <p className={styles['reader-card__last-tale']}>
@@ -40,9 +44,16 @@ export default async function ReaderCard({
                         <p className={styles['reader-card__last-tale']}>{t('noTales')}</p>
                     )}
                     {child.interests.length > 0 && (
-                        <p className={styles['reader-card__interests']}>
-                            {t('loves')} {child.interests.join(', ')}
-                        </p>
+                        <div className={styles['reader-card__interests-wrap']}>
+                            <p className={styles['reader-card__interests-label']}>{t('loves')}</p>
+                            <div className={styles['reader-card__interests']}>
+                                {child.interests.map((interest) => (
+                                    <Tag key={interest} variant="filled">
+                                        {interest}
+                                    </Tag>
+                                ))}
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>
@@ -52,11 +63,27 @@ export default async function ReaderCard({
                     href={`/workshop?childId=${child.id}`}
                     className={styles['reader-card__new-tale']}
                 >
-                    {t('newTaleButton')}
+                    <span className={styles['reader-card__new-tale-icon']} aria-hidden="true">
+                        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6 2.5v7M2.5 6h7"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                    </span>
+                    <span>{newTaleLabel}</span>
                 </Link>
-                <span className={styles['reader-card__count']}>
-                    {t('taleCount', { count: childStories.length })}
-                </span>
+                <InlineMetrics
+                    items={[
+                        {
+                            id: 'tales',
+                            value: childStories.length,
+                            label: t('taleCountMetricLabel', { count: childStories.length }),
+                        },
+                    ]}
+                />
             </div>
         </article>
     );

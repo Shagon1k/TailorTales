@@ -34,7 +34,7 @@ export default function RegenerationPanel({
     return (
         <section className={styles.panel} aria-label={t('ariaLabel')}>
             <div className={styles.panel__header}>
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
             </div>
 
             <div className={styles.panel__actions}>

@@ -420,6 +420,7 @@ export default function WorkshopForm({
                         value={pageCount}
                         onChange={setPageCount}
                         label={t('pageCount.label')}
+                        layout="grid"
                     >
                         {config.allowedPageCounts.map((count) => (
                             <OptionPill key={count} value={String(count)}>
@@ -459,6 +460,7 @@ export default function WorkshopForm({
                         value={language}
                         onChange={(v) => setLanguage(v as ILanguage)}
                         label={t('languagePicker.label')}
+                        layout="grid"
                     >
                         {LANGUAGE_CODES.map((code) => (
                             <OptionPill key={code} value={code}>
@@ -481,6 +483,7 @@ export default function WorkshopForm({
                         value={genre}
                         onChange={(v) => setGenre(v as IStoryGenre)}
                         label={t('genrePicker.label')}
+                        layout="grid"
                     >
                         {GENRES.map(({ value, key }) => (
                             <OptionPill key={value} value={value}>
@@ -508,6 +511,7 @@ export default function WorkshopForm({
                         value={writingStyle}
                         onChange={(v) => setWritingStyle(v as IWritingStyle)}
                         label={t('writingStylePicker.label')}
+                        layout="grid"
                     >
                         {WRITING_STYLES.map(({ value, key }) => (
                             <OptionPill key={value} value={value}>

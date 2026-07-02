@@ -74,7 +74,7 @@ export default function SpreadViewer({
                 </span>
 
                 <Button
-                    variant="primary"
+                    variant="secondary"
                     onClick={onNext}
                     disabled={isLast}
                     aria-controls={PAGE_REGION_ID}

@@ -678,6 +678,7 @@
             "lastTale": "letzte Geschichte {relativeTime}",
             "noTales": "noch keine Geschichten",
             "loves": "liebt:",
+            "taleCountMetricLabel": "{count, plural, one {Geschichte} other {Geschichten}}",
             "newTaleButton": "+ Neue Geschichte",
             "taleCount": "{count, plural, one {# Geschichte} other {# Geschichten}}"
         },
@@ -700,7 +701,6 @@
             "failedOverlay": "Generierung fehlgeschlagen",
             "draftOverlay": "Entwurf",
             "retryLabel": "Erneut versuchen",
-            "continueDraftLabel": "Fortsetzen",
             "deleteButton": "Löschen",
             "deleteAriaLabel": "{displayTitle} löschen",
             "deleteConfirm": "„{displayTitle}“ löschen? Dies kann nicht rückgängig gemacht werden.",

@@ -666,6 +666,7 @@
             "lastTale": "last tale {relativeTime}",
             "noTales": "no tales yet",
             "loves": "loves:",
+            "taleCountMetricLabel": "{count, plural, one {tale} other {tales}}",
             "newTaleButton": "+ New tale",
             "taleCount": "{count, plural, one {# tale} other {# tales}}"
         },
@@ -688,7 +689,6 @@
             "failedOverlay": "Generation failed",
             "draftOverlay": "Draft",
             "retryLabel": "Try again",
-            "continueDraftLabel": "Continue",
             "deleteButton": "Delete",
             "deleteAriaLabel": "Delete {displayTitle}",
             "deleteConfirm": "Delete “{displayTitle}”? This cannot be undone.",
