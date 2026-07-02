@@ -65,6 +65,7 @@ function createService(prisma = createPrismaMock()) {
     const storage = {
         upload: vi.fn().mockResolvedValue('uploaded-key'),
         getSignedUrl: vi.fn().mockResolvedValue('https://storage.test/page.png'),
+        downloadBuffer: vi.fn().mockResolvedValue(Buffer.from('reference-image')),
     };
     const pdfBinding = {
         buildAndStore: vi.fn().mockResolvedValue(undefined),
@@ -127,10 +128,13 @@ describe('RegenerationService', () => {
             prompt: 'Make the moon look friendlier.',
         });
 
-        expect(ai.generateImage).toHaveBeenCalledWith({
-            prompt: expect.stringContaining(mockStory.styleAnchor),
-            size: expect.any(String),
-        });
+        expect(ai.generateImage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining(mockStory.styleAnchor),
+                size: expect.any(String),
+                aspectRatio: '3:2',
+            }),
+        );
         expect(ai.generateImage.mock.calls[0][0].prompt).toContain(mockPage.illustrationPrompt);
         expect(ai.generateImage.mock.calls[0][0].prompt).toContain(
             'Requested change: Make the moon look friendlier.',

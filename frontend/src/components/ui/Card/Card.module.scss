@@ -2,12 +2,6 @@
     position: relative;
 
     // Variants — control background, shadow, border
-    &.m-default {
-        background: var(--bg-card);
-        box-shadow: var(--shadow-lg);
-        color: var(--text-on-card);
-    }
-
     // Lifted panel — subtle top-lighter gradient, soft hairline border, diffuse shadow.
     &.m-dark {
         background: var(--gradient-card-twilight);

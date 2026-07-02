@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import Loader from '@/components/ui/Loader/Loader';
 import Modal from '@/components/ui/Modal/Modal';
 import Button from '@/components/ui/Button/Button';
+import InlineMetrics from '@/components/ui/InlineMetrics/InlineMetrics';
 import ChildCard from './_components/ChildCard/ChildCard';
 import ChildForm, { type IChildFormValues } from './_components/ChildForm/ChildForm';
 import CharacterForm, {
@@ -14,8 +15,8 @@ import { useChildren, useCreateChild, useDeleteChild, useUpdateChild } from '@/h
 import {
     useCharacters,
     useCreateCharacter,
-    useCreateCharacterFromPrompt,
     useDeleteCharacter,
+    useGenerateCharacterPreview,
     useUpdateCharacter,
 } from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
@@ -43,26 +44,39 @@ export default function ChildrenPage(): React.ReactElement {
     const { mutate: createCharacter, isPending: isCreatingCharacter } = useCreateCharacter();
     const { mutate: updateCharacter, isPending: isUpdatingCharacter } = useUpdateCharacter();
     const { mutate: deleteCharacter, isPending: isDeletingCharacter } = useDeleteCharacter();
-    const { mutate: createCharacterFromPrompt, isPending: isGeneratingCharacter } =
-        useCreateCharacterFromPrompt();
+    const { mutate: generateCharacterPreview } = useGenerateCharacterPreview();
 
     const childrenLimit = subscription?.tier.childrenLimit ?? null;
     const atChildrenLimit = childrenLimit !== null && children.length >= childrenLimit;
+    const charactersLimit = subscription?.tier.charactersLimit ?? null;
+    const charactersLeft =
+        charactersLimit === null ? null : Math.max(charactersLimit - characters.length, 0);
+    const characterGenerationLimit = subscription?.tier.characterGenerationsPerMonth ?? 0;
+    const characterGenerationsUsed = subscription?.characterGenerationsUsed ?? 0;
+    const characterGenerationsLeft = Math.max(
+        characterGenerationLimit - characterGenerationsUsed,
+        0,
+    );
+    const canCreateCharacter =
+        characterGenerationsLeft > 0 && (charactersLeft === null || charactersLeft > 0);
 
     const [modal, setModal] = useState<TModalState>({ kind: 'closed' });
+    const [generatingCharacterPreviewId, setGeneratingCharacterPreviewId] = useState<string | null>(
+        null,
+    );
     const close = (): void => setModal({ kind: 'closed' });
 
     // A child may own several characters — group them all (Model B).
     const charactersByChildId = new Map<string, ICharacter[]>();
     for (const character of characters) {
-        if (character.childId === null) continue;
         const list = charactersByChildId.get(character.childId) ?? [];
         list.push(character);
         charactersByChildId.set(character.childId, list);
     }
 
     const isFormOpen = modal.kind === 'add' || modal.kind === 'edit';
-    const isCharacterFormOpen = modal.kind === 'character';
+    const activeCharacterModal = modal.kind === 'character' ? modal : null;
+    const isCharacterFormOpen = activeCharacterModal !== null;
 
     function handleChildSubmit(values: IChildFormValues): void {
         if (modal.kind === 'edit') {
@@ -76,17 +90,25 @@ export default function ChildrenPage(): React.ReactElement {
         values: ICharacterFormValues,
         source: IUserCharacterSource,
     ): void {
-        if (modal.kind !== 'character') return;
-        if (modal.character) {
-            updateCharacter({ id: modal.character.id, payload: values }, { onSuccess: close });
+        if (!activeCharacterModal) return;
+        if (activeCharacterModal.character) {
+            updateCharacter(
+                { id: activeCharacterModal.character.id, payload: values },
+                { onSuccess: close },
+            );
         } else {
-            createCharacter({ ...values, childId: modal.child.id, source }, { onSuccess: close });
+            createCharacter(
+                { ...values, childId: activeCharacterModal.child.id, source },
+                { onSuccess: close },
+            );
         }
     }
 
-    function handleGenerateCharacter(prompt: string): void {
-        if (modal.kind !== 'character') return;
-        createCharacterFromPrompt({ childId: modal.child.id, prompt }, { onSuccess: close });
+    function handleCharacterPreviewGenerate(character: ICharacter): void {
+        setGeneratingCharacterPreviewId(character.id);
+        generateCharacterPreview(character.id, {
+            onSettled: () => setGeneratingCharacterPreviewId(null),
+        });
     }
 
     if (isLoading) {
@@ -99,8 +121,6 @@ export default function ChildrenPage(): React.ReactElement {
 
     return (
         <div className={styles.page}>
-            <h2 className={styles.heading}>{t('heading')}</h2>
-
             {children.length === 0 ? (
                 <div className={styles.empty}>
                     <p className={styles['empty__text']}>{t('empty')}</p>
@@ -113,40 +133,82 @@ export default function ChildrenPage(): React.ReactElement {
                     </Button>
                 </div>
             ) : (
-                <>
-                    <div className={styles['add-row']}>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setModal({ kind: 'add' })}
-                            disabled={atChildrenLimit}
-                        >
-                            {t('addButton')}
-                        </Button>
-                        {atChildrenLimit && (
-                            <p className={styles['add-row__limit-hint']}>{t('limitHint')}</p>
-                        )}
+                <div className={styles.content}>
+                    <div className={styles.main}>
+                        <div className={styles.grid}>
+                            {children.map((child) => (
+                                <ChildCard
+                                    key={child.id}
+                                    child={child}
+                                    characters={charactersByChildId.get(child.id) ?? []}
+                                    onEdit={(c) => setModal({ kind: 'edit', child: c })}
+                                    onDelete={(c) => setModal({ kind: 'delete', child: c })}
+                                    onCharacterAdd={(c) =>
+                                        setModal({ kind: 'character', child: c, character: null })
+                                    }
+                                    onCharacterEdit={(c, character) =>
+                                        setModal({ kind: 'character', child: c, character })
+                                    }
+                                    onCharacterDelete={(character) =>
+                                        setModal({ kind: 'deleteCharacter', character })
+                                    }
+                                    onCharacterGeneratePreview={handleCharacterPreviewGenerate}
+                                    canAddCharacter={canCreateCharacter}
+                                    canGenerateCharacterPreview={characterGenerationsLeft > 0}
+                                    generatingCharacterPreviewId={generatingCharacterPreviewId}
+                                    addCharacterHint={
+                                        !canCreateCharacter
+                                            ? characterGenerationsLeft === 0
+                                                ? t('characterGenerationLimitHint')
+                                                : t('characterLimitHint')
+                                            : null
+                                    }
+                                />
+                            ))}
+                        </div>
                     </div>
-                    <div className={styles.grid}>
-                        {children.map((child) => (
-                            <ChildCard
-                                key={child.id}
-                                child={child}
-                                characters={charactersByChildId.get(child.id) ?? []}
-                                onEdit={(c) => setModal({ kind: 'edit', child: c })}
-                                onDelete={(c) => setModal({ kind: 'delete', child: c })}
-                                onCharacterAdd={(c) =>
-                                    setModal({ kind: 'character', child: c, character: null })
-                                }
-                                onCharacterEdit={(c, character) =>
-                                    setModal({ kind: 'character', child: c, character })
-                                }
-                                onCharacterDelete={(character) =>
-                                    setModal({ kind: 'deleteCharacter', character })
-                                }
+                    <aside className={styles.aside}>
+                        <section className={styles.utility} aria-label={t('quotaLabel')}>
+                            <div className={styles['add-row']}>
+                                <Button
+                                    variant="secondary"
+                                    fullWidth
+                                    onClick={() => setModal({ kind: 'add' })}
+                                    disabled={atChildrenLimit}
+                                >
+                                    {t('addButton')}
+                                </Button>
+                                {atChildrenLimit && (
+                                    <p className={styles['add-row__limit-hint']}>
+                                        {t('limitHint')}
+                                    </p>
+                                )}
+                            </div>
+                            <InlineMetrics
+                                align="center"
+                                items={[
+                                    {
+                                        id: 'generations',
+                                        value: characterGenerationsLeft,
+                                        label: t('characterQuotaMetricLabel', {
+                                            count: characterGenerationsLeft,
+                                        }),
+                                    },
+                                    {
+                                        id: 'slots',
+                                        value: charactersLeft === null ? '∞' : charactersLeft,
+                                        label:
+                                            charactersLeft === null
+                                                ? t('characterSlotsUnlimitedMetricLabel')
+                                                : t('characterSlotsMetricLabel', {
+                                                      count: charactersLeft,
+                                                  }),
+                                    },
+                                ]}
                             />
-                        ))}
-                    </div>
-                </>
+                        </section>
+                    </aside>
+                </div>
             )}
 
             <Modal
@@ -177,34 +239,28 @@ export default function ChildrenPage(): React.ReactElement {
                 opened={isCharacterFormOpen}
                 onClose={close}
                 title={
-                    modal.kind === 'character' && modal.character
+                    activeCharacterModal?.character
                         ? tCharModal('editTitle')
                         : tCharModal('addTitle')
                 }
             >
-                {isCharacterFormOpen && (
+                {activeCharacterModal && (
                     <CharacterForm
                         initialValues={
-                            modal.character
+                            activeCharacterModal.character
                                 ? {
-                                      name: modal.character.name,
-                                      description: modal.character.description,
+                                      name: activeCharacterModal.character.name,
+                                      description: activeCharacterModal.character.description,
                                   }
                                 : undefined
                         }
                         onSubmit={handleCharacterSubmit}
                         onCancel={close}
                         isSubmitting={
-                            modal.kind === 'character' && modal.character
+                            activeCharacterModal.character
                                 ? isUpdatingCharacter
                                 : isCreatingCharacter
                         }
-                        onGenerateFromPrompt={
-                            modal.kind === 'character' && !modal.character
-                                ? handleGenerateCharacter
-                                : undefined
-                        }
-                        isGenerating={isGeneratingCharacter}
                     />
                 )}
             </Modal>

@@ -61,6 +61,7 @@ export class BillingWebhookService {
                 currentPeriodEnd: this.parsePeriodEnd(event),
                 pagesUsed: 0,
                 regenerationsUsed: 0,
+                characterGenerationsUsed: 0,
             },
         });
 
@@ -98,7 +99,11 @@ export class BillingWebhookService {
                 status: event.data.status === 'past_due' ? 'PAST_DUE' : 'ACTIVE',
                 cancelAtPeriodEnd: event.data.scheduledChange?.action === 'cancel',
                 currentPeriodEnd: newPeriodEnd,
-                ...(isNewBillingCycle && { pagesUsed: 0, regenerationsUsed: 0 }),
+                ...(isNewBillingCycle && {
+                    pagesUsed: 0,
+                    regenerationsUsed: 0,
+                    characterGenerationsUsed: 0,
+                }),
             },
         });
 
@@ -136,6 +141,7 @@ export class BillingWebhookService {
                 currentPeriodEnd: null,
                 pagesUsed: 0,
                 regenerationsUsed: 0,
+                characterGenerationsUsed: 0,
             },
         });
 

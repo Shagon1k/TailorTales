@@ -10,8 +10,9 @@
     border: none;
 
     &.m-filled {
-        background: var(--bg-elevated);
-        color: var(--text-secondary);
+        background: color-mix(in srgb, var(--bg-elevated-hover) 82%, black 18%);
+        color: var(--text-primary);
+        border: 1px solid color-mix(in srgb, var(--accent-gold) 45%, transparent);
     }
 
     &.m-warm {

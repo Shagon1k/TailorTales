@@ -28,9 +28,9 @@ export default function PaymentDetails(): React.ReactElement {
     }
 
     return (
-        <Card variant="default" size="md">
+        <Card size="md">
             <Stack gap="sm">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 <p className={styles['payment-details__copy']}>{t('body')}</p>
                 <Group>
                     <Button variant="secondary" onClick={() => openPortal()} loading={isOpening}>

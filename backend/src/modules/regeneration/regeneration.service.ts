@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import type { Child, Page, Story } from '../../generated/prisma/client.js';
+import type { Character, Child, Page, Story } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { endsWithCompleteSentence } from '../../common/text.utils.js';
 import { StorageService } from '../storage/storage.service.js';
@@ -8,12 +8,14 @@ import { PdfBindingService } from '../rendering/pdf-binding.service.js';
 import { PAGE_TEMPLATES } from '../rendering/page-templates.config.js';
 import { AI_CLIENT, type IAiClient } from '../ai/ai.types.js';
 import { CHARS_PER_TOKEN } from '../generation/generation.constants.js';
+import { buildImageSlotPrompt } from '../generation/generation.prompts.js';
 import { QuotaService } from '../subscriptions/quota.service.js';
 import { buildPageTextSystemPrompt, buildPageTextUserPrompt } from './regeneration.prompts.js';
 import type { RegeneratePageDto } from './dto/regenerate-page.dto.js';
 
 type StoryForRegen = Story & {
     child: Pick<Child, 'name'>;
+    character: Pick<Character, 'previewKey'> | null;
 };
 
 @Injectable()
@@ -37,7 +39,10 @@ export class RegenerationService {
         // 1. Ownership + status check
         const story = await this.prisma.story.findFirst({
             where: { id: storyId, userId },
-            include: { child: { select: { name: true } } },
+            include: {
+                child: { select: { name: true } },
+                character: { select: { previewKey: true } },
+            },
         });
         if (!story) throw new NotFoundException(`Story ${storyId} not found`);
         if (story.status !== 'COMPLETED') {
@@ -176,6 +181,12 @@ export class RegenerationService {
         const prompt = [
             story.styleAnchor,
             page.illustrationPrompt,
+            buildImageSlotPrompt(
+                page.layout ?? imageSlot.name,
+                tpl.narrativePurpose,
+                imageSlot.aspect,
+                imageSlot.size,
+            ),
             authorNote ? `Requested change: ${authorNote}` : null,
         ]
             .filter(Boolean)
@@ -183,7 +194,21 @@ export class RegenerationService {
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
-        return this.ai.generateImage({ prompt, size: imageSlot.size });
+        const referenceImageUrls = story.character?.previewKey
+            ? [await this.getReferenceImageDataUrl(story.character.previewKey)]
+            : undefined;
+
+        return this.ai.generateImage({
+            prompt,
+            size: imageSlot.size,
+            aspectRatio: imageSlot.aspect,
+            referenceImageUrls,
+        });
+    }
+
+    private async getReferenceImageDataUrl(key: string): Promise<string> {
+        const buffer = await this.storage.downloadBuffer(key);
+        return `data:image/png;base64,${buffer.toString('base64')}`;
     }
 
     private async persistPageImage(

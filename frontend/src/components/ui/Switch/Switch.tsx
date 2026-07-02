@@ -8,6 +8,7 @@ export interface ISwitchProps {
     onChange: (checked: boolean) => void;
     /** Visible text beside the switch; also names the control for assistive tech. */
     label: string;
+    hideLabel?: boolean;
     disabled?: boolean;
 }
 
@@ -19,6 +20,7 @@ export default function Switch({
     checked,
     onChange,
     label,
+    hideLabel = false,
     disabled = false,
 }: Readonly<ISwitchProps>): React.ReactElement {
     return (
@@ -34,7 +36,9 @@ export default function Switch({
             <span className={styles.switch__track} aria-hidden="true">
                 <span className={styles.switch__thumb} />
             </span>
-            <span className={styles.switch__label}>{label}</span>
+            <span className={clsx(styles.switch__label, { [styles['m-sr-only']]: hideLabel })}>
+                {label}
+            </span>
         </label>
     );
 }

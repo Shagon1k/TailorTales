@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { IPage, IRegenerateWhat } from '@/types/story.types';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import Button from '@/components/ui/Button/Button';
+import InlineMetrics from '@/components/ui/InlineMetrics/InlineMetrics';
 import { useSubscription } from '@/hooks/subscription';
 import RegenerationModal from './components/RegenerationModal/RegenerationModal';
 import styles from './RegenerationPanel.module.scss';
@@ -12,11 +13,13 @@ import styles from './RegenerationPanel.module.scss';
 export interface IRegenerationPanelProps {
     storyId: string;
     page: IPage;
+    onRegenerated?: () => void;
 }
 
 export default function RegenerationPanel({
     storyId,
     page,
+    onRegenerated,
 }: Readonly<IRegenerationPanelProps>): React.ReactElement {
     const t = useTranslations('storyReader.regeneration');
     const [modalWhat, setModalWhat] = useState<IRegenerateWhat | null>(null);
@@ -31,7 +34,7 @@ export default function RegenerationPanel({
     return (
         <section className={styles.panel} aria-label={t('ariaLabel')}>
             <div className={styles.panel__header}>
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
             </div>
 
             <div className={styles.panel__actions}>
@@ -58,12 +61,24 @@ export default function RegenerationPanel({
                 </Button>
             </div>
 
-            {regenerationsLeft !== null && (
+            {regenerationsLeft !== null && quotaExhausted && (
                 <p className={styles.panel__quota} data-exhausted={quotaExhausted || undefined}>
-                    {quotaExhausted
-                        ? t('quotaExhausted')
-                        : t('quotaInfo', { count: regenerationsLeft })}
+                    {t('quotaExhausted')}
                 </p>
+            )}
+
+            {regenerationsLeft !== null && !quotaExhausted && (
+                <InlineMetrics
+                    align="center"
+                    ariaLabel={t('quotaAriaLabel')}
+                    items={[
+                        {
+                            id: 'regenerations',
+                            value: regenerationsLeft,
+                            label: t('quotaMetricLabel', { count: regenerationsLeft }),
+                        },
+                    ]}
+                />
             )}
 
             {/* key forces remount on each open — cleanly resets form state without useEffect */}
@@ -74,6 +89,7 @@ export default function RegenerationPanel({
                 what={modalWhat ?? 'text'}
                 opened={modalWhat !== null}
                 onClose={() => setModalWhat(null)}
+                onSuccess={onRegenerated}
             />
         </section>
     );

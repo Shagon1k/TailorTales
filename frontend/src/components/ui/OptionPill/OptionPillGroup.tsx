@@ -10,6 +10,7 @@ export interface IOptionPillGroupProps {
     /** Accessible label for the radio group. */
     label?: string;
     disabled?: boolean;
+    layout?: 'wrap' | 'grid';
 }
 
 export default function OptionPillGroup({
@@ -18,10 +19,16 @@ export default function OptionPillGroup({
     children,
     label,
     disabled = false,
+    layout = 'wrap',
 }: Readonly<IOptionPillGroupProps>): React.ReactElement {
     return (
         <OptionPillGroupContext value={{ value, onChange, disabled }}>
-            <div role="radiogroup" aria-label={label} className={styles['option-pill-group']}>
+            <div
+                role="radiogroup"
+                aria-label={label}
+                className={styles['option-pill-group']}
+                data-layout={layout}
+            >
                 {children}
             </div>
         </OptionPillGroupContext>

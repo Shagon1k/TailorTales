@@ -1,7 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import CapsLink from '@/components/ui/CapsLink/CapsLink';
-import type { IStorySummary } from '@/types/story.types';
-import { getAge } from '@/utils/date.utils';
+import type { IPublicStorySummary } from '@/types/story.types';
 import StoryCard, { type TStoryCardTone } from './components/StoryCard/StoryCard';
 import styles from './TalesSection.module.scss';
 
@@ -9,7 +7,7 @@ import styles from './TalesSection.module.scss';
 const TONES: TStoryCardTone[] = ['rose', 'fox', 'plum'];
 
 export interface ITalesSectionProps {
-    tales: IStorySummary[];
+    tales: IPublicStorySummary[];
 }
 
 export default async function TalesSection({
@@ -25,19 +23,23 @@ export default async function TalesSection({
             <div className={styles.tales__inner}>
                 <div className={styles.tales__header}>
                     <h2 className={styles.tales__heading}>{t('heading')}</h2>
-                    {/* TODO: link to /tales once the public library page is built */}
-                    <CapsLink href="#">{t('browseLink')}</CapsLink>
                 </div>
                 <div className={styles.tales__grid}>
                     {tales.map((tale, index) => (
                         <StoryCard
                             key={tale.id}
+                            title={tale.title}
                             quote={tale.question}
-                            childName={tale.child.name}
-                            age={getAge(tale.child.birthdate)}
+                            age={tale.readerAge}
                             pages={tale.pageCount}
+                            language={tale.language}
+                            genre={tale.genre}
+                            writingStyle={tale.writingStyle}
+                            artStyleName={tale.artStyle.name}
+                            hasCharacter={tale.hasCharacter}
+                            pdfUrl={tale.pdfUrl}
                             format={tale.type === 'COMIC' ? 'comic' : 'book'}
-                            rating={tale.rating ?? 0}
+                            rating={tale.rating}
                             tone={TONES[index % TONES.length]}
                         />
                     ))}

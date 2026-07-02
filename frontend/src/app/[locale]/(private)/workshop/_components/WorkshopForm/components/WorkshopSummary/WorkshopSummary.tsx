@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import { useSubscription } from '@/hooks/subscription';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
+import InlineMetrics from '@/components/ui/InlineMetrics/InlineMetrics';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import type { IChild } from '@/types/child.types';
 import type { ICharacter } from '@/types/character.types';
@@ -25,8 +26,8 @@ export interface IWorkshopSummaryProps {
     question: string;
     isValid: boolean;
     isPending: boolean;
-    onSubmit: () => void;
-    onCharacterChoose: () => void;
+    onGenerate: () => void;
+    onSaveDraft: () => void;
 }
 
 export default function WorkshopSummary({
@@ -39,8 +40,8 @@ export default function WorkshopSummary({
     question,
     isValid,
     isPending,
-    onSubmit,
-    onCharacterChoose,
+    onGenerate,
+    onSaveDraft,
 }: Readonly<IWorkshopSummaryProps>): React.ReactElement {
     const t = useTranslations('workshop.summary');
     const hasQuestion = question.trim().length > 0;
@@ -50,6 +51,7 @@ export default function WorkshopSummary({
 
     const { data: subscription } = useSubscription();
     const creditCost = pageCount ? Number(pageCount) * CREDITS_PER_BOOK_PAGE : 0;
+    const isCreditsLoading = subscription === undefined;
     const creditsRemaining = subscription
         ? Math.max(subscription.tier.pagesPerMonth - subscription.pagesUsed, 0)
         : null;
@@ -74,17 +76,7 @@ export default function WorkshopSummary({
 
             <ul className={styles.summary__rows}>
                 <SummaryRow label={t('labels.reader')} value={child?.name ?? null} />
-                <SummaryRow
-                    label={t('labels.character')}
-                    value={character?.name ?? null}
-                    action={{
-                        label: character
-                            ? t('characterAction.change')
-                            : t('characterAction.choose'),
-                        onClick: onCharacterChoose,
-                        disabled: child === null,
-                    }}
-                />
+                <SummaryRow label={t('labels.character')} value={character?.name ?? null} />
                 <SummaryRow label={t('labels.format')} value={storyTypeLabel} />
                 <SummaryRow
                     label={t('labels.length')}
@@ -99,14 +91,22 @@ export default function WorkshopSummary({
 
             <hr className={styles.summary__divider} aria-hidden="true" />
 
-            <p className={styles.summary__credits}>
-                <span className={styles['summary__credits-cost']}>
-                    {t('creditCost', { creditCost })}
-                </span>
-                <span className={styles['summary__credits-remaining']}>
-                    {t('creditsRemaining', { creditsRemaining: creditsRemaining ?? '--' })}
-                </span>
-            </p>
+            <InlineMetrics
+                align="center"
+                ariaLabel={t('creditsAriaLabel')}
+                items={[
+                    {
+                        id: 'cost',
+                        value: creditCost,
+                        label: t('creditCostMetricLabel'),
+                    },
+                    {
+                        id: 'remaining',
+                        value: creditsRemaining ?? '--',
+                        label: t('creditsRemainingMetricLabel'),
+                    },
+                ]}
+            />
 
             {pageCount && creditsRemaining !== null && (
                 <p className={styles.summary__quota} data-over={overBudget || undefined}>
@@ -121,9 +121,9 @@ export default function WorkshopSummary({
                     variant="primary"
                     size="lg"
                     fullWidth
-                    disabled={!isValid || isPending || overBudget}
+                    disabled={!isValid || isPending || overBudget || isCreditsLoading}
                     loading={isPending}
-                    onClick={onSubmit}
+                    onClick={onGenerate}
                 >
                     {t('generateButton')}
                 </Button>
@@ -131,7 +131,7 @@ export default function WorkshopSummary({
                     variant="quiet"
                     fullWidth
                     disabled={!isValid || isPending}
-                    onClick={onSubmit}
+                    onClick={onSaveDraft}
                 >
                     {t('draftButton')}
                 </Button>
@@ -142,19 +142,12 @@ export default function WorkshopSummary({
 
 // ── Private sub-component ─────────────────────────────────────────────────────
 
-interface ISummaryRowAction {
-    label: string;
-    onClick: () => void;
-    disabled?: boolean;
-}
-
 interface ISummaryRowProps {
     label: string;
     value: string | null;
-    action?: ISummaryRowAction;
 }
 
-function SummaryRow({ label, value, action }: Readonly<ISummaryRowProps>): React.ReactElement {
+function SummaryRow({ label, value }: Readonly<ISummaryRowProps>): React.ReactElement {
     return (
         <li className={styles['summary__row']}>
             <span className={styles['summary__row-label']}>{label}</span>
@@ -162,16 +155,6 @@ function SummaryRow({ label, value, action }: Readonly<ISummaryRowProps>): React
                 <span className={styles['summary__row-value']}>
                     {value ?? <span className={styles['summary__row-empty']}>—</span>}
                 </span>
-                {action && (
-                    <button
-                        type="button"
-                        className={styles['summary__row-action']}
-                        onClick={action.onClick}
-                        disabled={action.disabled}
-                    >
-                        {action.label}
-                    </button>
-                )}
             </div>
         </li>
     );

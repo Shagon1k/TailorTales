@@ -58,8 +58,10 @@
 
 | Method | Path         | Auth | Body       | Response                                                                                                                                                                                                        |
 | ------ | ------------ | ---- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/me`        | user | —          | The current `User`.                                                                                                                                                                                             |
-| PATCH  | `/me`        | user | `{ name }` | Updated `User`. `name`: 1–100 chars.                                                                                                                                                                            |
+| GET    | `/me`        | user | —          | Current account profile: `{ id, email, name, avatarUrl, hasCustomAvatar, role, createdAt, updatedAt }`. `avatarUrl` is either the user's Google avatar URL or a signed URL for the uploaded custom avatar.      |
+| PATCH  | `/me`        | user | `{ name }` | Same profile shape as `GET /me`. `name`: 1–100 chars.                                                                                                                                                           |
+| POST   | `/me/avatar` | user | multipart  | Same profile shape as `GET /me`. Upload field: `avatar` (`image/jpeg`, `image/png`, `image/webp`, max 5 MB). Stores a custom avatar in S3 and makes it the active avatar.                                       |
+| DELETE | `/me/avatar` | user | —          | Same profile shape as `GET /me`. Clears the custom avatar and falls back to the Google avatar (if available) or initials.                                                                                       |
 | GET    | `/me/export` | user | —          | GDPR data export: profile, children, characters, stories + pages, ratings, notifications, subscription state, and signed links to any retained files.                                                           |
 | DELETE | `/me`        | user | —          | Cancel active Paddle subscription, delete all owned S3 objects, cascade-delete all DB rows. **Irreversible.** Blocked while a paid subscription is active (user must cancel first and wait for the period end). |
 
@@ -79,15 +81,15 @@
 
 ### Characters — `/characters`
 
-| Method | Path                      | Auth | Body                           | Response                                                                                                             |
-| ------ | ------------------------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/characters`             | user | —                              | `Character[]` (owner's; optional `?childId=` filter).                                                                |
-| GET    | `/characters/:id`         | user | —                              | `Character` (404 if not owned).                                                                                      |
-| POST   | `/characters`             | user | `CreateCharacterDto`           | `Character`. Belongs to a child (`childId` required). `source`: `IMAGINED` (default) or `QUIZ`.                      |
-| POST   | `/characters/from-prompt` | user | `CreateCharacterFromPromptDto` | AI drafts a name + appearance from a free-text `prompt`; saved as free-form (`source = IMAGINED`).                   |
-| PATCH  | `/characters/:id`         | user | `UpdateCharacterDto`           | `Character`.                                                                                                         |
-| DELETE | `/characters/:id`         | user | —                              | 204. Clears `Story.characterId` on related stories (styleAnchor snapshots are unaffected).                           |
-| POST   | `/characters/:id/preview` | user | —                              | Generates an AI portrait from `description`, stores it in S3, updates `previewKey`. Returns the updated `Character`. |
+| Method | Path                      | Auth | Body                           | Response                                                                                                                                                                                                                                                            |
+| ------ | ------------------------- | ---- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/characters`             | user | —                              | `ICharacterResponse[]` (owner's; optional `?childId=` filter). Each item includes `previewUrl` (signed) in addition to DB fields.                                                                                                                                   |
+| GET    | `/characters/:id`         | user | —                              | `ICharacterResponse` (404 if not owned).                                                                                                                                                                                                                            |
+| POST   | `/characters`             | user | `CreateCharacterDto`           | `ICharacterResponse`. Belongs to a child (`childId` required). `source`: `IMAGINED` (default) or `QUIZ`. The backend turns the submitted name/description into an AI-generated character profile, saves it, then best-effort generates a preview.                   |
+| POST   | `/characters/from-prompt` | user | `CreateCharacterFromPromptDto` | `ICharacterResponse`. AI drafts a name + appearance from a free-text `prompt`; saved as free-form (`source = IMAGINED`) and then best-effort generates a preview. 403 if either `charactersLimit` or the monthly `characterGenerationsPerMonth` quota is exhausted. |
+| PATCH  | `/characters/:id`         | user | `UpdateCharacterDto`           | `ICharacterResponse`. Editing `name` or `description` clears the stale preview so the user can regenerate it from the new profile.                                                                                                                                  |
+| DELETE | `/characters/:id`         | user | —                              | 204. Deletes the preview asset if present. Clears `Story.characterId` on related stories (styleAnchor snapshots are unaffected).                                                                                                                                    |
+| POST   | `/characters/:id/preview` | user | —                              | Generates an AI portrait from `name` + `description`, stores it in S3, updates `previewKey`, and returns the updated `ICharacterResponse`. 403 if the monthly `characterGenerationsPerMonth` quota is exhausted.                                                    |
 
 ---
 
@@ -101,21 +103,22 @@
 
 ### Stories — `/stories`
 
-| Method | Path                                   | Auth   | Body                    | Response                                                                                                                       |
-| ------ | -------------------------------------- | ------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| GET    | `/stories/public`                      | public | —                       | `IStorySummary[]` — stories where `isPublic = true`, ordered newest-first. Includes `rating` score.                            |
-| GET    | `/stories/config`                      | user   | —                       | Allowed page counts, question length bounds, the 6 suggestion chips.                                                           |
-| GET    | `/stories`                             | user   | —                       | `IStorySummary[]` — caller's stories, including `FAILED`.                                                                      |
-| GET    | `/stories/active-job`                  | user   | —                       | `{ jobId, storyId }` or `null`.                                                                                                |
-| GET    | `/stories/:id`                         | user   | —                       | `IStoryDetail` (pages, signed URLs, `myRating`, `rating`).                                                                     |
-| GET    | `/stories/:id/progress`                | user   | —                       | **SSE** stream — see below.                                                                                                    |
-| GET    | `/stories/:id/pages/:order/html`       | user   | —                       | Handlebars-rendered page HTML (same path as Puppeteer uses). Powers the in-browser reader iframe.                              |
-| POST   | `/stories`                             | user   | `CreateStoryDto`        | Created `Story` (status `DRAFT`). `genre` and `writingStyle` are optional flavour knobs.                                       |
-| POST   | `/stories/:id/generate`                | user   | —                       | **202** `{ jobId, storyId }`. 409 if a generation is active or story isn't `DRAFT`. Checks page-credit quota before enqueuing. |
-| POST   | `/stories/:id/pages/:order/regenerate` | user   | `RegeneratePageDto`     | Updated `Page`. Re-stitches PDF. 402 if regeneration quota exhausted.                                                          |
-| POST   | `/stories/:id/rating`                  | user   | `CreateRatingDto`       | Upserted `Rating`. Sets `Story.isPublic` when `isPublic` field is present.                                                     |
-| PATCH  | `/stories/:id/public`                  | admin  | `{ isPublic: boolean }` | 200. Admin override for story public visibility.                                                                               |
-| DELETE | `/stories/:id`                         | user   | —                       | 204.                                                                                                                           |
+| Method | Path                                   | Auth   | Body                    | Response                                                                                                                                                                                               |
+| ------ | -------------------------------------- | ------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GET    | `/stories/public`                      | public | —                       | Public-safe showcase stories where `isPublic = true`, `status = COMPLETED`, and owner `rating >= 4`, ordered newest-first. Includes safe metadata only (no child name/birthdate) plus signed `pdfUrl`. |
+| GET    | `/stories/config`                      | user   | —                       | Allowed page counts, question length bounds, the 6 suggestion chips.                                                                                                                                   |
+| GET    | `/stories`                             | user   | —                       | `IStorySummary[]` — caller's stories, including `DRAFT` and `FAILED`.                                                                                                                                  |
+| GET    | `/stories/active-job`                  | user   | —                       | `{ jobId, storyId }` or `null`.                                                                                                                                                                        |
+| GET    | `/stories/:id`                         | user   | —                       | `IStoryDetail` (pages, signed URLs, `myRating`, `rating`).                                                                                                                                             |
+| GET    | `/stories/:id/progress`                | user   | —                       | **SSE** stream — see below.                                                                                                                                                                            |
+| GET    | `/stories/:id/pages/:order/html`       | user   | —                       | Handlebars-rendered page HTML (same path as Puppeteer uses). Powers the in-browser reader iframe.                                                                                                      |
+| POST   | `/stories`                             | user   | `CreateStoryDto`        | Created `Story` (status `DRAFT`). This is a free draft save; page-credit quota is not checked here. `genre` and `writingStyle` are optional flavour knobs.                                             |
+| POST   | `/stories/:id/retry`                   | user   | `CreateStoryDto`        | **202** `{ jobId, storyId }`. Reuses the same failed/draft story row: purges generated assets, deletes old pages, resets the story to `DRAFT`, then re-enqueues generation.                            |
+| POST   | `/stories/:id/generate`                | user   | —                       | **202** `{ jobId, storyId }`. 409 if a generation is active or story isn't `DRAFT`. Checks page-credit quota before enqueuing.                                                                         |
+| POST   | `/stories/:id/pages/:order/regenerate` | user   | `RegeneratePageDto`     | Updated `Page`. Re-stitches PDF. 402 if regeneration quota exhausted.                                                                                                                                  |
+| POST   | `/stories/:id/rating`                  | user   | `CreateRatingDto`       | Upserted `Rating`. Mirrors the share toggle onto `Story.isPublic` when `isPublic` is present, but only stories rated 4-5 stars appear in the public showcase.                                          |
+| PATCH  | `/stories/:id/public`                  | admin  | `{ isPublic: boolean }` | 200. Admin override for story public visibility.                                                                                                                                                       |
+| DELETE | `/stories/:id`                         | user   | —                       | 204. Deletes the story's stored assets (`coverImageKey`, `pdfKey`, page illustrations) before removing the DB row.                                                                                     |
 
 > Route order matters: `public`, `config`, `active-job` are declared before `:id` so they
 > are not captured as an id param.
@@ -216,7 +219,7 @@ All admin routes require `ADMIN` or `SUPER_ADMIN` role.
 | PATCH  | `/admin/users/:id/role`           | Change role (`USER` / `ADMIN` / `SUPER_ADMIN`).                                                |
 | PATCH  | `/admin/users/:id/suspension`     | Suspend or reinstate a user.                                                                   |
 | GET    | `/admin/stories?search=&page=`    | Paginated story list with owner + child context.                                               |
-| DELETE | `/admin/stories/:id`              | Force-delete any story (does not delete S3 objects).                                           |
+| DELETE | `/admin/stories/:id`              | Force-delete any story, including its stored assets.                                           |
 | GET    | `/admin/art-styles`               | Full art style list (includes `isActive`, `order`, `thumbnailUrl`).                            |
 | POST   | `/admin/art-styles`               | Create art style.                                                                              |
 | PATCH  | `/admin/art-styles/reorder`       | Update `order` for all styles in one call.                                                     |

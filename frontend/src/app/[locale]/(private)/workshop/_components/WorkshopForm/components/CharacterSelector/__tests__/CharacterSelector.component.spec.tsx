@@ -6,11 +6,12 @@ import CharacterSelector from '../CharacterSelector';
 const CHARACTER: ICharacter = {
     id: 'char-1',
     userId: 'user-1',
-    childId: null,
+    childId: 'child-1',
     source: 'IMAGINED',
     name: 'Captain Pip',
     description: 'A brave little fox.',
     previewKey: null,
+    previewUrl: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -20,17 +21,14 @@ describe('CharacterSelector', () => {
         it('should render a "no character" option followed by each character', () => {
             render(<CharacterSelector items={[CHARACTER]} selectedId={null} onSelect={vi.fn()} />);
 
-            expect(screen.getByRole('button', { name: /no character/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Captain Pip' })).toBeInTheDocument();
+            expect(screen.getByRole('radio', { name: /no character/i })).toBeInTheDocument();
+            expect(screen.getByRole('radio', { name: 'Captain Pip' })).toBeInTheDocument();
         });
 
-        it('should mark the "no character" option pressed when nothing is selected', () => {
+        it('should mark the "no character" option checked when nothing is selected', () => {
             render(<CharacterSelector items={[CHARACTER]} selectedId={null} onSelect={vi.fn()} />);
 
-            expect(screen.getByRole('button', { name: /no character/i })).toHaveAttribute(
-                'aria-pressed',
-                'true',
-            );
+            expect(screen.getByRole('radio', { name: /no character/i })).toBeChecked();
         });
     });
 
@@ -39,7 +37,7 @@ describe('CharacterSelector', () => {
             const onSelect = vi.fn();
             render(<CharacterSelector items={[CHARACTER]} selectedId={null} onSelect={onSelect} />);
 
-            await userEvent.click(screen.getByRole('button', { name: 'Captain Pip' }));
+            await userEvent.click(screen.getByRole('radio', { name: 'Captain Pip' }));
 
             expect(onSelect).toHaveBeenCalledWith('char-1');
         });
@@ -50,7 +48,7 @@ describe('CharacterSelector', () => {
                 <CharacterSelector items={[CHARACTER]} selectedId="char-1" onSelect={onSelect} />,
             );
 
-            await userEvent.click(screen.getByRole('button', { name: /no character/i }));
+            await userEvent.click(screen.getByRole('radio', { name: /no character/i }));
 
             expect(onSelect).toHaveBeenCalledWith(null);
         });

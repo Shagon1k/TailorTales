@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { GenerationPipeline } from '../generation.pipeline.js';
 import { StoryPromptBuilder } from '../story-prompt-builder.js';
 import { StoryPlanValidator } from '../story-plan.validator.js';
+import { ImageProhibitedContentError } from '../../../common/errors.js';
 import { PdfBindingService } from '../../rendering/pdf-binding.service.js';
 import { AI_CLIENT } from '../../ai/ai.types.js';
 import { AiStubClient } from '../../ai/ai-stub.client.js';
@@ -30,6 +31,7 @@ const mockStory = {
     writingStyle: null,
     title: null,
     styleAnchor: null,
+    characterId: null,
     isPublic: false,
     coverImageKey: null,
     pdfKey: null,
@@ -37,6 +39,7 @@ const mockStory = {
     updatedAt: new Date(),
     child: { id: 'child-1', name: 'Maya', birthdate: new Date('2019-01-01'), interests: [] },
     artStyle: { id: 'style-1', name: 'Storybook', promptPrefix: 'Warm watercolour style.' },
+    character: null,
 };
 
 const mockBlueprint = {
@@ -91,6 +94,7 @@ function buildMockPrisma() {
 const mockStorage = {
     upload: vi.fn().mockResolvedValue('mock-key'),
     getSignedUrl: vi.fn().mockResolvedValue('https://example.com/image.png'),
+    downloadBuffer: vi.fn().mockResolvedValue(Buffer.from('reference-image')),
 };
 
 const mockPdfBinding = {
@@ -156,6 +160,41 @@ describe('GenerationPipeline', () => {
 
             // PDF built and stored via shared service
             expect(mockPdfBinding.buildAndStore).toHaveBeenCalled();
+        });
+
+        it('should retry a provider-blocked image with a safe fallback prompt', async () => {
+            const stubClient = new AiStubClient();
+            const generateImage = vi
+                .spyOn(stubClient, 'generateImage')
+                .mockRejectedValueOnce(new ImageProhibitedContentError())
+                .mockResolvedValue(Buffer.from('fallback-image'));
+
+            const module = await Test.createTestingModule({
+                providers: [
+                    GenerationPipeline,
+                    StoryPromptBuilder,
+                    StoryPlanValidator,
+                    { provide: AI_CLIENT, useValue: stubClient },
+                    { provide: PrismaService, useValue: mockPrisma },
+                    { provide: StorageService, useValue: mockStorage },
+                    { provide: PdfBindingService, useValue: mockPdfBinding },
+                    { provide: NotificationEmitterService, useValue: mockNotifications },
+                    { provide: QuotaService, useValue: mockQuota },
+                ],
+            }).compile();
+
+            const resilientPipeline = module.get(GenerationPipeline);
+
+            await resilientPipeline.run(JOB_ID);
+
+            expect(generateImage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    prompt: expect.stringContaining('SAFE FALLBACK ILLUSTRATION'),
+                }),
+            );
+            expect(mockPrisma.job.update).toHaveBeenCalledWith(
+                expect.objectContaining({ data: expect.objectContaining({ status: 'COMPLETED' }) }),
+            );
         });
     });
 

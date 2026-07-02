@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Stack } from '@mantine/core';
+import { billingApi } from '@/api/billing';
 import { useSubscription } from '@/hooks/subscription';
 import PlanCard from './_components/PlanCard/PlanCard';
 import UsageBars from './_components/UsageBars/UsageBars';
@@ -25,13 +26,24 @@ export default function SubscriptionPage(): React.ReactElement {
         if (!checkoutSucceeded || isPaid) return;
 
         let attempts = 0;
+        let isSyncing = false;
         const timer = setInterval(() => {
+            if (isSyncing) return;
             attempts += 1;
             if (attempts > CHECKOUT_POLL_MAX_ATTEMPTS) {
                 clearInterval(timer);
                 return;
             }
-            refetch();
+            isSyncing = true;
+            billingApi
+                .sync()
+                .catch((err: unknown) => {
+                    console.error('Subscription sync failed', err);
+                })
+                .finally(() => {
+                    isSyncing = false;
+                    refetch();
+                });
         }, CHECKOUT_POLL_INTERVAL_MS);
 
         return () => clearInterval(timer);

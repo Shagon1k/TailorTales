@@ -1,3 +1,4 @@
+@use 'styles/interactions' as *;
 @use 'styles/typography' as *;
 
 .chip {
@@ -13,9 +14,14 @@
     color: var(--text-secondary);
     cursor: pointer;
     white-space: nowrap;
+    @include selectable-press-feedback(
+        color-mix(in srgb, var(--accent-primary) 10%, var(--bg-elevated))
+    );
     transition:
         border-color var(--duration-base) var(--ease-out),
-        color var(--duration-base) var(--ease-out);
+        color var(--duration-base) var(--ease-out),
+        background var(--duration-base) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
 
     &:not([disabled]):hover {
         border-color: var(--accent-primary);
@@ -35,6 +41,10 @@
     transition: color var(--duration-base) var(--ease-out);
 
     .chip:not([disabled]):hover & {
+        color: var(--accent-primary);
+    }
+
+    .chip:not([disabled]):active & {
         color: var(--accent-primary);
     }
 }

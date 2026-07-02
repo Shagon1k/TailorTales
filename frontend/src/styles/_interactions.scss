@@ -1,0 +1,65 @@
+@mixin selectable-interaction-shell($selected-background, $hover-background: null) {
+    transition:
+        background var(--duration-base) var(--ease-out),
+        border-color var(--duration-base) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out),
+        transform var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out);
+
+    &:not(:disabled):hover {
+        border-color: var(--accent-primary);
+
+        @if $hover-background != null {
+            background: $hover-background;
+        }
+    }
+
+    &:disabled {
+        opacity: var(--opacity-disabled);
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    &.m-selected {
+        background: $selected-background;
+        border-color: var(--accent-primary);
+        box-shadow:
+            0 10px 22px rgb(12 4 2 / 0.14),
+            0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+    }
+}
+
+@mixin selectable-press-feedback($active-background) {
+    &:not([disabled]):active {
+        border-color: var(--accent-primary);
+        background: $active-background;
+    }
+}
+
+@mixin button-accent-outline-feedback(
+    $hover-background,
+    $active-background,
+    $hover-color: null,
+    $active-color: null
+) {
+    &:not([data-disabled]):hover {
+        border-color: var(--accent-primary);
+        background: $hover-background;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+
+        @if $hover-color != null {
+            color: $hover-color;
+        }
+    }
+
+    &:not([data-disabled]):active {
+        border-color: var(--accent-primary);
+        background: $active-background;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+
+        @if $active-color != null {
+            color: $active-color;
+        }
+    }
+}

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import Button from '@/components/ui/Button/Button';
+import Modal from '@/components/ui/Modal/Modal';
 import type { IUserCharacterSource } from '@/types/character.types';
 import CharacterQuiz from './components/CharacterQuiz/CharacterQuiz';
 import styles from './CharacterForm.module.scss';
@@ -22,9 +23,6 @@ interface ICharacterFormProps {
     onSubmit: (values: ICharacterFormValues, source: IUserCharacterSource) => void;
     onCancel: () => void;
     isSubmitting?: boolean;
-    /** When provided, offers a second mode that asks the AI to draft the character. */
-    onGenerateFromPrompt?: (prompt: string) => void;
-    isGenerating?: boolean;
 }
 
 const DEFAULT_VALUES: ICharacterFormValues = {
@@ -32,89 +30,100 @@ const DEFAULT_VALUES: ICharacterFormValues = {
     description: '',
 };
 
-type TMode = 'manual' | 'quiz' | 'prompt';
+type TMode = 'manual' | 'quiz';
 
 export default function CharacterForm({
     initialValues,
     onSubmit,
     onCancel,
     isSubmitting = false,
-    onGenerateFromPrompt,
-    isGenerating = false,
 }: Readonly<ICharacterFormProps>): React.ReactElement {
     const t = useTranslations('workshop.characterForm');
     const [mode, setMode] = useState<TMode>('manual');
-    const canGenerate = onGenerateFromPrompt !== undefined;
+    const formId = useId();
+    const isEditing = initialValues !== undefined;
+    const canChooseMode = !isEditing;
 
     const form = useForm<ICharacterFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
+        validateInputOnBlur: true,
         validate: {
-            name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
             description: (v) => (v.trim().length < 1 ? t('errors.descriptionRequired') : null),
         },
     });
 
-    const promptForm = useForm<{ prompt: string }>({
-        initialValues: { prompt: '' },
-        validate: {
-            prompt: (v) => (v.trim().length < 1 ? t('errors.promptRequired') : null),
-        },
-    });
-
     return (
-        <Stack gap="sm">
-            {canGenerate && (
-                <div className={styles.modes} role="group" aria-label={t('modeGroupLabel')}>
-                    <Button
-                        type="button"
-                        variant={mode === 'manual' ? 'primary' : 'quiet'}
-                        onClick={() => setMode('manual')}
+        <Stack gap="md">
+            {canChooseMode && (
+                <div className={styles['mode-switch']}>
+                    <div
+                        className={styles['mode-switch__track']}
+                        role="tablist"
+                        aria-label={t('modeGroupLabel')}
                     >
-                        {t('modeManual')}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant={mode === 'quiz' ? 'primary' : 'quiet'}
-                        onClick={() => setMode('quiz')}
-                    >
-                        {t('modeQuiz')}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant={mode === 'prompt' ? 'primary' : 'quiet'}
-                        onClick={() => setMode('prompt')}
-                    >
-                        {t('modePrompt')}
-                    </Button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={mode === 'manual'}
+                            className={styles['mode-switch__option']}
+                            data-active={mode === 'manual' || undefined}
+                            onClick={() => setMode('manual')}
+                        >
+                            {t('modeWrite')}
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={mode === 'quiz'}
+                            className={styles['mode-switch__option']}
+                            data-active={mode === 'quiz' || undefined}
+                            onClick={() => setMode('quiz')}
+                        >
+                            {t('modeGuided')}
+                        </button>
+                    </div>
                 </div>
             )}
 
             {mode === 'manual' && (
-                <form onSubmit={form.onSubmit((v) => onSubmit(v, 'IMAGINED'))}>
-                    <Stack gap="sm">
-                        <Input
-                            label={t('nameLabel')}
-                            placeholder={t('namePlaceholder')}
-                            {...form.getInputProps('name')}
-                        />
-                        <Textarea
-                            label={t('descriptionLabel')}
-                            placeholder={t('descriptionPlaceholder')}
-                            autosize
-                            minRows={4}
-                            maxRows={8}
-                            {...form.getInputProps('description')}
-                        />
+                <>
+                    <form id={formId} onSubmit={form.onSubmit((v) => onSubmit(v, 'IMAGINED'))}>
+                        <Stack gap="md">
+                            <Input
+                                label={t('nameLabel')}
+                                placeholder={t('namePlaceholder')}
+                                {...form.getInputProps('name')}
+                            />
+                            <Textarea
+                                label={isEditing ? t('descriptionLabel') : t('ideaLabel')}
+                                placeholder={
+                                    isEditing ? t('descriptionPlaceholder') : t('ideaPlaceholder')
+                                }
+                                required
+                                autosize
+                                minRows={4}
+                                maxRows={8}
+                                {...form.getInputProps('description')}
+                            />
+                            {!isEditing && <p className={styles['mode-hint']}>{t('writeHint')}</p>}
+                        </Stack>
+                    </form>
+                    <Modal.Footer>
                         <div className={styles.actions}>
                             <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                                 {t('cancelButton')}
                             </Button>
-                            <Button type="submit" variant="primary" loading={isSubmitting}>
-                                {t('saveButton')}
+                            <Button
+                                type="submit"
+                                form={formId}
+                                variant="primary"
+                                loading={isSubmitting}
+                            >
+                                {isEditing ? t('saveButton') : t('createButton')}
                             </Button>
                         </div>
-                    </Stack>
-                </form>
+                    </Modal.Footer>
+                </>
             )}
 
             {mode === 'quiz' && (
@@ -122,32 +131,8 @@ export default function CharacterForm({
                     onSubmit={(v) => onSubmit(v, 'QUIZ')}
                     onCancel={onCancel}
                     isSubmitting={isSubmitting}
+                    isEditing={isEditing}
                 />
-            )}
-
-            {mode === 'prompt' && (
-                <form
-                    onSubmit={promptForm.onSubmit((v) => onGenerateFromPrompt?.(v.prompt.trim()))}
-                >
-                    <Stack gap="sm">
-                        <Textarea
-                            label={t('promptLabel')}
-                            placeholder={t('promptPlaceholder')}
-                            autosize
-                            minRows={3}
-                            maxRows={6}
-                            {...promptForm.getInputProps('prompt')}
-                        />
-                        <div className={styles.actions}>
-                            <Button variant="quiet" onClick={onCancel} disabled={isGenerating}>
-                                {t('cancelButton')}
-                            </Button>
-                            <Button type="submit" variant="primary" loading={isGenerating}>
-                                {t('generateButton')}
-                            </Button>
-                        </div>
-                    </Stack>
-                </form>
             )}
         </Stack>
     );

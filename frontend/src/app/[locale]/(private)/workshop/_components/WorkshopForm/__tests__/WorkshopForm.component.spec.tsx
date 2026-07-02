@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { IChild } from '@/types/child.types';
 import type { IArtStyle } from '@/types/art-style.types';
 import type { IStoryConfig } from '@/types/story.types';
+import type { IUsageSummary } from '@/types/subscription.types';
 import WorkshopForm from '../WorkshopForm';
 
 const mockRouterPush = vi.hoisted(() => vi.fn());
@@ -26,15 +27,56 @@ vi.mock('@/i18n/navigation', () => ({
     useRouter: vi.fn().mockReturnValue({ push: mockRouterPush }),
 }));
 
+const SUBSCRIPTION: IUsageSummary = {
+    tier: {
+        id: 'tier-free',
+        name: 'Free Chapter',
+        priceMonthly: 0,
+        watermark: true,
+        pagesPerMonth: 12,
+        regenerationsPerMonth: 3,
+        childrenLimit: 1,
+        charactersLimit: 3,
+        characterGenerationsPerMonth: 3,
+        retentionDays: 30,
+    },
+    status: 'ACTIVE',
+    cancelAtPeriodEnd: false,
+    currentPeriodEnd: null,
+    pagesUsed: 0,
+    regenerationsUsed: 0,
+    characterGenerationsUsed: 0,
+    childrenUsed: 1,
+    talesCount: 2,
+};
+
 vi.mock('@/hooks/subscription', () => ({
-    useSubscription: () => ({ data: undefined }),
+    useSubscription: () => ({ data: SUBSCRIPTION }),
 }));
 
 const mockStoriesCreate = vi.hoisted(() => vi.fn());
 const mockStoriesGenerate = vi.hoisted(() => vi.fn());
+const mockStoriesRetry = vi.hoisted(() => vi.fn());
 
 vi.mock('@/api/stories', () => ({
-    storiesApi: { create: mockStoriesCreate, generate: mockStoriesGenerate },
+    storiesApi: {
+        create: mockStoriesCreate,
+        generate: mockStoriesGenerate,
+        retry: mockStoriesRetry,
+    },
+}));
+
+vi.mock('@/utils/question-suggestions.utils', () => ({
+    QUESTION_SUGGESTION_COUNT: 6,
+    getLocalizedQuestionSuggestions: () => [
+        'Why is the sky blue?',
+        'How do bees find their flowers?',
+        'Where does the rain go?',
+        'Why do stars twinkle?',
+        'Why do cats purr?',
+        'How do spiders spin webs?',
+    ],
+    getRandomQuestionSuggestions: (suggestions: string[]) => suggestions,
 }));
 
 // WorkshopForm uses the character hooks — mock the entire module so tests focus on
@@ -97,14 +139,17 @@ describe('WorkshopForm', () => {
         mockRouterPush.mockClear();
         mockStoriesCreate.mockClear();
         mockStoriesGenerate.mockClear();
+        mockStoriesRetry.mockClear();
         mockStoriesGenerate.mockResolvedValue({ jobId: 'job-1', storyId: 'story-new' });
+        mockStoriesRetry.mockResolvedValue({ jobId: 'job-1', storyId: 'story-retry' });
     });
 
     describe('given the form is rendered', () => {
-        it('should display all five section headings', () => {
+        it('should display the main workshop sections including character selection', () => {
             renderForm();
 
             expect(screen.getByText(/a question to begin with/i)).toBeInTheDocument();
+            expect(screen.getByText(/choose a character/i)).toBeInTheDocument();
             expect(screen.getByText(/a book, or a comic/i)).toBeInTheDocument();
             expect(screen.getByText(/how long the tale should be/i)).toBeInTheDocument();
             expect(screen.getByText(/a look for the pictures/i)).toBeInTheDocument();
@@ -125,11 +170,27 @@ describe('WorkshopForm', () => {
             );
         });
 
-        it('should render suggestion chips from config', () => {
+        it('should render localized suggestion chips', () => {
             renderForm();
 
             expect(screen.getByText('Why is the sky blue?')).toBeInTheDocument();
-            expect(screen.getByText('How do bees find flowers?')).toBeInTheDocument();
+            expect(screen.getByText('How do bees find their flowers?')).toBeInTheDocument();
+        });
+
+        it('should render art style thumbnails when they are available', () => {
+            renderForm();
+
+            expect(screen.getByRole('img', { name: 'Storybook' })).toHaveAttribute(
+                'src',
+                'https://example.com/thumb.jpg',
+            );
+        });
+
+        it('should pre-select the current app locale as the story language', () => {
+            renderForm();
+
+            const langGroup = screen.getByRole('radiogroup', { name: /story language/i });
+            expect(within(langGroup).getByRole('radio', { name: /^English/i })).toBeChecked();
         });
     });
 
@@ -139,6 +200,24 @@ describe('WorkshopForm', () => {
 
             // Reader is auto-selected (only 1), but format/length/style/language/question are all empty
             expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
+        });
+
+        it('should show a useful question validation message after blur', async () => {
+            renderForm();
+
+            const textarea = screen.getByRole('textbox', { name: /story question/i });
+            await userEvent.click(textarea);
+            await userEvent.tab();
+
+            expect(screen.getByText(/start with a question for the tale/i)).toBeInTheDocument();
+        });
+
+        it('should show that comics are disabled on purpose for now', () => {
+            renderForm();
+
+            expect(
+                screen.getByText(/comic stays disabled for now while we finish panel layouts/i),
+            ).toBeInTheDocument();
         });
     });
 
@@ -165,7 +244,10 @@ describe('WorkshopForm', () => {
     });
 
     describe('given all required fields are filled', () => {
-        async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
+        async function fillAndClick(
+            buttonName: RegExp,
+            beforeSubmit?: () => Promise<void>,
+        ): Promise<void> {
             renderForm({ initialQuestion: 'Why is the sky blue?' });
 
             // Format — RadioCard accessible name = title + description; use ^Book to anchor the match
@@ -187,8 +269,11 @@ describe('WorkshopForm', () => {
             // Optional flavour knobs, selected by individual tests before submit.
             if (beforeSubmit) await beforeSubmit();
 
-            // Submit
-            await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
+            await userEvent.click(screen.getByRole('button', { name: buttonName }));
+        }
+
+        async function fillAndSubmit(beforeSubmit?: () => Promise<void>): Promise<void> {
+            await fillAndClick(/light the lantern/i, beforeSubmit);
         }
 
         it('should call storiesApi.create with the correct payload', async () => {
@@ -237,6 +322,66 @@ describe('WorkshopForm', () => {
             await waitFor(() => {
                 expect(mockStoriesGenerate).toHaveBeenCalledWith('story-new');
                 expect(mockRouterPush).toHaveBeenCalledWith('/workshop/story-new');
+            });
+        });
+
+        it('should save a draft without starting generation', async () => {
+            mockStoriesCreate.mockResolvedValue({ id: 'story-draft' });
+
+            await fillAndClick(/save as draft/i);
+
+            await waitFor(() => {
+                expect(mockStoriesCreate).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        childId: 'child-1',
+                        type: 'BOOK',
+                        question: 'Why is the sky blue?',
+                        pageCount: 5,
+                        artStyleId: 'style-1',
+                        language: 'EN',
+                    }),
+                );
+                expect(mockStoriesGenerate).not.toHaveBeenCalled();
+                expect(mockStoriesRetry).not.toHaveBeenCalled();
+                expect(mockRouterPush).toHaveBeenCalledWith('/library');
+            });
+        });
+
+        it('should retry the existing failed story instead of creating a new one', async () => {
+            renderForm({
+                initialStoryId: 'story-failed',
+                initialQuestion: 'Why is the sky blue?',
+            });
+
+            const formatGroup = screen.getByRole('radiogroup', { name: /story format/i });
+            await userEvent.click(within(formatGroup).getByRole('radio', { name: /^Book/i }));
+
+            const lengthGroup = screen.getByRole('radiogroup', { name: /page count/i });
+            await userEvent.click(within(lengthGroup).getByRole('radio', { name: /short/i }));
+
+            const artGroup = screen.getByRole('radiogroup', { name: /art style/i });
+            await userEvent.click(within(artGroup).getByRole('radio', { name: /storybook/i }));
+
+            const langGroup = screen.getByRole('radiogroup', { name: /story language/i });
+            await userEvent.click(within(langGroup).getByRole('radio', { name: /^English/i }));
+
+            await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
+
+            await waitFor(() => {
+                expect(mockStoriesCreate).not.toHaveBeenCalled();
+                expect(mockStoriesGenerate).not.toHaveBeenCalled();
+                expect(mockStoriesRetry).toHaveBeenCalledWith(
+                    'story-failed',
+                    expect.objectContaining({
+                        childId: 'child-1',
+                        type: 'BOOK',
+                        question: 'Why is the sky blue?',
+                        pageCount: 5,
+                        artStyleId: 'style-1',
+                        language: 'EN',
+                    }),
+                );
+                expect(mockRouterPush).toHaveBeenCalledWith('/workshop/story-retry');
             });
         });
 

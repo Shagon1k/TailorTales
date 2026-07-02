@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-
-export const metadata: Metadata = { title: 'Workshop' };
-import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
+import { getTranslations } from 'next-intl/server';
+import PageHero from '@/components/shared/PageHero/PageHero';
 import { childrenServerApi } from '@/api/children.server';
 import { artStylesServerApi } from '@/api/art-styles.server';
 import { storiesServerApi } from '@/api/stories.server';
@@ -10,12 +9,25 @@ import WorkshopForm from './_components/WorkshopForm/WorkshopForm';
 import styles from './page.module.scss';
 
 interface IWorkshopPageProps {
+    params: Promise<{ locale: string }>;
     searchParams: Promise<{ childId?: string; question?: string; storyId?: string }>;
 }
 
+export async function generateMetadata({
+    params,
+}: Readonly<Pick<IWorkshopPageProps, 'params'>>): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'workshop.page' });
+
+    return { title: t('title') };
+}
+
 export default async function WorkshopPage({
+    params,
     searchParams,
 }: Readonly<IWorkshopPageProps>): Promise<React.ReactElement> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'workshop.hero' });
     const activeJob = await storiesServerApi.getActiveJob();
     if (activeJob) {
         redirect(`/workshop/${activeJob.storyId}`);
@@ -39,19 +51,18 @@ export default async function WorkshopPage({
 
     return (
         <main className={styles.page}>
-            <PageHero
-                eyebrow="The workshop"
-                heading={
-                    <>
-                        Let&apos;s make one <HeroHighlight>small tale</HeroHighlight>.
-                    </>
-                }
-            />
+            <PageHero eyebrow={t('eyebrow')} heading={t('heading')} />
             <WorkshopForm
                 readers={readers}
                 artStyles={artStyles}
                 config={config}
+                initialStoryId={
+                    prefillStory?.status === 'FAILED' || prefillStory?.status === 'DRAFT'
+                        ? prefillStory.id
+                        : null
+                }
                 initialChildId={prefillStory?.childId ?? childId ?? null}
+                initialCharacterId={prefillStory?.characterId ?? null}
                 initialQuestion={prefillStory?.question ?? question ?? ''}
                 initialStoryType={prefillStory?.type ?? null}
                 initialPageCount={prefillStory?.pageCount ?? null}

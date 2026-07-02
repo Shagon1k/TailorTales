@@ -62,8 +62,10 @@ describe('StoriesService', () => {
     let storyFindFirst: ReturnType<typeof vi.fn>;
     let storyFindUnique: ReturnType<typeof vi.fn>;
     let storyCreate: ReturnType<typeof vi.fn>;
+    let storyUpdate: ReturnType<typeof vi.fn>;
     let storyDelete: ReturnType<typeof vi.fn>;
     let storyCount: ReturnType<typeof vi.fn>;
+    let pageDeleteMany: ReturnType<typeof vi.fn>;
     let characterFindFirst: ReturnType<typeof vi.fn>;
     let getSignedUrl: ReturnType<typeof vi.fn>;
     let storageDeleteMany: ReturnType<typeof vi.fn>;
@@ -73,8 +75,10 @@ describe('StoriesService', () => {
         storyFindFirst = vi.fn();
         storyFindUnique = vi.fn();
         storyCreate = vi.fn();
+        storyUpdate = vi.fn();
         storyDelete = vi.fn();
         storyCount = vi.fn();
+        pageDeleteMany = vi.fn();
         characterFindFirst = vi.fn();
         getSignedUrl = vi.fn();
         storageDeleteMany = vi.fn().mockResolvedValue({ requested: 3, deleted: 3 });
@@ -90,8 +94,12 @@ describe('StoriesService', () => {
                             findFirst: storyFindFirst,
                             findUnique: storyFindUnique,
                             create: storyCreate,
+                            update: storyUpdate,
                             delete: storyDelete,
                             count: storyCount,
+                        },
+                        page: {
+                            deleteMany: pageDeleteMany,
                         },
                         character: { findFirst: characterFindFirst },
                         $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
@@ -181,16 +189,29 @@ describe('StoriesService', () => {
     });
 
     describe('findPublic', () => {
-        it('should return only COMPLETED public stories', async () => {
+        it('should return only completed public stories rated 4 stars or higher', async () => {
             storyFindMany.mockResolvedValue([MOCK_STORY_WITH_RELATIONS]);
 
-            await service.findPublic();
+            const result = await service.findPublic();
 
             expect(storyFindMany).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    where: { isPublic: true, status: 'COMPLETED' },
+                    where: {
+                        isPublic: true,
+                        status: 'COMPLETED',
+                        ratings: { some: { score: { gte: 4 } } },
+                    },
                 }),
             );
+            expect(result[0]).toMatchObject({
+                question: 'Why is the sky blue?',
+                pageCount: 8,
+                rating: 0,
+                readerAge: expect.any(Number),
+                hasCharacter: false,
+                pdfUrl: null,
+            });
+            expect(result[0]).not.toHaveProperty('child');
         });
     });
 
@@ -277,6 +298,50 @@ describe('StoriesService', () => {
                 expect(storyCreate).toHaveBeenCalledWith({
                     data: expect.objectContaining({ genre: 'BEDTIME', writingStyle: 'POETIC' }),
                 });
+            });
+        });
+    });
+
+    describe('retry', () => {
+        it('should reset a failed story in place and clear generated artifacts', async () => {
+            const failedStory = {
+                ...MOCK_STORY,
+                status: 'FAILED',
+                coverImageKey: 'covers/story-1.jpg',
+                pdfKey: 'pdf/story-1.pdf',
+                pages: [{ illustrations: [{ key: 'pages/story-1-1.png' }] }],
+            };
+            storyFindFirst.mockResolvedValue(failedStory);
+            storyUpdate.mockResolvedValue({ ...MOCK_STORY, status: 'DRAFT' });
+            pageDeleteMany.mockResolvedValue({ count: 1 });
+
+            const dto: CreateStoryDto = {
+                childId: 'child-1',
+                type: 'BOOK',
+                question: 'Who lives in the deepest sea?',
+                pageCount: 8,
+                artStyleId: 'style-1',
+                language: 'EN',
+            };
+
+            await service.retry('story-1', 'user-123', dto);
+
+            expect(storageDeleteMany).toHaveBeenCalledWith([
+                'pdf/story-1.pdf',
+                'covers/story-1.jpg',
+                'pages/story-1-1.png',
+            ]);
+            expect(pageDeleteMany).toHaveBeenCalledWith({ where: { storyId: 'story-1' } });
+            expect(storyUpdate).toHaveBeenCalledWith({
+                where: { id: 'story-1' },
+                data: expect.objectContaining({
+                    question: 'Who lives in the deepest sea?',
+                    status: 'DRAFT',
+                    title: null,
+                    styleAnchor: null,
+                    coverImageKey: null,
+                    pdfKey: null,
+                }),
             });
         });
     });

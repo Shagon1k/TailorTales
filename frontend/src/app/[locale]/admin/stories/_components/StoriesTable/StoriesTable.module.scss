@@ -64,8 +64,9 @@
     white-space: nowrap;
 
     &.m-completed {
-        color: var(--accent-cool);
-        border-color: var(--accent-cool);
+        color: color-mix(in srgb, var(--accent-cool) 62%, var(--text-primary));
+        border-color: color-mix(in srgb, var(--accent-cool) 78%, var(--text-primary));
+        background: color-mix(in srgb, var(--accent-cool) 10%, transparent);
     }
 
     &.m-failed {

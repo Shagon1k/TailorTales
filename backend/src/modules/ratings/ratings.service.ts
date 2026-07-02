@@ -23,6 +23,9 @@ export class RatingsService {
             throw new BadRequestException('errors.ratings.storyNotCompleted');
         }
 
+        const publicVisibility =
+            dto.isPublic === undefined ? undefined : dto.isPublic && dto.score >= 4;
+
         const [rating] = await this.prisma.$transaction([
             this.prisma.rating.upsert({
                 where: { storyId_userId: { storyId, userId } },
@@ -30,12 +33,12 @@ export class RatingsService {
                 update: { score: dto.score, comment: dto.comment ?? null },
             }),
             // Only touch visibility when the toggle was sent; leave it untouched otherwise.
-            ...(dto.isPublic === undefined
+            ...(publicVisibility === undefined
                 ? []
                 : [
                       this.prisma.story.update({
                           where: { id: storyId },
-                          data: { isPublic: dto.isPublic },
+                          data: { isPublic: publicVisibility },
                       }),
                   ]),
         ]);

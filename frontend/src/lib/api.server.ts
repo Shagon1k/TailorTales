@@ -4,6 +4,16 @@ import { cookies } from 'next/headers';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+export class ApiServerError extends Error {
+    constructor(
+        public readonly status: number,
+        public readonly statusText: string,
+    ) {
+        super(`API ${status}: ${statusText}`);
+        this.name = 'ApiServerError';
+    }
+}
+
 export async function apiFetchServer<T = void>(path: string, init?: RequestInit): Promise<T> {
     const cookieStore = await cookies();
     const token = cookieStore.get('access_token');
@@ -19,7 +29,7 @@ export async function apiFetchServer<T = void>(path: string, init?: RequestInit)
     });
 
     if (!res.ok) {
-        throw new Error(`API ${res.status}: ${res.statusText}`);
+        throw new ApiServerError(res.status, res.statusText);
     }
 
     // Some endpoints return no body — skip JSON parsing for non-JSON responses

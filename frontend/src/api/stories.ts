@@ -40,6 +40,15 @@ export const storiesApi = {
             body: JSON.stringify(payload),
         }),
 
+    retry: (
+        id: string,
+        payload: ICreateStoryPayload,
+    ): Promise<{ jobId: string; storyId: string }> =>
+        apiFetch<{ jobId: string; storyId: string }>(`/stories/${id}/retry`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+        }),
+
     generate: (id: string): Promise<{ jobId: string; storyId: string }> =>
         apiFetch<{ jobId: string; storyId: string }>(`/stories/${id}/generate`, {
             method: 'POST',

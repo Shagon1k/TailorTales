@@ -90,6 +90,23 @@ export class StorageService implements OnModuleInit {
         }
     }
 
+    async downloadBuffer(key: string): Promise<Buffer> {
+        try {
+            const response = await this.client.send(
+                new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+            );
+            if (!response.Body) {
+                throw new Error(`Object body missing for: ${key}`);
+            }
+
+            const bytes = await response.Body.transformToByteArray();
+            return Buffer.from(bytes);
+        } catch (err: unknown) {
+            this.logger.error(`Failed to download object: ${key}`, err);
+            throw err;
+        }
+    }
+
     async delete(key: string): Promise<void> {
         this.logger.log(`Deleting object: ${key}`);
 

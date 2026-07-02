@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { OmitStyling } from '@/components/ui/types';
 import styles from './Card.module.scss';
 
-export type TCardVariant = 'default' | 'dark' | 'gradient' | 'outlined' | 'featured';
+export type TCardVariant = 'dark' | 'gradient' | 'outlined' | 'featured';
 export type TCardSize = 'sm' | 'md' | 'lg' | 'hero';
 
 export interface ICardProps extends OmitStyling<
@@ -16,7 +16,7 @@ export interface ICardProps extends OmitStyling<
 }
 
 export default function Card({
-    variant = 'default',
+    variant = 'gradient',
     size = 'md',
     ...props
 }: Readonly<ICardProps>): React.ReactElement {

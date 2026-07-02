@@ -22,17 +22,69 @@ export const STORY_SYSTEM_PROMPT_SUFFIX = [
  * "do not use text". Note: this intentionally also clears COMIC speech bubbles.
  */
 export const IMAGE_NO_TEXT_DIRECTIVE =
-    'A fully wordless illustration: no letters, words, numbers, captions, signage, or speech bubbles of any kind — convey everything through imagery alone.';
+    'A fully wordless illustration: no letters, words, numbers, captions, titles, labels, signage, logos, symbols meant to be read, or speech bubbles of any kind — convey everything through imagery alone.';
 
 export const STORY_STRUCTURE_RULES_HEADER = 'PAGE STRUCTURE (mandatory):';
 export const STORY_OUTPUT_RULES_HEADER = 'OUTPUT RULES:';
 
 export const STORY_OUTPUT_RULES = [
     '  • text: the story prose for this page (null for illustration-only pages)',
-    '  • chapterTitle: short chapter label shown above the text (null if not needed)',
+    '  • chapterTitle: short chapter label shown above the text (null by default; use only for meaningful chapter breaks)',
     '  • illustration.prompt: a complete, self-contained image generation prompt',
+    '  • illustration.prompt must describe imagery only — never ask the image to render titles, chapter names, captions, labels, signs, readable symbols, or speech bubbles because page text is rendered separately by the template',
     '  • styleAnchor: describe recurring characters + overall visual style — prepended to every illustration prompt',
     '  • Every prose page text (interior and final pages) must end with a complete sentence — the last character must be ., !, ?, … or ,',
+].join('\n');
+
+export function buildImageSlotPrompt(
+    templateName: string,
+    narrativePurpose: string,
+    aspect: string,
+    size: string,
+): string {
+    return [
+        'ILLUSTRATION LAYOUT NOTES:',
+        `  • This illustration will be placed into the "${templateName}" template.`,
+        `  • Compose specifically for a ${aspect} frame (${size}).`,
+        `  • Template purpose: ${narrativePurpose}`,
+        '  • Keep the main subject, faces, and important props inside the central safe area.',
+        '  • Avoid placing crucial details near the outer edges where framing or cropping may trim them.',
+        '  • Any title, chapter label, caption, closing text, child name, or other UI text is rendered by the page template separately.',
+        `  • ${IMAGE_NO_TEXT_DIRECTIVE}`,
+    ].join('\n');
+}
+
+export function buildSafeImageFallbackPrompt(
+    artStylePrompt: string,
+    templateName: string,
+    narrativePurpose: string,
+    aspect: string,
+    size: string,
+): string {
+    return [
+        artStylePrompt,
+        'SAFE FALLBACK ILLUSTRATION:',
+        '  • Create a calm, gentle, child-friendly storybook scene.',
+        '  • Use peaceful nature, soft light, cozy shapes, and harmless whimsical props.',
+        '  • Avoid danger, fear, injury, conflict, weapons, medical details, disturbing imagery, or realistic children.',
+        '  • Do not include readable text or symbols.',
+        buildImageSlotPrompt(templateName, narrativePurpose, aspect, size),
+    ].join('\n\n');
+}
+
+export const STORY_LAYOUT_DYNAMICS_RULES = [
+    'LAYOUT DYNAMICS:',
+    '  • The child is the audience for the book, not automatically the protagonist.',
+    "  • Treat the reader's name as private audience metadata, not story material.",
+    '  • If a CHARACTER section is present, that character is the recurring hero of the story.',
+    '  • If no CHARACTER section is present, do NOT turn the child into the hero. Keep the child out of the cast unless explicitly needed.',
+    '  • In the no-character case, the story may explain, observe, or gently narrate events without inventing a fixed recurring hero.',
+    '  • Do not invent a child protagonist just because the audience is a child. Be various in your choice.',
+    "  • Never use the reader's name in page text, chapter titles, cover subtitle text, styleAnchor, or illustration prompts unless a CHARACTER section explicitly makes that named person the hero.",
+    '  • Do not default every interior page to the same template.',
+    '  • For stories with 5 or more pages, use at least two different interior templates when the narrative allows it.',
+    '  • Use layout changes to support pacing and emotional rhythm, not randomly.',
+    '  • Match the layout to the beat: text-led pages for explanation, image-first pages for scene reveals, centered-image pages for transitional beats, and full-image pages for major visual payoffs.',
 ].join('\n');
 
 /**
@@ -47,7 +99,11 @@ export function buildCharacterPromptSection(name: string, description: string): 
     return [
         'CHARACTER (recurring visual identity — inform styleAnchor and every illustration prompt):',
         `  ${name}: ${description}`,
+        '  This character is the main hero of the story.',
         '  Every illustration of this character must match this description precisely.',
+        '  Treat the character appearance as fixed canon across all pages: do not vary species,',
+        '  face shape, body proportions, colors, signature clothing, hats, accessories, or markings.',
+        '  Repeat those exact recurring traits in the styleAnchor and keep them stable in every scene.',
     ].join('\n');
 }
 

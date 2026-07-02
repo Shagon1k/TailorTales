@@ -86,6 +86,15 @@ describe('RatingsService', () => {
             });
         });
 
+        it('should keep a shared story private when the rating is below 4', async () => {
+            await service.upsert(STORY_ID, USER_ID, { score: 3, isPublic: true });
+
+            expect(prisma.story.update).toHaveBeenCalledWith({
+                where: { id: STORY_ID },
+                data: { isPublic: false },
+            });
+        });
+
         it('should retract visibility when isPublic is false', async () => {
             await service.upsert(STORY_ID, USER_ID, { score: 5, isPublic: false });
 

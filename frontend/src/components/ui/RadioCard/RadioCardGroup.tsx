@@ -1,6 +1,6 @@
 'use client';
 
-import { RadioCardGroupContext } from './RadioCard';
+import { SelectableCardGroup } from '@/components/ui/SelectableCard/SelectableCard';
 import styles from './RadioCardGroup.module.scss';
 
 export interface IRadioCardGroupProps {
@@ -20,10 +20,15 @@ export default function RadioCardGroup({
     disabled = false,
 }: Readonly<IRadioCardGroupProps>): React.ReactElement {
     return (
-        <RadioCardGroupContext value={{ value, onChange, disabled }}>
-            <div role="radiogroup" aria-label={label} className={styles['radio-card-group']}>
-                {children}
-            </div>
-        </RadioCardGroupContext>
+        <SelectableCardGroup
+            value={value}
+            onChange={(nextValue) => {
+                if (nextValue !== null) onChange(nextValue);
+            }}
+            label={label}
+            disabled={disabled}
+        >
+            <div className={styles['radio-card-group']}>{children}</div>
+        </SelectableCardGroup>
     );
 }

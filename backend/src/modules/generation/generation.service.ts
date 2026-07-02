@@ -150,10 +150,10 @@ export class GenerationService {
             };
 
             let timer: NodeJS.Timeout | undefined;
-            void init().then((ok) => {
+            init().then((ok) => {
                 if (!ok || done) return;
-                void poll();
-                timer = setInterval(() => void poll(), SSE_POLL_INTERVAL_MS);
+                poll();
+                timer = setInterval(() => poll(), SSE_POLL_INTERVAL_MS);
             });
 
             return () => {

@@ -9,9 +9,9 @@ export const USER_SETTABLE_CHARACTER_SOURCES = ['IMAGINED', 'QUIZ'] as const;
 
 export class CreateCharacterDto {
     @IsString()
-    @MinLength(1)
+    @IsOptional()
     @MaxLength(CHARACTER_NAME_MAX_LENGTH)
-    name!: string;
+    name?: string;
 
     @IsString()
     @MinLength(1)
@@ -22,7 +22,7 @@ export class CreateCharacterDto {
     @IsString()
     childId!: string;
 
-    /** How it was created: free-form (`IMAGINED`) or the guided quiz (`QUIZ`). Defaults to `IMAGINED`. */
+    /** How it was created: free-form (`IMAGINED`) or the guided flow (`QUIZ`). Defaults to `IMAGINED`. */
     @IsOptional()
     @IsIn(USER_SETTABLE_CHARACTER_SOURCES)
     source?: (typeof USER_SETTABLE_CHARACTER_SOURCES)[number];

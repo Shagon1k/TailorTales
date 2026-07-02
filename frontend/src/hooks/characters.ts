@@ -5,6 +5,7 @@ import {
     type ICreateCharacterPayload,
     type IUpdateCharacterPayload,
 } from '@/api/characters';
+import { SUBSCRIPTION_QUERY_KEY } from '@/hooks/subscription';
 import type { ICharacter } from '@/types/character.types';
 
 export const CHARACTERS_QUERY_KEY = ['characters'] as const;
@@ -48,5 +49,18 @@ export function useCreateCharacterFromPrompt(): ReturnType<
     return useMutation({
         mutationFn: charactersApi.createFromPrompt,
         onSuccess: () => queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY }),
+    });
+}
+
+export function useGenerateCharacterPreview(): ReturnType<
+    typeof useMutation<ICharacter, Error, string>
+> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: charactersApi.generatePreview,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: CHARACTERS_QUERY_KEY });
+            queryClient.invalidateQueries({ queryKey: SUBSCRIPTION_QUERY_KEY });
+        },
     });
 }

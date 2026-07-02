@@ -8,4 +8,17 @@ export const userApi = {
             method: 'PATCH',
             body: JSON.stringify({ name }),
         }),
+    uploadAvatar: (avatar: File): Promise<IUser> => {
+        const formData = new FormData();
+        formData.append('avatar', avatar);
+
+        return apiFetch<IUser>('/me/avatar', {
+            method: 'POST',
+            body: formData,
+        });
+    },
+    deleteAvatar: (): Promise<IUser> =>
+        apiFetch<IUser>('/me/avatar', {
+            method: 'DELETE',
+        }),
 };

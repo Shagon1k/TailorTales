@@ -10,7 +10,7 @@ export class CreateStoryDto {
     @IsString()
     childId!: string;
 
-    /** Optional protagonist. Omit for a child-led story (no recurring character). */
+    /** Optional recurring hero. Omit to let the story run without a fixed protagonist. */
     @IsString()
     @IsOptional()
     characterId?: string;

@@ -11,15 +11,15 @@ import WonderJar from './_components/WonderJar/WonderJar';
 import styles from './page.module.scss';
 
 export default async function LibraryPage(): Promise<React.ReactElement> {
-    const [user, readers, allStories, config] = await Promise.all([
+    const [user, readers, allStories] = await Promise.all([
         getServerUser(),
         childrenServerApi.getAll(),
         storiesServerApi.getAll(),
-        storiesServerApi.getConfig(),
     ]);
 
     const stories = allStories.filter(
-        (story) => story.status === 'COMPLETED' || story.status === 'FAILED',
+        (story) =>
+            story.status === 'COMPLETED' || story.status === 'FAILED' || story.status === 'DRAFT',
     );
 
     return (
@@ -27,7 +27,7 @@ export default async function LibraryPage(): Promise<React.ReactElement> {
             <LibraryGreeting userName={user?.name ?? null} storyCount={stories.length} />
             <ReaderRow readers={readers} stories={stories} />
             <TaleGrid readers={readers} stories={stories} />
-            <WonderJar readers={readers} suggestions={config.questionSuggestions} />
+            <WonderJar readers={readers} />
         </div>
     );
 }

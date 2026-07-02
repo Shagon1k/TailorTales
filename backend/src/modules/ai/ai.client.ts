@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppError } from '../../common/errors.js';
+import { AppError, ImageProhibitedContentError } from '../../common/errors.js';
 import {
     type IAiClient,
     type ICharacterProfile,
@@ -22,6 +22,37 @@ import { CHARACTER_PROFILE_SYSTEM_PROMPT } from '../characters/characters.prompt
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 1_000;
+
+interface IImageGenerationRecord {
+    b64_json?: string;
+    url?: string;
+}
+
+function readOpenRouterErrorCode(text: string): string | null {
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(text);
+    } catch {
+        return null;
+    }
+
+    if (
+        typeof parsed === 'object' &&
+        parsed !== null &&
+        'error' in parsed &&
+        typeof parsed.error === 'object' &&
+        parsed.error !== null &&
+        'metadata' in parsed.error &&
+        typeof parsed.error.metadata === 'object' &&
+        parsed.error.metadata !== null &&
+        'code' in parsed.error.metadata &&
+        typeof parsed.error.metadata.code === 'string'
+    ) {
+        return parsed.error.metadata.code;
+    }
+
+    return null;
+}
 
 @Injectable()
 export class AiClient implements IAiClient {
@@ -141,20 +172,45 @@ export class AiClient implements IAiClient {
     async generateImage(input: IGenerateImageInput): Promise<Buffer> {
         this.logger.log(`Generating image (model: ${this.imageModel}, size: ${input.size})`);
 
-        const [width, height] = input.size.split('x').map(Number);
-
         const body = {
             model: this.imageModel,
-            messages: [{ role: 'user', content: input.prompt }],
-            modalities: ['image'],
-            image_size: { width, height },
+            prompt: input.prompt,
+            aspect_ratio: input.aspectRatio ?? this.aspectRatioFromSize(input.size),
+            input_references: input.referenceImageUrls?.map((url) => ({
+                type: 'image_url',
+                image_url: { url },
+            })),
         };
 
-        const data = await this.post<{
-            choices: { message: { content: unknown } }[];
-        }>('/chat/completions', body);
+        const data = await this.post<{ data: IImageGenerationRecord[] }>('/images', body);
 
-        return this.extractImageBuffer(data.choices[0]?.message?.content, input.size);
+        return this.extractGeneratedImageBuffer(data.data[0], input.size);
+    }
+
+    private aspectRatioFromSize(size: string): string {
+        const match = /^(\d+)x(\d+)$/.exec(size);
+        if (!match) {
+            throw new Error(`Invalid image size format: ${size}`);
+        }
+
+        const width = Number.parseInt(match[1], 10);
+        const height = Number.parseInt(match[2], 10);
+        const divisor = this.greatestCommonDivisor(width, height);
+
+        return `${width / divisor}:${height / divisor}`;
+    }
+
+    private greatestCommonDivisor(a: number, b: number): number {
+        let x = a;
+        let y = b;
+
+        while (y !== 0) {
+            const next = x % y;
+            x = y;
+            y = next;
+        }
+
+        return x;
     }
 
     async moderateText(text: string): Promise<IModerationResult> {
@@ -202,46 +258,30 @@ export class AiClient implements IAiClient {
         }
     }
 
-    private extractImageBuffer(content: unknown, size: string): Buffer {
-        // OpenRouter image models return content as an array of parts or a plain string.
-        // Handle both shapes — the exact format depends on the underlying model.
-        if (Array.isArray(content)) {
-            for (const part of content) {
-                if (
-                    part &&
-                    typeof part === 'object' &&
-                    'type' in part &&
-                    part.type === 'image_url' &&
-                    'image_url' in part &&
-                    part.image_url &&
-                    typeof part.image_url === 'object' &&
-                    'url' in part.image_url &&
-                    typeof part.image_url.url === 'string'
-                ) {
-                    return this.dataUrlToBuffer(part.image_url.url);
-                }
-            }
+    private async extractUrlImageBuffer(url: string): Promise<Buffer> {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`Failed to download generated image: ${res.status} ${res.statusText}`);
         }
 
-        if (typeof content === 'string' && content.startsWith('data:')) {
-            return this.dataUrlToBuffer(content);
-        }
-
-        const preview =
-            typeof content === 'string'
-                ? content.slice(0, 120)
-                : JSON.stringify(content).slice(0, 120);
-        this.logger.error(`Unknown image response format (size: ${size}): ${preview}`);
-        throw new Error(
-            `Unexpected image response format from OpenRouter (size: ${size}). ` +
-                `Content type: ${typeof content}`,
-        );
+        return Buffer.from(await res.arrayBuffer());
     }
 
-    private dataUrlToBuffer(dataUrl: string): Buffer {
-        const comma = dataUrl.indexOf(',');
-        if (comma === -1) throw new Error('Malformed data URL — no comma separator');
-        return Buffer.from(dataUrl.slice(comma + 1), 'base64');
+    private async extractGeneratedImageBuffer(
+        image: IImageGenerationRecord | undefined,
+        size: string,
+    ): Promise<Buffer> {
+        if (image?.b64_json) {
+            return Buffer.from(image.b64_json, 'base64');
+        }
+
+        if (image?.url) {
+            return this.extractUrlImageBuffer(image.url);
+        }
+
+        const preview = JSON.stringify(image).slice(0, 240);
+        this.logger.error(`Unknown /images response format (size: ${size}): ${preview}`);
+        throw new Error(`Unexpected /images response format from OpenRouter (size: ${size})`);
     }
 
     private async post<TResponse>(path: string, body: unknown): Promise<TResponse> {
@@ -268,6 +308,14 @@ export class AiClient implements IAiClient {
                 if (res.status >= 400 && res.status < 500) {
                     const text = await res.text();
                     this.logger.error(`OpenRouter ${res.status} on ${path}: ${text.slice(0, 500)}`);
+                    if (
+                        path === '/images' &&
+                        readOpenRouterErrorCode(text) === 'IMAGE_PROHIBITED_CONTENT'
+                    ) {
+                        throw Object.assign(new ImageProhibitedContentError(), {
+                            permanent: true,
+                        });
+                    }
                     const userMessage =
                         res.status === 429
                             ? 'AI service rate limit reached. Please try again in a moment.'

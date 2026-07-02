@@ -14,13 +14,16 @@ function renderQuiz(): ReturnType<typeof vi.fn> {
 }
 
 describe('CharacterQuiz', () => {
-    it('should require a name before submitting', async () => {
+    it('should allow submitting without a name', async () => {
         const onSubmit = renderQuiz();
 
         await userEvent.click(screen.getByRole('button', { name: /create character/i }));
 
-        expect(onSubmit).not.toHaveBeenCalled();
-        expect(screen.getByText('Name is required')).toBeInTheDocument();
+        expect(onSubmit).toHaveBeenCalledWith({
+            name: '',
+            description:
+                'Girl. Hair: medium-length brown. Eyes: brown. Skin: medium. Wearing: blue clothes.',
+        });
     });
 
     it('should assemble a description from the default selections', async () => {

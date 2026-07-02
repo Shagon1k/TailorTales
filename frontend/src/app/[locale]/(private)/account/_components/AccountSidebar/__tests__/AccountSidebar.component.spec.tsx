@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MantineProvider } from '@mantine/core';
 import type { IUserContext } from '@/context/UserContext';
 import type { IUser } from '@/types/user.types';
 import AccountSidebar from '../AccountSidebar';
@@ -8,6 +9,7 @@ const mockRouterReplace = vi.hoisted(() => vi.fn());
 const mockPathname = vi.hoisted(() => vi.fn(() => '/account/profile'));
 const mockUseCurrentUser = vi.hoisted(() => vi.fn());
 const mockLogout = vi.hoisted(() => vi.fn());
+const mockUseSubscription = vi.hoisted(() => vi.fn());
 
 vi.mock('@/i18n/navigation', () => ({
     Link: ({
@@ -35,11 +37,16 @@ vi.mock('@/api/auth', () => ({
     authApi: { logout: mockLogout },
 }));
 
+vi.mock('@/hooks/subscription', () => ({
+    useSubscription: mockUseSubscription,
+}));
+
 const TEST_USER: IUser = {
     id: 'user-1',
     email: 'alice@example.com',
     name: 'Alice Wonderland',
     avatarUrl: null,
+    hasCustomAvatar: false,
     role: 'USER',
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
@@ -49,41 +56,54 @@ function makeContext(overrides: Partial<IUserContext> = {}): IUserContext {
     return { user: TEST_USER, isLoading: false, refetch: vi.fn(), ...overrides };
 }
 
+function renderSidebar(): ReturnType<typeof render> {
+    return render(
+        <MantineProvider env="test">
+            <AccountSidebar />
+        </MantineProvider>,
+    );
+}
+
 describe('AccountSidebar', () => {
     beforeEach(() => {
         mockUseCurrentUser.mockReturnValue(makeContext());
         mockPathname.mockReturnValue('/account/profile');
         mockLogout.mockResolvedValue(undefined);
+        mockUseSubscription.mockReturnValue({ data: undefined });
         mockRouterReplace.mockClear();
     });
 
     describe('given a logged-in user', () => {
         it('should display the user name and email', () => {
-            render(<AccountSidebar />);
+            renderSidebar();
 
             expect(screen.getByText('Alice Wonderland')).toBeInTheDocument();
             expect(screen.getByText('alice@example.com')).toBeInTheDocument();
         });
 
-        it('should display the first initial in the avatar', () => {
-            render(<AccountSidebar />);
+        it('should display avatar initials when no image is set', () => {
+            renderSidebar();
 
-            expect(screen.getByText('A')).toBeInTheDocument();
+            expect(screen.getByText('AW')).toBeInTheDocument();
         });
 
         it('should render all nav items', () => {
-            render(<AccountSidebar />);
+            renderSidebar();
 
             expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /children/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /subscription/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /notifications/i })).toBeInTheDocument();
-            expect(screen.getByRole('link', { name: /language/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /privacy/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /delete account/i })).toBeInTheDocument();
+            expect(screen.queryByRole('link', { name: /language/i })).not.toBeInTheDocument();
+            expect(
+                screen.queryByRole('button', { name: /export library/i }),
+            ).not.toBeInTheDocument();
         });
 
         it('should link nav items to the correct hrefs', () => {
-            render(<AccountSidebar />);
+            renderSidebar();
 
             expect(screen.getByRole('link', { name: /profile/i })).toHaveAttribute(
                 'href',
@@ -103,7 +123,7 @@ describe('AccountSidebar', () => {
     describe('given the current pathname is /account/profile', () => {
         it('should apply the active modifier to the Profile link', () => {
             mockPathname.mockReturnValue('/account/profile');
-            render(<AccountSidebar />);
+            renderSidebar();
 
             const profileLink = screen.getByRole('link', { name: /profile/i });
             expect(profileLink.className).toMatch(/m-active/);
@@ -111,7 +131,7 @@ describe('AccountSidebar', () => {
 
         it('should not apply the active modifier to other links', () => {
             mockPathname.mockReturnValue('/account/profile');
-            render(<AccountSidebar />);
+            renderSidebar();
 
             const childrenLink = screen.getByRole('link', { name: /children/i });
             expect(childrenLink.className).not.toMatch(/m-active/);
@@ -121,7 +141,7 @@ describe('AccountSidebar', () => {
     describe('given the current pathname is /account/subscription', () => {
         it('should apply the active modifier to the Subscription link', () => {
             mockPathname.mockReturnValue('/account/subscription');
-            render(<AccountSidebar />);
+            renderSidebar();
 
             const subscriptionLink = screen.getByRole('link', { name: /subscription/i });
             expect(subscriptionLink.className).toMatch(/m-active/);
@@ -144,7 +164,7 @@ describe('AccountSidebar', () => {
                 },
             });
 
-            render(<AccountSidebar />);
+            renderSidebar();
 
             await userEvent.click(screen.getByRole('button', { name: /sign out/i }));
 

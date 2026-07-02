@@ -1,9 +1,11 @@
 'use client';
 
+import { useId } from 'react';
 import { SimpleGrid, Stack, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
+import Modal from '@/components/ui/Modal/Modal';
 import Select from '@/components/ui/Select/Select';
 import Button from '@/components/ui/Button/Button';
 import type { ICharacterFormValues } from '../../CharacterForm';
@@ -13,6 +15,7 @@ interface ICharacterQuizProps {
     onSubmit: (values: ICharacterFormValues) => void;
     onCancel: () => void;
     isSubmitting?: boolean;
+    isEditing?: boolean;
 }
 
 interface IQuizValues {
@@ -53,14 +56,13 @@ export default function CharacterQuiz({
     onSubmit,
     onCancel,
     isSubmitting = false,
+    isEditing = false,
 }: Readonly<ICharacterQuizProps>): React.ReactElement {
     const t = useTranslations('workshop.characterQuiz');
+    const formId = useId();
 
     const form = useForm<IQuizValues>({
         initialValues: DEFAULTS,
-        validate: {
-            name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
-        },
     });
 
     const optionsFor = (dimension: keyof typeof OPTIONS): { value: string; label: string }[] =>
@@ -90,72 +92,83 @@ export default function CharacterQuiz({
     }
 
     return (
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-            <Stack gap="sm">
-                {/* Photo seam — disabled until the GDPR-gated photo flow ships (Deferred #10). */}
-                <Tooltip label={t('photoTooltip')} multiline w={280} withArrow position="bottom">
-                    <div className={styles.photo}>
-                        <Button type="button" variant="quiet" fullWidth disabled>
-                            {t('photoButton')}
-                        </Button>
-                    </div>
-                </Tooltip>
-                <Input
-                    label={t('nameLabel')}
-                    placeholder={t('namePlaceholder')}
-                    {...form.getInputProps('name')}
-                />
-                <SimpleGrid cols={2} spacing="sm">
-                    <Select
-                        label={t('genderLabel')}
-                        data={optionsFor('gender')}
-                        {...form.getInputProps('gender')}
+        <>
+            <form id={formId} onSubmit={form.onSubmit(handleSubmit)}>
+                <Stack gap="md">
+                    {/* Photo seam — disabled until the GDPR-gated photo flow ships (Deferred #10). */}
+                    <Tooltip
+                        label={t('photoTooltip')}
+                        multiline
+                        w={280}
+                        withArrow
+                        position="bottom"
+                    >
+                        <div className={styles.photo}>
+                            <Button type="button" variant="quiet" fullWidth disabled>
+                                {t('photoButton')}
+                            </Button>
+                        </div>
+                    </Tooltip>
+                    <p className={styles['photo__note']}>{t('photoDeferredNote')}</p>
+                    <Input
+                        label={t('nameLabel')}
+                        placeholder={t('namePlaceholder')}
+                        {...form.getInputProps('name')}
                     />
-                    <Select
-                        label={t('skinToneLabel')}
-                        data={optionsFor('skinTone')}
-                        {...form.getInputProps('skinTone')}
+                    <SimpleGrid cols={2} spacing="sm">
+                        <Select
+                            label={t('genderLabel')}
+                            data={optionsFor('gender')}
+                            {...form.getInputProps('gender')}
+                        />
+                        <Select
+                            label={t('skinToneLabel')}
+                            data={optionsFor('skinTone')}
+                            {...form.getInputProps('skinTone')}
+                        />
+                        <Select
+                            label={t('hairColorLabel')}
+                            data={optionsFor('hairColor')}
+                            {...form.getInputProps('hairColor')}
+                        />
+                        <Select
+                            label={t('hairLengthLabel')}
+                            data={optionsFor('hairLength')}
+                            {...form.getInputProps('hairLength')}
+                        />
+                        <Select
+                            label={t('eyeColorLabel')}
+                            data={optionsFor('eyeColor')}
+                            {...form.getInputProps('eyeColor')}
+                        />
+                        <Select
+                            label={t('clothingColorLabel')}
+                            data={optionsFor('clothingColor')}
+                            {...form.getInputProps('clothingColor')}
+                        />
+                    </SimpleGrid>
+                    <Input
+                        label={t('clothingItemLabel')}
+                        placeholder={t('clothingItemPlaceholder')}
+                        {...form.getInputProps('clothingItem')}
                     />
-                    <Select
-                        label={t('hairColorLabel')}
-                        data={optionsFor('hairColor')}
-                        {...form.getInputProps('hairColor')}
+                    <Input
+                        label={t('detailLabel')}
+                        placeholder={t('detailPlaceholder')}
+                        {...form.getInputProps('detail')}
                     />
-                    <Select
-                        label={t('hairLengthLabel')}
-                        data={optionsFor('hairLength')}
-                        {...form.getInputProps('hairLength')}
-                    />
-                    <Select
-                        label={t('eyeColorLabel')}
-                        data={optionsFor('eyeColor')}
-                        {...form.getInputProps('eyeColor')}
-                    />
-                    <Select
-                        label={t('clothingColorLabel')}
-                        data={optionsFor('clothingColor')}
-                        {...form.getInputProps('clothingColor')}
-                    />
-                </SimpleGrid>
-                <Input
-                    label={t('clothingItemLabel')}
-                    placeholder={t('clothingItemPlaceholder')}
-                    {...form.getInputProps('clothingItem')}
-                />
-                <Input
-                    label={t('detailLabel')}
-                    placeholder={t('detailPlaceholder')}
-                    {...form.getInputProps('detail')}
-                />
+                </Stack>
+            </form>
+            <Modal.Footer>
                 <div className={styles.actions}>
                     <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                         {t('cancelButton')}
                     </Button>
-                    <Button type="submit" variant="primary" loading={isSubmitting}>
-                        {t('createButton')}
+                    <Button type="submit" form={formId} variant="primary" loading={isSubmitting}>
+                        {isEditing ? t('saveButton') : t('createButton')}
                     </Button>
                 </div>
-            </Stack>
-        </form>
+            </Modal.Footer>
+        </>
     );
 }

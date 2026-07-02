@@ -1,4 +1,5 @@
 @use 'styles/typography' as *;
+@use 'styles/interactions' as *;
 
 .trigger {
     position: relative;
@@ -17,15 +18,27 @@
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.06em;
-    transition: border-color 100ms ease;
-
-    &:hover {
-        border-color: var(--text-muted);
-    }
+    line-height: 1;
+    @include button-accent-outline-feedback(
+        color-mix(in srgb, var(--accent-primary) 12%, transparent),
+        color-mix(in srgb, var(--accent-primary) 18%, transparent),
+        var(--text-primary),
+        var(--text-primary)
+    );
 
     &[aria-expanded='true'] {
         border-color: var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
     }
+}
+
+.trigger__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-indent: 0.06em;
 }
 
 .list {

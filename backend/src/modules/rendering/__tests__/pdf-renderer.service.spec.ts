@@ -59,4 +59,37 @@ describe.skipIf(!!process.env.CI)('PdfRendererService', () => {
             ).rejects.toThrow('book-unknown');
         }, 30_000);
     });
+
+    describe('given the middle-image template', () => {
+        it('should split prose around the illustration in the generated HTML', () => {
+            const html = service.buildPageHtml(
+                {
+                    order: 2,
+                    layout: 'book-image-middle',
+                    chapterTitle: 'A quiet turn',
+                    text: 'Maya watched the fireflies gather. Then the garden began to glow around her.',
+                    imageBase64: null,
+                },
+                THREE_PAGE_STORY_FIXTURE,
+            );
+
+            expect(html).toContain('image-middle__lead');
+            expect(html).toContain('Maya watched the fireflies gather.');
+            expect(html).toContain('Then the garden began to glow around her.');
+        });
+    });
+
+    describe('given a watermarked page', () => {
+        it('should render a compact two-line watermark with the fox mark', () => {
+            const html = service.buildPageHtml(
+                FIVE_PAGE_STORY_FIXTURE.pages[0],
+                FIVE_PAGE_STORY_FIXTURE,
+            );
+
+            expect(html).toContain("class='watermark'");
+            expect(html).toContain('TailorTales');
+            expect(html).toContain('Preview');
+            expect(html).toContain('🦊');
+        });
+    });
 });

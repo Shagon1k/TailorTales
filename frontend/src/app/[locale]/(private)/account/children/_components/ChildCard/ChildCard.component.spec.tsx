@@ -25,6 +25,7 @@ const MOCK_CHARACTER: ICharacter = {
     name: 'Princess Mia',
     description: 'A girl with curly red hair and blue overalls.',
     previewKey: null,
+    previewUrl: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
 };
@@ -38,6 +39,7 @@ function renderCard(
         onCharacterAdd?: () => void;
         onCharacterEdit?: (child: IChild, character: ICharacter) => void;
         onCharacterDelete?: (character: ICharacter) => void;
+        onCharacterGeneratePreview?: (character: ICharacter) => void;
     } = {},
 ): ReturnType<typeof render> {
     return render(
@@ -50,6 +52,7 @@ function renderCard(
                 onCharacterAdd={handlers.onCharacterAdd ?? vi.fn()}
                 onCharacterEdit={handlers.onCharacterEdit ?? vi.fn()}
                 onCharacterDelete={handlers.onCharacterDelete ?? vi.fn()}
+                onCharacterGeneratePreview={handlers.onCharacterGeneratePreview ?? vi.fn()}
             />
         </MantineProvider>,
     );
@@ -170,5 +173,53 @@ describe('ChildCard', () => {
                 expect.objectContaining({ id: 'char-1' }),
             );
         });
+
+        it('should call onCharacterGeneratePreview when Generate preview is clicked', async () => {
+            const onCharacterGeneratePreview = vi.fn();
+            renderCard({}, [MOCK_CHARACTER], { onCharacterGeneratePreview });
+
+            await userEvent.click(
+                screen.getByRole('button', { name: 'Generate preview for Princess Mia' }),
+            );
+
+            expect(onCharacterGeneratePreview).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 'char-1' }),
+            );
+        });
+
+        it('should render compact utility action for preview generation', () => {
+            renderCard({}, [MOCK_CHARACTER]);
+
+            expect(
+                screen
+                    .getByRole('button', { name: 'Generate preview for Princess Mia' })
+                    .querySelector('svg'),
+            ).not.toBeNull();
+        });
+
+        it('should render Regenerate when the character already has a preview', () => {
+            renderCard({}, [
+                {
+                    ...MOCK_CHARACTER,
+                    previewKey: 'users/user-123/characters/char-1/preview',
+                    previewUrl: 'https://signed.test/char-1.png',
+                },
+            ]);
+
+            expect(
+                screen.getByRole('button', { name: 'Regenerate preview for Princess Mia' }),
+            ).toBeInTheDocument();
+        });
+    });
+
+    it('should render child-level actions with explicit labels', () => {
+        renderCard();
+
+        expect(screen.getByRole('button', { name: `Edit ${MOCK_CHILD.name}` })).toHaveTextContent(
+            'Edit child',
+        );
+        expect(screen.getByRole('button', { name: `Delete ${MOCK_CHILD.name}` })).toHaveTextContent(
+            'Delete child',
+        );
     });
 });

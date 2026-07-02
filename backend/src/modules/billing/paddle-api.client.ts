@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Environment, Paddle } from '@paddle/paddle-node-sdk';
-import type { IInvoice, IPaddleClient, IPaddleEvent } from './billing.types.js';
+import { Environment, Paddle, type Subscription } from '@paddle/paddle-node-sdk';
+import type {
+    IInvoice,
+    IPaddleClient,
+    IPaddleCustomer,
+    IPaddleEvent,
+    IPaddleSubscriptionSnapshot,
+} from './billing.types.js';
 
 @Injectable()
 export class PaddleApiClient implements IPaddleClient {
@@ -31,6 +37,21 @@ export class PaddleApiClient implements IPaddleClient {
         // The SDK returns typed event classes; reduce to the shape handlers consume.
         const data = event.data as IPaddleEvent['data'];
         return { eventType: event.eventType, data };
+    }
+
+    async findCustomersByEmail(email: string): Promise<IPaddleCustomer[]> {
+        const collection = this.paddle.customers.list({ email: [email] });
+        return (await collection.next()).map((customer) => ({
+            id: customer.id,
+            email: customer.email,
+        }));
+    }
+
+    async listSubscriptions(paddleCustomerId: string): Promise<IPaddleSubscriptionSnapshot[]> {
+        const collection = this.paddle.subscriptions.list({ customerId: [paddleCustomerId] });
+        return (await collection.next()).map((subscription) =>
+            this.toSubscriptionSnapshot(subscription),
+        );
     }
 
     async cancelSubscription(paddleSubscriptionId: string): Promise<void> {
@@ -64,5 +85,28 @@ export class PaddleApiClient implements IPaddleClient {
             });
         }
         return invoices;
+    }
+
+    private toSubscriptionSnapshot(subscription: Subscription): IPaddleSubscriptionSnapshot {
+        return {
+            id: subscription.id,
+            customerId: subscription.customerId,
+            status: subscription.status,
+            createdAt: subscription.createdAt,
+            customData:
+                typeof subscription.customData?.userId === 'string'
+                    ? { userId: subscription.customData.userId }
+                    : null,
+            items: subscription.items.map((item) => ({ price: { id: item.price.id } })),
+            currentBillingPeriod: subscription.currentBillingPeriod
+                ? {
+                      startsAt: subscription.currentBillingPeriod.startsAt,
+                      endsAt: subscription.currentBillingPeriod.endsAt,
+                  }
+                : null,
+            scheduledChange: subscription.scheduledChange
+                ? { action: subscription.scheduledChange.action }
+                : null,
+        };
     }
 }

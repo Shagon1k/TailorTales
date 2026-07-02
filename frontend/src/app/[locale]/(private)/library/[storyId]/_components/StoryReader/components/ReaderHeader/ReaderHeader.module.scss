@@ -54,22 +54,21 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-6);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+
+    > :last-child {
+        flex-shrink: 0;
+    }
 }
 
 .header__title {
     @include t-heading-3xl;
 
+    flex: 1 1 auto;
     margin: 0;
-    font-style: italic;
     color: var(--text-primary);
-}
-
-.header__actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    flex-shrink: 0;
+    min-width: 0;
+    text-wrap: balance;
 }
 
 .header__meta {

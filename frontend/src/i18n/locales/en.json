@@ -86,26 +86,60 @@
             "lightAName": {
                 "numeral": "i.",
                 "title": "Light a name",
-                "body": "Tell us who the story is for. Just a name, an age, a few things they love."
+                "body": "Tell us who it is for. A name, an age, and a few things they love."
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Whisper a why",
-                "body": "Pick a question they keep asking. Or one of ours. The tale is built around it."
+                "body": "Pick their question, then choose the feel: length, language, look, and style."
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Carry it home",
-                "body": "A printable PDF in minutes. Five to twenty pages, age-matched, theirs to keep."
+                "body": "We turn it into a personalized illustrated PDF in minutes — ready to print or keep."
             }
         },
         "tales": {
             "heading": "Tales lit recently.",
-            "browseLink": "Browse the library →",
             "card": {
-                "meta": "for {childName}, {age} · {pages} pages",
-                "comicSuffix": " · comic"
+                "meta": "age {age} · {pages} pages",
+                "comicSuffix": " · comic",
+                "untitled": "Untitled tale",
+                "previewButton": "Peek inside",
+                "previewPdfLink": "Preview sample PDF",
+                "details": {
+                    "age": "Reader age",
+                    "ageValue": "{age} years old",
+                    "format": "Format",
+                    "pages": "Length",
+                    "language": "Language",
+                    "genre": "Genre",
+                    "writingStyle": "Writing style",
+                    "artStyle": "Art style",
+                    "hero": "Recurring hero"
+                },
+                "formats": {
+                    "book": "Book",
+                    "comic": "Comic"
+                },
+                "hero": {
+                    "selected": "Character selected",
+                    "none": "No fixed hero"
+                }
             }
+        }
+    },
+    "storyOptions": {
+        "genres": {
+            "fairyTale": "Fairy tale",
+            "bedtime": "Bedtime",
+            "educational": "Educational",
+            "adventure": "Adventure"
+        },
+        "writingStyles": {
+            "simple": "Simple",
+            "poetic": "Poetic",
+            "imaginative": "Imaginative"
         }
     },
     "howItWorks": {
@@ -116,32 +150,32 @@
         "hero": {
             "eyebrow": "How it works",
             "heading": "Three <highlight>small steps</highlight>, one <highlight>lasting tale</highlight>.",
-            "subheading": "No accounts to configure, no prompts to engineer. You answer three questions and the workshop does the rest."
+            "subheading": "Start with a reader and a question, shape the feel, and the workshop turns it into a personalized illustrated PDF in minutes."
         },
         "steps": {
             "lightAName": {
                 "numeral": "i.",
                 "title": "Light a name",
-                "body": "Tell us who the story is for — a first name, an age, and two or three things they love right now. Dinosaurs, puddles, their dog. We use that to anchor the tale in their world, not a generic one.",
+                "body": "Start with the child behind the tale: a name, an age, and a few things they love right now. If you already made a recurring character, you can bring them in too.",
                 "detail1": "Takes about a minute",
-                "detail2": "One child per tale",
-                "detail3": "You can save profiles for next time"
+                "detail2": "Saved reader profiles for next time",
+                "detail3": "Optional recurring character"
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Whisper a why",
-                "body": "Pick the question or theme that's been on their mind lately. Why is the sky dark? Where do lost things go? Choose from our curated list or type your own. The tale is built around that spark, not around a generic plot.",
-                "detail1": "40+ starter questions",
-                "detail2": "Or write your own in plain words",
-                "detail3": "Tone adjusts to age automatically"
+                "body": "Choose the question they keep asking, then shape the mood around it: length, language, writing style, and art style. We keep the setup simple, but the result feels personal.",
+                "detail1": "Question prompts or your own words",
+                "detail2": "Choose length, language, and voice",
+                "detail3": "Pick the visual style for the pages"
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Carry it home",
-                "body": "In a few minutes, a printable PDF lands in your library. Five to twenty pages — the length fits the age. A picture book for four-year-olds, a longer comic for eight-year-olds. Theirs to keep, re-read, and print.",
+                "body": "The workshop writes and illustrates the tale, then places a print-ready PDF in your library. Come back to re-read it, share it, rate it, or keep refining the next one.",
                 "detail1": "PDF ready in under 5 minutes",
-                "detail2": "Book or comic format",
-                "detail3": "Print at home or at any copy shop"
+                "detail2": "Saved in your library when it's done",
+                "detail3": "Print at home or keep it digital"
             }
         }
     },
@@ -217,9 +251,8 @@
                     "pageRegenerations": "Page regenerations",
                     "watermark": "Watermark",
                     "printReadyPdf": "Print-ready PDF",
-                    "priorityQueue": "Priority queue",
-                    "storiesRetained": "Stories retained",
-                    "contentLanguages": "EN + RU + DE content"
+                    "generatedFilesRetained": "Generated files retained",
+                    "contentLanguages": "Multilingual content"
                 },
                 "values": {
                     "booksOnly": "Books only",
@@ -315,7 +348,7 @@
         },
         "cookies": {
             "title": "Cookies",
-            "body": "We use one first-party session cookie to keep you signed in, and one cookie to remember your preferences (language, theme). We do not use tracking cookies or third-party advertising cookies."
+            "body": "We use one first-party session cookie to keep you signed in. Your cookie-consent choice is stored in local storage, not a cookie. Analytics cookies are set only after you accept them in production; we do not use third-party advertising cookies."
         },
         "lastUpdated": "Last updated: May 2026."
     },
@@ -351,10 +384,43 @@
                 "title": "A question to begin with",
                 "subheading": "Type their question, or pluck one from the jar below.",
                 "placeholder": "e.g. Why do mountains breathe smoke?",
-                "jarLabel": "Or pluck one from the jar"
+                "jarLabel": "Or pluck one from the jar",
+                "errors": {
+                    "required": "Start with a question for the tale",
+                    "tooShort": "Give us a little more to work with — at least {min} characters."
+                },
+                "suggestions": {
+                    "moonFollows": "Why does the moon follow me?",
+                    "beesFindFlowers": "How do bees find their flowers?",
+                    "rainGoes": "Where does the rain go?",
+                    "skyBlue": "Why is the sky blue?",
+                    "deepestSea": "Who lives in the deepest sea?",
+                    "seedKnowsUp": "How does a seed know the way up?",
+                    "starsTwinkle": "Why do stars twinkle?",
+                    "leavesChangeColor": "Why do leaves change color?",
+                    "catsPurr": "Why do cats purr?",
+                    "windInvisible": "Why can't we see the wind?",
+                    "spidersSpinWebs": "How do spiders spin webs?",
+                    "cloudsFloat": "Why don't clouds fall down?",
+                    "owlsAwakeAtNight": "Why are owls awake at night?",
+                    "snailsCarryHomes": "Why do snails carry their homes?",
+                    "echoComesBack": "Why does an echo come back?",
+                    "iceSlippery": "Why is ice so slippery?"
+                }
+            },
+            "characterPicker": {
+                "number": "2.",
+                "title": "Choose a character",
+                "note": "Optional — pick a recurring hero, or leave the tale without a fixed hero for now.",
+                "selectReaderFirst": "Choose a reader first to unlock their character shelf.",
+                "noGenerationsLeft": "No character generations left this cycle.",
+                "noCharacterSlotsLeft": "No saved character slots left on this plan.",
+                "listLabel": "Select a character",
+                "none": "No character — no fixed hero for this tale",
+                "createNew": "+ Create a new character"
             },
             "formatPicker": {
-                "number": "2.",
+                "number": "3.",
                 "title": "A book, or a comic",
                 "label": "Story format",
                 "book": {
@@ -364,79 +430,75 @@
                 "comic": {
                     "title": "Comic — coming soon",
                     "description": "Panels, speech bubbles, more zip. Great for readers 6+. 2 credits / page"
-                }
+                },
+                "comicDeferredNote": "Comic stays disabled for now while we finish panel layouts and speech bubbles."
             },
             "pageCount": {
-                "number": "3.",
+                "number": "4.",
                 "title": "How long the tale should be",
                 "label": "Page count",
                 "option5": "Short · 5 pp",
                 "option8": "Medium · 8 pp",
                 "option12": "Long · 12 pp",
                 "option16": "Big · 16 pp",
-                "option20": "Bedtime saga · 20 pp"
+                "option20": "Extra long · 20 pp"
             },
             "artStylePicker": {
-                "number": "4.",
+                "number": "5.",
                 "title": "A look for the pictures",
                 "note": "All styles are consistent across the book — the fox in chapter 1 is the same fox in chapter 12."
             },
             "languagePicker": {
-                "number": "5.",
+                "number": "6.",
                 "title": "The language of the tale",
                 "label": "Story language"
             },
             "genrePicker": {
-                "number": "6.",
+                "number": "7.",
                 "title": "Pick a genre",
                 "label": "Story genre (optional)",
                 "note": "Optional — sets the mood of the tale.",
                 "fairyTale": {
-                    "label": "Fairy tale",
                     "hint": "A magical story full of wonder, kindness, and a gentle moral."
                 },
                 "bedtime": {
-                    "label": "Bedtime",
                     "hint": "Calm and soothing, winding gently down toward sleep."
                 },
                 "educational": {
-                    "label": "Educational",
                     "hint": "Explains how and why things work through the child’s discovery."
                 },
                 "adventure": {
-                    "label": "Adventure",
                     "hint": "A brave little journey about courage and solving a problem."
                 }
             },
             "writingStylePicker": {
-                "number": "7.",
+                "number": "8.",
                 "title": "Pick a writing style",
                 "label": "Writing style (optional)",
                 "note": "Optional — shapes how the words sound.",
-                "poetic": {
-                    "label": "Poetic",
-                    "hint": "Lyrical and rhythmic."
-                },
                 "simple": {
-                    "label": "Simple",
                     "hint": "Clean and easy."
                 },
+                "poetic": {
+                    "hint": "Lyrical and rhythmic."
+                },
                 "imaginative": {
-                    "label": "Imaginative",
                     "hint": "Creative and vivid."
                 }
             },
             "submitError": "Could not start generation. Please try again.",
+            "validation": {
+                "reader": "reader",
+                "question": "question",
+                "format": "format",
+                "length": "length",
+                "artStyle": "art style",
+                "language": "language"
+            },
             "artStyleLabel": "Art style",
             "characterModal": {
                 "editTitle": "Edit character",
                 "addTitle": "Add character"
-            },
-            "characterPicker": {
-                "title": "Choose a character",
-                "listLabel": "Select a character",
-                "none": "No character — the story follows the reader",
-                "createNew": "+ Create a new character"
             }
         },
         "summary": {
@@ -450,15 +512,16 @@
                 "language": "Language",
                 "style": "Style"
             },
-            "characterAction": {
-                "choose": "Choose",
-                "change": "Change"
-            },
             "lengthValue": "{pageCount} pages",
-            "creditCost": "{creditCost} credits",
-            "creditsRemaining": " · {creditsRemaining} remaining",
+            "creditsAriaLabel": "Credits needed and credits left",
+            "creditCostMetricLabel": "credits for this tale",
+            "creditsRemainingMetricLabel": "left this cycle",
             "quotaExhausted": "This tale needs {creditCost} credits but only {creditsRemaining} remain this cycle — pick a shorter length or upgrade your plan.",
             "quotaInfo": "{pageCount} pages will use {creditCost} of your {creditsRemaining} remaining credits this cycle.",
+            "validation": {
+                "title": "Still needed before we can save or generate",
+                "fields": "{fields}."
+            },
             "generateButton": "Light the lantern →",
             "draftButton": "Save as draft",
             "format": {
@@ -469,25 +532,33 @@
         "characterForm": {
             "nameLabel": "Name",
             "namePlaceholder": "e.g. Princess Mia",
+            "nameHint": "Optional — leave it blank and we'll suggest one.",
+            "ideaLabel": "Describe the character",
+            "ideaPlaceholder": "Describe the character's appearance, colors, clothes, and any special details. We'll refine it into a polished story character.",
             "descriptionLabel": "Description",
             "descriptionPlaceholder": "Describe the character's appearance in detail — hair color, eye color, clothing, distinguishing features…",
             "cancelButton": "Cancel",
             "saveButton": "Save",
+            "createButton": "Create character",
             "modeGroupLabel": "How to create the character",
-            "modeManual": "Write it myself",
-            "modePrompt": "Generate from a prompt",
-            "promptLabel": "Describe the character",
-            "promptPlaceholder": "e.g. a brave little fox who loves the sea, with a red scarf",
-            "generateButton": "Generate",
+            "modeWrite": "Write it",
+            "modeGuided": "Guided",
+            "writeHint": "We'll use AI to refine this into a consistent character profile and preview.",
+            "quota": {
+                "ariaLabel": "Character creation limits for this plan",
+                "generationsMetricLabel": "{count, plural, one {generation left this cycle} other {generations left this cycle}}",
+                "charactersMetricLabel": "{count, plural, one {character slot left on this plan} other {character slots left on this plan}}",
+                "charactersUnlimitedMetricLabel": "character slots on this plan"
+            },
             "errors": {
-                "nameRequired": "Name is required",
-                "descriptionRequired": "Description is required",
+                "descriptionRequired": "Tell us what the character looks like",
                 "promptRequired": "Tell us a little about the character"
             }
         },
         "characterQuiz": {
             "nameLabel": "Name",
             "namePlaceholder": "e.g. Pip",
+            "nameHint": "Optional — leave it blank and we'll suggest one.",
             "genderLabel": "Girl or boy",
             "gender": { "girl": "Girl", "boy": "Boy" },
             "hairColorLabel": "Hair color",
@@ -508,16 +579,17 @@
             },
             "clothingItemLabel": "What are they wearing?",
             "clothingItemPlaceholder": "e.g. a raincoat, a dress, overalls",
-            "detailLabel": "Anything special? (optional)",
+            "detailLabel": "Anything special?",
             "detailPlaceholder": "e.g. freckles, round glasses, a small cape",
             "cancelButton": "Cancel",
             "createButton": "Create character",
-            "photoButton": "📷 Use a photo — coming soon",
+            "saveButton": "Save",
+            "photoButton": "Use a photo",
             "photoTooltip": "Soon you'll be able to upload a photo of your child, a parent, or anyone else to use as the story's main character.",
+            "photoDeferredNote": "Coming soon. Photo-based character creation is parked for now, so this option stays disabled.",
             "descriptionTemplate": "{gender}. Hair: {hairLength} {hairColor}. Eyes: {eyeColor}. Skin: {skinTone}. Wearing: {clothing}.",
             "descriptionClothing": "{color} {item}",
-            "descriptionClothingGeneric": "{color} clothes",
-            "errors": { "nameRequired": "Name is required" }
+            "descriptionClothingGeneric": "{color} clothes"
         }
     },
     "workshopProgress": {
@@ -564,7 +636,7 @@
         },
         "log": {
             "header": "The workshop log",
-            "live": "● LIVE"
+            "live": "LIVE"
         },
         "safety": "It's quite safe to close this window — we'll email {childName}'s tale when it's ready."
     },
@@ -594,6 +666,7 @@
             "lastTale": "last tale {relativeTime}",
             "noTales": "no tales yet",
             "loves": "loves:",
+            "taleCountMetricLabel": "{count, plural, one {tale} other {tales}}",
             "newTaleButton": "+ New tale",
             "taleCount": "{count, plural, one {# tale} other {# tales}}"
         },
@@ -612,8 +685,19 @@
         },
         "taleCard": {
             "failedAriaLabel": "{displayTitle} — generation failed, try again",
+            "draftAriaLabel": "{displayTitle} — draft, continue in workshop",
             "failedOverlay": "Generation failed",
-            "retryLabel": "Try again →",
+            "draftOverlay": "Draft",
+            "retryLabel": "Try again",
+            "deleteButton": "Delete",
+            "deleteAriaLabel": "Delete {displayTitle}",
+            "deleteConfirm": "Delete “{displayTitle}”? This cannot be undone.",
+            "deleteError": "Could not delete this tale. Please try again.",
+            "deleteModal": {
+                "title": "Delete tale",
+                "cancelButton": "Cancel",
+                "deleteButton": "Delete"
+            },
             "age": "age {age}",
             "pageCount": "{pageCount}pp"
         },
@@ -647,6 +731,9 @@
         "chapters": {
             "ariaLabel": "Chapters",
             "eyebrow": "· Chapters ·",
+            "coverFallback": "Cover",
+            "endingFallback": "Closing",
+            "sceneFallback": "Scene {order}",
             "pageFallback": "Page {order}"
         },
         "spread": {
@@ -683,8 +770,13 @@
             "noteAriaLabel": "Rating note",
             "notePlaceholder": "Write a small note (optional)…",
             "shareLabel": "Share this story as an example for other families",
+            "shareHint": "Only tales rated 4 or 5 stars appear in the public showcase.",
             "saveButton": "Save rating",
+            "updateButton": "Save changes",
+            "editButton": "Edit rating",
             "savedStatus": "Saved — thank you!",
+            "sharedStatus": "Shared as an example for other families.",
+            "privateStatus": "Only you can see this rating.",
             "defaultError": "Something went wrong. Please try again."
         },
         "regeneration": {
@@ -693,6 +785,8 @@
             "textButton": "Regenerate text",
             "illustrationButton": "Repaint illustration",
             "bothButton": "Remake everything",
+            "quotaAriaLabel": "Regenerations left this cycle",
+            "quotaMetricLabel": "{count, plural, one {regeneration left this cycle} other {regenerations left this cycle}}",
             "quotaExhausted": "No regenerations left this cycle — they refresh when your plan renews.",
             "quotaInfo": "{count, plural, one {# regeneration left this cycle.} other {# regenerations left this cycle.}}",
             "modal": {
@@ -731,10 +825,18 @@
             "deleteAccount": "Delete account"
         },
         "profile": {
+            "changeAvatarButton": "Change avatar",
             "editButton": "Edit name",
             "nameLabel": "Name",
             "saveButton": "Save",
-            "cancelButton": "Cancel"
+            "cancelButton": "Cancel",
+            "cropper": {
+                "title": "Adjust avatar",
+                "description": "Move and scale the image so it sits nicely in the circle.",
+                "zoomLabel": "Zoom",
+                "cancelButton": "Cancel",
+                "saveButton": "Save avatar"
+            }
         },
         "children": {
             "heading": "Children",
@@ -743,6 +845,12 @@
             "addFirstButton": "Add your first child",
             "addButton": "Add child",
             "limitHint": "You've reached the child limit for your plan. Upgrade to add more.",
+            "quotaLabel": "Plan limits for children and characters",
+            "characterQuotaMetricLabel": "{count, plural, one {character generation left} other {character generations left}}",
+            "characterSlotsMetricLabel": "{count, plural, one {saved character slot left} other {saved character slots left}}",
+            "characterSlotsUnlimitedMetricLabel": "saved character slots",
+            "characterGenerationLimitHint": "This plan has no character generations left this cycle.",
+            "characterLimitHint": "This plan has no saved character slots left.",
             "editModal": {
                 "title": "Edit child"
             },
@@ -777,6 +885,7 @@
             },
             "interestsLabel": "Interests",
             "interestsPlaceholder": "Add interest and press Enter",
+            "interestsLimitReached": "Maximum 10 interests reached.",
             "cancelButton": "Cancel",
             "saveButton": "Save",
             "errors": {
@@ -801,13 +910,20 @@
             "editCharacterAriaLabel": "Edit character {characterName}",
             "addCharacterAriaLabel": "Add character for {childName}",
             "deleteCharacterAriaLabel": "Delete character {characterName}",
+            "generateCharacterPreviewAriaLabel": "Generate preview for {characterName}",
+            "regenerateCharacterPreviewAriaLabel": "Regenerate preview for {characterName}",
+            "previewCharacterAriaLabel": "Open larger preview for {characterName}",
             "editCharacterButton": "Edit",
             "addCharacterButton": "Add character",
+            "generateCharacterPreviewButton": "Generate preview",
+            "regenerateCharacterPreviewButton": "Regenerate",
             "deleteCharacterButton": "Delete",
             "editAriaLabel": "Edit {childName}",
             "editButton": "Edit",
+            "editChildButton": "Edit child",
             "deleteAriaLabel": "Delete {childName}",
-            "deleteButton": "Delete"
+            "deleteButton": "Delete",
+            "deleteChildButton": "Delete child"
         },
         "subscription": {
             "loading": "Loading your subscription…",
@@ -845,6 +961,7 @@
             },
             "invoices": {
                 "eyebrow": "Past parcels",
+                "loading": "Loading invoices",
                 "emptyPaid": "No invoices yet — your first one arrives with the next renewal.",
                 "emptyFree": "No invoices — the Free Chapter never bills you.",
                 "pdfLink": "PDF"
@@ -1041,8 +1158,9 @@
                 "activeLabel": "Active",
                 "moveUp": "Move {name} up",
                 "moveDown": "Move {name} down",
+                "previewThumbnail": "Open larger thumbnail preview for {name}",
                 "edit": "Edit",
-                "generateThumbnail": "Generate thumbnail",
+                "generateThumbnail": "Generate",
                 "regenerateThumbnail": "Regenerate",
                 "generating": "Generating…",
                 "noThumbnail": "none"
@@ -1100,6 +1218,11 @@
                 "create": "Create blueprint",
                 "saving": "Saving…",
                 "saveError": "Could not save the blueprint. Please try again.",
+                "deleteModal": {
+                    "title": "Delete blueprint",
+                    "cancel": "Keep blueprint",
+                    "confirm": "Delete"
+                },
                 "deleteConfirm": "Delete \"{name}\"? This cannot be undone.",
                 "nameLabel": "Blueprint name",
                 "namePlaceholder": "My blueprint",

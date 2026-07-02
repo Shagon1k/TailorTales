@@ -100,5 +100,20 @@ describe('apiFetch', () => {
             const [, init] = vi.mocked(fetch).mock.calls[0];
             expect((init?.headers as Record<string, string>)['Accept-Language']).toBeUndefined();
         });
+
+        it('should omit Content-Type when sending FormData', async () => {
+            vi.mocked(fetch).mockResolvedValue(mockResponse(200, {}));
+
+            const formData = new FormData();
+            formData.append('avatar', new Blob(['avatar'], { type: 'image/png' }), 'avatar.png');
+
+            await apiFetch('/me/avatar', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const [, init] = vi.mocked(fetch).mock.calls[0];
+            expect((init?.headers as Record<string, string>)['Content-Type']).toBeUndefined();
+        });
     });
 });

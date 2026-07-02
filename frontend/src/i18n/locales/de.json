@@ -86,26 +86,60 @@
             "lightAName": {
                 "numeral": "i.",
                 "title": "Einen Namen erhellen",
-                "body": "Sag uns, für wen die Geschichte ist. Nur ein Name, ein Alter, ein paar Dinge, die sie lieben."
+                "body": "Sag uns, für wen sie ist. Ein Name, ein Alter und ein paar Dinge, die sie lieben."
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Ein Warum flüstern",
-                "body": "Wähle eine Frage, die sie immer wieder stellen. Oder eine von unseren. Die Geschichte wird darum herum aufgebaut."
+                "body": "Wähle ihre Frage und dann das Gefühl: Länge, Sprache, Bildwelt und Stil."
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Nach Hause tragen",
-                "body": "Ein druckbares PDF in Minuten. Fünf bis zwanzig Seiten, altersgerecht, für immer ihr Eigen."
+                "body": "Wir verwandeln alles in Minuten in ein persönliches illustriertes PDF — zum Drucken und Behalten."
             }
         },
         "tales": {
             "heading": "Zuletzt entstandene Geschichten.",
-            "browseLink": "Bibliothek durchstöbern →",
             "card": {
-                "meta": "für {childName}, {age} · {pages} Seiten",
-                "comicSuffix": " · Comic"
+                "meta": "{age} Jahre · {pages} Seiten",
+                "comicSuffix": " · Comic",
+                "untitled": "Unbenannte Geschichte",
+                "previewButton": "Hineinschauen",
+                "previewPdfLink": "Beispiel-PDF öffnen",
+                "details": {
+                    "age": "Alter des Lesers",
+                    "ageValue": "{age} Jahre",
+                    "format": "Format",
+                    "pages": "Länge",
+                    "language": "Sprache",
+                    "genre": "Genre",
+                    "writingStyle": "Schreibstil",
+                    "artStyle": "Bildstil",
+                    "hero": "Wiederkehrender Held"
+                },
+                "formats": {
+                    "book": "Buch",
+                    "comic": "Comic"
+                },
+                "hero": {
+                    "selected": "Charakter ausgewählt",
+                    "none": "Kein fester Held"
+                }
             }
+        }
+    },
+    "storyOptions": {
+        "genres": {
+            "fairyTale": "Märchen",
+            "bedtime": "Gute-Nacht",
+            "educational": "Lehrreich",
+            "adventure": "Abenteuer"
+        },
+        "writingStyles": {
+            "simple": "Einfach",
+            "poetic": "Poetisch",
+            "imaginative": "Fantasievoll"
         }
     },
     "howItWorks": {
@@ -116,32 +150,32 @@
         "hero": {
             "eyebrow": "So funktioniert's",
             "heading": "Drei <highlight>kleine Schritte</highlight>, eine <highlight>bleibende Geschichte</highlight>.",
-            "subheading": "Keine Konten einzurichten, keine Prompts zu schreiben. Du beantwortest drei Fragen und die Werkstatt erledigt den Rest."
+            "subheading": "Beginne mit einem Kind und einer Frage, gib der Geschichte ihren Ton — und die Werkstatt macht daraus in Minuten ein persönliches illustriertes PDF."
         },
         "steps": {
             "lightAName": {
                 "numeral": "i.",
                 "title": "Einen Namen erhellen",
-                "body": "Sag uns, für wen die Geschichte ist — ein Vorname, ein Alter und zwei oder drei Dinge, die sie gerade lieben. Dinosaurier, Pfützen, ihr Hund. Wir verwenden das, um die Geschichte in ihrer Welt zu verankern, nicht in einer generischen.",
+                "body": "Beginne mit dem Kind hinter der Geschichte: ein Name, ein Alter und ein paar Dinge, die gerade geliebt werden. Wenn du schon einen wiederkehrenden Helden angelegt hast, kannst du ihn gleich mitnehmen.",
                 "detail1": "Dauert etwa eine Minute",
-                "detail2": "Ein Kind pro Geschichte",
-                "detail3": "Du kannst Profile für das nächste Mal speichern"
+                "detail2": "Gespeicherte Leserprofile fürs nächste Mal",
+                "detail3": "Wiederkehrender Charakter optional"
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Ein Warum flüstern",
-                "body": "Wähle die Frage oder das Thema, das sie zuletzt beschäftigt hat. Warum ist der Himmel dunkel? Wohin gehen verlorene Dinge? Wähle aus unserer kuratierten Liste oder schreib deine eigene. Die Geschichte wird um diesen Funken herum aufgebaut, nicht um eine generische Handlung.",
-                "detail1": "40+ Einstiegsfragen",
-                "detail2": "Oder schreib deine eigene in einfachen Worten",
-                "detail3": "Der Ton passt sich automatisch dem Alter an"
+                "body": "Wähle die Frage, die immer wieder gestellt wird, und forme dann das Gefühl der Geschichte: Länge, Sprache, Schreibstil und Bildwelt. Wenige Entscheidungen, aber ein viel persönlicheres Ergebnis.",
+                "detail1": "Frage aus Ideenpool oder in eigenen Worten",
+                "detail2": "Länge, Sprache und Stimme auswählbar",
+                "detail3": "Auch der Illustrationsstil ist wählbar"
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Nach Hause tragen",
-                "body": "In wenigen Minuten landet ein druckbares PDF in deiner Bibliothek. Fünf bis zwanzig Seiten — die Länge passt zum Alter. Ein Bilderbuch für Vierjährige, ein längerer Comic für Achtjährige. Für immer ihr Eigen, zum Wiederlesen und Drucken.",
+                "body": "Die Werkstatt schreibt und illustriert die Geschichte und legt das fertige PDF in deine Bibliothek. Du kannst sie wieder lesen, teilen, bewerten und die nächste Geschichte noch feiner abstimmen.",
                 "detail1": "PDF in weniger als 5 Minuten fertig",
-                "detail2": "Buch- oder Comicformat",
-                "detail3": "Zu Hause oder in jedem Copyshop drucken"
+                "detail2": "Fertig gespeichert in deiner Bibliothek",
+                "detail3": "Digital lesen oder zu Hause drucken"
             }
         }
     },
@@ -217,9 +251,8 @@
                     "pageRegenerations": "Seiten-Regenerierungen",
                     "watermark": "Wasserzeichen",
                     "printReadyPdf": "Druckfertiges PDF",
-                    "priorityQueue": "Prioritätswarteschlange",
-                    "storiesRetained": "Gespeicherte Geschichten",
-                    "contentLanguages": "EN + RU + DE Inhalt"
+                    "generatedFilesRetained": "Generierte Dateien gespeichert",
+                    "contentLanguages": "Mehrsprachige Inhalte"
                 },
                 "values": {
                     "booksOnly": "Nur Bücher",
@@ -315,7 +348,7 @@
         },
         "cookies": {
             "title": "Cookies",
-            "body": "Wir verwenden ein eigenes Sitzungs-Cookie, um dich angemeldet zu halten, und ein Cookie zum Speichern deiner Einstellungen (Sprache, Theme). Wir verwenden keine Tracking-Cookies oder Werbe-Cookies von Drittanbietern."
+            "body": "Wir verwenden ein eigenes Sitzungs-Cookie, um dich angemeldet zu halten. Deine Cookie-Einwilligung wird im lokalen Speicher gespeichert, nicht in einem Cookie. Analyse-Cookies werden nur in Produktion gesetzt, nachdem du zugestimmt hast; Werbe-Cookies von Drittanbietern verwenden wir nicht."
         },
         "lastUpdated": "Zuletzt aktualisiert: Mai 2026."
     },
@@ -351,10 +384,43 @@
                 "title": "Eine Frage zum Anfangen",
                 "subheading": "Schreib ihre Frage, oder nimm eine aus dem Glas unten.",
                 "placeholder": "z.B. Warum atmen Berge Rauch?",
-                "jarLabel": "Oder eine aus dem Glas nehmen"
+                "jarLabel": "Oder eine aus dem Glas nehmen",
+                "errors": {
+                    "required": "Wir brauchen zuerst eine Frage für die Geschichte",
+                    "tooShort": "Gib uns bitte etwas mehr Stoff — mindestens {min} Zeichen."
+                },
+                "suggestions": {
+                    "moonFollows": "Warum folgt mir der Mond?",
+                    "beesFindFlowers": "Wie finden Bienen ihre Blumen?",
+                    "rainGoes": "Wohin geht der Regen?",
+                    "skyBlue": "Warum ist der Himmel blau?",
+                    "deepestSea": "Wer lebt im tiefsten Meer?",
+                    "seedKnowsUp": "Woher weiß ein Samen, wo oben ist?",
+                    "starsTwinkle": "Warum funkeln Sterne?",
+                    "leavesChangeColor": "Warum wechseln Blätter ihre Farbe?",
+                    "catsPurr": "Warum schnurren Katzen?",
+                    "windInvisible": "Warum können wir den Wind nicht sehen?",
+                    "spidersSpinWebs": "Wie spinnen Spinnen ihre Netze?",
+                    "cloudsFloat": "Warum fallen Wolken nicht herunter?",
+                    "owlsAwakeAtNight": "Warum sind Eulen nachts wach?",
+                    "snailsCarryHomes": "Warum tragen Schnecken ihr Haus mit sich?",
+                    "echoComesBack": "Warum kommt ein Echo zurück?",
+                    "iceSlippery": "Warum ist Eis so rutschig?"
+                }
+            },
+            "characterPicker": {
+                "number": "2.",
+                "title": "Charakter auswählen",
+                "note": "Optional — wähle einen wiederkehrenden Helden oder lass die Geschichte vorerst ohne festen Helden laufen.",
+                "selectReaderFirst": "Wähle zuerst ein Kind aus, um seine Charaktere zu sehen.",
+                "noGenerationsLeft": "In diesem Zyklus sind keine Charakter-Generierungen mehr übrig.",
+                "noCharacterSlotsLeft": "In diesem Tarif sind keine Speicherplätze für Charaktere mehr übrig.",
+                "listLabel": "Charakter auswählen",
+                "none": "Kein Charakter — diese Geschichte hat keinen festen Helden",
+                "createNew": "+ Neuen Charakter erstellen"
             },
             "formatPicker": {
-                "number": "2.",
+                "number": "3.",
                 "title": "Ein Buch oder ein Comic",
                 "label": "Geschichtsformat",
                 "book": {
@@ -364,79 +430,75 @@
                 "comic": {
                     "title": "Comic — kommt bald",
                     "description": "Panels, Sprechblasen, mehr Schwung. Toll für Leser ab 6 Jahren. 2 Credits / Seite"
-                }
+                },
+                "comicDeferredNote": "Comics bleiben vorerst deaktiviert, bis wir Panels und Sprechblasen fertig haben."
             },
             "pageCount": {
-                "number": "3.",
+                "number": "4.",
                 "title": "Wie lang die Geschichte sein soll",
                 "label": "Seitenanzahl",
                 "option5": "Kurz · 5 S.",
                 "option8": "Mittel · 8 S.",
                 "option12": "Lang · 12 S.",
                 "option16": "Groß · 16 S.",
-                "option20": "Schlafenszeit-Saga · 20 S."
+                "option20": "Extra lang · 20 S."
             },
             "artStylePicker": {
-                "number": "4.",
+                "number": "5.",
                 "title": "Ein Look für die Bilder",
                 "note": "Alle Stile sind durchgehend konsistent — der Fuchs in Kapitel 1 ist derselbe Fuchs in Kapitel 12."
             },
             "languagePicker": {
-                "number": "5.",
+                "number": "6.",
                 "title": "Die Sprache der Geschichte",
                 "label": "Geschichtssprache"
             },
             "genrePicker": {
-                "number": "6.",
+                "number": "7.",
                 "title": "Genre wählen",
                 "label": "Genre der Geschichte (optional)",
                 "note": "Optional — bestimmt die Stimmung der Geschichte.",
                 "fairyTale": {
-                    "label": "Märchen",
                     "hint": "Eine magische Geschichte voller Wunder, Güte und einer sanften Moral."
                 },
                 "bedtime": {
-                    "label": "Gute-Nacht",
                     "hint": "Ruhig und beruhigend, sanft dem Schlaf entgegen."
                 },
                 "educational": {
-                    "label": "Lehrreich",
                     "hint": "Erklärt durch die Entdeckungen des Kindes, wie und warum Dinge funktionieren."
                 },
                 "adventure": {
-                    "label": "Abenteuer",
                     "hint": "Eine mutige kleine Reise über Mut und das Lösen eines Problems."
                 }
             },
             "writingStylePicker": {
-                "number": "7.",
+                "number": "8.",
                 "title": "Schreibstil wählen",
                 "label": "Schreibstil (optional)",
                 "note": "Optional — prägt den Klang der Worte.",
-                "poetic": {
-                    "label": "Poetisch",
-                    "hint": "Lyrisch und rhythmisch."
-                },
                 "simple": {
-                    "label": "Einfach",
                     "hint": "Klar und leicht."
                 },
+                "poetic": {
+                    "hint": "Lyrisch und rhythmisch."
+                },
                 "imaginative": {
-                    "label": "Fantasievoll",
                     "hint": "Kreativ und lebendig."
                 }
             },
             "submitError": "Generierung konnte nicht gestartet werden. Bitte erneut versuchen.",
+            "validation": {
+                "reader": "Kind",
+                "question": "Frage",
+                "format": "Format",
+                "length": "Länge",
+                "artStyle": "Illustrationsstil",
+                "language": "Sprache"
+            },
             "artStyleLabel": "Kunststil",
             "characterModal": {
                 "editTitle": "Charakter bearbeiten",
                 "addTitle": "Charakter hinzufügen"
-            },
-            "characterPicker": {
-                "title": "Charakter auswählen",
-                "listLabel": "Charakter auswählen",
-                "none": "Kein Charakter — die Geschichte folgt dem Kind",
-                "createNew": "+ Neuen Charakter erstellen"
             }
         },
         "summary": {
@@ -450,15 +512,16 @@
                 "language": "Sprache",
                 "style": "Stil"
             },
-            "characterAction": {
-                "choose": "Auswählen",
-                "change": "Ändern"
-            },
             "lengthValue": "{pageCount} Seiten",
-            "creditCost": "{creditCost} Credits",
-            "creditsRemaining": " · {creditsRemaining} verbleibend",
+            "creditsAriaLabel": "Benötigte Credits und verbleibende Credits",
+            "creditCostMetricLabel": "Credits für diese Geschichte",
+            "creditsRemainingMetricLabel": "verbleiben in diesem Zyklus",
             "quotaExhausted": "Diese Geschichte benötigt {creditCost} Credits, aber nur {creditsRemaining} verbleiben in diesem Zyklus — wähle eine kürzere Länge oder upgrade deinen Plan.",
             "quotaInfo": "{pageCount} Seiten verwenden {creditCost} deiner {creditsRemaining} verbleibenden Credits in diesem Zyklus.",
+            "validation": {
+                "title": "Vor dem Speichern oder Generieren fehlt noch",
+                "fields": "{fields}."
+            },
             "generateButton": "Die Laterne anzünden →",
             "draftButton": "Als Entwurf speichern",
             "format": {
@@ -469,25 +532,34 @@
         "characterForm": {
             "nameLabel": "Name",
             "namePlaceholder": "z.B. Prinzessin Mia",
+            "nameHint": "Optional — leer lassen und wir schlagen einen Namen vor.",
+            "ideaLabel": "Beschreibe die Figur",
+            "ideaPlaceholder": "Beschreibe Aussehen, Farben, Kleidung und besondere Details der Figur. Wir verfeinern es zu einer stimmigen Geschichtenfigur.",
             "descriptionLabel": "Beschreibung",
             "descriptionPlaceholder": "Beschreibe das Aussehen des Charakters detailliert — Haarfarbe, Augenfarbe, Kleidung, besondere Merkmale…",
             "cancelButton": "Abbrechen",
             "saveButton": "Speichern",
+            "createButton": "Charakter erstellen",
             "modeGroupLabel": "Wie der Charakter erstellt wird",
-            "modeManual": "Selbst schreiben",
-            "modePrompt": "Aus einem Prompt generieren",
-            "promptLabel": "Beschreibe den Charakter",
-            "promptPlaceholder": "z.B. ein mutiger kleiner Fuchs, der das Meer liebt, mit rotem Schal",
-            "generateButton": "Generieren",
+            "modeWrite": "Selbst schreiben",
+            "modeGuided": "Geführt",
+            "writeHint": "Wir nutzen KI, um daraus ein stimmiges Figurenprofil und eine Vorschau zu machen.",
+            "quota": {
+                "ariaLabel": "Charakterlimits für diesen Tarif",
+                "generationsMetricLabel": "{count, plural, one {Generierung in diesem Zyklus übrig} other {Generierungen in diesem Zyklus übrig}}",
+                "charactersMetricLabel": "{count, plural, one {Charakter-Slot in diesem Tarif übrig} other {Charakter-Slots in diesem Tarif übrig}}",
+                "charactersUnlimitedMetricLabel": "Charakter-Slots in diesem Tarif"
+            },
             "errors": {
                 "nameRequired": "Name ist erforderlich",
-                "descriptionRequired": "Beschreibung ist erforderlich",
+                "descriptionRequired": "Erzähl uns, wie die Figur aussieht",
                 "promptRequired": "Erzähl uns ein wenig über den Charakter"
             }
         },
         "characterQuiz": {
             "nameLabel": "Name",
             "namePlaceholder": "z.B. Pip",
+            "nameHint": "Optional — leer lassen und wir schlagen einen Namen vor.",
             "genderLabel": "Mädchen oder Junge",
             "gender": { "girl": "Mädchen", "boy": "Junge" },
             "hairColorLabel": "Haarfarbe",
@@ -518,12 +590,14 @@
             },
             "clothingItemLabel": "Was trägt die Figur?",
             "clothingItemPlaceholder": "z.B. ein Regenmantel, ein Kleid, eine Latzhose",
-            "detailLabel": "Etwas Besonderes? (optional)",
+            "detailLabel": "Etwas Besonderes?",
             "detailPlaceholder": "z.B. Sommersprossen, runde Brille, ein kleiner Umhang",
             "cancelButton": "Abbrechen",
             "createButton": "Charakter erstellen",
-            "photoButton": "📷 Foto verwenden — bald verfügbar",
+            "saveButton": "Speichern",
+            "photoButton": "Foto verwenden",
             "photoTooltip": "Bald kannst du ein Foto deines Kindes, eines Elternteils oder einer anderen Person hochladen, um sie als Hauptfigur der Geschichte zu verwenden.",
+            "photoDeferredNote": "Bald verfügbar. Die Charaktererstellung per Foto ist vorerst zurückgestellt, deshalb bleibt diese Option deaktiviert.",
             "descriptionTemplate": "{gender}. Haare: {hairLength} {hairColor}. Augen: {eyeColor}. Haut: {skinTone}. Kleidung: {clothing}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} Kleidung",
@@ -574,7 +648,7 @@
         },
         "log": {
             "header": "Das Werkstatt-Protokoll",
-            "live": "● LIVE"
+            "live": "LIVE"
         },
         "safety": "Du kannst dieses Fenster ruhig schließen — wir senden {childName}s Geschichte per E-Mail, wenn sie fertig ist."
     },
@@ -604,6 +678,7 @@
             "lastTale": "letzte Geschichte {relativeTime}",
             "noTales": "noch keine Geschichten",
             "loves": "liebt:",
+            "taleCountMetricLabel": "{count, plural, one {Geschichte} other {Geschichten}}",
             "newTaleButton": "+ Neue Geschichte",
             "taleCount": "{count, plural, one {# Geschichte} other {# Geschichten}}"
         },
@@ -622,8 +697,19 @@
         },
         "taleCard": {
             "failedAriaLabel": "{displayTitle} — Generierung fehlgeschlagen, erneut versuchen",
+            "draftAriaLabel": "{displayTitle} — Entwurf, in der Werkstatt fortsetzen",
             "failedOverlay": "Generierung fehlgeschlagen",
-            "retryLabel": "Erneut versuchen →",
+            "draftOverlay": "Entwurf",
+            "retryLabel": "Erneut versuchen",
+            "deleteButton": "Löschen",
+            "deleteAriaLabel": "{displayTitle} löschen",
+            "deleteConfirm": "„{displayTitle}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+            "deleteError": "Diese Geschichte konnte nicht gelöscht werden. Bitte erneut versuchen.",
+            "deleteModal": {
+                "title": "Geschichte löschen",
+                "cancelButton": "Abbrechen",
+                "deleteButton": "Löschen"
+            },
             "age": "Alter {age}",
             "pageCount": "{pageCount} S."
         },
@@ -657,6 +743,9 @@
         "chapters": {
             "ariaLabel": "Kapitel",
             "eyebrow": "· Kapitel ·",
+            "coverFallback": "Cover",
+            "endingFallback": "Schluss",
+            "sceneFallback": "Szene {order}",
             "pageFallback": "Seite {order}"
         },
         "spread": {
@@ -693,8 +782,13 @@
             "noteAriaLabel": "Bewertungsnotiz",
             "notePlaceholder": "Eine kleine Notiz schreiben (optional)…",
             "shareLabel": "Diese Geschichte als Beispiel für andere Familien teilen",
+            "shareHint": "Nur Geschichten mit 4 oder 5 Sternen erscheinen in der öffentlichen Auswahl.",
             "saveButton": "Bewertung speichern",
+            "updateButton": "Änderungen speichern",
+            "editButton": "Bewertung bearbeiten",
             "savedStatus": "Gespeichert — danke!",
+            "sharedStatus": "Als Beispiel für andere Familien geteilt.",
+            "privateStatus": "Nur du kannst diese Bewertung sehen.",
             "defaultError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
         },
         "regeneration": {
@@ -703,6 +797,8 @@
             "textButton": "Text neu generieren",
             "illustrationButton": "Illustration neu malen",
             "bothButton": "Alles neu machen",
+            "quotaAriaLabel": "Verbleibende Regenerierungen in diesem Zyklus",
+            "quotaMetricLabel": "{count, plural, one {Regenerierung verbleibt in diesem Zyklus} other {Regenerierungen verbleiben in diesem Zyklus}}",
             "quotaExhausted": "Keine Regenerierungen mehr in diesem Zyklus — sie erneuern sich, wenn dein Plan verlängert wird.",
             "quotaInfo": "{count, plural, one {# Regenerierung verbleibt in diesem Zyklus.} other {# Regenerierungen verbleiben in diesem Zyklus.}}",
             "modal": {
@@ -741,10 +837,18 @@
             "deleteAccount": "Konto löschen"
         },
         "profile": {
+            "changeAvatarButton": "Avatar ändern",
             "editButton": "Name bearbeiten",
             "nameLabel": "Name",
             "saveButton": "Speichern",
-            "cancelButton": "Abbrechen"
+            "cancelButton": "Abbrechen",
+            "cropper": {
+                "title": "Avatar anpassen",
+                "description": "Verschiebe und skaliere das Bild so, dass es sauber in den Kreis passt.",
+                "zoomLabel": "Zoom",
+                "cancelButton": "Abbrechen",
+                "saveButton": "Avatar speichern"
+            }
         },
         "children": {
             "heading": "Kinder",
@@ -753,6 +857,12 @@
             "addFirstButton": "Erstes Kind hinzufügen",
             "addButton": "Kind hinzufügen",
             "limitHint": "Du hast das Kinderlimit für deinen Plan erreicht. Upgrade, um mehr hinzuzufügen.",
+            "quotaLabel": "Tariflimits für Kinder und Charaktere",
+            "characterQuotaMetricLabel": "{count, plural, one {Charakter-Generierung übrig} other {Charakter-Generierungen übrig}}",
+            "characterSlotsMetricLabel": "{count, plural, one {gespeicherter Charakter-Slot übrig} other {gespeicherte Charakter-Slots übrig}}",
+            "characterSlotsUnlimitedMetricLabel": "gespeicherte Charakter-Slots",
+            "characterGenerationLimitHint": "In diesem Tarif sind in diesem Zyklus keine Charakter-Generierungen mehr übrig.",
+            "characterLimitHint": "In diesem Tarif sind keine Speicherplätze für Charaktere mehr übrig.",
             "editModal": {
                 "title": "Kind bearbeiten"
             },
@@ -787,6 +897,7 @@
             },
             "interestsLabel": "Interessen",
             "interestsPlaceholder": "Interesse hinzufügen und Enter drücken",
+            "interestsLimitReached": "Maximal 10 Interessen erreicht.",
             "cancelButton": "Abbrechen",
             "saveButton": "Speichern",
             "errors": {
@@ -811,13 +922,20 @@
             "editCharacterAriaLabel": "Charakter {characterName} bearbeiten",
             "addCharacterAriaLabel": "Charakter für {childName} hinzufügen",
             "deleteCharacterAriaLabel": "Charakter {characterName} löschen",
+            "generateCharacterPreviewAriaLabel": "Vorschau für {characterName} erstellen",
+            "regenerateCharacterPreviewAriaLabel": "Vorschau für {characterName} neu generieren",
+            "previewCharacterAriaLabel": "Größere Vorschau für {characterName} öffnen",
             "editCharacterButton": "Bearbeiten",
             "addCharacterButton": "Charakter hinzufügen",
+            "generateCharacterPreviewButton": "Vorschau erstellen",
+            "regenerateCharacterPreviewButton": "Neu generieren",
             "deleteCharacterButton": "Löschen",
             "editAriaLabel": "{childName} bearbeiten",
             "editButton": "Bearbeiten",
+            "editChildButton": "Kind bearbeiten",
             "deleteAriaLabel": "{childName} löschen",
-            "deleteButton": "Löschen"
+            "deleteButton": "Löschen",
+            "deleteChildButton": "Kind löschen"
         },
         "subscription": {
             "loading": "Abonnement wird geladen…",
@@ -855,6 +973,7 @@
             },
             "invoices": {
                 "eyebrow": "Vergangene Pakete",
+                "loading": "Rechnungen werden geladen",
                 "emptyPaid": "Noch keine Rechnungen — deine erste kommt mit der nächsten Verlängerung.",
                 "emptyFree": "Keine Rechnungen — das kostenlose Kapitel stellt dir nie etwas in Rechnung.",
                 "pdfLink": "PDF"
@@ -1051,8 +1170,9 @@
                 "activeLabel": "Aktiv",
                 "moveUp": "{name} nach oben",
                 "moveDown": "{name} nach unten",
+                "previewThumbnail": "Größere Vorschaubildansicht für {name} öffnen",
                 "edit": "Bearbeiten",
-                "generateThumbnail": "Vorschaubild erstellen",
+                "generateThumbnail": "Erstellen",
                 "regenerateThumbnail": "Neu generieren",
                 "generating": "Wird erstellt…",
                 "noThumbnail": "keins"
@@ -1110,6 +1230,11 @@
                 "create": "Vorlage erstellen",
                 "saving": "Wird gespeichert…",
                 "saveError": "Vorlage konnte nicht gespeichert werden. Bitte erneut versuchen.",
+                "deleteModal": {
+                    "title": "Vorlage löschen",
+                    "cancel": "Vorlage behalten",
+                    "confirm": "Löschen"
+                },
                 "deleteConfirm": "\"{name}\" löschen? Dies kann nicht rückgängig gemacht werden.",
                 "nameLabel": "Vorlagenname",
                 "namePlaceholder": "Meine Vorlage",

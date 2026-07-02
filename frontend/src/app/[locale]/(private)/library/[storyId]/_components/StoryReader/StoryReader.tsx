@@ -16,6 +16,7 @@ export interface IStoryReaderProps {
 
 export default function StoryReader({ story }: Readonly<IStoryReaderProps>): React.ReactElement {
     const [pageIndex, setPageIndex] = useState(0);
+    const [pageRefreshToken, setPageRefreshToken] = useState(0);
     const totalPages = story.pages.length;
     const currentPage = story.pages[pageIndex];
 
@@ -25,6 +26,10 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
 
     function handleNext(): void {
         setPageIndex((i) => Math.min(totalPages - 1, i + 1));
+    }
+
+    function handlePageRegenerated(): void {
+        setPageRefreshToken((token) => token + 1);
     }
 
     return (
@@ -46,6 +51,7 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                             storyId={story.id}
                             page={currentPage}
                             pageIndex={pageIndex}
+                            pageRefreshToken={pageRefreshToken}
                             totalPages={totalPages}
                             onPrev={handlePrev}
                             onNext={handleNext}
@@ -54,7 +60,13 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                 </main>
 
                 <aside className={styles.reader__panels}>
-                    {currentPage && <RegenerationPanel storyId={story.id} page={currentPage} />}
+                    {currentPage && (
+                        <RegenerationPanel
+                            storyId={story.id}
+                            page={currentPage}
+                            onRegenerated={handlePageRegenerated}
+                        />
+                    )}
                     <RatingPanel
                         storyId={story.id}
                         childName={story.child.name}

@@ -20,7 +20,7 @@ export default function PrivacyInfo(): React.ReactElement {
     return (
         <Card variant="gradient" size="md">
             <Stack gap="md">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 {sections.map((section) => (
                     <div key={section.title}>
                         <h3 className={styles['privacy-info__title']}>{section.title}</h3>

@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { AppError } from '../../common/errors.js';
+import { AppError, ImageProhibitedContentError } from '../../common/errors.js';
 import type {
     ArtStyle,
     Character,
@@ -19,11 +19,12 @@ import { QuotaService } from '../subscriptions/quota.service.js';
 import { StoryPromptBuilder } from './story-prompt-builder.js';
 import { StoryPlanValidator } from './story-plan.validator.js';
 import { IMAGE_CONCURRENCY, computeMaxTokens } from './generation.constants.js';
-import { IMAGE_NO_TEXT_DIRECTIVE } from './generation.prompts.js';
+import { buildImageSlotPrompt, buildSafeImageFallbackPrompt } from './generation.prompts.js';
 
 type StoryWithRelations = Story & {
-    child: Pick<Child, 'id' | 'name' | 'birthdate' | 'interests'>;
+    child: Pick<Child, 'id' | 'name' | 'birthdate' | 'gender' | 'interests'>;
     artStyle: Pick<ArtStyle, 'id' | 'name' | 'promptPrefix'>;
+    character: Pick<Character, 'id' | 'name' | 'description' | 'previewKey'> | null;
 };
 
 @Injectable()
@@ -125,8 +126,6 @@ export class GenerationPipeline {
 
     private async runPlanning(story: StoryWithRelations): Promise<IStoryPlan> {
         const blueprint = await this.selectBlueprint(story.type);
-        const character = await this.loadCharacterForStory(story);
-
         const systemPrompt = this.promptBuilder.buildSystemPrompt(blueprint);
         const userPrompt = this.promptBuilder.buildUserPrompt({
             child: story.child,
@@ -135,7 +134,7 @@ export class GenerationPipeline {
             question: story.question,
             pageCount: story.pageCount,
             language: story.language,
-            character: character ?? undefined,
+            character: story.character ?? undefined,
             genre: story.genre,
             writingStyle: story.writingStyle,
         });
@@ -172,6 +171,12 @@ export class GenerationPipeline {
         if (result.lengthOverflows.length > 0) {
             this.logger.warn(
                 `${result.lengthOverflows.length} text length overflow(s) — CSS will handle visual clipping`,
+            );
+        }
+
+        if (result.sentenceWarnings.length > 0) {
+            this.logger.warn(
+                `${result.sentenceWarnings.length} sentence completeness warning(s) — keeping the plan usable`,
             );
         }
 
@@ -282,15 +287,53 @@ export class GenerationPipeline {
         if (!page.illustrationPrompt) return;
 
         const imageSlot = tpl.images[0];
-        const prompt =
-            `${story.styleAnchor ?? ''}\n\n${page.illustrationPrompt}\n\n${IMAGE_NO_TEXT_DIRECTIVE}`.trim();
+        const prompt = [
+            story.styleAnchor ?? null,
+            page.illustrationPrompt,
+            buildImageSlotPrompt(
+                page.layout ?? imageSlot.name,
+                tpl.narrativePurpose,
+                imageSlot.aspect,
+                imageSlot.size,
+            ),
+        ]
+            .filter(Boolean)
+            .join('\n\n');
+        const referenceImageUrls = story.character?.previewKey
+            ? [await this.getReferenceImageDataUrl(story.character.previewKey)]
+            : undefined;
 
         this.logger.log(`Generating image for page ${page.order} (${imageSlot.size})`);
 
-        const imageBuffer = await this.ai.generateImage({
-            prompt,
-            size: imageSlot.size,
-        });
+        let imageBuffer: Buffer;
+        try {
+            imageBuffer = await this.ai.generateImage({
+                prompt,
+                size: imageSlot.size,
+                aspectRatio: imageSlot.aspect,
+                referenceImageUrls,
+            });
+        } catch (err: unknown) {
+            if (!(err instanceof ImageProhibitedContentError)) {
+                throw err;
+            }
+
+            this.logger.warn(
+                `Image prompt for page ${page.order} was blocked by provider safety; retrying with safe fallback prompt`,
+            );
+
+            imageBuffer = await this.ai.generateImage({
+                prompt: buildSafeImageFallbackPrompt(
+                    story.artStyle.promptPrefix,
+                    page.layout ?? imageSlot.name,
+                    tpl.narrativePurpose,
+                    imageSlot.aspect,
+                    imageSlot.size,
+                ),
+                size: imageSlot.size,
+                aspectRatio: imageSlot.aspect,
+            });
+        }
 
         const key = StorageKeys.pageIllustration(story.userId, story.id, page.order);
         await this.storage.upload(imageBuffer, key, 'image/png');
@@ -303,6 +346,11 @@ export class GenerationPipeline {
         });
 
         this.logger.log(`Page ${page.order} illustration stored: ${key}`);
+    }
+
+    private async getReferenceImageDataUrl(key: string): Promise<string> {
+        const buffer = await this.storage.downloadBuffer(key);
+        return `data:image/png;base64,${buffer.toString('base64')}`;
     }
 
     // ---------------------------------------------------------------------------
@@ -329,27 +377,23 @@ export class GenerationPipeline {
     // Helpers
     // ---------------------------------------------------------------------------
 
-    /**
-     * Loads the protagonist the user chose for this story (`story.characterId`).
-     * Returns null when none was chosen — the pipeline continues child-led.
-     * Uses PrismaService directly so GenerationModule has no dependency on CharactersModule.
-     */
-    private async loadCharacterForStory(
-        story: Story,
-    ): Promise<Pick<Character, 'id' | 'name' | 'description'> | null> {
-        if (!story.characterId) return null;
-        return this.prisma.character.findFirst({
-            where: { id: story.characterId, userId: story.userId },
-            select: { id: true, name: true, description: true },
-        });
-    }
-
     private async loadStory(storyId: string): Promise<StoryWithRelations> {
         const story = await this.prisma.story.findUnique({
             where: { id: storyId },
             include: {
-                child: { select: { id: true, name: true, birthdate: true, interests: true } },
+                child: {
+                    select: {
+                        id: true,
+                        name: true,
+                        birthdate: true,
+                        gender: true,
+                        interests: true,
+                    },
+                },
                 artStyle: { select: { id: true, name: true, promptPrefix: true } },
+                character: {
+                    select: { id: true, name: true, description: true, previewKey: true },
+                },
             },
         });
         if (!story) throw new NotFoundException(`Story ${storyId} not found`);

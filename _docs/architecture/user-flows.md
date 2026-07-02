@@ -28,7 +28,16 @@ sequenceDiagram
     Backend-->>Browser: User object (hydrates session)
 ```
 
-## 2. Story generation (happy path)
+## 2. Draft save and story generation
+
+Workshop has two deliberately separate actions:
+
+- **Save as draft** calls `POST /stories` only. It creates a free `DRAFT` row and returns the
+  user to the Library, where draft cards link back to `/workshop?storyId=...`.
+- **Light the lantern** starts generation. For a new tale the frontend first creates the
+  `DRAFT`, then calls `POST /stories/:id/generate`; for an existing `DRAFT`/`FAILED` tale it
+  calls `POST /stories/:id/retry` from the prefilled workshop form. Page-credit quota is
+  checked only when generation is enqueued, not when a draft is saved.
 
 ```mermaid
 sequenceDiagram
@@ -42,18 +51,25 @@ sequenceDiagram
     participant Storage as S3/MinIO
     participant Resend
 
-    User->>Browser: fills Workshop form, clicks "Light the lantern"
-    Browser->>Backend: POST /stories (create DRAFT)
-    Backend->>DB: INSERT Story (status=DRAFT)
-    Backend-->>Browser: { id: storyId }
+    User->>Browser: fills Workshop form
+    alt clicks "Save as draft"
+        Browser->>Backend: POST /stories (create DRAFT)
+        Backend->>DB: INSERT Story (status=DRAFT)
+        Backend-->>Browser: { id: storyId }
+        Browser->>Browser: redirect → /library
+    else clicks "Light the lantern"
+        Browser->>Backend: POST /stories (create DRAFT)
+        Backend->>DB: INSERT Story (status=DRAFT)
+        Backend-->>Browser: { id: storyId }
 
-    Browser->>Backend: POST /stories/:id/generate
-    Backend->>DB: check no PENDING/ACTIVE job for user (409 if one exists)
-    Backend->>DB: INSERT Job (status=PENDING), Story → QUEUED
-    Backend->>Queue: queue.add('generate', { jobId })
-    Backend-->>Browser: 202 { jobId, storyId }
+        Browser->>Backend: POST /stories/:id/generate
+        Backend->>DB: check page-credit quota (402 if exhausted)
+        Backend->>DB: check no PENDING/ACTIVE job for user (409 if one exists)
+        Backend->>DB: INSERT Job (status=PENDING), Story → QUEUED
+        Backend->>Queue: queue.add('generate', { jobId })
+        Backend-->>Browser: 202 { jobId, storyId }
 
-    Browser->>Backend: GET /stories/:id/progress (SSE, stays open)
+        Browser->>Backend: GET /stories/:id/progress (SSE, stays open)
 
     Queue->>Worker: dequeue job
     Worker->>DB: Job → ACTIVE, Story → GENERATING
@@ -98,7 +114,8 @@ sequenceDiagram
     Backend-->>Browser: SSE completed event
     Browser->>Backend: GET /stories/:id (load story detail)
     Backend-->>Browser: IStoryDetail with signed pdfUrl
-    User->>Browser: clicks "Download PDF"
+        User->>Browser: clicks "Download PDF"
+    end
 ```
 
 ## 3. Page regeneration

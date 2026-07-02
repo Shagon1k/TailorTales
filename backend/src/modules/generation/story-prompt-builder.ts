@@ -3,6 +3,7 @@ import type {
     ArtStyle,
     Character,
     Child,
+    Gender,
     Language,
     StoryBlueprint,
     StoryGenre,
@@ -13,6 +14,7 @@ import {
     PAGE_TEMPLATES,
 } from '../rendering/page-templates.config.js';
 import {
+    STORY_LAYOUT_DYNAMICS_RULES,
     STORY_OUTPUT_RULES,
     STORY_OUTPUT_RULES_HEADER,
     STORY_STRUCTURE_RULES_HEADER,
@@ -22,10 +24,10 @@ import {
     buildInterestsHintSection,
     buildWritingStyleSection,
 } from './generation.prompts.js';
-import { LANGUAGE_NAMES } from '../../common/languages.constants.js';
+import { GENDER_AUDIENCE_NAMES, LANGUAGE_NAMES } from '../../common/languages.constants.js';
 
 interface IPromptContext {
-    child: Pick<Child, 'name' | 'birthdate' | 'interests'>;
+    child: Pick<Child, 'name' | 'birthdate' | 'gender' | 'interests'>;
     artStyle: Pick<ArtStyle, 'promptPrefix'>;
     blueprint: Pick<StoryBlueprint, 'systemPrompt'>;
     question: string;
@@ -48,6 +50,7 @@ export class StoryPromptBuilder {
         const age = this.computeAge(ctx.child.birthdate);
         const interiorTemplates = BOOK_INTERIOR_TEMPLATE_NAMES;
         const languageName = LANGUAGE_NAMES[ctx.language];
+        const audienceGender = this.describeAudienceGender(ctx.child.gender);
 
         const templateGuide = interiorTemplates
             .map((name) => {
@@ -59,8 +62,18 @@ export class StoryPromptBuilder {
             })
             .join('\n');
 
+        const layoutUsageGuide = interiorTemplates
+            .map((name) => `  • ${name}: ${PAGE_TEMPLATES[name].narrativePurpose}`)
+            .join('\n');
+
+        const layoutDistributionRules = this.buildLayoutDistributionRules(
+            ctx.pageCount,
+            interiorTemplates,
+        );
+
         return [
-            `Write a ${ctx.pageCount}-page children's book in ${languageName} for ${ctx.child.name}, age ${age}.`,
+            `Write a ${ctx.pageCount}-page children's book in ${languageName} for a child aged ${age}.`,
+            `Audience profile only: ${audienceGender}, age ${age}. Use this only to tune clarity, pacing, emotional tone, and relatable details for the reader.`,
             '',
             `QUESTION TO ANSWER: "${ctx.question}"`,
             '',
@@ -89,6 +102,15 @@ export class StoryPromptBuilder {
             'FINAL TEMPLATE (last page only):',
             `  • book-final: closing text max ${PAGE_TEMPLATES['book-final'].maxChars.closing} chars`,
             '',
+            STORY_LAYOUT_DYNAMICS_RULES,
+            '',
+            ...this.buildChapterRules(ctx.pageCount),
+            '',
+            ...layoutDistributionRules,
+            '',
+            'INTERIOR TEMPLATE USAGE GUIDE:',
+            layoutUsageGuide,
+            '',
             STORY_OUTPUT_RULES_HEADER,
             STORY_OUTPUT_RULES,
             `  • Total pages in output: exactly ${ctx.pageCount}`,
@@ -97,5 +119,121 @@ export class StoryPromptBuilder {
 
     private computeAge(birthdate: Date): number {
         return Math.floor((Date.now() - birthdate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    }
+
+    private describeAudienceGender(gender: Gender): string {
+        return GENDER_AUDIENCE_NAMES[gender];
+    }
+
+    private buildLayoutDistributionRules(pageCount: number, interiorTemplates: string[]): string[] {
+        const interiors = interiorTemplates.map((name) => ({
+            name,
+            beat: PAGE_TEMPLATES[name].interiorBeat ?? 'default',
+        }));
+        const defaultTemplates = interiors
+            .filter((tpl) => tpl.beat === 'default')
+            .map((tpl) => tpl.name);
+        const bridgeTemplates = interiors
+            .filter((tpl) => tpl.beat === 'bridge')
+            .map((tpl) => tpl.name);
+        const highlightTemplates = interiors
+            .filter((tpl) => tpl.beat === 'highlight')
+            .map((tpl) => tpl.name);
+
+        const rules = ['LAYOUT DISTRIBUTION:'];
+
+        if (pageCount >= 5) {
+            rules.push(
+                '  • Use at least one non-default interior layout so the book does not feel mechanically repetitive.',
+            );
+        }
+
+        if (highlightTemplates.length > 0) {
+            rules.push(
+                `  • Reserve ${this.joinTemplateNames(highlightTemplates)} for reveals, wonder beats, emotional peaks, or visually rich scene changes — not just once as a token variation.`,
+            );
+        }
+
+        if (bridgeTemplates.length > 0) {
+            rules.push(
+                `  • Use ${this.joinTemplateNames(bridgeTemplates)} for quieter transitions, breathers, reflections, or short connective beats between bigger scenes.`,
+            );
+        }
+
+        if (defaultTemplates.length > 0) {
+            rules.push(
+                `  • ${this.joinTemplateNames(defaultTemplates)} can carry the steady core of the story, but do not let it dominate every interior page.`,
+            );
+            rules.push(
+                `  • Avoid using ${this.joinTemplateNames(defaultTemplates)} more than 2 times in a row unless the story clearly stays in one continuous explanatory beat.`,
+            );
+            rules.push(
+                '  • When a page begins with a strong visual reveal or a new scene, prefer an image-first default layout over a text-led one.',
+            );
+        }
+
+        if (pageCount >= 8) {
+            rules.push(
+                '  • For longer books, spread visual peaks across the story instead of clustering all the variety into a single moment.',
+            );
+            rules.push(
+                '  • Use at least three distinct interior mood shifts across the book: a steady narrative beat, a visual highlight, and a quieter bridge or pause when the template set allows it.',
+            );
+            rules.push(
+                '  • Let layout rhythm follow story rhythm: setup and explanation pages may be steadier, transitions may compress around an image, and reveals should feel visually expansive.',
+            );
+        }
+
+        if (pageCount >= 10 && highlightTemplates.length > 0) {
+            rules.push(
+                `  • For 10+ pages, include at least 2 meaningful ${this.joinTemplateNames(highlightTemplates)} moments at different parts of the story when the plot allows it.`,
+            );
+        }
+
+        if (pageCount >= 12) {
+            rules.push(
+                '  • For 12+ pages, vary pacing across beginning, middle, and ending so the layout rhythm evolves with the story rather than repeating one composition pattern.',
+            );
+            rules.push(
+                '  • Across the full book, combine scene-setting pages, text-led explanation pages, visually centered transition pages, and at least a couple of full-image payoff moments when the story supports them.',
+            );
+        }
+
+        return rules;
+    }
+
+    private buildChapterRules(pageCount: number): string[] {
+        const rules = ['CHAPTER STRUCTURE:'];
+
+        if (pageCount < 5) {
+            rules.push('  • For this book length, use 0-1 chapters.');
+        } else if (pageCount <= 8) {
+            rules.push('  • For this book length, use 1-3 chapters.');
+        } else if (pageCount <= 12) {
+            rules.push('  • For this book length, use 2-4 chapters.');
+        } else if (pageCount <= 16) {
+            rules.push('  • For this book length, use 3-5 chapters.');
+        } else if (pageCount <= 20) {
+            rules.push('  • For this book length, use 4-6 chapters.');
+        } else {
+            rules.push('  • For this book length, use 6-8 chapters.');
+        }
+
+        rules.push('  • Chapters are optional, not mandatory on every page.');
+        rules.push('  • Keep chapterTitle null by default.');
+        rules.push('  • Do not treat each page as a separate chapter.');
+        rules.push(
+            '  • Do not place chapter headings on consecutive interior pages unless there is a strong structural reason.',
+        );
+        rules.push(
+            '  • Use chapter headings only for meaningful shifts in story phase, setting, tone, or explanation.',
+        );
+
+        return rules;
+    }
+
+    private joinTemplateNames(templateNames: string[]): string {
+        if (templateNames.length === 1) return `"${templateNames[0]}"`;
+        return templateNames.map((name) => `"${name}"`).join(', ');
     }
 }

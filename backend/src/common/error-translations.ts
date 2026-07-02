@@ -35,6 +35,16 @@ const translations: Record<string, ITranslationEntry> = {
         de: (p) => `Das monatliche Regenerierungslimit von ${p['limit']} wurde erreicht.`,
         ru: (p) => `Достигнут месячный лимит регенерации: ${p['limit']} раз.`,
     },
+    'errors.quota.charactersExceeded': {
+        en: (p) => `Your plan allows up to ${p['limit']} saved characters.`,
+        de: (p) => `Dein Tarif erlaubt bis zu ${p['limit']} gespeicherte Figuren.`,
+        ru: (p) => `Ваш тариф позволяет сохранить до ${p['limit']} персонажей.`,
+    },
+    'errors.quota.characterGenerationsExceeded': {
+        en: (p) => `Monthly character-generation limit of ${p['limit']} has been reached.`,
+        de: (p) => `Das monatliche Limit von ${p['limit']} Charakter-Generierungen wurde erreicht.`,
+        ru: (p) => `Достигнут месячный лимит генерации персонажей: ${p['limit']} раз.`,
+    },
     'errors.ratings.storyNotCompleted': {
         en: 'Only completed stories can be rated.',
         de: 'Nur abgeschlossene Geschichten können bewertet werden.',
@@ -64,6 +74,21 @@ const translations: Record<string, ITranslationEntry> = {
         en: 'A character already exists for this child.',
         de: 'Für dieses Kind existiert bereits eine Figur.',
         ru: 'Для этого ребёнка уже существует персонаж.',
+    },
+    'errors.user.avatarMissing': {
+        en: 'Please choose an image to upload.',
+        de: 'Bitte wähle ein Bild zum Hochladen aus.',
+        ru: 'Пожалуйста, выберите изображение для загрузки.',
+    },
+    'errors.user.avatarUnsupportedType': {
+        en: 'Avatar must be a JPG, PNG, or WebP image.',
+        de: 'Der Avatar muss ein JPG-, PNG- oder WebP-Bild sein.',
+        ru: 'Аватар должен быть изображением JPG, PNG или WebP.',
+    },
+    'errors.user.avatarTooLarge': {
+        en: (p) => `Avatar image must be ${p['limitMb']} MB or smaller.`,
+        de: (p) => `Das Avatarbild muss ${p['limitMb']} MB oder kleiner sein.`,
+        ru: (p) => `Размер аватара должен быть не больше ${p['limitMb']} МБ.`,
     },
 };
 

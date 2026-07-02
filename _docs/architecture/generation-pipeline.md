@@ -78,11 +78,16 @@ protagonist (`Story.characterId`, if any), builds the system and user prompts vi
 computes a `max_tokens` ceiling, and asks the LLM for a **Story Plan** — a JSON object with
 this shape:
 
-The user prompt composes: the child's name + age (audience targeting) · the chosen Character
-as the protagonist when present (else child-led) · the child's `interests` as an **optional,
-non-forcing hint** (woven in only when they fit) · the optional `genre` and `writingStyle`
-flavour knobs, each injecting a fixed prompt fragment when set (omitted otherwise) · the
-ArtStyle's `promptPrefix`.
+The user prompt composes: the child's name + age + gender (**audience targeting only**) · the
+chosen Character as the protagonist when present (else **no fixed recurring hero**) · the
+child's `interests` as an **optional, non-forcing hint** (woven in only when they fit) · the
+optional `genre` and `writingStyle` flavour knobs, each injecting a fixed prompt fragment
+when set (omitted otherwise) · the ArtStyle's `promptPrefix` · explicit layout-dynamics
+rules that push the model to vary interior templates instead of defaulting every page to the
+same text/image arrangement. For longer books the prompt now explicitly asks the model to
+match layout to story beat: text-led layouts for explanation, image-first layouts for
+scene-setting and reveals, centered-image layouts for short transitions, and full-image
+layouts for visual payoff moments.
 
 ```json
 {
@@ -129,12 +134,18 @@ structured call, so only images parallelize.
 
 For each page: the prompt is `styleAnchor + "\n\n" + page.illustrationPrompt + "\n\n" +
 IMAGE_NO_TEXT_DIRECTIVE` (the style anchor is prepended to **every** image for cross-page
-character/style consistency; the no-text directive forbids in-image words on every image —
-including covers and COMIC speech bubbles — since image models render text, especially
-Cyrillic, unreliably),
+character/style consistency; when the selected Character already has a generated preview,
+that preview is also passed as a **reference image** to the image model for stronger visual
+identity carry-over; the no-text directive forbids in-image words on every image — including
+covers and COMIC speech bubbles — since image models render text, especially Cyrillic,
+unreliably),
 the image size comes from the template's `images[0].size`, the bytes are uploaded to
 `StorageKeys.pageIllustration(userId, storyId, order)`, and the key is written back to
 `Page.illustrations` as `[{ key, position }]`.
+
+If the image provider blocks a page prompt as prohibited content, Pictures retries that page
+once with a neutral safe fallback prompt (peaceful child-friendly scene, no reference image).
+If the fallback is also blocked or any other image error occurs, the story still fails.
 
 > `coverImageKey` is set here because the cover is page 1's illustration — already known by the end of Pictures. Ready is only about the finished PDF.
 
@@ -184,23 +195,37 @@ name and writes text + an illustration prompt. It never emits image sizes (looke
 the template) or character counts (measured by us). Code fixes the invariants (page 1 =
 cover, last = final, count = requested); the validator enforces them.
 
+Current BOOK interior templates:
+
+| Template            | Beat      | Shape                                                                                                      |
+| ------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `book-text`         | bridge    | prose-only page for quiet reflection, explanation, or a breathing pause                                    |
+| `book-text-image`   | default   | text-led page with the illustration in the lower half                                                      |
+| `book-image-top`    | default   | image-first page with the illustration at the top and prose below                                          |
+| `book-image-middle` | bridge    | centered illustration with prose split above and below; the renderer balances the stored text in two parts |
+| `book-full-image`   | highlight | near full-bleed illustration with minimal captioning for reveals / wonder / dramatic moments               |
+
+The image model also receives the target slot aspect ratio from the same template config, so
+top/bottom/centered layouts can ask for differently-shaped source images instead of cropping
+every illustration from the same generic frame.
+
 ## StoryPlanValidator: two-class failures
 
 [`StoryPlanValidator.validate()`](../../backend/src/modules/generation/story-plan.validator.ts)
 returns **two separate lists**, treated completely differently:
 
-| Class                 | Examples                                                                                                                                                                         | Handling                                                                                                                  |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **Structural errors** | wrong page count; page 1 not a cover; last page not final; unknown template; template type ≠ story type; interior page using a cover/final template; missing illustration prompt | **One repair retry** — the errors are appended to the prompt and the LLM tries again. Still broken → the story **FAILS**. |
-| **Length overflows**  | `page.text` longer than the template zone's `maxChars`                                                                                                                           | **Logged, never blocks.** CSS (`overflow: hidden`, `word-break`) clips visually.                                          |
+| Class                 | Examples                                                                                                                                                                         | Handling                                                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Structural errors** | wrong page count; page 1 not a cover; last page not final; unknown template; template type ≠ story type; interior page using a cover/final template; missing illustration prompt | **One repair retry** — the errors are appended to the prompt and the LLM tries again. Still broken → the story **FAILS**.     |
+| **Soft warnings**     | `page.text` longer than the template zone's `maxChars`; prose that does not end with a complete sentence                                                                         | **Logged, never blocks.** CSS handles overflow; sentence warnings are kept as usable prose instead of failing the whole plan. |
 
 > **Why not truncate overflowing text?** Truncating mid-narrative on a children's story
 > page can drop the punchline or the emotional payoff. Clipping a few characters visually is
 > recoverable; silently corrupting the story is not. So overflow is a warning, not an error,
 > and the CSS auto-fit safety net handles the rare overrun.
 
-Structural errors are about a plan we _cannot render_; length overflow is about a plan that
-_renders imperfectly_. Only the first is worth a retry or a failure.
+Structural errors are about a plan we _cannot render_; soft warnings are about a plan that
+_renders imperfectly but remains usable_. Only the first is worth a retry or a failure.
 
 ## AiClient vs AiStubClient: the Symbol-token swap
 
@@ -251,6 +276,19 @@ latest job plus a count of pages that already have illustrations. It emits:
 | `failed`        | `Job.status = FAILED`                                                                      |
 
 > Polling Postgres instead of pushing from the worker because the worker and the HTTP handler share only Postgres. Push would require Redis Pub/Sub — more moving parts for a latency gain invisible on a ~2-minute generation. Redis Pub/Sub is the post-MVP scale-out path.
+
+## Retry semantics for failed stories
+
+Failed-story recovery is intentionally **in-place**, not "clone and try again". The workshop
+prefills from the failed story, then `POST /stories/:id/retry`:
+
+1. validates the replacement config,
+2. deletes the story's generated assets (`coverImageKey`, `pdfKey`, page illustrations),
+3. deletes existing `Page` rows,
+4. resets the same `Story` row to `DRAFT` and clears generation outputs.
+
+That keeps a stable `storyId`, avoids duplicate failed shells in the library, and guarantees
+the next generation starts from a clean persisted state.
 
 ## Scale envelope (MVP)
 

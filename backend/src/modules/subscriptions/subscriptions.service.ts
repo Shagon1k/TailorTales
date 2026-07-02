@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { SubscriptionStatus } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { PricingTiersService } from '../pricing-tiers/pricing-tiers.service.js';
 import type { IUsageSummary, TSubscriptionWithTier } from './subscriptions.types.js';
@@ -50,7 +51,9 @@ export class SubscriptionsService {
                 watermark: pricingTier.watermark,
                 pagesPerMonth: pricingTier.pagesPerMonth,
                 regenerationsPerMonth: pricingTier.regenerationsPerMonth,
+                characterGenerationsPerMonth: pricingTier.characterGenerationsPerMonth,
                 childrenLimit: pricingTier.childrenLimit,
+                charactersLimit: pricingTier.charactersLimit,
                 retentionDays: pricingTier.retentionDays,
             },
             status: subscription.status,
@@ -58,6 +61,7 @@ export class SubscriptionsService {
             currentPeriodEnd: subscription.currentPeriodEnd,
             pagesUsed: subscription.pagesUsed,
             regenerationsUsed: subscription.regenerationsUsed,
+            characterGenerationsUsed: subscription.characterGenerationsUsed,
             childrenUsed,
             talesCount,
         };
@@ -67,6 +71,33 @@ export class SubscriptionsService {
         await this.prisma.subscription.update({
             where: { userId },
             data: { cancelAtPeriodEnd: true },
+        });
+    }
+
+    async applyPaddleSubscription(
+        userId: string,
+        data: {
+            pricingTierId: string;
+            paddleSubscriptionId: string;
+            paddleCustomerId: string;
+            status: SubscriptionStatus;
+            cancelAtPeriodEnd: boolean;
+            currentPeriodEnd: Date | null;
+        },
+    ): Promise<void> {
+        await this.prisma.subscription.update({
+            where: { userId },
+            data: {
+                pricingTierId: data.pricingTierId,
+                paddleSubscriptionId: data.paddleSubscriptionId,
+                paddleCustomerId: data.paddleCustomerId,
+                status: data.status,
+                cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+                currentPeriodEnd: data.currentPeriodEnd,
+                pagesUsed: 0,
+                regenerationsUsed: 0,
+                characterGenerationsUsed: 0,
+            },
         });
     }
 }

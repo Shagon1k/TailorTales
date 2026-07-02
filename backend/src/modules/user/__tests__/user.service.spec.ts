@@ -1,7 +1,9 @@
 import { Test } from '@nestjs/testing';
 import type { User } from '../../../generated/prisma/client.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
+import { StorageService } from '../../storage/storage.service.js';
 import { UserService } from '../user.service.js';
+import type { IUploadedAvatarFile } from '../user.types.js';
 
 const MOCK_USER: User = {
     id: 'user-123',
@@ -9,6 +11,7 @@ const MOCK_USER: User = {
     email: 'alice@example.com',
     name: 'Alice',
     avatarUrl: null,
+    avatarKey: null,
     notificationPreferences: null,
     role: 'USER',
     suspendedAt: null,
@@ -24,12 +27,18 @@ describe('UserService', () => {
     let userCreate: ReturnType<typeof vi.fn>;
     let userUpdate: ReturnType<typeof vi.fn>;
     let pricingTierFindFirst: ReturnType<typeof vi.fn>;
+    let upload: ReturnType<typeof vi.fn>;
+    let getSignedUrl: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         userFindUnique = vi.fn();
         userCreate = vi.fn();
         userUpdate = vi.fn();
         pricingTierFindFirst = vi.fn().mockResolvedValue(MOCK_FREE_TIER);
+        upload = vi.fn().mockResolvedValue('users/user-123/profile/avatar');
+        getSignedUrl = vi
+            .fn()
+            .mockResolvedValue('https://signed.test/users/user-123/profile/avatar');
 
         const module = await Test.createTestingModule({
             providers: [
@@ -47,6 +56,7 @@ describe('UserService', () => {
                         },
                     },
                 },
+                { provide: StorageService, useValue: { upload, getSignedUrl } },
             ],
         }).compile();
 
@@ -75,6 +85,7 @@ describe('UserService', () => {
     describe('findOrCreate', () => {
         it('should return the existing user when the googleId already exists', async () => {
             userFindUnique.mockResolvedValue(MOCK_USER);
+            userUpdate.mockResolvedValue(MOCK_USER);
 
             const result = await service.findOrCreate({
                 googleId: 'google-abc',
@@ -82,6 +93,14 @@ describe('UserService', () => {
                 name: 'Alice',
             });
 
+            expect(userUpdate).toHaveBeenCalledWith({
+                where: { id: 'user-123' },
+                data: {
+                    email: 'alice@example.com',
+                    name: 'Alice',
+                    avatarUrl: undefined,
+                },
+            });
             expect(userCreate).not.toHaveBeenCalled();
             expect(result).toBe(MOCK_USER);
         });
@@ -142,6 +161,30 @@ describe('UserService', () => {
                 data: { name: 'Bob' },
             });
             expect(result).toEqual(updated);
+        });
+    });
+
+    describe('uploadAvatar', () => {
+        it('should upload the avatar, persist the key, and return a signed URL', async () => {
+            const updated = { ...MOCK_USER, avatarKey: 'users/user-123/profile/avatar' };
+            userUpdate.mockResolvedValue(updated);
+
+            const result = await service.uploadAvatar('user-123', {
+                buffer: Buffer.from('image'),
+                mimetype: 'image/png',
+                size: 1024,
+            } satisfies IUploadedAvatarFile);
+
+            expect(upload).toHaveBeenCalledWith(
+                Buffer.from('image'),
+                'users/user-123/profile/avatar',
+                'image/png',
+            );
+            expect(userUpdate).toHaveBeenCalledWith({
+                where: { id: 'user-123' },
+                data: { avatarKey: 'users/user-123/profile/avatar' },
+            });
+            expect(result.avatarUrl).toBe('https://signed.test/users/user-123/profile/avatar');
         });
     });
 });

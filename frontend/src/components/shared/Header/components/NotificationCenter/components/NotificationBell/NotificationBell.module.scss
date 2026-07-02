@@ -11,10 +11,14 @@
     color: var(--text-muted);
     cursor: pointer;
     flex-shrink: 0;
-    transition: color 100ms ease;
+    transition: color var(--duration-base) var(--ease-out);
 
     &:hover {
-        color: var(--text-primary);
+        color: var(--accent-primary);
+    }
+
+    &[aria-expanded='true'] {
+        color: var(--accent-primary);
     }
 
     &__badge {

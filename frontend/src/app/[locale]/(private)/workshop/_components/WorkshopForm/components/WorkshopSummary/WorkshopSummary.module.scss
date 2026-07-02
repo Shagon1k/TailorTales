@@ -95,44 +95,10 @@
         gap: var(--space-2);
     }
 
-    &__row-action {
-        @include t-body-sm;
-        color: var(--text-accent);
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        min-height: var(--hit-min);
-        min-width: var(--hit-min);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        &:disabled {
-            opacity: var(--opacity-disabled);
-            cursor: default;
-        }
-    }
-
     &__divider {
         border: none;
         border-top: 1px solid var(--border-subtle);
         margin: 0;
-    }
-
-    &__credits {
-        @include t-body-sm;
-        margin: 0;
-        text-align: center;
-    }
-
-    &__credits-cost {
-        color: var(--text-primary);
-        font-weight: 600;
-    }
-
-    &__credits-remaining {
-        color: var(--text-muted);
     }
 
     &__quota {
@@ -142,7 +108,7 @@
         color: var(--text-secondary);
 
         &[data-over] {
-            color: var(--accent-warm);
+            color: var(--accent-danger);
         }
     }
 

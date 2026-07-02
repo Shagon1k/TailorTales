@@ -1,6 +1,54 @@
-.modes {
-    display: flex;
+@use 'styles/typography' as *;
+
+.mode-switch {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-inline: calc(var(--modal-shell-padding) * -1);
+    padding: var(--space-2) var(--modal-shell-padding) var(--space-4);
+    border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 65%, transparent);
+    background: color-mix(in srgb, var(--bg-elevated) 96%, black 4%);
+    box-shadow: 0 10px 22px -20px rgba(0, 0, 0, 0.5);
+}
+
+.mode-switch__track {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2);
+}
+
+.mode-switch__option {
+    @include t-body-sm;
+    min-height: 40px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-subtle);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition:
+        border-color var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out),
+        background var(--duration-base) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
+
+    &:hover {
+        border-color: color-mix(in srgb, var(--accent-primary) 78%, white 22%);
+        color: var(--text-primary);
+    }
+
+    &[data-active] {
+        border-color: var(--accent-primary);
+        color: var(--text-primary);
+        background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+    }
+}
+
+.mode-hint {
+    @include t-body-sm;
+    color: var(--text-muted);
+    margin: 0;
 }
 
 .actions {

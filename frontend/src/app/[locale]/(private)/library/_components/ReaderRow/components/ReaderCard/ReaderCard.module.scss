@@ -4,11 +4,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: var(--space-6);
+    gap: var(--space-5);
     min-width: 220px;
     max-width: 260px;
     padding: var(--space-6);
-    background: var(--bg-elevated);
+    background: color-mix(in srgb, var(--bg-elevated) 94%, black 6%);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     flex-shrink: 0;
@@ -17,21 +17,34 @@
 .reader-card__top {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
 }
 
 .reader-card__info {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
+}
+
+.reader-card__name-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 0;
 }
 
 .reader-card__name {
     @include t-body-md;
 
-    margin: 0;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.reader-card__age {
+    @include t-body-sm;
+
+    color: var(--text-muted);
 }
 
 .reader-card__last-tale {
@@ -41,11 +54,25 @@
     color: var(--text-muted);
 }
 
-.reader-card__interests {
-    @include t-body-sm;
+.reader-card__interests-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.reader-card__interests-label {
+    @include t-caps-xs;
 
     margin: 0;
-    color: var(--text-secondary);
+    color: var(--text-muted);
+}
+
+.reader-card__interests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    max-height: calc(24px * 3 + var(--space-2) * 2);
+    overflow: hidden;
 }
 
 .reader-card__footer {
@@ -54,25 +81,55 @@
     justify-content: space-between;
     padding-top: var(--space-4);
     border-top: 1px solid var(--border-subtle);
+    gap: var(--space-3);
 }
 
 .reader-card__new-tale {
     @include t-body-sm;
 
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-pill);
+    border: 1px solid color-mix(in srgb, var(--accent-primary) 24%, transparent);
+    background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
     color: var(--text-accent);
     text-decoration: none;
     font-weight: 600;
-    min-height: var(--hit-min);
-    display: flex;
-    align-items: center;
+    white-space: nowrap;
+    transition:
+        border-color var(--duration-base) var(--ease-out),
+        background var(--duration-base) var(--ease-out),
+        color var(--duration-base) var(--ease-out);
 
     &:hover {
-        text-decoration: underline;
+        border-color: var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 16%, transparent);
     }
 }
 
-.reader-card__count {
-    @include t-body-sm;
+.reader-card__new-tale-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
 
-    color: var(--text-muted);
+    svg {
+        display: block;
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.reader-card__footer :global(.inline-metrics) {
+    flex-shrink: 0;
+}
+
+.reader-card__footer :global(.inline-metrics__item) {
+    white-space: nowrap;
 }

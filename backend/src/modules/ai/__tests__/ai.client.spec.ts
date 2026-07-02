@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { ImageProhibitedContentError } from '../../../common/errors.js';
 import { AiClient } from '../ai.client.js';
 
 const mockConfig = (overrides: Record<string, unknown> = {}): ConfigService => {
@@ -124,8 +125,8 @@ describe('AiClient', () => {
     });
 
     describe('generateImage', () => {
-        it('should extract base64 from image_url content part', async () => {
-            const fakeBase64 = Buffer.from('fake image').toString('base64');
+        it('should extract base64 from the OpenRouter /images response', async () => {
+            const fakeBase64 = Buffer.from('generated image').toString('base64');
 
             vi.stubGlobal(
                 'fetch',
@@ -134,21 +135,7 @@ describe('AiClient', () => {
                     status: 200,
                     json: () =>
                         Promise.resolve({
-                            choices: [
-                                {
-                                    message: {
-                                        content: [
-                                            { type: 'text', text: '' },
-                                            {
-                                                type: 'image_url',
-                                                image_url: {
-                                                    url: `data:image/png;base64,${fakeBase64}`,
-                                                },
-                                            },
-                                        ],
-                                    },
-                                },
-                            ],
+                            data: [{ b64_json: fakeBase64 }],
                         }),
                 }),
             );
@@ -156,30 +143,120 @@ describe('AiClient', () => {
             const buf = await client.generateImage({ prompt: 'a fox', size: '1024x1536' });
 
             expect(Buffer.isBuffer(buf)).toBe(true);
-            expect(buf.toString()).toBe('fake image');
+            expect(buf.toString()).toBe('generated image');
         });
 
-        it('should extract base64 from plain data URL string content', async () => {
-            const fakeBase64 = Buffer.from('fox image').toString('base64');
-
-            vi.stubGlobal(
-                'fetch',
-                vi.fn().mockResolvedValue({
+        it('should download the image when OpenRouter returns a URL', async () => {
+            const fetchMock = vi
+                .fn()
+                .mockResolvedValueOnce({
                     ok: true,
                     status: 200,
                     json: () =>
                         Promise.resolve({
-                            choices: [
-                                {
-                                    message: { content: `data:image/png;base64,${fakeBase64}` },
-                                },
-                            ],
+                            data: [{ url: 'https://openrouter.test/generated-image.png' }],
                         }),
-                }),
-            );
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    status: 200,
+                    arrayBuffer: () => Promise.resolve(Buffer.from('url image')),
+                });
+
+            vi.stubGlobal('fetch', fetchMock);
 
             const buf = await client.generateImage({ prompt: 'a fox', size: '1024x1536' });
-            expect(buf.toString()).toBe('fox image');
+
+            expect(Buffer.isBuffer(buf)).toBe(true);
+            expect(buf.toString()).toBe('url image');
+            expect(fetchMock).toHaveBeenCalledTimes(2);
+        });
+
+        it('should send reference images alongside the prompt when provided', async () => {
+            const fetchMock = vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () =>
+                    Promise.resolve({
+                        data: [{ b64_json: Buffer.from('reference image').toString('base64') }],
+                    }),
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await client.generateImage({
+                prompt: 'a fox hero',
+                size: '1024x1536',
+                referenceImageUrls: ['https://signed.test/char-1.png'],
+            });
+
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.any(String),
+                expect.objectContaining({
+                    body: JSON.stringify({
+                        model: 'test-image-model',
+                        prompt: 'a fox hero',
+                        aspect_ratio: '2:3',
+                        input_references: [
+                            {
+                                type: 'image_url',
+                                image_url: { url: 'https://signed.test/char-1.png' },
+                            },
+                        ],
+                    }),
+                }),
+            );
+        });
+
+        it('should prefer the explicit aspect ratio when provided', async () => {
+            const fetchMock = vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () =>
+                    Promise.resolve({
+                        data: [{ b64_json: Buffer.from('wide image').toString('base64') }],
+                    }),
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await client.generateImage({
+                prompt: 'a wide scene',
+                size: '1024x1536',
+                aspectRatio: '16:9',
+            });
+
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.any(String),
+                expect.objectContaining({
+                    body: JSON.stringify({
+                        model: 'test-image-model',
+                        prompt: 'a wide scene',
+                        aspect_ratio: '16:9',
+                    }),
+                }),
+            );
+        });
+
+        it('should throw ImageProhibitedContentError when the image provider blocks the request', async () => {
+            const fetchMock = vi.fn().mockResolvedValue({
+                ok: false,
+                status: 400,
+                text: () =>
+                    Promise.resolve(
+                        JSON.stringify({
+                            error: {
+                                message: 'Gemini blocked the request (IMAGE_PROHIBITED_CONTENT)',
+                                metadata: { code: 'IMAGE_PROHIBITED_CONTENT' },
+                            },
+                        }),
+                    ),
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await expect(
+                client.generateImage({ prompt: 'a blocked scene', size: '1024x1536' }),
+            ).rejects.toThrow(ImageProhibitedContentError);
+
+            expect(fetchMock).toHaveBeenCalledTimes(1);
         });
 
         it('should throw on unexpected content format', async () => {
@@ -188,16 +265,13 @@ describe('AiClient', () => {
                 vi.fn().mockResolvedValue({
                     ok: true,
                     status: 200,
-                    json: () =>
-                        Promise.resolve({
-                            choices: [{ message: { content: 'unexpected plain text' } }],
-                        }),
+                    json: () => Promise.resolve({ data: [{}] }),
                 }),
             );
 
             await expect(
                 client.generateImage({ prompt: 'a fox', size: '1024x1536' }),
-            ).rejects.toThrow('Unexpected image response format');
+            ).rejects.toThrow('Unexpected /images response format');
         });
     });
 });

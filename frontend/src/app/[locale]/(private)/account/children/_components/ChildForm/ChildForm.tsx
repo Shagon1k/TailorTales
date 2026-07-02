@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
@@ -7,6 +8,7 @@ import Input from '@/components/ui/Input/Input';
 import Select from '@/components/ui/Select/Select';
 import TagsInput from '@/components/ui/TagsInput/TagsInput';
 import Button from '@/components/ui/Button/Button';
+import Modal from '@/components/ui/Modal/Modal';
 import type { IGender } from '@/types/child.types';
 import styles from './ChildForm.module.scss';
 
@@ -25,6 +27,7 @@ interface IChildFormProps {
 }
 
 const TODAY = new Date().toISOString().split('T')[0];
+const MAX_INTERESTS = 10;
 
 const DEFAULT_VALUES: IChildFormValues = {
     name: '',
@@ -40,6 +43,7 @@ export default function ChildForm({
     isSubmitting = false,
 }: Readonly<IChildFormProps>): React.ReactElement {
     const t = useTranslations('account.childForm');
+    const formId = useId();
 
     const genderOptions = [
         { value: 'MALE', label: t('genderOptions.male') },
@@ -48,6 +52,7 @@ export default function ChildForm({
 
     const form = useForm<IChildFormValues>({
         initialValues: { ...DEFAULT_VALUES, ...initialValues },
+        validateInputOnBlur: true,
         validate: {
             name: (v) => (v.trim().length < 1 ? t('errors.nameRequired') : null),
             birthdate: (v) => {
@@ -61,39 +66,52 @@ export default function ChildForm({
         },
     });
 
+    const hasReachedInterestsLimit = form.values.interests.length >= MAX_INTERESTS;
+
     return (
-        <form onSubmit={form.onSubmit(onSubmit)}>
-            <Stack gap="sm">
-                <Input
-                    label={t('nameLabel')}
-                    placeholder={t('namePlaceholder')}
-                    {...form.getInputProps('name')}
-                />
-                <Input
-                    label={t('birthdateLabel')}
-                    type="date"
-                    max={TODAY}
-                    {...form.getInputProps('birthdate')}
-                />
-                <Select
-                    label={t('genderLabel')}
-                    data={genderOptions}
-                    {...form.getInputProps('gender')}
-                />
-                <TagsInput
-                    label={t('interestsLabel')}
-                    placeholder={t('interestsPlaceholder')}
-                    {...form.getInputProps('interests')}
-                />
+        <>
+            <form id={formId} onSubmit={form.onSubmit(onSubmit)}>
+                <Stack gap="sm">
+                    <Input
+                        label={t('nameLabel')}
+                        placeholder={t('namePlaceholder')}
+                        required
+                        {...form.getInputProps('name')}
+                    />
+                    <Input
+                        label={t('birthdateLabel')}
+                        type="date"
+                        max={TODAY}
+                        required
+                        {...form.getInputProps('birthdate')}
+                    />
+                    <Select
+                        label={t('genderLabel')}
+                        data={genderOptions}
+                        required
+                        {...form.getInputProps('gender')}
+                    />
+                    <TagsInput
+                        label={t('interestsLabel')}
+                        placeholder={t('interestsPlaceholder')}
+                        description={
+                            hasReachedInterestsLimit ? t('interestsLimitReached') : undefined
+                        }
+                        maxTags={MAX_INTERESTS}
+                        {...form.getInputProps('interests')}
+                    />
+                </Stack>
+            </form>
+            <Modal.Footer>
                 <div className={styles.actions}>
                     <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                         {t('cancelButton')}
                     </Button>
-                    <Button type="submit" variant="primary" loading={isSubmitting}>
+                    <Button type="submit" form={formId} variant="primary" loading={isSubmitting}>
                         {t('saveButton')}
                     </Button>
                 </div>
-            </Stack>
-        </form>
+            </Modal.Footer>
+        </>
     );
 }

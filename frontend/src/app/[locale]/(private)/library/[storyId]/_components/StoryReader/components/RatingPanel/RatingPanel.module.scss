@@ -22,6 +22,25 @@
     color: var(--text-secondary);
 }
 
+.rating__readonly-note {
+    @include t-body-base;
+
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-primary);
+    background: rgba(248, 234, 206, 0.06);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    white-space: pre-wrap;
+}
+
+.rating__visibility {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-muted);
+}
+
 .rating__status {
     @include t-body-sm;
 

@@ -6,11 +6,12 @@ export type IUserCharacterSource = Extract<ICharacterSource, 'IMAGINED' | 'QUIZ'
 export interface ICharacter {
     id: string;
     userId: string;
-    childId: string | null;
+    childId: string;
     source: ICharacterSource;
     name: string;
     description: string;
     previewKey: string | null;
+    previewUrl: string | null;
     createdAt: string;
     updatedAt: string;
 }

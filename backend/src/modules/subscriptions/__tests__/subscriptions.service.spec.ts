@@ -9,7 +9,9 @@ const MOCK_FREE_TIER = {
     priceMonthly: 0,
     pagesPerMonth: 12,
     regenerationsPerMonth: 3,
+    characterGenerationsPerMonth: 3,
     childrenLimit: 1,
+    charactersLimit: 5,
     retentionDays: 30,
     watermark: true,
     order: 1,
@@ -29,6 +31,7 @@ const MOCK_SUBSCRIPTION = {
     currentPeriodEnd: null,
     pagesUsed: 5,
     regenerationsUsed: 1,
+    characterGenerationsUsed: 2,
     createdAt: new Date(),
     updatedAt: new Date(),
 };
@@ -103,10 +106,17 @@ describe('SubscriptionsService', () => {
             const summary = await service.getUsageSummary('user-1');
 
             expect(summary).toMatchObject({
-                tier: { name: 'Free Chapter', pagesPerMonth: 12, watermark: true },
+                tier: {
+                    name: 'Free Chapter',
+                    pagesPerMonth: 12,
+                    watermark: true,
+                    characterGenerationsPerMonth: 3,
+                    charactersLimit: 5,
+                },
                 status: 'ACTIVE',
                 pagesUsed: 5,
                 regenerationsUsed: 1,
+                characterGenerationsUsed: 2,
                 childrenUsed: 1,
                 talesCount: 4,
             });

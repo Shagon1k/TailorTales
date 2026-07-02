@@ -49,6 +49,16 @@ describe('ChildForm', () => {
         expect(screen.getByText(/name is required/i)).toBeInTheDocument();
     });
 
+    it('should show validation on blur for required fields', async () => {
+        renderForm();
+
+        const nameInput = screen.getByLabelText(/name/i);
+        await userEvent.click(nameInput);
+        await userEvent.tab();
+
+        expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+    });
+
     it('should call onSubmit with correct values when form is valid', async () => {
         const onSubmit = vi.fn();
         renderForm(onSubmit, vi.fn(), {
@@ -74,5 +84,20 @@ describe('ChildForm', () => {
         await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
         expect(onCancel).toHaveBeenCalled();
+    });
+
+    it('should cap interests at 10 tags', async () => {
+        renderForm();
+
+        const interestsInput = screen.getByRole('combobox', { name: /interests/i });
+
+        for (let i = 1; i <= 11; i += 1) {
+            await userEvent.type(interestsInput, `interest-${i}{enter}`);
+        }
+
+        expect(screen.getAllByText(/interest-\d+/i)).toHaveLength(10);
+        expect(screen.getByText('interest-10')).toBeInTheDocument();
+        expect(screen.queryByText('interest-11')).not.toBeInTheDocument();
+        expect(screen.getByText('Maximum 10 interests reached.')).toBeInTheDocument();
     });
 });

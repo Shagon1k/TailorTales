@@ -116,19 +116,13 @@ export function buildComparisonGroups(
                     feature: t('rows.printReadyPdf'),
                     ...perTier((tier) => (tier.watermark ? { type: 'dash' } : { type: 'check' })),
                 },
-                {
-                    feature: t('rows.priorityQueue'),
-                    free: { type: 'dash' },
-                    storyHour: { type: 'dash' },
-                    family: { type: 'check' },
-                },
             ],
         },
         {
             title: t('groups.workshop'),
             rows: [
                 {
-                    feature: t('rows.storiesRetained'),
+                    feature: t('rows.generatedFilesRetained'),
                     ...perTier((tier) => ({
                         type: 'text',
                         value:

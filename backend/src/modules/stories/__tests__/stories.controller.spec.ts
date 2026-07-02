@@ -11,7 +11,7 @@ import {
     STORY_QUESTION_MAX_LENGTH,
     STORY_QUESTION_MIN_LENGTH,
 } from '../stories.constants.js';
-import type { IStoryDetail, IStorySummary } from '../stories.types.js';
+import type { IPublicStorySummary, IStoryDetail, IStorySummary } from '../stories.types.js';
 
 const MOCK_USER: User = {
     id: 'user-123',
@@ -19,6 +19,7 @@ const MOCK_USER: User = {
     email: 'alice@example.com',
     name: 'Alice',
     avatarUrl: null,
+    avatarKey: null,
     notificationPreferences: null,
     role: 'USER',
     suspendedAt: null,
@@ -57,6 +58,27 @@ const MOCK_SUMMARY: IStorySummary = {
 };
 
 const MOCK_DETAIL: IStoryDetail = { ...MOCK_SUMMARY, pages: [], pdfUrl: null, myRating: null };
+const MOCK_PUBLIC_SUMMARY: IPublicStorySummary = {
+    id: 'story-1',
+    type: 'BOOK',
+    question: 'Why is the sky blue?',
+    pageCount: 8,
+    language: 'EN',
+    genre: null,
+    writingStyle: null,
+    title: null,
+    rating: 5,
+    readerAge: 6,
+    hasCharacter: false,
+    artStyle: {
+        id: 'style-1',
+        name: 'Storybook',
+        slug: 'storybook',
+        thumbnailUrl: 'https://example.com/thumb.jpg',
+    },
+    coverImageUrl: null,
+    pdfUrl: 'https://example.com/story.pdf',
+};
 
 describe('StoriesController', () => {
     let controller: StoriesController;
@@ -64,6 +86,7 @@ describe('StoriesController', () => {
     let findAllByUser: ReturnType<typeof vi.fn>;
     let findOneByUser: ReturnType<typeof vi.fn>;
     let create: ReturnType<typeof vi.fn>;
+    let retry: ReturnType<typeof vi.fn>;
     let remove: ReturnType<typeof vi.fn>;
     let setPublicVisibility: ReturnType<typeof vi.fn>;
     let upsertRating: ReturnType<typeof vi.fn>;
@@ -73,6 +96,7 @@ describe('StoriesController', () => {
         findAllByUser = vi.fn();
         findOneByUser = vi.fn();
         create = vi.fn();
+        retry = vi.fn();
         remove = vi.fn();
         setPublicVisibility = vi.fn();
         upsertRating = vi.fn();
@@ -87,13 +111,16 @@ describe('StoriesController', () => {
                         findAllByUser,
                         findOneByUser,
                         create,
+                        retry,
                         remove,
                         setPublicVisibility,
                     },
                 },
                 {
                     provide: GenerationService,
-                    useValue: { enqueue: vi.fn() },
+                    useValue: {
+                        enqueue: vi.fn().mockResolvedValue({ jobId: 'job-1', storyId: 'story-1' }),
+                    },
                 },
                 {
                     provide: RegenerationService,
@@ -111,12 +138,12 @@ describe('StoriesController', () => {
 
     describe('findPublic', () => {
         it('should return public stories without requiring authentication', async () => {
-            findPublic.mockResolvedValue([MOCK_SUMMARY]);
+            findPublic.mockResolvedValue([MOCK_PUBLIC_SUMMARY]);
 
             const result = await controller.findPublic();
 
             expect(findPublic).toHaveBeenCalledTimes(1);
-            expect(result).toEqual([MOCK_SUMMARY]);
+            expect(result).toEqual([MOCK_PUBLIC_SUMMARY]);
         });
     });
 
@@ -194,6 +221,25 @@ describe('StoriesController', () => {
             await controller.remove('story-1', MOCK_USER);
 
             expect(remove).toHaveBeenCalledWith('story-1', 'user-123');
+        });
+    });
+
+    describe('retry', () => {
+        it('should reset the failed story and enqueue generation for the same story id', async () => {
+            retry.mockResolvedValue(undefined);
+            const dto = {
+                childId: 'child-1',
+                type: 'BOOK' as const,
+                question: 'Why is the sky blue?',
+                pageCount: 8,
+                artStyleId: 'style-1',
+                language: 'EN' as const,
+            };
+
+            const result = await controller.retry('story-1', MOCK_USER, dto);
+
+            expect(retry).toHaveBeenCalledWith('story-1', 'user-123', dto);
+            expect(result).toEqual({ jobId: 'job-1', storyId: 'story-1' });
         });
     });
 

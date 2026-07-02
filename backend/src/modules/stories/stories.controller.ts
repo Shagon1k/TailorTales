@@ -33,7 +33,12 @@ import {
     STORY_QUESTION_MIN_LENGTH,
 } from './stories.constants.js';
 import { StoriesService } from './stories.service.js';
-import type { IStoryConfig, IStoryDetail, IStorySummary } from './stories.types.js';
+import type {
+    IPublicStorySummary,
+    IStoryConfig,
+    IStoryDetail,
+    IStorySummary,
+} from './stories.types.js';
 
 @Controller('stories')
 export class StoriesController {
@@ -47,7 +52,7 @@ export class StoriesController {
     // Static routes must be declared before :id to avoid being matched as an id param.
     @Get('public')
     @Public()
-    findPublic(): Promise<IStorySummary[]> {
+    findPublic(): Promise<IPublicStorySummary[]> {
         return this.storiesService.findPublic();
     }
 
@@ -86,6 +91,17 @@ export class StoriesController {
     @Post()
     create(@CurrentUser() user: User, @Body() dto: CreateStoryDto): Promise<Story> {
         return this.storiesService.create(user.id, dto);
+    }
+
+    @Post(':id/retry')
+    @HttpCode(202)
+    async retry(
+        @Param('id') id: string,
+        @CurrentUser() user: User,
+        @Body() dto: CreateStoryDto,
+    ): Promise<{ jobId: string; storyId: string }> {
+        await this.storiesService.retry(id, user.id, dto);
+        return this.generationService.enqueue(id, user.id);
     }
 
     @Post(':id/generate')

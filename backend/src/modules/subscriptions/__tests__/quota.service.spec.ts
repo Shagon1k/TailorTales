@@ -13,7 +13,9 @@ const MOCK_FREE_TIER = {
     priceMonthly: 0,
     pagesPerMonth: 12,
     regenerationsPerMonth: 3,
+    characterGenerationsPerMonth: 3,
     childrenLimit: 1,
+    charactersLimit: 5,
     retentionDays: 30,
     watermark: true,
     order: 1,
@@ -27,7 +29,9 @@ const MOCK_PAID_TIER = {
     priceMonthly: 500,
     pagesPerMonth: 60,
     regenerationsPerMonth: 10,
+    characterGenerationsPerMonth: 10,
     childrenLimit: 3,
+    charactersLimit: 15,
     retentionDays: null,
     watermark: false,
     order: 2,
@@ -46,6 +50,7 @@ function buildSubscription(overrides: Partial<TSubscriptionWithTier> = {}): TSub
         currentPeriodEnd: null,
         pagesUsed: 0,
         regenerationsUsed: 0,
+        characterGenerationsUsed: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
         ...overrides,
@@ -56,10 +61,12 @@ describe('QuotaService', () => {
     let service: QuotaService;
     let getOrCreateForUser: ReturnType<typeof vi.fn>;
     let subscriptionUpdate: ReturnType<typeof vi.fn>;
+    let characterCount: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         getOrCreateForUser = vi.fn();
         subscriptionUpdate = vi.fn();
+        characterCount = vi.fn();
 
         const module = await Test.createTestingModule({
             providers: [
@@ -70,7 +77,10 @@ describe('QuotaService', () => {
                 },
                 {
                     provide: PrismaService,
-                    useValue: { subscription: { update: subscriptionUpdate } },
+                    useValue: {
+                        subscription: { update: subscriptionUpdate },
+                        character: { count: characterCount },
+                    },
                 },
             ],
         }).compile();
@@ -181,6 +191,70 @@ describe('QuotaService', () => {
 
             expect(txUpdate).toHaveBeenCalled();
             expect(subscriptionUpdate).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('assertCharacterLimit', () => {
+        it('should pass while under the saved-character limit', async () => {
+            getOrCreateForUser.mockResolvedValue(buildSubscription());
+            characterCount.mockResolvedValue(4);
+
+            await expect(service.assertCharacterLimit('user-1')).resolves.toBeUndefined();
+        });
+
+        it('should throw ForbiddenException at the saved-character limit', async () => {
+            getOrCreateForUser.mockResolvedValue(buildSubscription());
+            characterCount.mockResolvedValue(5);
+
+            await expect(service.assertCharacterLimit('user-1')).rejects.toThrow(
+                ForbiddenException,
+            );
+        });
+
+        it('should skip the check when the tier allows unlimited characters', async () => {
+            getOrCreateForUser.mockResolvedValue(
+                buildSubscription({
+                    pricingTier: { ...MOCK_PAID_TIER, charactersLimit: null },
+                }),
+            );
+
+            await expect(service.assertCharacterLimit('user-1')).resolves.toBeUndefined();
+            expect(characterCount).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('assertCharacterGenerationCredit', () => {
+        it('should pass while under the monthly character-generation limit', async () => {
+            getOrCreateForUser.mockResolvedValue(
+                buildSubscription({ characterGenerationsUsed: 2 }),
+            );
+
+            await expect(
+                service.assertCharacterGenerationCredit('user-1'),
+            ).resolves.toBeUndefined();
+        });
+
+        it('should throw ForbiddenException at the monthly character-generation limit', async () => {
+            getOrCreateForUser.mockResolvedValue(
+                buildSubscription({ characterGenerationsUsed: 3 }),
+            );
+
+            await expect(service.assertCharacterGenerationCredit('user-1')).rejects.toThrow(
+                ForbiddenException,
+            );
+        });
+    });
+
+    describe('recordCharacterGeneration', () => {
+        it('should increment characterGenerationsUsed via the default client', async () => {
+            getOrCreateForUser.mockResolvedValue(buildSubscription());
+
+            await service.recordCharacterGeneration('user-1');
+
+            expect(subscriptionUpdate).toHaveBeenCalledWith({
+                where: { id: 'sub-1' },
+                data: { characterGenerationsUsed: { increment: 1 } },
+            });
         });
     });
 

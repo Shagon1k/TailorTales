@@ -4,7 +4,9 @@ import { MantineProvider } from '@mantine/core';
 import HeaderUserChip from '../HeaderUserChip';
 
 const mockLogout = vi.hoisted(() => vi.fn());
-const mockUser = vi.hoisted(() => ({ current: { name: 'Alice Wonderland', role: 'USER' } }));
+const mockUser = vi.hoisted(() => ({
+    current: { name: 'Alice Wonderland', role: 'USER', avatarUrl: null },
+}));
 
 vi.mock('@/api/auth', () => ({
     authApi: { logout: mockLogout },
@@ -30,7 +32,7 @@ describe('HeaderUserChip', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockLogout.mockResolvedValue(undefined);
-        mockUser.current = { name: 'Alice Wonderland', role: 'USER' };
+        mockUser.current = { name: 'Alice Wonderland', role: 'USER', avatarUrl: null };
     });
 
     describe('trigger', () => {
@@ -78,7 +80,11 @@ describe('HeaderUserChip', () => {
         });
 
         it('should show the admin panel link for an admin', async () => {
-            mockUser.current = { name: 'Alice Wonderland', role: 'SUPER_ADMIN' };
+            mockUser.current = {
+                name: 'Alice Wonderland',
+                role: 'SUPER_ADMIN',
+                avatarUrl: null,
+            };
             renderChip();
 
             await userEvent.click(screen.getByRole('button', { name: /account menu/i }));

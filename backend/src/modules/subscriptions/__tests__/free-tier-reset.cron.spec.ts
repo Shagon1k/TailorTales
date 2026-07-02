@@ -53,6 +53,7 @@ describe('FreeTierResetCron', () => {
             data: {
                 pagesUsed: 0,
                 regenerationsUsed: 0,
+                characterGenerationsUsed: 0,
                 currentPeriodEnd: EXPECTED_NEXT_PERIOD_END,
             },
         });

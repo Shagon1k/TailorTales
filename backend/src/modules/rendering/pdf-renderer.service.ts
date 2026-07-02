@@ -3,11 +3,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Handlebars from 'handlebars';
-import puppeteer, { type Browser } from 'puppeteer';
+import puppeteer, { type Browser, type Page } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
 import { ConfigService } from '@nestjs/config';
 import { PAGE_TEMPLATES } from './page-templates.config.js';
-import type { IPageToRender, IStoryToRender } from './rendering.types.js';
+import type { IInteriorTextSplit, IPageToRender, IStoryToRender } from './rendering.types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(__dirname, 'templates');
@@ -15,7 +15,8 @@ const TEMPLATES_DIR = join(__dirname, 'templates');
 @Injectable()
 export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(PdfRendererService.name);
-    private browser!: Browser;
+    private browser: Browser | null = null;
+    private launchPromise: Promise<Browser> | null = null;
     private readonly fontsUrl: string;
 
     constructor(config: ConfigService) {
@@ -34,20 +35,13 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     );
 
     async onModuleInit(): Promise<void> {
-        this.browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-gpu',
-                '--disable-dev-shm-usage',
-            ],
-        });
-        this.logger.log('Puppeteer browser started');
+        await this.ensureBrowser();
     }
 
     async onModuleDestroy(): Promise<void> {
+        this.launchPromise = null;
         await this.browser?.close();
+        this.browser = null;
         this.logger.log('Puppeteer browser closed');
     }
 
@@ -82,7 +76,23 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
     private async renderPage(page: IPageToRender, story: IStoryToRender): Promise<Buffer> {
         const fullHtml = this.buildPageHtml(page, story);
 
-        const tab = await this.browser.newPage();
+        try {
+            return await this.renderPageOnce(fullHtml);
+        } catch (err: unknown) {
+            if (!this.isRecoverableBrowserDisconnect(err)) throw err;
+
+            const techMessage = err instanceof Error ? err.message : String(err);
+            this.logger.warn(
+                `Puppeteer connection dropped during PDF render; retrying once: ${techMessage}`,
+            );
+            await this.restartBrowser();
+            return this.renderPageOnce(fullHtml);
+        }
+    }
+
+    private async renderPageOnce(fullHtml: string): Promise<Buffer> {
+        const browser = await this.ensureBrowser();
+        const tab = await browser.newPage();
         try {
             await tab.setContent(fullHtml, { waitUntil: 'load' });
             await tab.waitForFunction('document.fonts.status === "loaded"');
@@ -96,7 +106,73 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
 
             return Buffer.from(pdfBytes);
         } finally {
+            await this.closeTabQuietly(tab);
+        }
+    }
+
+    private async ensureBrowser(): Promise<Browser> {
+        if (this.browser && this.browser.connected) return this.browser;
+        if (this.launchPromise) return this.launchPromise;
+
+        this.launchPromise = this.launchBrowser();
+
+        try {
+            this.browser = await this.launchPromise;
+            return this.browser;
+        } finally {
+            this.launchPromise = null;
+        }
+    }
+
+    private async launchBrowser(): Promise<Browser> {
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+            ],
+        });
+
+        browser.on('disconnected', () => {
+            this.logger.warn('Puppeteer browser disconnected');
+            this.browser = null;
+        });
+
+        this.logger.log('Puppeteer browser started');
+        return browser;
+    }
+
+    private async restartBrowser(): Promise<void> {
+        const previousBrowser = this.browser;
+        this.browser = null;
+        this.launchPromise = null;
+
+        try {
+            await previousBrowser?.close();
+        } catch (err: unknown) {
+            const techMessage = err instanceof Error ? err.message : String(err);
+            this.logger.warn(`Failed to close stale Puppeteer browser cleanly: ${techMessage}`);
+        }
+
+        await this.ensureBrowser();
+    }
+
+    private isRecoverableBrowserDisconnect(err: unknown): boolean {
+        if (!(err instanceof Error)) return false;
+        return (
+            err.message.includes('Connection closed') ||
+            err.message.includes('Protocol error') ||
+            err.message.includes('Target closed')
+        );
+    }
+
+    private async closeTabQuietly(tab: Page): Promise<void> {
+        try {
             await tab.close();
+        } catch (err: unknown) {
+            if (!this.isRecoverableBrowserDisconnect(err)) throw err;
         }
     }
 
@@ -114,6 +190,10 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
                 return { ...base, text: page.text };
             case 'book-text-image':
                 return { ...base, text: page.text };
+            case 'book-image-top':
+                return { ...base, text: page.text };
+            case 'book-image-middle':
+                return { ...base, ...this.splitInteriorText(page.text) };
             case 'book-full-image':
                 return { ...base, caption: page.text };
             case 'book-final':
@@ -121,6 +201,53 @@ export class PdfRendererService implements OnModuleInit, OnModuleDestroy {
             default:
                 return { ...base, text: page.text };
         }
+    }
+
+    private splitInteriorText(text: string | null): IInteriorTextSplit {
+        const source = text?.trim() ?? '';
+        if (!source) {
+            return { lead: '', tail: '' };
+        }
+
+        const sentences = source.match(/[^.!?…]+[.!?…]?/g)?.map((part) => part.trim()) ?? [source];
+        if (sentences.length <= 1) {
+            return this.splitByWordBalance(source);
+        }
+
+        const totalLength = sentences.reduce((sum, sentence) => sum + sentence.length, 0);
+        let accumulated = 0;
+        let bestIndex = 1;
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        for (let index = 0; index < sentences.length - 1; index += 1) {
+            accumulated += sentences[index].length;
+            const distance = Math.abs(totalLength / 2 - accumulated);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = index + 1;
+            }
+        }
+
+        const lead = sentences.slice(0, bestIndex).join(' ').trim();
+        const tail = sentences.slice(bestIndex).join(' ').trim();
+        if (!lead || !tail) {
+            return this.splitByWordBalance(source);
+        }
+
+        return { lead, tail };
+    }
+
+    private splitByWordBalance(text: string): IInteriorTextSplit {
+        const words = text.split(/\s+/).filter(Boolean);
+        if (words.length <= 2) {
+            return { lead: text, tail: '' };
+        }
+
+        const midpoint = Math.ceil(words.length / 2);
+        return {
+            lead: words.slice(0, midpoint).join(' '),
+            tail: words.slice(midpoint).join(' '),
+        };
     }
 
     private async stitchPages(pageBuffers: Buffer[]): Promise<Buffer> {

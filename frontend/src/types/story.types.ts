@@ -46,10 +46,28 @@ export interface IStoryArtStyle {
     thumbnailUrl: string | null;
 }
 
+export interface IPublicStorySummary {
+    id: string;
+    type: IStoryType;
+    question: string;
+    pageCount: number;
+    language: ILanguage;
+    genre: IStoryGenre | null;
+    writingStyle: IWritingStyle | null;
+    title: string | null;
+    rating: number;
+    readerAge: number;
+    hasCharacter: boolean;
+    artStyle: IStoryArtStyle;
+    coverImageUrl: string | null;
+    pdfUrl: string | null;
+}
+
 export interface IStorySummary {
     id: string;
     userId: string;
     childId: string;
+    characterId: string | null;
     type: IStoryType;
     status: IStoryStatus;
     blueprintId: string | null;
@@ -99,7 +117,7 @@ export interface IStoryConfig {
 
 export interface ICreateStoryPayload {
     childId: string;
-    /** Optional protagonist. Omit for a child-led story (no recurring character). */
+    /** Optional recurring hero. Omit to let the story run without a fixed protagonist. */
     characterId?: string;
     type: IStoryType;
     question: string;

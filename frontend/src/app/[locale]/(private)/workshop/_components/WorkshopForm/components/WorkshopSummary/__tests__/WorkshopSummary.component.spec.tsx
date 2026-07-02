@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import type { IUsageSummary } from '@/types/subscription.types';
 import WorkshopSummary, { type IWorkshopSummaryProps } from '../WorkshopSummary';
@@ -43,8 +44,8 @@ function renderSummary(props: Partial<IWorkshopSummaryProps> = {}): void {
         question: 'Why is the sky blue?',
         isValid: true,
         isPending: false,
-        onSubmit: vi.fn(),
-        onCharacterChoose: vi.fn(),
+        onGenerate: vi.fn(),
+        onSaveDraft: vi.fn(),
     };
     render(
         <MantineProvider>
@@ -61,8 +62,12 @@ describe('WorkshopSummary', () => {
     it('should show the credit cost and the real remaining balance', () => {
         renderSummary({ pageCount: '8' });
 
-        expect(screen.getByText('8 credits')).toBeInTheDocument();
-        expect(screen.getByText(/· 12 remaining/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '8 credits for this tale',
+        );
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '12 left this cycle',
+        );
         expect(
             screen.getByText('8 pages will use 8 of your 12 remaining credits this cycle.'),
         ).toBeInTheDocument();
@@ -73,7 +78,9 @@ describe('WorkshopSummary', () => {
 
         renderSummary({ pageCount: '5' });
 
-        expect(screen.getByText(/· 7 remaining/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '7 left this cycle',
+        );
     });
 
     it('should disable submission and warn when the tale exceeds the remaining credits', () => {
@@ -82,7 +89,20 @@ describe('WorkshopSummary', () => {
         renderSummary({ pageCount: '12' });
 
         expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /save as draft/i })).toBeEnabled();
         expect(screen.getByText(/only 4 remain this cycle/i)).toBeInTheDocument();
+    });
+
+    it('should route each action through its own handler', async () => {
+        const onGenerate = vi.fn();
+        const onSaveDraft = vi.fn();
+        renderSummary({ onGenerate, onSaveDraft });
+
+        await userEvent.click(screen.getByRole('button', { name: /light the lantern/i }));
+        await userEvent.click(screen.getByRole('button', { name: /save as draft/i }));
+
+        expect(onGenerate).toHaveBeenCalledOnce();
+        expect(onSaveDraft).toHaveBeenCalledOnce();
     });
 
     it('should fall back to placeholders while the subscription is loading', () => {
@@ -90,7 +110,10 @@ describe('WorkshopSummary', () => {
 
         renderSummary({ pageCount: '8' });
 
-        expect(screen.getByText(/· -- remaining/)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /light the lantern/i })).toBeEnabled();
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '-- left this cycle',
+        );
+        expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /save as draft/i })).toBeEnabled();
     });
 });

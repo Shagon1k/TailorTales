@@ -11,30 +11,31 @@ const IFRAME_NATURAL_HEIGHT = 794;
 export interface IStoryPageIframeProps {
     storyId: string;
     pageOrder: number;
+    refreshToken?: number;
 }
 
 export default function StoryPageIframe({
     storyId,
     pageOrder,
+    refreshToken = 0,
 }: Readonly<IStoryPageIframeProps>): React.ReactElement {
     const containerRef = useRef<HTMLDivElement>(null);
     // Per-story cache: avoids re-fetching pages already viewed (e.g. navigating back).
-    const htmlCacheRef = useRef(new Map<number, string>());
+    const htmlCacheRef = useRef(new Map<string, string>());
     const [html, setHtml] = useState<string | null>(null);
+    const [displayedPageOrder, setDisplayedPageOrder] = useState(pageOrder);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [scale, setScale] = useState(1);
-
-    // Fetch page HTML whenever storyId or pageOrder changes.
-    useEffect(() => {
-        // Clear per-story cache when the story itself changes.
-        htmlCacheRef.current.clear();
-    }, [storyId]);
+    const [isFrameReady, setIsFrameReady] = useState(false);
 
     useEffect(() => {
-        const cached = htmlCacheRef.current.get(pageOrder);
+        const cacheKey = `${storyId}:${pageOrder}:${refreshToken}`;
+        const cached = htmlCacheRef.current.get(cacheKey);
         if (cached) {
+            setDisplayedPageOrder(pageOrder);
             setHtml(cached);
+            setIsFrameReady(false);
             setIsLoading(false);
             setError(null);
             return;
@@ -44,13 +45,14 @@ export default function StoryPageIframe({
 
         async function fetchPageHtml(): Promise<void> {
             setIsLoading(true);
-            setHtml(null);
             setError(null);
             try {
                 const result = await storiesApi.getPageHtml(storyId, pageOrder);
                 if (!cancelled) {
-                    htmlCacheRef.current.set(pageOrder, result);
+                    htmlCacheRef.current.set(cacheKey, result);
+                    setDisplayedPageOrder(pageOrder);
                     setHtml(result);
+                    setIsFrameReady(false);
                     setIsLoading(false);
                 }
             } catch (err: unknown) {
@@ -66,7 +68,7 @@ export default function StoryPageIframe({
         return () => {
             cancelled = true;
         };
-    }, [storyId, pageOrder]);
+    }, [storyId, pageOrder, refreshToken]);
 
     // Track container width to scale the fixed-size A5 stage proportionally.
     useEffect(() => {
@@ -109,13 +111,13 @@ export default function StoryPageIframe({
                 )}
                 {html && (
                     <iframe
-                        // key forces a fresh document when the page changes,
-                        // avoiding stale srcDoc content visible during the next fetch.
-                        key={`${storyId}-${pageOrder}`}
+                        key={displayedPageOrder}
                         srcDoc={html}
-                        title={`Page ${pageOrder}`}
+                        title={`Page ${displayedPageOrder}`}
                         className={styles['page-iframe__frame']}
                         sandbox="allow-same-origin"
+                        onLoad={() => setIsFrameReady(true)}
+                        data-ready={isFrameReady}
                     />
                 )}
             </div>

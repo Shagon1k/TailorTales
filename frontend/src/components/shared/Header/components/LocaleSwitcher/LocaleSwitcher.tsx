@@ -32,7 +32,7 @@ function LocaleTrigger({
             aria-haspopup="menu"
             onClick={onClick}
         >
-            {locale.toUpperCase()}
+            <span className={styles.trigger__label}>{locale.toUpperCase()}</span>
         </button>
     );
 }
