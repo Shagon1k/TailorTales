@@ -5,8 +5,12 @@ import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { authApi } from '@/api/auth';
 import Avatar from '@/components/ui/Avatar/Avatar';
+import DeleteAccountAction from '@/app/[locale]/(private)/account/_components/DeleteAccountAction/DeleteAccountAction';
 import { useCurrentUser } from '@/context/UserContext';
+import { usePreservedScroll } from '@/hooks/usePreservedScroll';
 import styles from './AccountSidebar.module.scss';
+
+const ACCOUNT_SCROLL_KEY = 'account:scroll-y';
 
 interface INavItem {
     href: string;
@@ -97,6 +101,10 @@ export default function AccountSidebar(): React.ReactElement {
     const t = useTranslations('account.sidebar');
     const { user } = useCurrentUser();
     const pathname = usePathname();
+    const { rememberScrollPosition } = usePreservedScroll({
+        storageKey: ACCOUNT_SCROLL_KEY,
+        restoreKey: pathname,
+    });
 
     const navItems: INavItem[] = [
         { href: '/account/profile', label: t('nav.profile'), icon: 'profile' },
@@ -136,6 +144,8 @@ export default function AccountSidebar(): React.ReactElement {
                         <li key={item.href}>
                             <Link
                                 href={item.href}
+                                scroll={false}
+                                onClick={rememberScrollPosition}
                                 className={clsx(styles['sidebar__nav-item'], {
                                     [styles['m-active']]: pathname === item.href,
                                 })}
@@ -161,12 +171,21 @@ export default function AccountSidebar(): React.ReactElement {
                     </span>
                     {t('signOut')}
                 </button>
-                <Link href="/account/privacy" className={styles['sidebar__delete']}>
-                    <span className={styles['sidebar__nav-icon']}>
-                        <SidebarIcon name="delete" />
-                    </span>
-                    {t('deleteAccount')}
-                </Link>
+                <DeleteAccountAction>
+                    {({ disabled, openModal }) => (
+                        <button
+                            type="button"
+                            className={styles['sidebar__delete']}
+                            disabled={disabled}
+                            onClick={() => openModal()}
+                        >
+                            <span className={styles['sidebar__nav-icon']}>
+                                <SidebarIcon name="delete" />
+                            </span>
+                            {t('deleteAccount')}
+                        </button>
+                    )}
+                </DeleteAccountAction>
             </div>
         </aside>
     );

@@ -22,7 +22,7 @@ export default function InvoiceList({ isPaid }: Readonly<IInvoiceListProps>): Re
     return (
         <Card variant="gradient" size="md">
             <Stack gap="sm">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
 
                 {isLoading ? (
                     <Loader size="sm" label={t('loading')} />

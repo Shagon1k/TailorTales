@@ -35,6 +35,24 @@ describe('Modal', () => {
             expect(screen.getByText('Are you sure?')).toBeInTheDocument();
         });
 
+        it('should render footer content when Modal.Footer is used', () => {
+            renderModal({
+                opened: true,
+                onClose: vi.fn(),
+                children: (
+                    <>
+                        <div>Body content</div>
+                        <Modal.Footer>
+                            <button type="button">Footer action</button>
+                        </Modal.Footer>
+                    </>
+                ),
+            });
+
+            expect(screen.getByText('Body content')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Footer action' })).toBeInTheDocument();
+        });
+
         it('should call onClose when the close button is clicked', async () => {
             const onClose = vi.fn();
             renderModal({ opened: true, onClose, title: 'Confirm' });

@@ -33,25 +33,10 @@ describe('CharacterForm', () => {
         renderForm();
 
         expect(
-            screen.getByRole('combobox', { name: /how to create the character/i }),
+            screen.getByRole('tablist', { name: /how to create the character/i }),
         ).toBeInTheDocument();
         expect(screen.getByText('Write it')).toBeInTheDocument();
         expect(screen.getByText('Guided')).toBeInTheDocument();
         expect(screen.queryByText(/prompt/i)).toBeNull();
-    });
-
-    it('should show remaining generation and character-slot quota in create mode', () => {
-        render(
-            <MantineProvider>
-                <CharacterForm
-                    onSubmit={vi.fn()}
-                    onCancel={vi.fn()}
-                    quota={{ generationsLeft: 2, charactersLeft: 1 }}
-                />
-            </MantineProvider>,
-        );
-
-        expect(screen.getByText('2 generations left this cycle')).toBeInTheDocument();
-        expect(screen.getByText('1 character slot left on this plan')).toBeInTheDocument();
     });
 });

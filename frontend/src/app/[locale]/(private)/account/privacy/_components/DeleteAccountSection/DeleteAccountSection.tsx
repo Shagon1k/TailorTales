@@ -1,14 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Group, Stack } from '@mantine/core';
-import { accountApi } from '@/api/account';
 import Button from '@/components/ui/Button/Button';
 import Card from '@/components/ui/Card/Card';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
-import Input from '@/components/ui/Input/Input';
-import Modal from '@/components/ui/Modal/Modal';
+import DeleteAccountAction from '@/app/[locale]/(private)/account/_components/DeleteAccountAction/DeleteAccountAction';
 import styles from './DeleteAccountSection.module.scss';
 
 interface IDeleteAccountSectionProps {
@@ -19,73 +16,29 @@ export default function DeleteAccountSection({
     hasPaidSubscription,
 }: Readonly<IDeleteAccountSectionProps>): React.ReactElement {
     const t = useTranslations('account.privacy.delete');
-    const confirmWord = t('modal.confirmWord');
-    const [modalOpen, setModalOpen] = useState(false);
-    const [confirmText, setConfirmText] = useState('');
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    async function handleDelete(): Promise<void> {
-        setIsDeleting(true);
-        setError(null);
-        try {
-            await accountApi.deleteAccount();
-            window.location.href = '/';
-        } catch {
-            setError(t('modal.error'));
-            setIsDeleting(false);
-        }
-    }
 
     return (
         <Card variant="gradient" size="md">
             <Stack gap="sm">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 <p className={styles['delete-account__copy']}>{t('body')}</p>
                 {hasPaidSubscription && (
                     <p className={styles['delete-account__blocked']}>{t('blocked')}</p>
                 )}
                 <Group>
-                    <Button
-                        variant="secondary"
-                        disabled={hasPaidSubscription}
-                        onClick={() => setModalOpen(true)}
-                    >
-                        {t('button')}
-                    </Button>
+                    <DeleteAccountAction>
+                        {({ disabled, openModal }) => (
+                            <Button
+                                variant="secondary"
+                                disabled={disabled}
+                                onClick={() => openModal()}
+                            >
+                                {t('button')}
+                            </Button>
+                        )}
+                    </DeleteAccountAction>
                 </Group>
             </Stack>
-
-            <Modal
-                opened={modalOpen}
-                onClose={() => setModalOpen(false)}
-                title={t('modal.title')}
-                size="sm"
-            >
-                <Stack gap="md">
-                    <p className={styles['delete-account__copy']}>{t('modal.body')}</p>
-                    <Input
-                        label={t('modal.confirmLabel')}
-                        value={confirmText}
-                        onChange={(e) => setConfirmText(e.currentTarget.value)}
-                        placeholder={t('modal.confirmPlaceholder')}
-                    />
-                    {error && <p className={styles['delete-account__error']}>{error}</p>}
-                    <Group justify="flex-end" gap="sm">
-                        <Button variant="quiet" onClick={() => setModalOpen(false)}>
-                            {t('modal.keepButton')}
-                        </Button>
-                        <Button
-                            variant="primary"
-                            disabled={confirmText !== confirmWord}
-                            loading={isDeleting}
-                            onClick={() => handleDelete()}
-                        >
-                            {t('modal.confirmButton')}
-                        </Button>
-                    </Group>
-                </Stack>
-            </Modal>
         </Card>
     );
 }

@@ -9,6 +9,7 @@ const mockRouterReplace = vi.hoisted(() => vi.fn());
 const mockPathname = vi.hoisted(() => vi.fn(() => '/account/profile'));
 const mockUseCurrentUser = vi.hoisted(() => vi.fn());
 const mockLogout = vi.hoisted(() => vi.fn());
+const mockUseSubscription = vi.hoisted(() => vi.fn());
 
 vi.mock('@/i18n/navigation', () => ({
     Link: ({
@@ -34,6 +35,10 @@ vi.mock('@/context/UserContext', () => ({
 
 vi.mock('@/api/auth', () => ({
     authApi: { logout: mockLogout },
+}));
+
+vi.mock('@/hooks/subscription', () => ({
+    useSubscription: mockUseSubscription,
 }));
 
 const TEST_USER: IUser = {
@@ -64,6 +69,7 @@ describe('AccountSidebar', () => {
         mockUseCurrentUser.mockReturnValue(makeContext());
         mockPathname.mockReturnValue('/account/profile');
         mockLogout.mockResolvedValue(undefined);
+        mockUseSubscription.mockReturnValue({ data: undefined });
         mockRouterReplace.mockClear();
     });
 
@@ -89,6 +95,7 @@ describe('AccountSidebar', () => {
             expect(screen.getByRole('link', { name: /subscription/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /notifications/i })).toBeInTheDocument();
             expect(screen.getByRole('link', { name: /privacy/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /delete account/i })).toBeInTheDocument();
             expect(screen.queryByRole('link', { name: /language/i })).not.toBeInTheDocument();
             expect(
                 screen.queryByRole('button', { name: /export library/i }),

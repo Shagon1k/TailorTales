@@ -1,0 +1,19 @@
+@use 'styles/typography' as *;
+
+.copy {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.error {
+    @include t-body-sm;
+    color: var(--accent-danger);
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}

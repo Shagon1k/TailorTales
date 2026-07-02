@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button/Button';
 import { useSubscription } from '@/hooks/subscription';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
+import InlineMetrics from '@/components/ui/InlineMetrics/InlineMetrics';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import type { IChild } from '@/types/child.types';
 import type { ICharacter } from '@/types/character.types';
@@ -90,14 +91,22 @@ export default function WorkshopSummary({
 
             <hr className={styles.summary__divider} aria-hidden="true" />
 
-            <p className={styles.summary__credits}>
-                <span className={styles['summary__credits-cost']}>
-                    {t('creditCost', { creditCost })}
-                </span>
-                <span className={styles['summary__credits-remaining']}>
-                    {t('creditsRemaining', { creditsRemaining: creditsRemaining ?? '--' })}
-                </span>
-            </p>
+            <InlineMetrics
+                align="center"
+                ariaLabel={t('creditsAriaLabel')}
+                items={[
+                    {
+                        id: 'cost',
+                        value: creditCost,
+                        label: t('creditCostMetricLabel'),
+                    },
+                    {
+                        id: 'remaining',
+                        value: creditsRemaining ?? '--',
+                        label: t('creditsRemainingMetricLabel'),
+                    },
+                ]}
+            />
 
             {pageCount && creditsRemaining !== null && (
                 <p className={styles.summary__quota} data-over={overBudget || undefined}>

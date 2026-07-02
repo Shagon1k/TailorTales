@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import Button from '@/components/ui/Button/Button';
-import Select from '@/components/ui/Select/Select';
+import Modal from '@/components/ui/Modal/Modal';
 import type { IUserCharacterSource } from '@/types/character.types';
 import CharacterQuiz from './components/CharacterQuiz/CharacterQuiz';
 import styles from './CharacterForm.module.scss';
@@ -17,18 +17,12 @@ export interface ICharacterFormValues {
     description: string;
 }
 
-export interface ICharacterQuotaInfo {
-    charactersLeft: number | null;
-    generationsLeft: number;
-}
-
 interface ICharacterFormProps {
     initialValues?: Partial<ICharacterFormValues>;
     /** `source` reports how it was made: `IMAGINED` (manual) or `QUIZ`. Ignored on edit. */
     onSubmit: (values: ICharacterFormValues, source: IUserCharacterSource) => void;
     onCancel: () => void;
     isSubmitting?: boolean;
-    quota?: ICharacterQuotaInfo;
 }
 
 const DEFAULT_VALUES: ICharacterFormValues = {
@@ -38,19 +32,15 @@ const DEFAULT_VALUES: ICharacterFormValues = {
 
 type TMode = 'manual' | 'quiz';
 
-function isMode(value: string | null): value is TMode {
-    return value === 'manual' || value === 'quiz';
-}
-
 export default function CharacterForm({
     initialValues,
     onSubmit,
     onCancel,
     isSubmitting = false,
-    quota,
 }: Readonly<ICharacterFormProps>): React.ReactElement {
     const t = useTranslations('workshop.characterForm');
     const [mode, setMode] = useState<TMode>('manual');
+    const formId = useId();
     const isEditing = initialValues !== undefined;
     const canChooseMode = !isEditing;
 
@@ -63,66 +53,77 @@ export default function CharacterForm({
     });
 
     return (
-        <Stack gap="sm">
-            {quota && !isEditing && (
-                <div className={styles.quota}>
-                    <p className={styles['quota__line']}>
-                        {t('quota.generations', { count: quota.generationsLeft })}
-                    </p>
-                    <p className={styles['quota__line']}>
-                        {quota.charactersLeft === null
-                            ? t('quota.charactersUnlimited')
-                            : t('quota.characters', { count: quota.charactersLeft })}
-                    </p>
+        <Stack gap="md">
+            {canChooseMode && (
+                <div className={styles['mode-switch']}>
+                    <div
+                        className={styles['mode-switch__track']}
+                        role="tablist"
+                        aria-label={t('modeGroupLabel')}
+                    >
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={mode === 'manual'}
+                            className={styles['mode-switch__option']}
+                            data-active={mode === 'manual' || undefined}
+                            onClick={() => setMode('manual')}
+                        >
+                            {t('modeWrite')}
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={mode === 'quiz'}
+                            className={styles['mode-switch__option']}
+                            data-active={mode === 'quiz' || undefined}
+                            onClick={() => setMode('quiz')}
+                        >
+                            {t('modeGuided')}
+                        </button>
+                    </div>
                 </div>
             )}
 
-            {canChooseMode && (
-                <Select
-                    label={t('modeGroupLabel')}
-                    value={mode}
-                    data={[
-                        { value: 'manual', label: t('modeWrite') },
-                        { value: 'quiz', label: t('modeGuided') },
-                    ]}
-                    allowDeselect={false}
-                    onChange={(value) => {
-                        if (isMode(value)) setMode(value);
-                    }}
-                />
-            )}
-
             {mode === 'manual' && (
-                <form onSubmit={form.onSubmit((v) => onSubmit(v, 'IMAGINED'))}>
-                    <Stack gap="sm">
-                        <Input
-                            label={t('nameLabel')}
-                            placeholder={t('namePlaceholder')}
-                            description={t('nameHint')}
-                            {...form.getInputProps('name')}
-                        />
-                        <Textarea
-                            label={isEditing ? t('descriptionLabel') : t('ideaLabel')}
-                            placeholder={
-                                isEditing ? t('descriptionPlaceholder') : t('ideaPlaceholder')
-                            }
-                            required
-                            autosize
-                            minRows={4}
-                            maxRows={8}
-                            {...form.getInputProps('description')}
-                        />
-                        {!isEditing && <p className={styles['mode-hint']}>{t('writeHint')}</p>}
+                <>
+                    <form id={formId} onSubmit={form.onSubmit((v) => onSubmit(v, 'IMAGINED'))}>
+                        <Stack gap="md">
+                            <Input
+                                label={t('nameLabel')}
+                                placeholder={t('namePlaceholder')}
+                                {...form.getInputProps('name')}
+                            />
+                            <Textarea
+                                label={isEditing ? t('descriptionLabel') : t('ideaLabel')}
+                                placeholder={
+                                    isEditing ? t('descriptionPlaceholder') : t('ideaPlaceholder')
+                                }
+                                required
+                                autosize
+                                minRows={4}
+                                maxRows={8}
+                                {...form.getInputProps('description')}
+                            />
+                            {!isEditing && <p className={styles['mode-hint']}>{t('writeHint')}</p>}
+                        </Stack>
+                    </form>
+                    <Modal.Footer>
                         <div className={styles.actions}>
                             <Button variant="quiet" onClick={onCancel} disabled={isSubmitting}>
                                 {t('cancelButton')}
                             </Button>
-                            <Button type="submit" variant="primary" loading={isSubmitting}>
+                            <Button
+                                type="submit"
+                                form={formId}
+                                variant="primary"
+                                loading={isSubmitting}
+                            >
                                 {isEditing ? t('saveButton') : t('createButton')}
                             </Button>
                         </div>
-                    </Stack>
-                </form>
+                    </Modal.Footer>
+                </>
             )}
 
             {mode === 'quiz' && (

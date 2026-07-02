@@ -1,18 +1,6 @@
 @use 'styles/typography' as *;
 
-.delete-account__copy {
-    @include t-body-base;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
 .delete-account__blocked {
-    @include t-body-sm;
-    color: var(--accent-danger);
-    margin: 0;
-}
-
-.delete-account__error {
     @include t-body-sm;
     color: var(--accent-danger);
     margin: 0;

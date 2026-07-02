@@ -82,49 +82,53 @@ export default function ChildCard({
                         <ul className={styles['character__list']}>
                             {characters.map((character) => (
                                 <li key={character.id} className={styles['character__item']}>
-                                    <button
-                                        type="button"
-                                        className={styles['character__preview']}
-                                        onClick={() => {
-                                            if (character.previewUrl) {
-                                                setPreviewCharacter(character);
-                                            }
-                                        }}
-                                        disabled={!character.previewUrl}
-                                        aria-label={t('previewCharacterAriaLabel', {
-                                            characterName: character.name,
-                                        })}
-                                    >
-                                        {character.previewUrl ? (
-                                            <Image
-                                                src={character.previewUrl}
-                                                alt=""
-                                                fill
-                                                sizes="56px"
-                                                unoptimized
-                                                className={styles['character__preview-img']}
-                                            />
-                                        ) : (
-                                            <span
-                                                className={styles['character__preview-fallback']}
-                                                aria-hidden="true"
-                                            >
-                                                {character.name.charAt(0).toUpperCase()}
-                                            </span>
-                                        )}
-                                    </button>
-                                    <div className={styles['character__text']}>
-                                        <p className={styles['character__name']}>
-                                            {character.name}
-                                        </p>
-                                        <p className={styles['character__description']}>
-                                            {character.description}
-                                        </p>
+                                    <div className={styles['character__item-main']}>
+                                        <button
+                                            type="button"
+                                            className={styles['character__preview']}
+                                            onClick={() => {
+                                                if (character.previewUrl) {
+                                                    setPreviewCharacter(character);
+                                                }
+                                            }}
+                                            disabled={!character.previewUrl}
+                                            aria-label={t('previewCharacterAriaLabel', {
+                                                characterName: character.name,
+                                            })}
+                                        >
+                                            {character.previewUrl ? (
+                                                <Image
+                                                    src={character.previewUrl}
+                                                    alt=""
+                                                    fill
+                                                    sizes="104px"
+                                                    unoptimized
+                                                    className={styles['character__preview-img']}
+                                                />
+                                            ) : (
+                                                <span
+                                                    className={
+                                                        styles['character__preview-fallback']
+                                                    }
+                                                    aria-hidden="true"
+                                                >
+                                                    {character.name.charAt(0).toUpperCase()}
+                                                </span>
+                                            )}
+                                        </button>
+                                        <div className={styles['character__text']}>
+                                            <p className={styles['character__name']}>
+                                                {character.name}
+                                            </p>
+                                            <p className={styles['character__description']}>
+                                                {character.description}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div className={styles['character__item-actions']}>
-                                        <Button
-                                            variant="quiet"
-                                            loading={generatingCharacterPreviewId === character.id}
+                                        <button
+                                            type="button"
+                                            className={`${styles['character__utility-action']} ${generatingCharacterPreviewId === character.id ? styles['m-loading'] : ''}`}
                                             disabled={
                                                 !canGenerateCharacterPreview ||
                                                 generatingCharacterPreviewId !== null
@@ -139,11 +143,36 @@ export default function ChildCard({
                                                           characterName: character.name,
                                                       })
                                             }
+                                            aria-busy={
+                                                generatingCharacterPreviewId === character.id
+                                            }
                                         >
-                                            {character.previewUrl
-                                                ? t('regenerateCharacterPreviewButton')
-                                                : t('generateCharacterPreviewButton')}
-                                        </Button>
+                                            <span
+                                                className={styles['character__utility-icon']}
+                                                aria-hidden="true"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 16 16"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M13.333 3.333v3.334H10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M12.774 6.667a5.333 5.333 0 1 1-1.183-2.15l1.742 2.15"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                </svg>
+                                            </span>
+                                        </button>
                                         <Button
                                             variant="quiet"
                                             onClick={() => onCharacterEdit(child, character)}
@@ -151,7 +180,9 @@ export default function ChildCard({
                                                 characterName: character.name,
                                             })}
                                         >
-                                            {t('editCharacterButton')}
+                                            <span className={styles['character__action-label']}>
+                                                {t('editCharacterButton')}
+                                            </span>
                                         </Button>
                                         <Button
                                             variant="quiet"
@@ -160,7 +191,9 @@ export default function ChildCard({
                                                 characterName: character.name,
                                             })}
                                         >
-                                            {t('deleteCharacterButton')}
+                                            <span className={styles['character__action-label']}>
+                                                {t('deleteCharacterButton')}
+                                            </span>
                                         </Button>
                                     </div>
                                 </li>
@@ -188,14 +221,18 @@ export default function ChildCard({
                         onClick={() => onEdit(child)}
                         aria-label={t('editAriaLabel', { childName: child.name })}
                     >
-                        {t('editButton')}
+                        <span className={styles['character__action-label']}>
+                            {t('editChildButton')}
+                        </span>
                     </Button>
                     <Button
                         variant="quiet"
                         onClick={() => onDelete(child)}
                         aria-label={t('deleteAriaLabel', { childName: child.name })}
                     >
-                        {t('deleteButton')}
+                        <span className={styles['character__action-label']}>
+                            {t('deleteChildButton')}
+                        </span>
                     </Button>
                 </div>
             </div>

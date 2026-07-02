@@ -154,6 +154,7 @@
     @include t-body-base;
     font-weight: 500;
     color: var(--accent-danger);
+    text-decoration: none;
     background: transparent;
     border: none;
     padding: var(--space-2) var(--space-3);
@@ -167,5 +168,11 @@
 
     &:hover {
         background: var(--bg-elevated-hover);
+        color: var(--accent-danger);
+    }
+
+    &:disabled {
+        opacity: var(--opacity-disabled);
+        cursor: not-allowed;
     }
 }

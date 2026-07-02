@@ -40,7 +40,7 @@ export default function UsageBars({ subscription }: Readonly<IUsageBarsProps>): 
     return (
         <Card variant="gradient" size="md">
             <Stack gap="md">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 {rows.map((row) => (
                     <div key={row.label} className={styles['usage-bars__row']}>
                         <div className={styles['usage-bars__meta']}>

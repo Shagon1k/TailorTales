@@ -85,4 +85,19 @@ describe('ChildForm', () => {
 
         expect(onCancel).toHaveBeenCalled();
     });
+
+    it('should cap interests at 10 tags', async () => {
+        renderForm();
+
+        const interestsInput = screen.getByRole('combobox', { name: /interests/i });
+
+        for (let i = 1; i <= 11; i += 1) {
+            await userEvent.type(interestsInput, `interest-${i}{enter}`);
+        }
+
+        expect(screen.getAllByText(/interest-\d+/i)).toHaveLength(10);
+        expect(screen.getByText('interest-10')).toBeInTheDocument();
+        expect(screen.queryByText('interest-11')).not.toBeInTheDocument();
+        expect(screen.getByText('Maximum 10 interests reached.')).toBeInTheDocument();
+    });
 });

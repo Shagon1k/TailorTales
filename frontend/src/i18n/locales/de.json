@@ -86,17 +86,17 @@
             "lightAName": {
                 "numeral": "i.",
                 "title": "Einen Namen erhellen",
-                "body": "Sag uns, für wen die Geschichte ist. Nur ein Name, ein Alter, ein paar Dinge, die sie lieben."
+                "body": "Sag uns, für wen sie ist. Ein Name, ein Alter und ein paar Dinge, die sie lieben."
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Ein Warum flüstern",
-                "body": "Wähle eine Frage, die sie immer wieder stellen. Oder eine von unseren. Die Geschichte wird darum herum aufgebaut."
+                "body": "Wähle ihre Frage und dann das Gefühl: Länge, Sprache, Bildwelt und Stil."
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Nach Hause tragen",
-                "body": "Ein druckbares PDF in Minuten. Fünf bis zwanzig Seiten, altersgerecht, für immer ihr Eigen."
+                "body": "Wir verwandeln alles in Minuten in ein persönliches illustriertes PDF — zum Drucken und Behalten."
             }
         },
         "tales": {
@@ -150,32 +150,32 @@
         "hero": {
             "eyebrow": "So funktioniert's",
             "heading": "Drei <highlight>kleine Schritte</highlight>, eine <highlight>bleibende Geschichte</highlight>.",
-            "subheading": "Keine Konten einzurichten, keine Prompts zu schreiben. Du beantwortest drei Fragen und die Werkstatt erledigt den Rest."
+            "subheading": "Beginne mit einem Kind und einer Frage, gib der Geschichte ihren Ton — und die Werkstatt macht daraus in Minuten ein persönliches illustriertes PDF."
         },
         "steps": {
             "lightAName": {
                 "numeral": "i.",
                 "title": "Einen Namen erhellen",
-                "body": "Sag uns, für wen die Geschichte ist — ein Vorname, ein Alter und zwei oder drei Dinge, die sie gerade lieben. Dinosaurier, Pfützen, ihr Hund. Wir verwenden das, um die Geschichte in ihrer Welt zu verankern, nicht in einer generischen.",
+                "body": "Beginne mit dem Kind hinter der Geschichte: ein Name, ein Alter und ein paar Dinge, die gerade geliebt werden. Wenn du schon einen wiederkehrenden Helden angelegt hast, kannst du ihn gleich mitnehmen.",
                 "detail1": "Dauert etwa eine Minute",
-                "detail2": "Ein Kind pro Geschichte",
-                "detail3": "Du kannst Profile für das nächste Mal speichern"
+                "detail2": "Gespeicherte Leserprofile fürs nächste Mal",
+                "detail3": "Wiederkehrender Charakter optional"
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Ein Warum flüstern",
-                "body": "Wähle die Frage oder das Thema, das sie zuletzt beschäftigt hat. Warum ist der Himmel dunkel? Wohin gehen verlorene Dinge? Wähle aus unserer kuratierten Liste oder schreib deine eigene. Die Geschichte wird um diesen Funken herum aufgebaut, nicht um eine generische Handlung.",
-                "detail1": "40+ Einstiegsfragen",
-                "detail2": "Oder schreib deine eigene in einfachen Worten",
-                "detail3": "Der Ton passt sich automatisch dem Alter an"
+                "body": "Wähle die Frage, die immer wieder gestellt wird, und forme dann das Gefühl der Geschichte: Länge, Sprache, Schreibstil und Bildwelt. Wenige Entscheidungen, aber ein viel persönlicheres Ergebnis.",
+                "detail1": "Frage aus Ideenpool oder in eigenen Worten",
+                "detail2": "Länge, Sprache und Stimme auswählbar",
+                "detail3": "Auch der Illustrationsstil ist wählbar"
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Nach Hause tragen",
-                "body": "In wenigen Minuten landet ein druckbares PDF in deiner Bibliothek. Fünf bis zwanzig Seiten — die Länge passt zum Alter. Ein Bilderbuch für Vierjährige, ein längerer Comic für Achtjährige. Für immer ihr Eigen, zum Wiederlesen und Drucken.",
+                "body": "Die Werkstatt schreibt und illustriert die Geschichte und legt das fertige PDF in deine Bibliothek. Du kannst sie wieder lesen, teilen, bewerten und die nächste Geschichte noch feiner abstimmen.",
                 "detail1": "PDF in weniger als 5 Minuten fertig",
-                "detail2": "Buch- oder Comicformat",
-                "detail3": "Zu Hause oder in jedem Copyshop drucken"
+                "detail2": "Fertig gespeichert in deiner Bibliothek",
+                "detail3": "Digital lesen oder zu Hause drucken"
             }
         }
     },
@@ -513,8 +513,9 @@
                 "style": "Stil"
             },
             "lengthValue": "{pageCount} Seiten",
-            "creditCost": "{creditCost} Credits",
-            "creditsRemaining": " · {creditsRemaining} verbleibend",
+            "creditsAriaLabel": "Benötigte Credits und verbleibende Credits",
+            "creditCostMetricLabel": "Credits für diese Geschichte",
+            "creditsRemainingMetricLabel": "verbleiben in diesem Zyklus",
             "quotaExhausted": "Diese Geschichte benötigt {creditCost} Credits, aber nur {creditsRemaining} verbleiben in diesem Zyklus — wähle eine kürzere Länge oder upgrade deinen Plan.",
             "quotaInfo": "{pageCount} Seiten verwenden {creditCost} deiner {creditsRemaining} verbleibenden Credits in diesem Zyklus.",
             "validation": {
@@ -544,9 +545,10 @@
             "modeGuided": "Geführt",
             "writeHint": "Wir nutzen KI, um daraus ein stimmiges Figurenprofil und eine Vorschau zu machen.",
             "quota": {
-                "generations": "{count, plural, one {# Generierung in diesem Zyklus übrig} other {# Generierungen in diesem Zyklus übrig}}",
-                "characters": "{count, plural, one {# Charakter-Slot in diesem Tarif übrig} other {# Charakter-Slots in diesem Tarif übrig}}",
-                "charactersUnlimited": "Unbegrenzte Charakter-Slots in diesem Tarif"
+                "ariaLabel": "Charakterlimits für diesen Tarif",
+                "generationsMetricLabel": "{count, plural, one {Generierung in diesem Zyklus übrig} other {Generierungen in diesem Zyklus übrig}}",
+                "charactersMetricLabel": "{count, plural, one {Charakter-Slot in diesem Tarif übrig} other {Charakter-Slots in diesem Tarif übrig}}",
+                "charactersUnlimitedMetricLabel": "Charakter-Slots in diesem Tarif"
             },
             "errors": {
                 "nameRequired": "Name ist erforderlich",
@@ -588,14 +590,14 @@
             },
             "clothingItemLabel": "Was trägt die Figur?",
             "clothingItemPlaceholder": "z.B. ein Regenmantel, ein Kleid, eine Latzhose",
-            "detailLabel": "Etwas Besonderes? (optional)",
+            "detailLabel": "Etwas Besonderes?",
             "detailPlaceholder": "z.B. Sommersprossen, runde Brille, ein kleiner Umhang",
             "cancelButton": "Abbrechen",
             "createButton": "Charakter erstellen",
             "saveButton": "Speichern",
-            "photoButton": "📷 Foto verwenden — bald verfügbar",
+            "photoButton": "Foto verwenden",
             "photoTooltip": "Bald kannst du ein Foto deines Kindes, eines Elternteils oder einer anderen Person hochladen, um sie als Hauptfigur der Geschichte zu verwenden.",
-            "photoDeferredNote": "Die Charaktererstellung per Foto ist vorerst zurückgestellt, deshalb bleibt diese Option deaktiviert.",
+            "photoDeferredNote": "Bald verfügbar. Die Charaktererstellung per Foto ist vorerst zurückgestellt, deshalb bleibt diese Option deaktiviert.",
             "descriptionTemplate": "{gender}. Haare: {hairLength} {hairColor}. Augen: {eyeColor}. Haut: {skinTone}. Kleidung: {clothing}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} Kleidung",
@@ -795,6 +797,8 @@
             "textButton": "Text neu generieren",
             "illustrationButton": "Illustration neu malen",
             "bothButton": "Alles neu machen",
+            "quotaAriaLabel": "Verbleibende Regenerierungen in diesem Zyklus",
+            "quotaMetricLabel": "{count, plural, one {Regenerierung verbleibt in diesem Zyklus} other {Regenerierungen verbleiben in diesem Zyklus}}",
             "quotaExhausted": "Keine Regenerierungen mehr in diesem Zyklus — sie erneuern sich, wenn dein Plan verlängert wird.",
             "quotaInfo": "{count, plural, one {# Regenerierung verbleibt in diesem Zyklus.} other {# Regenerierungen verbleiben in diesem Zyklus.}}",
             "modal": {
@@ -853,9 +857,10 @@
             "addFirstButton": "Erstes Kind hinzufügen",
             "addButton": "Kind hinzufügen",
             "limitHint": "Du hast das Kinderlimit für deinen Plan erreicht. Upgrade, um mehr hinzuzufügen.",
-            "characterQuota": "{count, plural, one {# Charakter-Generierung übrig} other {# Charakter-Generierungen übrig}}",
-            "characterSlots": "{count, plural, one {# gespeicherter Charakter-Slot übrig} other {# gespeicherte Charakter-Slots übrig}}",
-            "characterSlotsUnlimited": "Unbegrenzte gespeicherte Charakter-Slots",
+            "quotaLabel": "Tariflimits für Kinder und Charaktere",
+            "characterQuotaMetricLabel": "{count, plural, one {Charakter-Generierung übrig} other {Charakter-Generierungen übrig}}",
+            "characterSlotsMetricLabel": "{count, plural, one {gespeicherter Charakter-Slot übrig} other {gespeicherte Charakter-Slots übrig}}",
+            "characterSlotsUnlimitedMetricLabel": "gespeicherte Charakter-Slots",
             "characterGenerationLimitHint": "In diesem Tarif sind in diesem Zyklus keine Charakter-Generierungen mehr übrig.",
             "characterLimitHint": "In diesem Tarif sind keine Speicherplätze für Charaktere mehr übrig.",
             "editModal": {
@@ -892,6 +897,7 @@
             },
             "interestsLabel": "Interessen",
             "interestsPlaceholder": "Interesse hinzufügen und Enter drücken",
+            "interestsLimitReached": "Maximal 10 Interessen erreicht.",
             "cancelButton": "Abbrechen",
             "saveButton": "Speichern",
             "errors": {
@@ -926,8 +932,10 @@
             "deleteCharacterButton": "Löschen",
             "editAriaLabel": "{childName} bearbeiten",
             "editButton": "Bearbeiten",
+            "editChildButton": "Kind bearbeiten",
             "deleteAriaLabel": "{childName} löschen",
-            "deleteButton": "Löschen"
+            "deleteButton": "Löschen",
+            "deleteChildButton": "Kind löschen"
         },
         "subscription": {
             "loading": "Abonnement wird geladen…",

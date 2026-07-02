@@ -101,21 +101,6 @@
         margin: 0;
     }
 
-    &__credits {
-        @include t-body-sm;
-        margin: 0;
-        text-align: center;
-    }
-
-    &__credits-cost {
-        color: var(--text-primary);
-        font-weight: 600;
-    }
-
-    &__credits-remaining {
-        color: var(--text-muted);
-    }
-
     &__quota {
         @include t-body-sm;
         margin: 0;

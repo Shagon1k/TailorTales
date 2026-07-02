@@ -552,10 +552,6 @@ export default function WorkshopForm({
                         onSubmit={handleCharacterSubmit}
                         onCancel={() => setIsCharacterModalOpen(false)}
                         isSubmitting={isCreatingCharacter}
-                        quota={{
-                            charactersLeft,
-                            generationsLeft: characterGenerationsLeft,
-                        }}
                     />
                 )}
             </Modal>

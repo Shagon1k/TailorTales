@@ -62,8 +62,12 @@ describe('WorkshopSummary', () => {
     it('should show the credit cost and the real remaining balance', () => {
         renderSummary({ pageCount: '8' });
 
-        expect(screen.getByText('8 credits')).toBeInTheDocument();
-        expect(screen.getByText(/· 12 remaining/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '8 credits for this tale',
+        );
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '12 left this cycle',
+        );
         expect(
             screen.getByText('8 pages will use 8 of your 12 remaining credits this cycle.'),
         ).toBeInTheDocument();
@@ -74,7 +78,9 @@ describe('WorkshopSummary', () => {
 
         renderSummary({ pageCount: '5' });
 
-        expect(screen.getByText(/· 7 remaining/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '7 left this cycle',
+        );
     });
 
     it('should disable submission and warn when the tale exceeds the remaining credits', () => {
@@ -104,7 +110,9 @@ describe('WorkshopSummary', () => {
 
         renderSummary({ pageCount: '8' });
 
-        expect(screen.getByText(/· -- remaining/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/credits needed and credits left/i)).toHaveTextContent(
+            '-- left this cycle',
+        );
         expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
         expect(screen.getByRole('button', { name: /save as draft/i })).toBeEnabled();
     });

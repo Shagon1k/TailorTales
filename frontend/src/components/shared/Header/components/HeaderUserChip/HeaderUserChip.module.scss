@@ -1,4 +1,5 @@
 @use 'styles/typography' as *;
+@use 'styles/interactions' as *;
 
 .chip {
     display: inline-flex;
@@ -14,13 +15,20 @@
     cursor: pointer;
     transition:
         background var(--duration-base) var(--ease-out),
-        border-color var(--duration-base) var(--ease-out);
+        border-color var(--duration-base) var(--ease-out),
+        box-shadow var(--duration-base) var(--ease-out);
     min-height: var(--hit-min);
+    @include button-accent-outline-feedback(
+        color-mix(in srgb, var(--accent-primary) 12%, var(--bg-elevated)),
+        color-mix(in srgb, var(--accent-primary) 18%, var(--bg-elevated)),
+        var(--text-primary),
+        var(--text-primary)
+    );
 
-    &:hover,
     &[aria-expanded='true'] {
-        background: var(--bg-elevated-hover);
-        border-color: var(--text-muted);
+        background: color-mix(in srgb, var(--accent-primary) 12%, var(--bg-elevated));
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
     }
 }
 
@@ -53,7 +61,12 @@
     /* >3 items: sign-out is set apart with a small gap and a mild-caution tint. */
     &.m-sign-out {
         margin-top: var(--space-1);
-        color: var(--accent-warm);
+        color: var(--accent-danger);
+    }
+
+    &.m-sign-out:hover {
+        background: var(--bg-elevated-hover);
+        color: var(--accent-danger);
     }
 }
 

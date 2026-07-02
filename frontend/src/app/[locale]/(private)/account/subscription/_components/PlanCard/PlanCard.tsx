@@ -33,7 +33,7 @@ export default function PlanCard({ subscription }: Readonly<IPlanCardProps>): Re
     return (
         <Card variant="gradient" size="md">
             <Stack gap="sm">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
 
                 {status === 'PAST_DUE' && (
                     <p className={styles['plan-card__warning']}>{t('pastDueWarning')}</p>

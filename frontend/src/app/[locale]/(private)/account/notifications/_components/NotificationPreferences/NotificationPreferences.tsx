@@ -63,7 +63,7 @@ export default function NotificationPreferences(): React.ReactElement {
     return (
         <Card variant="dark" size="md">
             <Stack gap="sm">
-                <CapsLabel>{t('eyebrow')}</CapsLabel>
+                <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 <p className={styles.prefs__copy}>{t('body')}</p>
 
                 {isError && <p className={styles.prefs__error}>{t('loadError')}</p>}

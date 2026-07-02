@@ -86,17 +86,17 @@
             "lightAName": {
                 "numeral": "i.",
                 "title": "Light a name",
-                "body": "Tell us who the story is for. Just a name, an age, a few things they love."
+                "body": "Tell us who it is for. A name, an age, and a few things they love."
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Whisper a why",
-                "body": "Pick a question they keep asking. Or one of ours. The tale is built around it."
+                "body": "Pick their question, then choose the feel: length, language, look, and style."
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Carry it home",
-                "body": "A printable PDF in minutes. Five to twenty pages, age-matched, theirs to keep."
+                "body": "We turn it into a personalized illustrated PDF in minutes — ready to print or keep."
             }
         },
         "tales": {
@@ -150,32 +150,32 @@
         "hero": {
             "eyebrow": "How it works",
             "heading": "Three <highlight>small steps</highlight>, one <highlight>lasting tale</highlight>.",
-            "subheading": "No accounts to configure, no prompts to engineer. You answer three questions and the workshop does the rest."
+            "subheading": "Start with a reader and a question, shape the feel, and the workshop turns it into a personalized illustrated PDF in minutes."
         },
         "steps": {
             "lightAName": {
                 "numeral": "i.",
                 "title": "Light a name",
-                "body": "Tell us who the story is for — a first name, an age, and two or three things they love right now. Dinosaurs, puddles, their dog. We use that to anchor the tale in their world, not a generic one.",
+                "body": "Start with the child behind the tale: a name, an age, and a few things they love right now. If you already made a recurring character, you can bring them in too.",
                 "detail1": "Takes about a minute",
-                "detail2": "One child per tale",
-                "detail3": "You can save profiles for next time"
+                "detail2": "Saved reader profiles for next time",
+                "detail3": "Optional recurring character"
             },
             "whisperAWhy": {
                 "numeral": "ii.",
                 "title": "Whisper a why",
-                "body": "Pick the question or theme that's been on their mind lately. Why is the sky dark? Where do lost things go? Choose from our curated list or type your own. The tale is built around that spark, not around a generic plot.",
-                "detail1": "40+ starter questions",
-                "detail2": "Or write your own in plain words",
-                "detail3": "Tone adjusts to age automatically"
+                "body": "Choose the question they keep asking, then shape the mood around it: length, language, writing style, and art style. We keep the setup simple, but the result feels personal.",
+                "detail1": "Question prompts or your own words",
+                "detail2": "Choose length, language, and voice",
+                "detail3": "Pick the visual style for the pages"
             },
             "carryItHome": {
                 "numeral": "iii.",
                 "title": "Carry it home",
-                "body": "In a few minutes, a printable PDF lands in your library. Five to twenty pages — the length fits the age. A picture book for four-year-olds, a longer comic for eight-year-olds. Theirs to keep, re-read, and print.",
+                "body": "The workshop writes and illustrates the tale, then places a print-ready PDF in your library. Come back to re-read it, share it, rate it, or keep refining the next one.",
                 "detail1": "PDF ready in under 5 minutes",
-                "detail2": "Book or comic format",
-                "detail3": "Print at home or at any copy shop"
+                "detail2": "Saved in your library when it's done",
+                "detail3": "Print at home or keep it digital"
             }
         }
     },
@@ -513,8 +513,9 @@
                 "style": "Style"
             },
             "lengthValue": "{pageCount} pages",
-            "creditCost": "{creditCost} credits",
-            "creditsRemaining": " · {creditsRemaining} remaining",
+            "creditsAriaLabel": "Credits needed and credits left",
+            "creditCostMetricLabel": "credits for this tale",
+            "creditsRemainingMetricLabel": "left this cycle",
             "quotaExhausted": "This tale needs {creditCost} credits but only {creditsRemaining} remain this cycle — pick a shorter length or upgrade your plan.",
             "quotaInfo": "{pageCount} pages will use {creditCost} of your {creditsRemaining} remaining credits this cycle.",
             "validation": {
@@ -544,9 +545,10 @@
             "modeGuided": "Guided",
             "writeHint": "We'll use AI to refine this into a consistent character profile and preview.",
             "quota": {
-                "generations": "{count, plural, one {# generation left this cycle} other {# generations left this cycle}}",
-                "characters": "{count, plural, one {# character slot left on this plan} other {# character slots left on this plan}}",
-                "charactersUnlimited": "Unlimited character slots on this plan"
+                "ariaLabel": "Character creation limits for this plan",
+                "generationsMetricLabel": "{count, plural, one {generation left this cycle} other {generations left this cycle}}",
+                "charactersMetricLabel": "{count, plural, one {character slot left on this plan} other {character slots left on this plan}}",
+                "charactersUnlimitedMetricLabel": "character slots on this plan"
             },
             "errors": {
                 "descriptionRequired": "Tell us what the character looks like",
@@ -577,14 +579,14 @@
             },
             "clothingItemLabel": "What are they wearing?",
             "clothingItemPlaceholder": "e.g. a raincoat, a dress, overalls",
-            "detailLabel": "Anything special? (optional)",
+            "detailLabel": "Anything special?",
             "detailPlaceholder": "e.g. freckles, round glasses, a small cape",
             "cancelButton": "Cancel",
             "createButton": "Create character",
             "saveButton": "Save",
-            "photoButton": "📷 Use a photo — coming soon",
+            "photoButton": "Use a photo",
             "photoTooltip": "Soon you'll be able to upload a photo of your child, a parent, or anyone else to use as the story's main character.",
-            "photoDeferredNote": "Photo-based character creation is parked for now, so this option stays disabled.",
+            "photoDeferredNote": "Coming soon. Photo-based character creation is parked for now, so this option stays disabled.",
             "descriptionTemplate": "{gender}. Hair: {hairLength} {hairColor}. Eyes: {eyeColor}. Skin: {skinTone}. Wearing: {clothing}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} clothes"
@@ -783,6 +785,8 @@
             "textButton": "Regenerate text",
             "illustrationButton": "Repaint illustration",
             "bothButton": "Remake everything",
+            "quotaAriaLabel": "Regenerations left this cycle",
+            "quotaMetricLabel": "{count, plural, one {regeneration left this cycle} other {regenerations left this cycle}}",
             "quotaExhausted": "No regenerations left this cycle — they refresh when your plan renews.",
             "quotaInfo": "{count, plural, one {# regeneration left this cycle.} other {# regenerations left this cycle.}}",
             "modal": {
@@ -841,9 +845,10 @@
             "addFirstButton": "Add your first child",
             "addButton": "Add child",
             "limitHint": "You've reached the child limit for your plan. Upgrade to add more.",
-            "characterQuota": "{count, plural, one {# character generation left} other {# character generations left}}",
-            "characterSlots": "{count, plural, one {# saved character slot left} other {# saved character slots left}}",
-            "characterSlotsUnlimited": "Unlimited saved character slots",
+            "quotaLabel": "Plan limits for children and characters",
+            "characterQuotaMetricLabel": "{count, plural, one {character generation left} other {character generations left}}",
+            "characterSlotsMetricLabel": "{count, plural, one {saved character slot left} other {saved character slots left}}",
+            "characterSlotsUnlimitedMetricLabel": "saved character slots",
             "characterGenerationLimitHint": "This plan has no character generations left this cycle.",
             "characterLimitHint": "This plan has no saved character slots left.",
             "editModal": {
@@ -880,6 +885,7 @@
             },
             "interestsLabel": "Interests",
             "interestsPlaceholder": "Add interest and press Enter",
+            "interestsLimitReached": "Maximum 10 interests reached.",
             "cancelButton": "Cancel",
             "saveButton": "Save",
             "errors": {
@@ -914,8 +920,10 @@
             "deleteCharacterButton": "Delete",
             "editAriaLabel": "Edit {childName}",
             "editButton": "Edit",
+            "editChildButton": "Edit child",
             "deleteAriaLabel": "Delete {childName}",
-            "deleteButton": "Delete"
+            "deleteButton": "Delete",
+            "deleteChildButton": "Delete child"
         },
         "subscription": {
             "loading": "Loading your subscription…",

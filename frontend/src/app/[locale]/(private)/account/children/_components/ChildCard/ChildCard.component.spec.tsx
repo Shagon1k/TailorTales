@@ -187,6 +187,16 @@ describe('ChildCard', () => {
             );
         });
 
+        it('should render compact utility action for preview generation', () => {
+            renderCard({}, [MOCK_CHARACTER]);
+
+            expect(
+                screen
+                    .getByRole('button', { name: 'Generate preview for Princess Mia' })
+                    .querySelector('svg'),
+            ).not.toBeNull();
+        });
+
         it('should render Regenerate when the character already has a preview', () => {
             renderCard({}, [
                 {
@@ -200,5 +210,16 @@ describe('ChildCard', () => {
                 screen.getByRole('button', { name: 'Regenerate preview for Princess Mia' }),
             ).toBeInTheDocument();
         });
+    });
+
+    it('should render child-level actions with explicit labels', () => {
+        renderCard();
+
+        expect(screen.getByRole('button', { name: `Edit ${MOCK_CHILD.name}` })).toHaveTextContent(
+            'Edit child',
+        );
+        expect(screen.getByRole('button', { name: `Delete ${MOCK_CHILD.name}` })).toHaveTextContent(
+            'Delete child',
+        );
     });
 });

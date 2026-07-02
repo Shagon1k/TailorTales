@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import Loader from '@/components/ui/Loader/Loader';
 import Modal from '@/components/ui/Modal/Modal';
 import Button from '@/components/ui/Button/Button';
+import InlineMetrics from '@/components/ui/InlineMetrics/InlineMetrics';
 import ChildCard from './_components/ChildCard/ChildCard';
 import ChildForm, { type IChildFormValues } from './_components/ChildForm/ChildForm';
 import CharacterForm, {
@@ -120,8 +121,6 @@ export default function ChildrenPage(): React.ReactElement {
 
     return (
         <div className={styles.page}>
-            <h2 className={styles.heading}>{t('heading')}</h2>
-
             {children.length === 0 ? (
                 <div className={styles.empty}>
                     <p className={styles['empty__text']}>{t('empty')}</p>
@@ -134,58 +133,82 @@ export default function ChildrenPage(): React.ReactElement {
                     </Button>
                 </div>
             ) : (
-                <>
-                    <div className={styles['add-row']}>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setModal({ kind: 'add' })}
-                            disabled={atChildrenLimit}
-                        >
-                            {t('addButton')}
-                        </Button>
-                        {atChildrenLimit && (
-                            <p className={styles['add-row__limit-hint']}>{t('limitHint')}</p>
-                        )}
-                        <p className={styles['add-row__quota']}>
-                            {t('characterQuota', { count: characterGenerationsLeft })}
-                            {' · '}
-                            {charactersLeft === null
-                                ? t('characterSlotsUnlimited')
-                                : t('characterSlots', { count: charactersLeft })}
-                        </p>
+                <div className={styles.content}>
+                    <div className={styles.main}>
+                        <div className={styles.grid}>
+                            {children.map((child) => (
+                                <ChildCard
+                                    key={child.id}
+                                    child={child}
+                                    characters={charactersByChildId.get(child.id) ?? []}
+                                    onEdit={(c) => setModal({ kind: 'edit', child: c })}
+                                    onDelete={(c) => setModal({ kind: 'delete', child: c })}
+                                    onCharacterAdd={(c) =>
+                                        setModal({ kind: 'character', child: c, character: null })
+                                    }
+                                    onCharacterEdit={(c, character) =>
+                                        setModal({ kind: 'character', child: c, character })
+                                    }
+                                    onCharacterDelete={(character) =>
+                                        setModal({ kind: 'deleteCharacter', character })
+                                    }
+                                    onCharacterGeneratePreview={handleCharacterPreviewGenerate}
+                                    canAddCharacter={canCreateCharacter}
+                                    canGenerateCharacterPreview={characterGenerationsLeft > 0}
+                                    generatingCharacterPreviewId={generatingCharacterPreviewId}
+                                    addCharacterHint={
+                                        !canCreateCharacter
+                                            ? characterGenerationsLeft === 0
+                                                ? t('characterGenerationLimitHint')
+                                                : t('characterLimitHint')
+                                            : null
+                                    }
+                                />
+                            ))}
+                        </div>
                     </div>
-                    <div className={styles.grid}>
-                        {children.map((child) => (
-                            <ChildCard
-                                key={child.id}
-                                child={child}
-                                characters={charactersByChildId.get(child.id) ?? []}
-                                onEdit={(c) => setModal({ kind: 'edit', child: c })}
-                                onDelete={(c) => setModal({ kind: 'delete', child: c })}
-                                onCharacterAdd={(c) =>
-                                    setModal({ kind: 'character', child: c, character: null })
-                                }
-                                onCharacterEdit={(c, character) =>
-                                    setModal({ kind: 'character', child: c, character })
-                                }
-                                onCharacterDelete={(character) =>
-                                    setModal({ kind: 'deleteCharacter', character })
-                                }
-                                onCharacterGeneratePreview={handleCharacterPreviewGenerate}
-                                canAddCharacter={canCreateCharacter}
-                                canGenerateCharacterPreview={characterGenerationsLeft > 0}
-                                generatingCharacterPreviewId={generatingCharacterPreviewId}
-                                addCharacterHint={
-                                    !canCreateCharacter
-                                        ? characterGenerationsLeft === 0
-                                            ? t('characterGenerationLimitHint')
-                                            : t('characterLimitHint')
-                                        : null
-                                }
+                    <aside className={styles.aside}>
+                        <section className={styles.utility} aria-label={t('quotaLabel')}>
+                            <div className={styles['add-row']}>
+                                <Button
+                                    variant="secondary"
+                                    fullWidth
+                                    onClick={() => setModal({ kind: 'add' })}
+                                    disabled={atChildrenLimit}
+                                >
+                                    {t('addButton')}
+                                </Button>
+                                {atChildrenLimit && (
+                                    <p className={styles['add-row__limit-hint']}>
+                                        {t('limitHint')}
+                                    </p>
+                                )}
+                            </div>
+                            <InlineMetrics
+                                align="center"
+                                items={[
+                                    {
+                                        id: 'generations',
+                                        value: characterGenerationsLeft,
+                                        label: t('characterQuotaMetricLabel', {
+                                            count: characterGenerationsLeft,
+                                        }),
+                                    },
+                                    {
+                                        id: 'slots',
+                                        value: charactersLeft === null ? '∞' : charactersLeft,
+                                        label:
+                                            charactersLeft === null
+                                                ? t('characterSlotsUnlimitedMetricLabel')
+                                                : t('characterSlotsMetricLabel', {
+                                                      count: charactersLeft,
+                                                  }),
+                                    },
+                                ]}
                             />
-                        ))}
-                    </div>
-                </>
+                        </section>
+                    </aside>
+                </div>
             )}
 
             <Modal
@@ -237,14 +260,6 @@ export default function ChildrenPage(): React.ReactElement {
                             activeCharacterModal.character
                                 ? isUpdatingCharacter
                                 : isCreatingCharacter
-                        }
-                        quota={
-                            !activeCharacterModal.character
-                                ? {
-                                      charactersLeft,
-                                      generationsLeft: characterGenerationsLeft,
-                                  }
-                                : undefined
                         }
                     />
                 )}

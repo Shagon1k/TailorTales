@@ -47,7 +47,9 @@ describe('RegenerationPanel', () => {
 
         renderPanel();
 
-        expect(screen.getByText('2 regenerations left this cycle.')).toBeInTheDocument();
+        expect(screen.getByLabelText(/regenerations left this cycle/i)).toHaveTextContent(
+            '2 regenerations left this cycle',
+        );
         expect(screen.getByRole('button', { name: /regenerate text/i })).toBeEnabled();
     });
 
