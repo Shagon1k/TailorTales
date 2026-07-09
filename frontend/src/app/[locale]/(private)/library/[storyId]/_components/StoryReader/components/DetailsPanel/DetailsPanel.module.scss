@@ -43,3 +43,26 @@
     text-align: right;
     margin: 0;
 }
+
+@media (max-width: 1023px) {
+    .details {
+        align-items: center;
+        padding: var(--space-4);
+        text-align: center;
+    }
+
+    .details__header,
+    .details__list {
+        width: 100%;
+    }
+
+    .details__row {
+        align-items: center;
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+
+    .details__row-value {
+        text-align: center;
+    }
+}

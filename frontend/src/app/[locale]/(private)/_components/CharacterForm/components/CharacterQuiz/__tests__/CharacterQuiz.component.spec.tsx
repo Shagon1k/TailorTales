@@ -3,6 +3,28 @@ import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import CharacterQuiz from '../CharacterQuiz';
 
+interface ISelectMockProps {
+    label?: string;
+    data: { value: string; label: string }[];
+    value?: string | null;
+    onChange?: (value: string | null) => void;
+}
+
+vi.mock('@/components/ui/Select/Select', () => ({
+    default: ({ label, data, value, onChange }: ISelectMockProps) => (
+        <label>
+            {label}
+            <select value={value ?? ''} onChange={(event) => onChange?.(event.currentTarget.value)}>
+                {data.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+        </label>
+    ),
+}));
+
 function renderQuiz(): ReturnType<typeof vi.fn> {
     const onSubmit = vi.fn();
     render(
@@ -54,5 +76,21 @@ describe('CharacterQuiz', () => {
                 description: expect.stringContaining('Wearing: blue a raincoat'),
             }),
         );
+    });
+
+    it('should assemble a creature description from the guided selections', async () => {
+        const user = userEvent.setup();
+        const onSubmit = renderQuiz();
+
+        await user.selectOptions(screen.getByRole('combobox', { name: 'Kind of character' }), [
+            'cat',
+        ]);
+        await user.type(screen.getByRole('textbox', { name: 'Accessory' }), 'a tiny bell');
+        await user.click(screen.getByRole('button', { name: /create character/i }));
+
+        expect(onSubmit).toHaveBeenCalledWith({
+            name: '',
+            description: 'Cat. Main color: gray. Markings: white paws. Accessory: a tiny bell.',
+        });
     });
 });

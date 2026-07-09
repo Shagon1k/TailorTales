@@ -38,3 +38,22 @@
     color: var(--text-muted);
     margin: 0;
 }
+
+@media (max-width: 767px) {
+    .content {
+        padding: 0 var(--layout-gutter) var(--space-12);
+        gap: var(--space-6);
+    }
+
+    .section {
+        padding-bottom: var(--space-6);
+    }
+
+    .section__title {
+        font-size: var(--fs-xl);
+    }
+
+    .section__body {
+        font-size: var(--fs-base);
+    }
+}

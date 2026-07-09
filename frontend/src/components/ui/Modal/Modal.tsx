@@ -43,6 +43,7 @@ function ModalFooter({ children }: Readonly<IModalFooterProps>): React.ReactElem
 
 function ModalComponent({
     size = 'md',
+    opened,
     closeButtonProps,
     children,
     ...props
@@ -53,9 +54,13 @@ function ModalComponent({
         <ModalFooterContext.Provider value={{ setFooterContent }}>
             <MantineModal
                 centered
+                opened={opened}
                 size={SIZE_PX[size]}
+                removeScrollProps={{ removeScrollBar: false }}
                 closeButtonProps={{ 'aria-label': 'Close modal', ...closeButtonProps }}
                 classNames={{
+                    overlay: styles['modal__overlay'],
+                    inner: styles['modal__inner'],
                     content: clsx(styles.modal, styles[`m-${size}`]),
                     header: styles['modal__header'],
                     title: styles['modal__subheader'],

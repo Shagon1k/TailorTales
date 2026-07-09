@@ -11,9 +11,9 @@
 
 ### Database
 
-| Variable       | Required | Default | Notes                         |
-| -------------- | -------- | ------- | ----------------------------- |
-| `DATABASE_URL` | yes      | —       | PostgreSQL connection string. |
+| Variable       | Required | Default | Notes                                                                        |
+| -------------- | -------- | ------- | ---------------------------------------------------------------------------- |
+| `DATABASE_URL` | yes      | —       | PostgreSQL connection string. Local Docker uses host port `5433` by default. |
 
 ### Auth
 
@@ -136,7 +136,7 @@ GOOGLE_CLIENT_SECRET=stub
 JWT_SECRET=ci-secret
 BACKEND_URL=http://localhost:3001
 FRONTEND_URL=http://localhost:3000
-REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://localhost:6380
 OPENROUTER_API_KEY=stub
 OPENROUTER_TEXT_MODEL=stub
 OPENROUTER_IMAGE_MODEL=stub

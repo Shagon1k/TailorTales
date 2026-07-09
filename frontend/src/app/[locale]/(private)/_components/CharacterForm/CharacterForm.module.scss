@@ -51,6 +51,19 @@
     margin: 0;
 }
 
+.photo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.photo__note {
+    @include t-body-sm;
+
+    margin: 0;
+    color: var(--text-muted);
+}
+
 .actions {
     display: flex;
     justify-content: flex-end;

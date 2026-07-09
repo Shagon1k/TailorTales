@@ -6,7 +6,7 @@
     gap: var(--space-8);
     align-items: start;
 
-    @media (max-width: 900px) {
+    @media (max-width: 1023px) {
         grid-template-columns: 1fr;
     }
 
@@ -123,5 +123,29 @@
         display: flex;
         flex-direction: column;
         gap: var(--space-4);
+    }
+}
+
+@media (max-width: 767px) {
+    .workshop {
+        gap: var(--space-5);
+
+        &__form {
+            gap: var(--space-6);
+            padding: var(--space-5);
+            border-radius: var(--radius-lg);
+        }
+
+        &__section {
+            gap: var(--space-4);
+
+            > :not(.workshop__section-header) {
+                margin-left: 0;
+            }
+        }
+
+        &__section-header {
+            align-items: flex-start;
+        }
     }
 }

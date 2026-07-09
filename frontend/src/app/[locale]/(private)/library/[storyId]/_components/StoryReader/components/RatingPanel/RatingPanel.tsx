@@ -116,17 +116,19 @@ export default function RatingPanel({
                         aria-label={t('ariaLabel')}
                     />
 
-                    <Textarea
-                        value={note}
-                        onChange={(e) => {
-                            setNote(e.currentTarget.value);
-                            clearStatus();
-                        }}
-                        placeholder={t('notePlaceholder')}
-                        minRows={3}
-                        maxRows={5}
-                        aria-label={t('noteAriaLabel')}
-                    />
+                    <div className={styles.rating__note}>
+                        <Textarea
+                            value={note}
+                            onChange={(e) => {
+                                setNote(e.currentTarget.value);
+                                clearStatus();
+                            }}
+                            placeholder={t('notePlaceholder')}
+                            minRows={3}
+                            maxRows={5}
+                            aria-label={t('noteAriaLabel')}
+                        />
+                    </div>
 
                     <Switch
                         checked={isPublic}
@@ -136,7 +138,6 @@ export default function RatingPanel({
                         }}
                         label={t('shareLabel')}
                     />
-                    <p className={styles.rating__visibility}>{t('shareHint')}</p>
 
                     <Button
                         variant="primary"

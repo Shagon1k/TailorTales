@@ -36,6 +36,7 @@
 
 .table {
     width: 100%;
+    min-width: 680px;
     border-collapse: collapse;
 }
 
@@ -98,4 +99,31 @@
 
 .table__dash {
     color: var(--text-muted);
+}
+
+@media (max-width: 767px) {
+    .section {
+        padding: var(--space-12) var(--layout-gutter);
+    }
+
+    .section__heading {
+        font-size: var(--fs-2xl);
+    }
+
+    .section__mascot {
+        display: none;
+    }
+
+    .section__table-area {
+        padding-top: 0;
+    }
+
+    .table__th-feature,
+    .table__th,
+    .table__th--accent,
+    .table__td-feature,
+    .table__td,
+    .table__td--accent {
+        padding: var(--space-3) var(--space-4);
+    }
 }

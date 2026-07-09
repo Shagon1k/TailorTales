@@ -238,7 +238,7 @@ export default function BlueprintForm({
                     <div className={styles['form__confirm-actions']}>
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="quiet"
                             onClick={() => {
                                 setDeleteError(null);
                                 setIsDeleteModalOpen(false);
@@ -249,7 +249,7 @@ export default function BlueprintForm({
                         </Button>
                         <Button
                             type="button"
-                            variant="primary"
+                            variant="danger"
                             onClick={handleDeleteConfirm}
                             loading={isPending}
                         >

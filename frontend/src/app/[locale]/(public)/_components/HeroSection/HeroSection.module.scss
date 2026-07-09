@@ -13,3 +13,17 @@
     justify-content: center;
     margin-top: var(--space-8);
 }
+
+@media (max-width: 767px) {
+    .hero__actions {
+        width: 100%;
+
+        :global(.button) {
+            width: 100%;
+        }
+    }
+
+    .hero__visual {
+        margin-top: var(--space-4);
+    }
+}

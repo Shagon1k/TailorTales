@@ -24,3 +24,14 @@
     text-align: center;
     margin: 0;
 }
+
+@media (max-width: 1023px) {
+    .plans {
+        padding: 0 var(--layout-gutter) var(--space-12);
+    }
+
+    .plans__grid {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 560px;
+    }
+}

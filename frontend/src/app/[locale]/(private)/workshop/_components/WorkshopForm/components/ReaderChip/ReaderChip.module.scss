@@ -84,3 +84,20 @@
         }
     }
 }
+
+@media (max-width: 767px) {
+    .reader-chip {
+        align-items: stretch;
+        flex-direction: column;
+        padding: var(--space-4);
+
+        &__left {
+            align-items: flex-start;
+        }
+
+        &__toggle {
+            align-self: flex-start;
+            padding: 0;
+        }
+    }
+}

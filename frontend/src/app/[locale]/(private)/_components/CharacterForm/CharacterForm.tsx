@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { Stack } from '@mantine/core';
+import { Stack, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
@@ -106,6 +106,29 @@ export default function CharacterForm({
                                 {...form.getInputProps('description')}
                             />
                             {!isEditing && <p className={styles['mode-hint']}>{t('writeHint')}</p>}
+                            {!isEditing && (
+                                <div className={styles.photo}>
+                                    <Tooltip
+                                        label={t('photoTooltip')}
+                                        multiline
+                                        w={280}
+                                        withArrow
+                                        position="bottom"
+                                    >
+                                        <div>
+                                            <Button
+                                                type="button"
+                                                variant="quiet"
+                                                fullWidth
+                                                disabled
+                                            >
+                                                {t('photoButton')}
+                                            </Button>
+                                        </div>
+                                    </Tooltip>
+                                    <p className={styles.photo__note}>{t('photoDeferredNote')}</p>
+                                </div>
+                            )}
                         </Stack>
                     </form>
                     <Modal.Footer>

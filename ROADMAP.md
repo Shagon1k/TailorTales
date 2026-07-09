@@ -136,6 +136,7 @@
 - ✅ `/account` settings page (Profile, Children, Subscription, Notifications, Language, Privacy & data)
 - ✅ Delete account (GDPR) including generated PDFs/images and reference-image objects where present
 - ✅ Schema reserved for reference-image input — Character can gain `referenceImageKey` later without changing the story-generation contract
+- ✅ Mobile/tablet web support with app-style footer navigation, mobile reader/library/account layouts, and touch-safe modals
 
 ### OUT (Post-MVP / v2)
 
@@ -155,17 +156,24 @@
 
 ## 7. Navigation Decisions
 
-### Public header (unauthenticated)
+### Desktop header
 
-`[Logo] TailorTales` · How it works · Pricing · `Sign in` · **Begin a tale →** (CTA button)
+Desktop (`>=1024px`) keeps the header as the primary navigation surface.
 
-### Private header (authenticated)
+- **Public / unauthenticated:** `[Logo] TailorTales` · How it works · Pricing · `Sign in` · **Begin a tale →** (CTA button)
+- **Private / authenticated:** `[Logo] TailorTales` · **Library** · **Workshop** · Pricing · `[Locale]` · `[🔔]` · `[Avatar] Name / Plan`
 
-`[Logo] TailorTales` · **Library** · **Workshop** · `[🔔]` · `[Avatar] Name / Plan`
+### Mobile/tablet footer dock
 
-### Footer (both states)
+Mobile and tablet (`<1024px`) use an application-style fixed footer dock instead of a
+hamburger in the header.
 
-Privacy · Contact _(both static pages)_
+| User state | Dock items                              | Secondary access                                                                  |
+| ---------- | --------------------------------------- | --------------------------------------------------------------------------------- |
+| Guest      | How it works · Pricing · Sign in · More | `More` opens contact/privacy and other public helper links.                       |
+| Signed in  | Library · Workshop · Account · More     | `Account` opens account subsections; `More` opens language + public helper links. |
+
+The regular text footer is hidden on mobile/tablet because the dock owns those links.
 
 ---
 
@@ -1064,20 +1072,20 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ---
 
-### Phase 18 — Mobile View Support
+### Phase 18 — Mobile View Support ✅
 
 **Goal:** add first-class mobile support across the product instead of treating mobile as a best-effort desktop squeeze.
 
 **Sub-tasks:**
 
-- [ ] Define the responsive foundation: supported breakpoints, page gutters, stacking rules, and when sticky / table / sidebar patterns must collapse
-- [ ] Adapt global shells and navigation: header, locale/account/notifications access, shared sidebar layouts, mobile-safe hero spacing, and replacements for desktop popovers/dropdowns where needed
-- [ ] Make the public experience mobile-ready: landing, pricing, how-it-works, contact, and privacy
-- [ ] Make the core private flows mobile-ready: workshop, library, account pages, children/characters flows, and story detail header/actions
-- [ ] Add dedicated mobile behavior for reading and generation flows: chapter navigation replacement, side panels, preview/progress screens, page grids, and touch-friendly controls
-- [ ] Define modal and overlay behavior on mobile: sizing, full-height/full-screen cases, sticky headers/footers, and safe interaction with long forms
-- [ ] Decide and implement the admin mobile policy: responsive support for key screens or an explicit desktop-only fallback for table-heavy screens
-- [ ] Add mobile QA coverage for critical widths and flows
+- [x] Define the responsive foundation: supported breakpoints, page gutters, stacking rules, and when sticky / table / sidebar patterns must collapse
+- [x] Adapt global shells and navigation: header, locale/account/notifications access, shared sidebar layouts, mobile-safe hero spacing, and replacements for desktop popovers/dropdowns where needed
+- [x] Make the public experience mobile-ready: landing, pricing, how-it-works, contact, and privacy
+- [x] Make the core private flows mobile-ready: workshop, library, account pages, children/characters flows, and story detail header/actions
+- [x] Add dedicated mobile behavior for reading and generation flows: chapter navigation replacement, side panels, preview/progress screens, page grids, and touch-friendly controls
+- [x] Define modal and overlay behavior on mobile: sizing, full-height/full-screen cases, sticky headers/footers, and safe interaction with long forms
+- [x] Decide and implement the admin mobile policy: responsive support for key screens or an explicit desktop-only fallback for table-heavy screens
+- [x] Add mobile QA coverage for critical widths and flows
 
 **Acceptance Check:**
 
@@ -1087,7 +1095,15 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Popovers, dropdowns, and modals remain usable on touch devices and small viewports
 - Admin surfaces have a clear, intentional mobile policy rather than accidental breakage
 
-**Deliverables:** responsive foundation decisions + mobile-ready public/private core flows + QA notes in ROADMAP / phase doc.
+**Deliverables:** responsive foundation decisions, mobile/tablet Quiet Dock navigation, mobile-ready public/private core flows, story reader/library/account mobile layouts, touch-safe modals, action element cleanup, and QA notes in ROADMAP / durable docs.
+
+**Phase closeout:** responsive rules live in `_docs/architecture/README.md`. Phase 18 uses Mobile `<768px`, Tablet `768px-1023px`, Desktop `>=1024px`; mobile/tablet navigation uses a fixed Quiet Dock with state-specific guest/auth items, dark `Account` and `More` sheets, inline language access, and mobile-safe cookie consent offset. The temporary phase doc was consolidated into durable docs and removed.
+
+**QA evidence:** `pnpm --filter ./frontend type-check`, `pnpm --filter ./frontend lint`,
+`pnpm --filter ./frontend test -- MobileFooterNav Header layout.component`, and
+`git diff --check` passed during the implementation pass. Browser checks covered public/login
+routes at `360`, `390`, `768`, and `1024` widths with zero page-level horizontal overflow, plus
+mobile dock visibility/state checks at `390`, `800`, and `1200` widths.
 
 ---
 
@@ -1337,27 +1353,27 @@ flowchart LR
 
 ## 14. Progress Tracking
 
-| Phase                               | Status         | Notes                                                                                                                                                                                                                                                                                                                                           |
-| ----------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0 — Infrastructure                  | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
-| 1 — Auth                            | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
-| 2 — Children                        | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
-| 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                                                                                                                                                                                                                        |
-| 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
-| 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred.                                                                                                                                                                                              |
-| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                                                                                                                                                                                                                      |
-| 7 — Mid-point Documentation         | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
-| 8 — Character + Regeneration        | ✅ Done        | Character entity + preview; page regeneration (text/illustration/both) with 30-day quota; iframe reader; FAILED stories in library. Resolved Deferred #8 and #9.                                                                                                                                                                                |
-| 9 — Subscriptions                   | ✅ Done        | Paddle MoR, PricingTier + Subscription entities, QuotaService, watermark, GDPR export/delete, retention cron, account + pricing UI wired.                                                                                                                                                                                                       |
-| 10 — Notifications                  | ✅ Done        | Full notification inbox, SSE bell stream, subscription-event emails, per-user preferences, NotificationEmitterService.                                                                                                                                                                                                                          |
-| 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                                                                                      |
-| 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                 |
-| 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                           |
-| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                        |
-| 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain. |
-| 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                  |
-| 17 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
-| 18 — Mobile View Support            | ⬜ Not started | Placeholder phase added; scope and acceptance criteria will be defined before implementation starts.                                                                                                                                                                                                                                            |
-| 19 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
+| Phase                               | Status         | Notes                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — Infrastructure                  | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 1 — Auth                            | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 2 — Children                        | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                                                                                                                                                                                                                                                                  |
+| 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred.                                                                                                                                                                                                                                        |
+| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                                                                                                                                                                                                                                                                |
+| 7 — Mid-point Documentation         | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 8 — Character + Regeneration        | ✅ Done        | Character entity + preview; page regeneration (text/illustration/both) with 30-day quota; iframe reader; FAILED stories in library. Resolved Deferred #8 and #9.                                                                                                                                                                                                                          |
+| 9 — Subscriptions                   | ✅ Done        | Paddle MoR, PricingTier + Subscription entities, QuotaService, watermark, GDPR export/delete, retention cron, account + pricing UI wired.                                                                                                                                                                                                                                                 |
+| 10 — Notifications                  | ✅ Done        | Full notification inbox, SSE bell stream, subscription-event emails, per-user preferences, NotificationEmitterService.                                                                                                                                                                                                                                                                    |
+| 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                                                                                                                                |
+| 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                                                           |
+| 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                                                                     |
+| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                                                                  |
+| 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain.                                           |
+| 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                                                            |
+| 17 — Final Manual Check-up          | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 18 — Mobile View Support            | ✅ Done        | First-class mobile/tablet web support: breakpoints, app-style footer dock with guest/auth states, Account/More sheets, public pages, login, library, story reader, workshop/account/admin-safe layouts, touch-safe modals, and Button/Link/Icon cleanup. Public/login viewport QA and automated frontend checks passed; private flows were polished through authenticated browser review. |
+| 19 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                                                           |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval

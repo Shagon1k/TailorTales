@@ -7,11 +7,13 @@
         color var(--duration-base) var(--ease-out);
 
     &.m-default {
-        color: var(--text-accent);
+        color: var(--accent-gold);
         text-decoration: underline;
+        text-decoration-thickness: 1.5px;
+        text-underline-offset: 5px;
 
         &:hover {
-            opacity: 0.8;
+            color: color-mix(in srgb, var(--accent-gold) 82%, var(--text-primary));
         }
     }
 
@@ -31,15 +33,6 @@
 
         &:hover {
             color: var(--text-on-card);
-        }
-    }
-
-    &.m-gold {
-        color: var(--accent-gold);
-        text-decoration: underline;
-
-        &:hover {
-            opacity: 0.8;
         }
     }
 }

@@ -45,6 +45,36 @@
             "ru": "Русский"
         }
     },
+    "mobileFooterNav": {
+        "ariaLabel": "Мобильная навигация",
+        "items": {
+            "library": "Библиотека",
+            "workshop": "Мастерская",
+            "account": "Аккаунт",
+            "signIn": "Войти",
+            "more": "Ещё",
+            "pricing": "Цены",
+            "howItWorks": "Как это работает",
+            "contact": "Контакты",
+            "privacy": "Конфиденциальность"
+        },
+        "more": {
+            "ariaLabel": "Дополнительная навигация",
+            "open": "Открыть дополнительную навигацию",
+            "close": "Закрыть дополнительную навигацию",
+            "closeBackdrop": "Закрыть фон дополнительной навигации"
+        },
+        "account": {
+            "ariaLabel": "Навигация по аккаунту",
+            "open": "Открыть навигацию по аккаунту",
+            "close": "Закрыть навигацию по аккаунту",
+            "closeBackdrop": "Закрыть фон навигации по аккаунту"
+        },
+        "language": {
+            "ariaLabel": "Язык",
+            "label": "Язык"
+        }
+    },
     "footer": {
         "brandName": "TailorTales",
         "tagline": "Маленькая мастерская для вопросов одного ребёнка.",
@@ -544,6 +574,9 @@
             "modeWrite": "Написать",
             "modeGuided": "С подсказками",
             "writeHint": "Мы используем ИИ, чтобы превратить это в цельный профиль персонажа и превью.",
+            "photoButton": "Использовать фото",
+            "photoTooltip": "Скоро вы сможете загрузить фото своего ребёнка, родителя или кого угодно, чтобы использовать как главного персонажа истории.",
+            "photoDeferredNote": "Скоро. Создание персонажа по фото пока отложено, поэтому эта опция остаётся выключенной.",
             "quota": {
                 "ariaLabel": "Лимиты создания персонажей для этого тарифа",
                 "generationsMetricLabel": "{count, plural, one {генерация осталась в этом цикле} other {генераций осталось в этом цикле}}",
@@ -560,6 +593,14 @@
             "nameLabel": "Имя",
             "namePlaceholder": "напр., Пип",
             "nameHint": "Необязательно — оставьте пустым, и мы предложим имя.",
+            "characterKindLabel": "Тип персонажа",
+            "characterKind": {
+                "child": "Ребёнок",
+                "cat": "Кот",
+                "dog": "Пёс",
+                "bunny": "Зайчик",
+                "dragon": "Дракон"
+            },
             "genderLabel": "Девочка или мальчик",
             "gender": { "girl": "Девочка", "boy": "Мальчик" },
             "hairColorLabel": "Цвет волос",
@@ -595,17 +636,36 @@
             },
             "clothingItemLabel": "Что на персонаже надето?",
             "clothingItemPlaceholder": "напр., дождевик, платье, комбинезон",
+            "creatureColorLabel": "Основной цвет",
+            "creatureColor": {
+                "gray": "серый",
+                "golden": "золотистый",
+                "white": "белый",
+                "black": "чёрный",
+                "orange": "рыжий",
+                "emerald": "изумрудный"
+            },
+            "creatureMarkingLabel": "Особые отметины",
+            "creatureMarking": {
+                "whitePaws": "белые лапки",
+                "spots": "маленькие пятнышки",
+                "stripes": "мягкие полоски",
+                "fluffyTail": "пушистый хвост",
+                "tinyHorns": "маленькие рожки"
+            },
+            "accessoryLabel": "Аксессуар",
+            "accessoryPlaceholder": "напр., маленький рюкзак, шарф, колокольчик",
             "detailLabel": "Что-то особенное?",
             "detailPlaceholder": "напр., веснушки, круглые очки, маленький плащ",
             "cancelButton": "Отмена",
             "createButton": "Создать персонажа",
             "saveButton": "Сохранить",
-            "photoButton": "Использовать фото",
-            "photoTooltip": "Скоро вы сможете загрузить фото своего ребёнка, родителя или кого угодно, чтобы использовать как главного персонажа истории.",
-            "photoDeferredNote": "Скоро. Создание персонажа по фото пока отложено, поэтому эта опция остаётся выключенной.",
             "descriptionTemplate": "{gender}. Волосы: {hairLength} {hairColor}. Глаза: {eyeColor}. Кожа: {skinTone}. Одежда: {clothing}.",
+            "descriptionCreatureTemplate": "{kind}. Основной цвет: {color}. Отметины: {marking}. Аксессуар: {accessory}.",
             "descriptionClothing": "{color}, {item}",
             "descriptionClothingGeneric": "{color}",
+            "descriptionAccessory": "{accessory}",
+            "descriptionAccessoryGeneric": "нет",
             "errors": { "nameRequired": "Имя обязательно" }
         }
     },
@@ -787,7 +847,6 @@
             "noteAriaLabel": "Заметка к оценке",
             "notePlaceholder": "Написать небольшую заметку (необязательно)…",
             "shareLabel": "Поделиться этой сказкой как примером для других семей",
-            "shareHint": "В публичную витрину попадают только истории с оценкой 4 или 5 звезд.",
             "saveButton": "Сохранить оценку",
             "updateButton": "Сохранить изменения",
             "editButton": "Редактировать оценку",
@@ -981,7 +1040,13 @@
                 "loading": "Загрузка счетов",
                 "emptyPaid": "Счетов пока нет — первый придёт при следующем продлении.",
                 "emptyFree": "Счетов нет — бесплатная глава никогда не выставляет счёт.",
-                "pdfLink": "PDF"
+                "pdfLink": "PDF",
+                "statuses": {
+                    "billed": "Выставлен",
+                    "paid": "Оплачен",
+                    "completed": "Завершён",
+                    "pastDue": "Просрочен"
+                }
             }
         },
         "notifications": {

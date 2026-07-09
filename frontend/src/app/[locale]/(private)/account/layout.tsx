@@ -16,6 +16,7 @@ export default function AccountLayout({
             subtitle="Manage your profile, children, and preferences."
             sidebar={<AccountSidebar />}
             mascot={<MascotImage image="fox-ruler" size={120} glow="outline" flip />}
+            mobileContentAlignment="center"
         >
             {children}
         </SidebarLayout>

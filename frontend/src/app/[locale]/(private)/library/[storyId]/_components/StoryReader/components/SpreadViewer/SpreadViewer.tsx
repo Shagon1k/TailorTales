@@ -47,7 +47,6 @@ export default function SpreadViewer({
                 aria-label={t('pageAriaLabel', { current: currentNumber, total: totalPages })}
             >
                 <StoryPageIframe
-                    key={`${storyId}:${page.order}:${pageRefreshToken}`}
                     storyId={storyId}
                     pageOrder={page.order}
                     refreshToken={pageRefreshToken}

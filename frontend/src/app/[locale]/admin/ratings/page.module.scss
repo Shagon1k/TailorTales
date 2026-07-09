@@ -32,3 +32,10 @@
     padding: var(--space-12) 0;
     margin: 0;
 }
+
+@media (max-width: 767px) {
+    .page__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

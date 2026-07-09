@@ -88,10 +88,10 @@ export default function StoriesPage(): React.ReactElement {
                     {t('deleteModal.body', { title: storyLabel })}
                 </p>
                 <div className={styles['page__confirm-actions']}>
-                    <Button variant="secondary" onClick={() => setPendingDelete(null)}>
+                    <Button variant="quiet" onClick={() => setPendingDelete(null)}>
                         {t('deleteModal.cancel')}
                     </Button>
-                    <Button onClick={confirmDelete} disabled={isDeleting}>
+                    <Button variant="danger" onClick={confirmDelete} disabled={isDeleting}>
                         {t('deleteModal.confirm')}
                     </Button>
                 </div>

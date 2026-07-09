@@ -45,6 +45,15 @@ export default function StoryReader({ story }: Readonly<IStoryReaderProps>): Rea
                     />
                 </aside>
 
+                <div className={styles['reader__mobile-chapters']}>
+                    <ChapterList
+                        pages={story.pages}
+                        activePageIndex={pageIndex}
+                        onPageClick={setPageIndex}
+                        layout="rail"
+                    />
+                </div>
+
                 <main className={styles.reader__spread}>
                     {currentPage && (
                         <SpreadViewer

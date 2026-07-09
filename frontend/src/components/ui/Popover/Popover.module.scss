@@ -8,3 +8,10 @@
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
 }
+
+@media (max-width: 767px) {
+    .popover {
+        max-height: min(560px, calc(100dvh - var(--space-8)));
+        width: calc(100vw - 2 * var(--layout-gutter));
+    }
+}

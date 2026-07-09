@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { SimpleGrid, Stack, Tooltip } from '@mantine/core';
+import { SimpleGrid, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslations } from 'next-intl';
 import Input from '@/components/ui/Input/Input';
@@ -20,6 +20,7 @@ interface ICharacterQuizProps {
 
 interface IQuizValues {
     name: string;
+    characterKind: string;
     gender: string;
     hairColor: string;
     hairLength: string;
@@ -27,11 +28,15 @@ interface IQuizValues {
     skinTone: string;
     clothingColor: string;
     clothingItem: string;
+    creatureColor: string;
+    creatureMarking: string;
+    accessory: string;
     detail: string;
 }
 
 const DEFAULTS: IQuizValues = {
     name: '',
+    characterKind: 'child',
     gender: 'girl',
     hairColor: 'brown',
     hairLength: 'medium',
@@ -39,17 +44,23 @@ const DEFAULTS: IQuizValues = {
     skinTone: 'medium',
     clothingColor: 'blue',
     clothingItem: '',
+    creatureColor: 'gray',
+    creatureMarking: 'whitePaws',
+    accessory: '',
     detail: '',
 };
 
 // Option keys per dimension — labels resolved via i18n at render and assembly time.
 const OPTIONS = {
+    characterKind: ['child', 'cat', 'dog', 'bunny', 'dragon'],
     gender: ['girl', 'boy'],
     hairColor: ['black', 'brown', 'blonde', 'red'],
     hairLength: ['short', 'medium', 'long'],
     eyeColor: ['brown', 'blue', 'green', 'gray'],
     skinTone: ['fair', 'medium', 'tan', 'dark'],
     clothingColor: ['red', 'blue', 'green', 'yellow', 'pink'],
+    creatureColor: ['gray', 'golden', 'white', 'black', 'orange', 'emerald'],
+    creatureMarking: ['whitePaws', 'spots', 'stripes', 'fluffyTail', 'tinyHorns'],
 } as const;
 
 export default function CharacterQuiz({
@@ -65,10 +76,11 @@ export default function CharacterQuiz({
         initialValues: DEFAULTS,
     });
 
+    const isChild = form.values.characterKind === 'child';
     const optionsFor = (dimension: keyof typeof OPTIONS): { value: string; label: string }[] =>
         OPTIONS[dimension].map((key) => ({ value: key, label: t(`${dimension}.${key}`) }));
 
-    function handleSubmit(values: IQuizValues): void {
+    function buildChildDescription(values: IQuizValues): string {
         const clothing = values.clothingItem.trim()
             ? t('descriptionClothing', {
                   color: t(`clothingColor.${values.clothingColor}`),
@@ -78,7 +90,7 @@ export default function CharacterQuiz({
                   color: t(`clothingColor.${values.clothingColor}`),
               });
 
-        const base = t('descriptionTemplate', {
+        return t('descriptionTemplate', {
             gender: t(`gender.${values.gender}`),
             hairLength: t(`hairLength.${values.hairLength}`),
             hairColor: t(`hairColor.${values.hairColor}`),
@@ -86,6 +98,26 @@ export default function CharacterQuiz({
             skinTone: t(`skinTone.${values.skinTone}`),
             clothing,
         });
+    }
+
+    function buildCreatureDescription(values: IQuizValues): string {
+        const accessory = values.accessory.trim()
+            ? t('descriptionAccessory', { accessory: values.accessory.trim() })
+            : t('descriptionAccessoryGeneric');
+
+        return t('descriptionCreatureTemplate', {
+            kind: t(`characterKind.${values.characterKind}`),
+            color: t(`creatureColor.${values.creatureColor}`),
+            marking: t(`creatureMarking.${values.creatureMarking}`),
+            accessory,
+        });
+    }
+
+    function handleSubmit(values: IQuizValues): void {
+        const base =
+            values.characterKind === 'child'
+                ? buildChildDescription(values)
+                : buildCreatureDescription(values);
 
         const detail = values.detail.trim();
         onSubmit({ name: values.name.trim(), description: detail ? `${base} ${detail}` : base });
@@ -95,63 +127,78 @@ export default function CharacterQuiz({
         <>
             <form id={formId} onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
-                    {/* Photo seam — disabled until the GDPR-gated photo flow ships (Deferred #10). */}
-                    <Tooltip
-                        label={t('photoTooltip')}
-                        multiline
-                        w={280}
-                        withArrow
-                        position="bottom"
-                    >
-                        <div className={styles.photo}>
-                            <Button type="button" variant="quiet" fullWidth disabled>
-                                {t('photoButton')}
-                            </Button>
-                        </div>
-                    </Tooltip>
-                    <p className={styles['photo__note']}>{t('photoDeferredNote')}</p>
                     <Input
                         label={t('nameLabel')}
                         placeholder={t('namePlaceholder')}
                         {...form.getInputProps('name')}
                     />
-                    <SimpleGrid cols={2} spacing="sm">
-                        <Select
-                            label={t('genderLabel')}
-                            data={optionsFor('gender')}
-                            {...form.getInputProps('gender')}
-                        />
-                        <Select
-                            label={t('skinToneLabel')}
-                            data={optionsFor('skinTone')}
-                            {...form.getInputProps('skinTone')}
-                        />
-                        <Select
-                            label={t('hairColorLabel')}
-                            data={optionsFor('hairColor')}
-                            {...form.getInputProps('hairColor')}
-                        />
-                        <Select
-                            label={t('hairLengthLabel')}
-                            data={optionsFor('hairLength')}
-                            {...form.getInputProps('hairLength')}
-                        />
-                        <Select
-                            label={t('eyeColorLabel')}
-                            data={optionsFor('eyeColor')}
-                            {...form.getInputProps('eyeColor')}
-                        />
-                        <Select
-                            label={t('clothingColorLabel')}
-                            data={optionsFor('clothingColor')}
-                            {...form.getInputProps('clothingColor')}
-                        />
-                    </SimpleGrid>
-                    <Input
-                        label={t('clothingItemLabel')}
-                        placeholder={t('clothingItemPlaceholder')}
-                        {...form.getInputProps('clothingItem')}
+                    <Select
+                        label={t('characterKindLabel')}
+                        data={optionsFor('characterKind')}
+                        {...form.getInputProps('characterKind')}
                     />
+                    <SimpleGrid cols={2} spacing="sm">
+                        {isChild ? (
+                            <>
+                                <Select
+                                    label={t('genderLabel')}
+                                    data={optionsFor('gender')}
+                                    {...form.getInputProps('gender')}
+                                />
+                                <Select
+                                    label={t('skinToneLabel')}
+                                    data={optionsFor('skinTone')}
+                                    {...form.getInputProps('skinTone')}
+                                />
+                                <Select
+                                    label={t('hairColorLabel')}
+                                    data={optionsFor('hairColor')}
+                                    {...form.getInputProps('hairColor')}
+                                />
+                                <Select
+                                    label={t('hairLengthLabel')}
+                                    data={optionsFor('hairLength')}
+                                    {...form.getInputProps('hairLength')}
+                                />
+                                <Select
+                                    label={t('eyeColorLabel')}
+                                    data={optionsFor('eyeColor')}
+                                    {...form.getInputProps('eyeColor')}
+                                />
+                                <Select
+                                    label={t('clothingColorLabel')}
+                                    data={optionsFor('clothingColor')}
+                                    {...form.getInputProps('clothingColor')}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Select
+                                    label={t('creatureColorLabel')}
+                                    data={optionsFor('creatureColor')}
+                                    {...form.getInputProps('creatureColor')}
+                                />
+                                <Select
+                                    label={t('creatureMarkingLabel')}
+                                    data={optionsFor('creatureMarking')}
+                                    {...form.getInputProps('creatureMarking')}
+                                />
+                            </>
+                        )}
+                    </SimpleGrid>
+                    {isChild ? (
+                        <Input
+                            label={t('clothingItemLabel')}
+                            placeholder={t('clothingItemPlaceholder')}
+                            {...form.getInputProps('clothingItem')}
+                        />
+                    ) : (
+                        <Input
+                            label={t('accessoryLabel')}
+                            placeholder={t('accessoryPlaceholder')}
+                            {...form.getInputProps('accessory')}
+                        />
+                    )}
                     <Input
                         label={t('detailLabel')}
                         placeholder={t('detailPlaceholder')}

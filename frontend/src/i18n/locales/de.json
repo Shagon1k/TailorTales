@@ -45,6 +45,36 @@
             "ru": "Русский"
         }
     },
+    "mobileFooterNav": {
+        "ariaLabel": "Mobile Navigation",
+        "items": {
+            "library": "Bibliothek",
+            "workshop": "Werkstatt",
+            "account": "Konto",
+            "signIn": "Anmelden",
+            "more": "Mehr",
+            "pricing": "Preise",
+            "howItWorks": "So funktioniert's",
+            "contact": "Kontakt",
+            "privacy": "Datenschutz"
+        },
+        "more": {
+            "ariaLabel": "Weitere Navigation",
+            "open": "Weitere Navigation öffnen",
+            "close": "Weitere Navigation schließen",
+            "closeBackdrop": "Hintergrund der weiteren Navigation schließen"
+        },
+        "account": {
+            "ariaLabel": "Kontonavigation",
+            "open": "Kontonavigation öffnen",
+            "close": "Kontonavigation schließen",
+            "closeBackdrop": "Hintergrund der Kontonavigation schließen"
+        },
+        "language": {
+            "ariaLabel": "Sprache",
+            "label": "Sprache"
+        }
+    },
     "footer": {
         "brandName": "TailorTales",
         "tagline": "Eine kleine Werkstatt für die Fragen eines Kindes.",
@@ -544,6 +574,9 @@
             "modeWrite": "Selbst schreiben",
             "modeGuided": "Geführt",
             "writeHint": "Wir nutzen KI, um daraus ein stimmiges Figurenprofil und eine Vorschau zu machen.",
+            "photoButton": "Foto verwenden",
+            "photoTooltip": "Bald kannst du ein Foto deines Kindes, eines Elternteils oder einer anderen Person hochladen, um sie als Hauptfigur der Geschichte zu verwenden.",
+            "photoDeferredNote": "Bald verfügbar. Die Charaktererstellung per Foto ist vorerst zurückgestellt, deshalb bleibt diese Option deaktiviert.",
             "quota": {
                 "ariaLabel": "Charakterlimits für diesen Tarif",
                 "generationsMetricLabel": "{count, plural, one {Generierung in diesem Zyklus übrig} other {Generierungen in diesem Zyklus übrig}}",
@@ -560,6 +593,14 @@
             "nameLabel": "Name",
             "namePlaceholder": "z.B. Pip",
             "nameHint": "Optional — leer lassen und wir schlagen einen Namen vor.",
+            "characterKindLabel": "Art der Figur",
+            "characterKind": {
+                "child": "Kind",
+                "cat": "Katze",
+                "dog": "Hund",
+                "bunny": "Hase",
+                "dragon": "Drache"
+            },
             "genderLabel": "Mädchen oder Junge",
             "gender": { "girl": "Mädchen", "boy": "Junge" },
             "hairColorLabel": "Haarfarbe",
@@ -590,17 +631,36 @@
             },
             "clothingItemLabel": "Was trägt die Figur?",
             "clothingItemPlaceholder": "z.B. ein Regenmantel, ein Kleid, eine Latzhose",
+            "creatureColorLabel": "Hauptfarbe",
+            "creatureColor": {
+                "gray": "grau",
+                "golden": "golden",
+                "white": "weiß",
+                "black": "schwarz",
+                "orange": "orange",
+                "emerald": "smaragdgrün"
+            },
+            "creatureMarkingLabel": "Besondere Merkmale",
+            "creatureMarking": {
+                "whitePaws": "weiße Pfoten",
+                "spots": "kleine Flecken",
+                "stripes": "weiche Streifen",
+                "fluffyTail": "ein flauschiger Schwanz",
+                "tinyHorns": "kleine Hörner"
+            },
+            "accessoryLabel": "Accessoire",
+            "accessoryPlaceholder": "z.B. ein kleiner Rucksack, Schal, Glöckchen",
             "detailLabel": "Etwas Besonderes?",
             "detailPlaceholder": "z.B. Sommersprossen, runde Brille, ein kleiner Umhang",
             "cancelButton": "Abbrechen",
             "createButton": "Charakter erstellen",
             "saveButton": "Speichern",
-            "photoButton": "Foto verwenden",
-            "photoTooltip": "Bald kannst du ein Foto deines Kindes, eines Elternteils oder einer anderen Person hochladen, um sie als Hauptfigur der Geschichte zu verwenden.",
-            "photoDeferredNote": "Bald verfügbar. Die Charaktererstellung per Foto ist vorerst zurückgestellt, deshalb bleibt diese Option deaktiviert.",
             "descriptionTemplate": "{gender}. Haare: {hairLength} {hairColor}. Augen: {eyeColor}. Haut: {skinTone}. Kleidung: {clothing}.",
+            "descriptionCreatureTemplate": "{kind}. Hauptfarbe: {color}. Merkmale: {marking}. Accessoire: {accessory}.",
             "descriptionClothing": "{color} {item}",
             "descriptionClothingGeneric": "{color} Kleidung",
+            "descriptionAccessory": "{accessory}",
+            "descriptionAccessoryGeneric": "keins",
             "errors": { "nameRequired": "Name ist erforderlich" }
         }
     },
@@ -782,7 +842,6 @@
             "noteAriaLabel": "Bewertungsnotiz",
             "notePlaceholder": "Eine kleine Notiz schreiben (optional)…",
             "shareLabel": "Diese Geschichte als Beispiel für andere Familien teilen",
-            "shareHint": "Nur Geschichten mit 4 oder 5 Sternen erscheinen in der öffentlichen Auswahl.",
             "saveButton": "Bewertung speichern",
             "updateButton": "Änderungen speichern",
             "editButton": "Bewertung bearbeiten",
@@ -976,7 +1035,13 @@
                 "loading": "Rechnungen werden geladen",
                 "emptyPaid": "Noch keine Rechnungen — deine erste kommt mit der nächsten Verlängerung.",
                 "emptyFree": "Keine Rechnungen — das kostenlose Kapitel stellt dir nie etwas in Rechnung.",
-                "pdfLink": "PDF"
+                "pdfLink": "PDF",
+                "statuses": {
+                    "billed": "Abgerechnet",
+                    "paid": "Bezahlt",
+                    "completed": "Abgeschlossen",
+                    "pastDue": "Überfällig"
+                }
             }
         },
         "notifications": {

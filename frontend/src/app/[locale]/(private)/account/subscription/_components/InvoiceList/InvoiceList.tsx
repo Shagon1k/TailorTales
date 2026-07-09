@@ -19,6 +19,21 @@ export default function InvoiceList({ isPaid }: Readonly<IInvoiceListProps>): Re
     const t = useTranslations('account.subscription.invoices');
     const { data: invoices, isLoading } = useInvoices();
 
+    function formatInvoiceStatus(status: string): string {
+        switch (status) {
+            case 'billed':
+                return t('statuses.billed');
+            case 'paid':
+                return t('statuses.paid');
+            case 'completed':
+                return t('statuses.completed');
+            case 'past_due':
+                return t('statuses.pastDue');
+            default:
+                return status.replaceAll('_', ' ');
+        }
+    }
+
     return (
         <Card variant="gradient" size="md">
             <Stack gap="sm">
@@ -43,16 +58,24 @@ export default function InvoiceList({ isPaid }: Readonly<IInvoiceListProps>): Re
                                 <span className={styles['invoice-list__description']}>
                                     {invoice.description}
                                 </span>
-                                <span className={styles['invoice-list__amount']}>
-                                    {formatMoney(invoice.amount, invoice.currency)}
-                                </span>
-                                <span className={styles['invoice-list__status']}>
-                                    {invoice.status}
+                                <span className={styles['invoice-list__meta']}>
+                                    <span className={styles['invoice-list__amount']}>
+                                        {formatMoney(invoice.amount, invoice.currency)}
+                                    </span>
+                                    <span className={styles['invoice-list__status']}>
+                                        {formatInvoiceStatus(invoice.status)}
+                                    </span>
                                 </span>
                                 {invoice.invoicePdfUrl && (
-                                    <Link href={invoice.invoicePdfUrl} variant="quiet">
-                                        {t('pdfLink')}
-                                    </Link>
+                                    <span className={styles['invoice-list__pdf']}>
+                                        <Link
+                                            href={invoice.invoicePdfUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            {t('pdfLink')}
+                                        </Link>
+                                    </span>
                                 )}
                             </li>
                         ))}

@@ -34,6 +34,11 @@
     white-space: pre-wrap;
 }
 
+.rating__note {
+    width: min(100%, 560px);
+    align-self: center;
+}
+
 .rating__visibility {
     @include t-body-sm;
 
@@ -49,5 +54,27 @@
 
     &.m-error {
         color: var(--accent-warm);
+    }
+}
+
+@media (max-width: 1023px) {
+    .rating {
+        align-items: center;
+        padding: var(--space-4);
+        text-align: center;
+    }
+
+    .rating__header {
+        width: 100%;
+        padding-bottom: var(--space-2);
+    }
+
+    .rating__readonly-note {
+        width: 100%;
+        text-align: left;
+    }
+
+    .rating :global(.button) {
+        width: min(100%, 220px);
     }
 }

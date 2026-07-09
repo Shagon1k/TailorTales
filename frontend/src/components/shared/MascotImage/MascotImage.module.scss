@@ -46,3 +46,17 @@
     height: 100%;
     object-fit: contain;
 }
+
+@media (max-width: 767px) {
+    .mascot-image.m-aura {
+        &::before {
+            inset: -40px;
+            filter: blur(22px);
+        }
+
+        &::after {
+            inset: -6px;
+            filter: blur(14px);
+        }
+    }
+}

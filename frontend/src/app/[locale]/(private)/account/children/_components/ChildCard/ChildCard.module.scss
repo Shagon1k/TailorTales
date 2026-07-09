@@ -218,6 +218,25 @@
     margin: 0;
 }
 
+@media (max-width: 767px) {
+    .character__item-main {
+        grid-template-columns: 80px minmax(0, 1fr);
+    }
+
+    .character__preview {
+        width: 80px;
+        height: 80px;
+    }
+
+    .character__text {
+        min-height: 80px;
+    }
+
+    .character__item-actions {
+        flex-wrap: wrap;
+    }
+}
+
 .actions {
     display: flex;
     width: 100%;

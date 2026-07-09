@@ -77,3 +77,49 @@
     margin: 0;
     color: var(--text-muted);
 }
+
+.header__download {
+    flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+    .header {
+        align-items: center;
+        padding: var(--space-5) var(--layout-gutter) 0;
+        text-align: center;
+    }
+
+    .header__breadcrumb-list {
+        justify-content: center;
+    }
+
+    .header__row {
+        width: 100%;
+        max-width: 480px;
+        align-items: center;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .header__download {
+        width: min(100%, 240px);
+
+        :global(.button) {
+            width: 100%;
+        }
+    }
+
+    .header__title {
+        font-size: var(--fs-2xl);
+        text-align: center;
+    }
+
+    .header__breadcrumb-current {
+        max-width: 18ch;
+    }
+
+    .header__meta {
+        max-width: 38ch;
+        text-align: center;
+    }
+}

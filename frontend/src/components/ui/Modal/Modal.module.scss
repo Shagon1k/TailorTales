@@ -1,5 +1,10 @@
 @use 'styles/typography' as *;
 
+.modal__overlay {
+    background: color-mix(in srgb, var(--bg-canvas) 74%, transparent);
+    backdrop-filter: blur(2px);
+}
+
 .modal {
     --mb-shadow: var(--shadow-lg);
     --modal-shell-padding: var(--space-10);
@@ -68,6 +73,7 @@
     }
 
     .modal__scroll {
+        margin-top: var(--space-2);
         padding: 0 var(--modal-shell-padding) var(--space-3);
         overflow: auto;
         min-height: 0;
@@ -84,5 +90,58 @@
 
     .modal__footer :where(.actions, [class*='__actions'], [class*='confirm-actions']) {
         margin-top: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .modal__inner {
+        align-items: center;
+        padding-top: calc(var(--header-height) + var(--space-2));
+        padding-bottom: var(--space-2);
+    }
+
+    .modal {
+        --modal-shell-padding: var(--space-4);
+
+        &.m-sm,
+        &.m-md,
+        &.m-lg {
+            width: calc(100dvw - var(--space-4));
+            max-width: calc(100dvw - var(--space-4));
+            max-height: calc(100dvh - var(--header-height) - var(--space-6));
+            border-radius: var(--radius-lg);
+        }
+
+        .modal__header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            padding: var(--space-4) var(--modal-shell-padding);
+            background: var(--bg-elevated);
+            border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
+        }
+
+        .modal__subheader {
+            max-width: calc(100% - var(--hit-min) - var(--space-3));
+            line-height: 1.45;
+            text-wrap: balance;
+        }
+
+        .modal__close {
+            width: var(--hit-min);
+            height: var(--hit-min);
+        }
+
+        .modal__scroll {
+            margin-top: var(--space-2);
+            padding-bottom: var(--space-5);
+        }
+
+        .modal__footer {
+            position: sticky;
+            bottom: 0;
+            padding: var(--space-3) var(--modal-shell-padding) var(--space-4);
+            background: var(--bg-elevated);
+        }
     }
 }

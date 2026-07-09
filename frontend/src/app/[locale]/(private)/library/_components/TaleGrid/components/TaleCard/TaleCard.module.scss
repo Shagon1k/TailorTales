@@ -196,3 +196,96 @@
     gap: var(--space-3);
     flex-wrap: wrap;
 }
+
+@media (max-width: 767px) {
+    .tale-card {
+        width: 100%;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        align-items: start;
+        gap: var(--space-3);
+        min-height: 132px;
+        padding: var(--space-3);
+        border-radius: var(--radius-lg);
+        background:
+            linear-gradient(
+                180deg,
+                color-mix(in srgb, var(--text-primary) 5%, transparent),
+                color-mix(in srgb, var(--bg-elevated) 90%, transparent)
+            ),
+            var(--bg-elevated);
+        box-shadow: var(--shadow-md);
+    }
+
+    .tale-card__cover-link {
+        grid-row: 1 / span 2;
+    }
+
+    .tale-card__cover {
+        width: 92px;
+        min-height: 124px;
+        aspect-ratio: 3 / 4;
+        border-radius: var(--radius-md);
+        box-shadow:
+            inset 0 0 0 1px color-mix(in srgb, var(--border-on-card) 30%, transparent),
+            0 10px 22px rgb(12 4 2 / 0.18);
+    }
+
+    .tale-card__cover-title {
+        display: none;
+    }
+
+    .tale-card__content {
+        min-width: 0;
+        gap: var(--space-2);
+    }
+
+    .tale-card__title {
+        display: -webkit-box;
+        overflow: hidden;
+        font-size: var(--fs-lg);
+        line-height: var(--lh-snug);
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .tale-card__meta {
+        flex-wrap: wrap;
+        gap: var(--space-1) var(--space-2);
+        font-size: var(--fs-sm);
+    }
+
+    .tale-card__status {
+        left: var(--space-1);
+        right: var(--space-1);
+        bottom: var(--space-1);
+        padding: 3px var(--space-2);
+        font-size: 11px;
+    }
+
+    .tale-card__actions {
+        grid-column: 2;
+        align-self: end;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: var(--space-2);
+        margin: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .tale-card__actions :global(.button) {
+        width: auto;
+        min-height: 34px;
+        padding-right: var(--space-3);
+        padding-left: var(--space-3);
+        font-size: var(--fs-sm);
+    }
+
+    .tale-card__error {
+        grid-column: 1 / -1;
+    }
+}

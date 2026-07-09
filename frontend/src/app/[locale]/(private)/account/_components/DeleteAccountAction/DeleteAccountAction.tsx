@@ -81,7 +81,7 @@ export default function DeleteAccountAction({
                                 {t('modal.keepButton')}
                             </Button>
                             <Button
-                                variant="primary"
+                                variant="danger"
                                 disabled={confirmText !== confirmWord}
                                 loading={isDeleting}
                                 onClick={() => handleDelete()}

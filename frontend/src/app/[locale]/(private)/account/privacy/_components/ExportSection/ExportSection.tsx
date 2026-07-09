@@ -31,7 +31,7 @@ export default function ExportSection(): React.ReactElement {
             <Stack gap="sm">
                 <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 <p className={styles['export-section__copy']}>{t('body')}</p>
-                <Group>
+                <Group justify="flex-end">
                     <Button
                         variant="secondary"
                         onClick={() => handleExport()}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import ButtonLink from '@/components/ui/Button/ButtonLink';
@@ -16,6 +17,8 @@ interface IHeaderProps {
 
 export default function Header({ variant }: Readonly<IHeaderProps>): React.ReactElement {
     const [scrolled, setScrolled] = useState(false);
+    const mobileHeader = useMediaQuery('(max-width: 767px)', false);
+    const compactNavigation = useMediaQuery('(max-width: 1023px)', false);
     const t = useTranslations('header');
 
     useEffect(() => {
@@ -31,7 +34,7 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
     return (
         <header className={styles.header} data-scrolled={scrolled}>
             <div className={styles.header__inner}>
-                <BrandMark size="lg" />
+                <BrandMark size={mobileHeader ? 'md' : 'lg'} />
                 <nav className={styles.header__nav} aria-label={t('nav.ariaLabel')}>
                     {variant === 'public' ? (
                         <>
@@ -67,6 +70,11 @@ export default function Header({ variant }: Readonly<IHeaderProps>): React.React
                         </>
                     )}
                 </nav>
+                {variant === 'private' && compactNavigation && (
+                    <div className={styles.header__tools}>
+                        <NotificationCenter />
+                    </div>
+                )}
             </div>
         </header>
     );

@@ -46,3 +46,24 @@
         border-radius: var(--radius-sm);
     }
 }
+
+@media (max-width: 1023px) {
+    .section {
+        padding: 0 var(--layout-gutter) var(--space-16);
+    }
+
+    .section__inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-8);
+    }
+}
+
+@media (max-width: 767px) {
+    .section {
+        padding-bottom: var(--space-12);
+    }
+
+    .info__heading {
+        font-size: var(--fs-xl);
+    }
+}

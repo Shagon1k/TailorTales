@@ -66,7 +66,7 @@ export default function PlanCard({ subscription }: Readonly<IPlanCardProps>): Re
                     </p>
                 )}
 
-                <Group gap="sm">
+                <Group justify="flex-end" gap="sm">
                     {!isPaid && (
                         <ButtonLink href="/pricing" variant="primary">
                             {t('upgradeButton')}
@@ -86,22 +86,37 @@ export default function PlanCard({ subscription }: Readonly<IPlanCardProps>): Re
                 title={t('cancelModal.title')}
                 size="sm"
             >
-                <Stack gap="md">
-                    <p>
-                        {t('cancelModal.body', {
-                            tierName: tier.name,
-                            date: currentPeriodEnd ? formatLongDate(currentPeriodEnd) : '',
-                        })}
-                    </p>
-                    <Group justify="flex-end" gap="sm">
-                        <Button variant="quiet" onClick={() => setConfirmOpen(false)}>
-                            {t('cancelModal.keepButton')}
-                        </Button>
-                        <Button variant="primary" onClick={handleCancel} loading={isCanceling}>
-                            {t('cancelModal.confirmButton')}
-                        </Button>
-                    </Group>
-                </Stack>
+                <>
+                    <Stack gap="md">
+                        <p>
+                            {t('cancelModal.body', {
+                                tierName: tier.name,
+                                date: currentPeriodEnd ? formatLongDate(currentPeriodEnd) : '',
+                            })}
+                        </p>
+                    </Stack>
+                    <Modal.Footer>
+                        <div className={styles['plan-card__modal-actions']}>
+                            <Button
+                                variant="secondary"
+                                fullWidth
+                                onClick={() => setConfirmOpen(false)}
+                                disabled={isCanceling}
+                            >
+                                {t('cancelModal.keepButton')}
+                            </Button>
+                            <button
+                                type="button"
+                                className={styles['plan-card__danger-action']}
+                                onClick={handleCancel}
+                                disabled={isCanceling}
+                                aria-busy={isCanceling}
+                            >
+                                {t('cancelModal.confirmButton')}
+                            </button>
+                        </div>
+                    </Modal.Footer>
+                </>
             </Modal>
         </Card>
     );

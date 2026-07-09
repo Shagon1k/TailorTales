@@ -45,6 +45,36 @@
             "ru": "Русский"
         }
     },
+    "mobileFooterNav": {
+        "ariaLabel": "Mobile navigation",
+        "items": {
+            "library": "Library",
+            "workshop": "Workshop",
+            "account": "Account",
+            "signIn": "Sign in",
+            "more": "More",
+            "pricing": "Pricing",
+            "howItWorks": "How it works",
+            "contact": "Contact us",
+            "privacy": "Privacy"
+        },
+        "more": {
+            "ariaLabel": "More navigation",
+            "open": "Open more navigation",
+            "close": "Close more navigation",
+            "closeBackdrop": "Close more navigation backdrop"
+        },
+        "account": {
+            "ariaLabel": "Account navigation",
+            "open": "Open account navigation",
+            "close": "Close account navigation",
+            "closeBackdrop": "Close account navigation backdrop"
+        },
+        "language": {
+            "ariaLabel": "Language",
+            "label": "Language"
+        }
+    },
     "footer": {
         "brandName": "TailorTales",
         "tagline": "A small workshop for one child's questions.",
@@ -544,6 +574,9 @@
             "modeWrite": "Write it",
             "modeGuided": "Guided",
             "writeHint": "We'll use AI to refine this into a consistent character profile and preview.",
+            "photoButton": "Use a photo",
+            "photoTooltip": "Soon you'll be able to upload a photo of your child, a parent, or anyone else to use as the story's main character.",
+            "photoDeferredNote": "Coming soon. Photo-based character creation is parked for now, so this option stays disabled.",
             "quota": {
                 "ariaLabel": "Character creation limits for this plan",
                 "generationsMetricLabel": "{count, plural, one {generation left this cycle} other {generations left this cycle}}",
@@ -559,6 +592,14 @@
             "nameLabel": "Name",
             "namePlaceholder": "e.g. Pip",
             "nameHint": "Optional — leave it blank and we'll suggest one.",
+            "characterKindLabel": "Kind of character",
+            "characterKind": {
+                "child": "Child",
+                "cat": "Cat",
+                "dog": "Dog",
+                "bunny": "Bunny",
+                "dragon": "Dragon"
+            },
             "genderLabel": "Girl or boy",
             "gender": { "girl": "Girl", "boy": "Boy" },
             "hairColorLabel": "Hair color",
@@ -579,17 +620,36 @@
             },
             "clothingItemLabel": "What are they wearing?",
             "clothingItemPlaceholder": "e.g. a raincoat, a dress, overalls",
+            "creatureColorLabel": "Main color",
+            "creatureColor": {
+                "gray": "gray",
+                "golden": "golden",
+                "white": "white",
+                "black": "black",
+                "orange": "orange",
+                "emerald": "emerald"
+            },
+            "creatureMarkingLabel": "Special markings",
+            "creatureMarking": {
+                "whitePaws": "white paws",
+                "spots": "small spots",
+                "stripes": "soft stripes",
+                "fluffyTail": "a fluffy tail",
+                "tinyHorns": "tiny horns"
+            },
+            "accessoryLabel": "Accessory",
+            "accessoryPlaceholder": "e.g. a tiny backpack, scarf, bell",
             "detailLabel": "Anything special?",
             "detailPlaceholder": "e.g. freckles, round glasses, a small cape",
             "cancelButton": "Cancel",
             "createButton": "Create character",
             "saveButton": "Save",
-            "photoButton": "Use a photo",
-            "photoTooltip": "Soon you'll be able to upload a photo of your child, a parent, or anyone else to use as the story's main character.",
-            "photoDeferredNote": "Coming soon. Photo-based character creation is parked for now, so this option stays disabled.",
             "descriptionTemplate": "{gender}. Hair: {hairLength} {hairColor}. Eyes: {eyeColor}. Skin: {skinTone}. Wearing: {clothing}.",
+            "descriptionCreatureTemplate": "{kind}. Main color: {color}. Markings: {marking}. Accessory: {accessory}.",
             "descriptionClothing": "{color} {item}",
-            "descriptionClothingGeneric": "{color} clothes"
+            "descriptionClothingGeneric": "{color} clothes",
+            "descriptionAccessory": "{accessory}",
+            "descriptionAccessoryGeneric": "none"
         }
     },
     "workshopProgress": {
@@ -770,7 +830,6 @@
             "noteAriaLabel": "Rating note",
             "notePlaceholder": "Write a small note (optional)…",
             "shareLabel": "Share this story as an example for other families",
-            "shareHint": "Only tales rated 4 or 5 stars appear in the public showcase.",
             "saveButton": "Save rating",
             "updateButton": "Save changes",
             "editButton": "Edit rating",
@@ -964,7 +1023,13 @@
                 "loading": "Loading invoices",
                 "emptyPaid": "No invoices yet — your first one arrives with the next renewal.",
                 "emptyFree": "No invoices — the Free Chapter never bills you.",
-                "pdfLink": "PDF"
+                "pdfLink": "PDF",
+                "statuses": {
+                    "billed": "Billed",
+                    "paid": "Paid",
+                    "completed": "Completed",
+                    "pastDue": "Past due"
+                }
             }
         },
         "notifications": {

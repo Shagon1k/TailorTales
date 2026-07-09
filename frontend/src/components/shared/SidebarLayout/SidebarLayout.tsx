@@ -1,4 +1,5 @@
 import PillLabel from '@/components/ui/PillLabel/PillLabel';
+import clsx from 'clsx';
 import styles from './SidebarLayout.module.scss';
 
 export interface ISidebarLayoutProps {
@@ -10,6 +11,8 @@ export interface ISidebarLayoutProps {
     sidebar: React.ReactNode;
     /** Optional decorative mascot anchored to the hero's bottom-right. */
     mascot?: React.ReactNode;
+    /** Centers the hero and narrows content on mobile/tablet when the section is app-like. */
+    mobileContentAlignment?: 'start' | 'center';
     children: React.ReactNode;
 }
 
@@ -23,10 +26,15 @@ export default function SidebarLayout({
     subtitle,
     sidebar,
     mascot,
+    mobileContentAlignment = 'start',
     children,
 }: Readonly<ISidebarLayoutProps>): React.ReactElement {
     return (
-        <div className={styles.layout}>
+        <div
+            className={clsx(styles.layout, {
+                [styles['m-mobile-centered']]: mobileContentAlignment === 'center',
+            })}
+        >
             <div className={styles.layout__hero}>
                 <div className={styles['layout__hero-inner']}>
                     <PillLabel>{eyebrow}</PillLabel>

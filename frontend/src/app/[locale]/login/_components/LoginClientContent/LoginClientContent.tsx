@@ -69,7 +69,7 @@ export default function LoginClientContent(): React.ReactElement {
                         <Button
                             component="a"
                             href={`${BACKEND_URL}/auth/google`}
-                            variant="light"
+                            variant="primary"
                             fullWidth
                             leftSection={<GoogleIcon />}
                         >

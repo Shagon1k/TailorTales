@@ -6,3 +6,10 @@
     gap: var(--space-10);
     padding-bottom: var(--space-16);
 }
+
+@media (max-width: 767px) {
+    .page {
+        gap: var(--space-6);
+        padding-bottom: 0;
+    }
+}

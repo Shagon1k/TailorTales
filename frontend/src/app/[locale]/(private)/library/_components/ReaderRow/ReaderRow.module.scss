@@ -99,3 +99,39 @@
     text-align: center;
     max-width: 12ch;
 }
+
+@media (max-width: 767px) {
+    .reader-row {
+        gap: var(--space-4);
+        padding: 0 var(--layout-gutter);
+    }
+
+    .reader-row__header {
+        align-items: center;
+    }
+
+    .reader-row__title {
+        font-size: var(--fs-2xl);
+        line-height: var(--lh-tight);
+    }
+
+    .reader-row__track {
+        gap: var(--space-3);
+        padding-bottom: 0;
+        scroll-padding-inline: var(--layout-gutter);
+        scroll-snap-type: x proximity;
+    }
+
+    .reader-row__track > * {
+        scroll-snap-align: start;
+    }
+
+    .reader-row__add {
+        width: min(74vw, 280px);
+    }
+
+    .reader-row__add-link {
+        min-height: 150px;
+        padding: var(--space-5);
+    }
+}
