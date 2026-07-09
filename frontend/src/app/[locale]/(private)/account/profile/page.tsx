@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Container, Group, Stack } from '@mantine/core';
 import type { Area } from 'react-easy-crop';
 import Avatar from '@/components/ui/Avatar/Avatar';
 import Button from '@/components/ui/Button/Button';
@@ -106,8 +105,8 @@ export default function ProfilePage(): React.ReactElement {
     }
 
     return (
-        <Container size="xs" py="xl">
-            <Stack align="center" gap="lg">
+        <section className={styles.profile}>
+            <div className={styles.profile__stack}>
                 <button
                     type="button"
                     className={styles['profile__avatar-button']}
@@ -142,13 +141,13 @@ export default function ProfilePage(): React.ReactElement {
                         {t('editButton')}
                     </Button>
                 ) : (
-                    <Stack w="100%" gap="sm">
+                    <div className={styles.profile__form}>
                         <Input
                             label={t('nameLabel')}
                             value={editedName}
                             onChange={(e) => setEditedName(e.currentTarget.value)}
                         />
-                        <Group>
+                        <div className={styles.profile__actions}>
                             <Button variant="primary" onClick={handleSave} loading={isSaving}>
                                 {t('saveButton')}
                             </Button>
@@ -159,10 +158,10 @@ export default function ProfilePage(): React.ReactElement {
                             >
                                 {t('cancelButton')}
                             </Button>
-                        </Group>
-                    </Stack>
+                        </div>
+                    </div>
                 )}
-            </Stack>
+            </div>
 
             <AvatarCropModal
                 opened={isCropModalOpen}
@@ -171,6 +170,6 @@ export default function ProfilePage(): React.ReactElement {
                 onClose={resetAvatarSelection}
                 onConfirm={(croppedAreaPixels) => handleAvatarCropConfirm(croppedAreaPixels)}
             />
-        </Container>
+        </section>
     );
 }

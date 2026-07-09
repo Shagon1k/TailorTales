@@ -32,7 +32,7 @@ export default function PaymentDetails(): React.ReactElement {
             <Stack gap="sm">
                 <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
                 <p className={styles['payment-details__copy']}>{t('body')}</p>
-                <Group>
+                <Group justify="flex-end">
                     <Button variant="secondary" onClick={() => openPortal()} loading={isOpening}>
                         {t('portalButton')}
                     </Button>

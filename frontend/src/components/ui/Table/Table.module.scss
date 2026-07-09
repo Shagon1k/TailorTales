@@ -1,7 +1,17 @@
 @use 'styles/typography' as *;
 
+.table__scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    -webkit-overflow-scrolling: touch;
+}
+
 .table {
     width: 100%;
+    min-width: 640px;
     border-collapse: collapse;
 }
 
@@ -28,4 +38,15 @@
     padding: var(--space-4);
     color: var(--text-secondary);
     vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+    .table {
+        min-width: 560px;
+    }
+
+    .table__th,
+    .table__td {
+        padding: var(--space-3);
+    }
 }

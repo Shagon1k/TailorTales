@@ -151,9 +151,18 @@
     );
 
     // ---- Layout ----
+    // Responsive breakpoints:
+    // Mobile < 768px; Tablet 768px–1023px; Desktop >= 1024px.
+    // CSS custom properties are documentation/runtime tokens only; media queries use literals.
+    --breakpoint-mobile-max: 767px;
+    --breakpoint-tablet-min: 768px;
+    --breakpoint-desktop-min: 1024px;
     --layout-max-width: 1200px;
     --layout-gutter: var(--space-6);
     --header-height: var(--space-16);
+    --mobile-footer-nav-height: 72px;
+    --mobile-footer-nav-bottom: var(--space-3);
+    --mobile-footer-nav-max-width: 420px;
 
     // ---- Motion ----
     --duration-base: 200ms;
@@ -164,6 +173,13 @@
     // ---- Focus & accessibility ----
     --focus-ring-color: var(--color-fox);
     --hit-min: 44px;
+}
+
+@media (max-width: 767px) {
+    :root {
+        --layout-gutter: var(--space-4);
+        --header-height: 56px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

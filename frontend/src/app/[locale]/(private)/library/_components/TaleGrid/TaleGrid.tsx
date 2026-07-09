@@ -49,28 +49,30 @@ export default function TaleGrid({
                     </span>
                 </div>
 
-                <div
-                    role="radiogroup"
-                    aria-labelledby="tale-grid-filter-label"
-                    className={styles['tale-grid__filters']}
-                >
+                <div className={styles['tale-grid__filter-block']}>
                     <span id="tale-grid-filter-label" className={styles['tale-grid__filter-label']}>
                         {t('grid.filterLabel')}
                     </span>
-                    {filterOptions.map(({ value, label }) => (
-                        <button
-                            key={value}
-                            type="button"
-                            role="radio"
-                            onClick={() => setFilter(value)}
-                            aria-checked={filter === value}
-                            className={clsx(styles['tale-grid__chip'], {
-                                [styles['m-active']]: filter === value,
-                            })}
-                        >
-                            {label}
-                        </button>
-                    ))}
+                    <div
+                        role="radiogroup"
+                        aria-labelledby="tale-grid-filter-label"
+                        className={styles['tale-grid__filters']}
+                    >
+                        {filterOptions.map(({ value, label }) => (
+                            <button
+                                key={value}
+                                type="button"
+                                role="radio"
+                                onClick={() => setFilter(value)}
+                                aria-checked={filter === value}
+                                className={clsx(styles['tale-grid__chip'], {
+                                    [styles['m-active']]: filter === value,
+                                })}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 

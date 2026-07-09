@@ -10,18 +10,23 @@ export interface IChapterListProps {
     pages: IPage[];
     activePageIndex: number;
     onPageClick: (pageIndex: number) => void;
+    layout?: 'sidebar' | 'rail';
 }
 
 export default function ChapterList({
     pages,
     activePageIndex,
     onPageClick,
+    layout = 'sidebar',
 }: Readonly<IChapterListProps>): React.ReactElement {
     const t = useTranslations('storyReader.chapters');
     const lastPageIndex = pages.length - 1;
 
     return (
-        <nav className={styles['chapter-list']} aria-label={t('ariaLabel')}>
+        <nav
+            className={clsx(styles['chapter-list'], styles[`m-${layout}`])}
+            aria-label={t('ariaLabel')}
+        >
             <div className={styles['chapter-list__header']}>
                 <CapsLabel variant="gold">{t('eyebrow')}</CapsLabel>
             </div>

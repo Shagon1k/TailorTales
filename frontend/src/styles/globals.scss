@@ -12,6 +12,7 @@
 html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
 }
 
 body {
@@ -22,6 +23,7 @@ body {
     background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-sans);
+    overflow-x: clip;
 }
 
 // ---- Focus ring ----

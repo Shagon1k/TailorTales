@@ -3,10 +3,11 @@ import clsx from 'clsx';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import styles from './BrandMark.module.scss';
 
-type TBrandMarkSize = 'default' | 'lg';
+type TBrandMarkSize = 'default' | 'md' | 'lg';
 
 const LOGO_SIZE: Record<TBrandMarkSize, number> = {
     default: 36,
+    md: 44,
     lg: 56,
 };
 
@@ -22,6 +23,7 @@ export default function BrandMark({
             href="/"
             className={clsx(styles.brand, {
                 [styles['m-default']]: size === 'default',
+                [styles['m-md']]: size === 'md',
                 [styles['m-lg']]: size === 'lg',
             })}
         >

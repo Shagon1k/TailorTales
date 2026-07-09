@@ -93,3 +93,9 @@
     color: var(--text-accent);
     flex-shrink: 0;
 }
+
+@media (max-width: 767px) {
+    .price-amount {
+        font-size: var(--fs-4xl);
+    }
+}

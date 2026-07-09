@@ -1,8 +1,6 @@
-@use 'styles/interactions' as *;
-
 .button {
     font-family: var(--font-sans);
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: 0;
     transition:
         box-shadow var(--duration-base) var(--ease-out),
@@ -33,82 +31,101 @@
 
     // Variants
     &.m-primary {
-        background: linear-gradient(180deg, #ff986d 0%, #f86e42 100%);
+        background: linear-gradient(135deg, #fb9a6f 0%, #f86e42 68%, #dbb155 145%);
         color: var(--text-on-card);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid color-mix(in srgb, var(--accent-gold) 28%, var(--accent-primary));
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.18),
-            0 8px 22px -14px rgba(248, 110, 66, 0.4);
+            inset 0 0 0 1px rgba(255, 244, 230, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            0 10px 26px -18px rgba(219, 177, 85, 0.42);
 
         &:not([data-disabled]):hover {
-            background: linear-gradient(180deg, #ff986d 0%, #f86e42 100%);
-            border-color: rgba(255, 255, 255, 0.16);
+            border-color: color-mix(in srgb, var(--accent-gold) 45%, var(--accent-primary));
             box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 1px rgba(248, 110, 66, 0.32),
-                0 14px 28px -16px rgba(248, 110, 66, 0.46);
+                inset 0 0 0 1px rgba(255, 244, 230, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 0 0 1px color-mix(in srgb, var(--accent-gold) 20%, transparent),
+                0 14px 30px -18px rgba(219, 177, 85, 0.52);
             transform: translateY(-1px);
         }
 
         &:not([data-disabled]):active {
-            transform: translateY(0);
-            border-color: rgba(255, 255, 255, 0.16);
+            background: linear-gradient(135deg, #f48763 0%, #ec603c 68%, #c99848 145%);
+            border-color: color-mix(in srgb, var(--accent-gold) 38%, var(--accent-primary));
             box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 0 1px rgba(248, 110, 66, 0.32),
-                0 10px 20px -14px rgba(248, 110, 66, 0.38);
+                inset 0 2px 6px rgba(78, 25, 30, 0.2),
+                inset 0 0 0 1px rgba(255, 244, 230, 0.12),
+                0 6px 16px -16px rgba(219, 177, 85, 0.38);
+            transform: translateY(1px);
         }
     }
 
     &.m-secondary {
-        background: rgba(248, 234, 206, 0.14);
+        background: color-mix(in srgb, var(--accent-gold) 12%, transparent);
         color: var(--text-primary);
-        border: 1px solid var(--border-subtle);
-        @include button-accent-outline-feedback(
-            color-mix(in srgb, var(--accent-primary) 14%, var(--bg-elevated)),
-            color-mix(in srgb, var(--accent-primary) 20%, var(--bg-elevated)),
-            var(--text-primary),
-            var(--text-primary)
-        );
+        border: 1px solid color-mix(in srgb, var(--accent-gold) 34%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 5%, transparent);
+
+        &:not([data-disabled]):hover {
+            border-color: color-mix(in srgb, var(--accent-gold) 48%, transparent);
+            background: color-mix(in srgb, var(--accent-gold) 17%, transparent);
+            box-shadow:
+                inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 6%, transparent),
+                0 0 0 1px color-mix(in srgb, var(--accent-gold) 16%, transparent),
+                0 10px 24px -20px rgba(219, 177, 85, 0.45);
+            transform: translateY(-1px);
+        }
+
+        &:not([data-disabled]):active {
+            border-color: color-mix(in srgb, var(--accent-gold) 42%, transparent);
+            background: color-mix(in srgb, var(--accent-gold) 20%, transparent);
+            box-shadow:
+                inset 0 2px 6px rgba(46, 16, 17, 0.18),
+                inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 4%, transparent);
+            transform: translateY(1px);
+        }
     }
 
     &.m-quiet {
         background: transparent;
-        color: var(--text-secondary);
-        border: 1px solid var(--border-subtle);
-        @include button-accent-outline-feedback(
-            color-mix(in srgb, var(--accent-primary) 12%, transparent),
-            color-mix(in srgb, var(--accent-primary) 18%, transparent),
-            var(--text-primary),
-            var(--text-primary)
-        );
-    }
-
-    &.m-on-card {
-        background: transparent;
-        color: var(--text-on-card);
-        border: 1.5px solid var(--border-on-card);
-        @include button-accent-outline-feedback(
-            color-mix(in srgb, var(--accent-primary) 8%, var(--bg-card)),
-            color-mix(in srgb, var(--accent-primary) 12%, var(--bg-card)),
-            var(--text-on-card),
-            var(--text-on-card)
-        );
-    }
-
-    &.m-light {
-        background: var(--bg-card);
-        color: var(--text-on-card);
-        border: none;
+        color: color-mix(in srgb, var(--accent-gold) 66%, var(--text-primary));
+        border: 1px solid color-mix(in srgb, var(--accent-gold) 20%, transparent);
 
         &:not([data-disabled]):hover {
-            background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-card));
-            box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+            border-color: color-mix(in srgb, var(--accent-gold) 36%, transparent);
+            background: color-mix(in srgb, var(--accent-gold) 8%, transparent);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-gold) 12%, transparent);
+            transform: translateY(-1px);
         }
 
         &:not([data-disabled]):active {
-            background: color-mix(in srgb, var(--accent-primary) 10%, var(--bg-card));
-            box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+            border-color: color-mix(in srgb, var(--accent-gold) 30%, transparent);
+            background: color-mix(in srgb, var(--accent-gold) 12%, transparent);
+            box-shadow: inset 0 2px 5px rgba(46, 16, 17, 0.18);
+            transform: translateY(1px);
+        }
+    }
+
+    &.m-danger {
+        background: color-mix(in srgb, var(--accent-danger) 14%, transparent);
+        color: color-mix(in srgb, var(--accent-danger) 82%, var(--text-primary));
+        border: 1px solid color-mix(in srgb, var(--accent-danger) 26%, transparent);
+
+        &:not([data-disabled]):hover {
+            border-color: color-mix(in srgb, var(--accent-danger) 46%, transparent);
+            background: color-mix(in srgb, var(--accent-danger) 20%, transparent);
+            box-shadow:
+                0 0 0 1px color-mix(in srgb, var(--accent-danger) 18%, transparent),
+                0 10px 24px -20px color-mix(in srgb, var(--accent-danger) 44%, transparent);
+            transform: translateY(-1px);
+        }
+
+        &:not([data-disabled]):active {
+            border-color: color-mix(in srgb, var(--accent-danger) 46%, transparent);
+            background: color-mix(in srgb, var(--accent-danger) 24%, transparent);
+            box-shadow: inset 0 2px 6px rgba(46, 16, 17, 0.2);
+            transform: translateY(1px);
         }
     }
 }

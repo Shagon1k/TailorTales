@@ -163,7 +163,7 @@ export default function TaleCard({ story }: Readonly<ITaleCardProps>): React.Rea
                         >
                             {t('deleteModal.cancelButton')}
                         </Button>
-                        <Button variant="primary" onClick={handleDelete} loading={isDeleting}>
+                        <Button variant="danger" onClick={handleDelete} loading={isDeleting}>
                             {t('deleteModal.deleteButton')}
                         </Button>
                     </div>

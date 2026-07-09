@@ -108,10 +108,10 @@ export default function UsersPage(): React.ReactElement {
                     {t('suspendModal.body', { name: pendingSuspend?.name ?? '' })}
                 </p>
                 <div className={styles['page__confirm-actions']}>
-                    <Button variant="secondary" onClick={() => setPendingSuspend(null)}>
+                    <Button variant="quiet" onClick={() => setPendingSuspend(null)}>
                         {t('suspendModal.cancel')}
                     </Button>
-                    <Button onClick={confirmSuspend} disabled={isSuspending}>
+                    <Button variant="danger" onClick={confirmSuspend} disabled={isSuspending}>
                         {t('suspendModal.confirm')}
                     </Button>
                 </div>

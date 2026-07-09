@@ -28,6 +28,7 @@ export default function StoryPageIframe({
     const [error, setError] = useState<string | null>(null);
     const [scale, setScale] = useState(1);
     const [isFrameReady, setIsFrameReady] = useState(false);
+    const showSkeleton = isLoading && !html;
 
     useEffect(() => {
         const cacheKey = `${storyId}:${pageOrder}:${refreshToken}`;
@@ -97,7 +98,7 @@ export default function StoryPageIframe({
                     transform: `scale(${scale})`,
                 }}
             >
-                {isLoading && (
+                {showSkeleton && (
                     <div
                         className={styles['page-iframe__skeleton']}
                         aria-busy="true"

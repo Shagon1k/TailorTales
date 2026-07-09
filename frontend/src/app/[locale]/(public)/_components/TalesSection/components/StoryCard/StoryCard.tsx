@@ -146,7 +146,7 @@ export default function StoryCard({
 
                     {pdfUrl && (
                         <div className={styles['story-card__actions']}>
-                            <Link href={pdfUrl} target="_blank" rel="noreferrer" variant="default">
+                            <Link href={pdfUrl} target="_blank" rel="noreferrer">
                                 {t('card.previewPdfLink')}
                             </Link>
                         </div>

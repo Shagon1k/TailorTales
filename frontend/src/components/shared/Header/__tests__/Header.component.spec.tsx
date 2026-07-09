@@ -114,6 +114,13 @@ describe('Header', () => {
             expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
         });
 
+        it('should keep Notifications inside the desktop navigation cluster', () => {
+            renderWithMantine(<Header variant="private" />);
+
+            const nav = screen.getByRole('navigation', { name: /main navigation/i });
+            expect(nav).toContainElement(screen.getByRole('button', { name: /notifications/i }));
+        });
+
         it('should render the account menu trigger', () => {
             renderWithMantine(<Header variant="private" />);
             expect(screen.getByRole('button', { name: /account menu/i })).toBeInTheDocument();

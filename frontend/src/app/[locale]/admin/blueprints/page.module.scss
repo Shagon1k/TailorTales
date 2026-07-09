@@ -38,3 +38,15 @@
         box-shadow: 0 6px 9px rgba(0, 0, 0, 0.35);
     }
 }
+
+@media (max-width: 767px) {
+    .page__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .page__action {
+        justify-content: center;
+        min-height: var(--hit-min);
+    }
+}

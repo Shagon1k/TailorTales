@@ -12,3 +12,10 @@
     @include t-body-sm;
     color: var(--text-muted);
 }
+
+@media (max-width: 767px) {
+    .pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

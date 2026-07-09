@@ -4,3 +4,11 @@
     padding: var(--space-8) var(--layout-gutter);
     width: 100%;
 }
+
+@media (max-width: 1023px) {
+    .main {
+        padding-bottom: calc(
+            var(--mobile-footer-nav-height) + var(--mobile-footer-nav-bottom) + var(--space-3)
+        );
+    }
+}

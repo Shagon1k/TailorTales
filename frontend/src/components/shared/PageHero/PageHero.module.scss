@@ -29,3 +29,24 @@
     font-style: italic;
     color: var(--text-accent);
 }
+
+@media (max-width: 1023px) {
+    .hero {
+        padding: var(--space-16) var(--layout-gutter) var(--space-12);
+    }
+}
+
+@media (max-width: 767px) {
+    .hero {
+        padding: var(--space-12) var(--layout-gutter) var(--space-8);
+        gap: var(--space-4);
+    }
+
+    .hero__heading {
+        font-size: var(--fs-3xl);
+    }
+
+    .hero__sub {
+        font-size: var(--fs-base);
+    }
+}

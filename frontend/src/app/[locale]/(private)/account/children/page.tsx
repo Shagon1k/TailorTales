@@ -272,23 +272,29 @@ export default function ChildrenPage(): React.ReactElement {
                 size="sm"
             >
                 {modal.kind === 'delete' && (
-                    <div className={styles['delete-confirm']}>
-                        <p className={styles['delete-confirm__text']}>
-                            {t('deleteConfirm', { childName: modal.child.name })}
-                        </p>
-                        <div className={styles['delete-confirm__actions']}>
-                            <Button variant="quiet" onClick={close} disabled={isDeleting}>
-                                {t('deleteModal.cancelButton')}
-                            </Button>
-                            <Button
-                                variant="primary"
-                                loading={isDeleting}
-                                onClick={() => deleteChild(modal.child.id, { onSuccess: close })}
-                            >
-                                {t('deleteModal.deleteButton')}
-                            </Button>
+                    <>
+                        <div className={styles['delete-confirm']}>
+                            <p className={styles['delete-confirm__text']}>
+                                {t('deleteConfirm', { childName: modal.child.name })}
+                            </p>
                         </div>
-                    </div>
+                        <Modal.Footer>
+                            <div className={styles['delete-confirm__actions']}>
+                                <Button variant="quiet" onClick={close} disabled={isDeleting}>
+                                    {t('deleteModal.cancelButton')}
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    loading={isDeleting}
+                                    onClick={() =>
+                                        deleteChild(modal.child.id, { onSuccess: close })
+                                    }
+                                >
+                                    {t('deleteModal.deleteButton')}
+                                </Button>
+                            </div>
+                        </Modal.Footer>
+                    </>
                 )}
             </Modal>
 
@@ -299,25 +305,35 @@ export default function ChildrenPage(): React.ReactElement {
                 size="sm"
             >
                 {modal.kind === 'deleteCharacter' && (
-                    <div className={styles['delete-confirm']}>
-                        <p className={styles['delete-confirm__text']}>
-                            {t('deleteCharacterConfirm', { characterName: modal.character.name })}
-                        </p>
-                        <div className={styles['delete-confirm__actions']}>
-                            <Button variant="quiet" onClick={close} disabled={isDeletingCharacter}>
-                                {t('deleteModal.cancelButton')}
-                            </Button>
-                            <Button
-                                variant="primary"
-                                loading={isDeletingCharacter}
-                                onClick={() =>
-                                    deleteCharacter(modal.character.id, { onSuccess: close })
-                                }
-                            >
-                                {t('deleteModal.deleteButton')}
-                            </Button>
+                    <>
+                        <div className={styles['delete-confirm']}>
+                            <p className={styles['delete-confirm__text']}>
+                                {t('deleteCharacterConfirm', {
+                                    characterName: modal.character.name,
+                                })}
+                            </p>
                         </div>
-                    </div>
+                        <Modal.Footer>
+                            <div className={styles['delete-confirm__actions']}>
+                                <Button
+                                    variant="quiet"
+                                    onClick={close}
+                                    disabled={isDeletingCharacter}
+                                >
+                                    {t('deleteModal.cancelButton')}
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    loading={isDeletingCharacter}
+                                    onClick={() =>
+                                        deleteCharacter(modal.character.id, { onSuccess: close })
+                                    }
+                                >
+                                    {t('deleteModal.deleteButton')}
+                                </Button>
+                            </div>
+                        </Modal.Footer>
+                    </>
                 )}
             </Modal>
         </div>

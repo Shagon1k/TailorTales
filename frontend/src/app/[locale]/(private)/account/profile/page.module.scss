@@ -1,5 +1,36 @@
 @use 'styles/typography' as *;
 
+.profile {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: var(--space-8) 0;
+}
+
+.profile__stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.profile__form {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.profile__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
 .profile__file-input {
     display: none;
 }
@@ -67,10 +98,26 @@
     @include t-heading-2xl;
     color: var(--text-primary);
     margin: 0;
+    width: 100%;
+    text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .email {
     @include t-body-base;
     color: var(--text-secondary);
     margin: 0;
+    width: 100%;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 1023px) {
+    .profile {
+        padding: var(--space-6) 0 0;
+    }
+
+    .profile__stack {
+        align-items: center;
+    }
 }

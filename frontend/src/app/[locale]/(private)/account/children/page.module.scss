@@ -105,7 +105,11 @@
     gap: var(--space-3);
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1023px) {
+    .page {
+        padding-bottom: 0;
+    }
+
     .content {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -115,7 +119,10 @@
         min-width: 0;
         position: static;
     }
+}
 
-    .utility {
+@media (max-width: 767px) {
+    .content {
+        gap: var(--space-5);
     }
 }

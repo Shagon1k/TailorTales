@@ -1,0 +1,28 @@
+.icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.m-sm {
+    width: 18px;
+    height: 18px;
+}
+
+.m-md {
+    width: 20px;
+    height: 20px;
+}
+
+.m-lg {
+    width: 28px;
+    height: 28px;
+}
+
+.m-accent {
+    color: var(--text-accent);
+}
+
+.m-danger {
+    color: var(--accent-danger);
+}

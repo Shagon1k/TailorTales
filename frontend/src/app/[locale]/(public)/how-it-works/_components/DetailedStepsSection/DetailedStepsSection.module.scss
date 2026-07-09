@@ -68,3 +68,30 @@
     display: flex;
     gap: var(--space-2);
 }
+
+@media (max-width: 767px) {
+    .steps {
+        padding: 0 var(--layout-gutter) var(--space-12);
+    }
+
+    .steps__mascot {
+        display: none;
+    }
+
+    .step {
+        gap: var(--space-4);
+    }
+
+    .step__numeral {
+        width: var(--space-8);
+        font-size: var(--fs-2xl);
+    }
+
+    .step__title {
+        font-size: var(--fs-xl);
+    }
+
+    .step__body {
+        font-size: var(--fs-base);
+    }
+}

@@ -37,3 +37,18 @@
     max-width: 400px;
     margin: 0;
 }
+
+@media (max-width: 767px) {
+    .cta {
+        padding: var(--space-10) var(--layout-gutter) var(--space-12);
+    }
+
+    .cta__card {
+        padding: var(--space-10) var(--space-5);
+        border-radius: var(--radius-lg);
+    }
+
+    .cta__heading {
+        font-size: var(--fs-2xl);
+    }
+}

@@ -53,3 +53,12 @@
     justify-content: flex-end;
     gap: var(--space-3);
 }
+
+@media (max-width: 767px) {
+    .page__header,
+    .page__search,
+    .page__confirm-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

@@ -1,7 +1,11 @@
 import styles from './Table.module.scss';
 
 function TableRoot({ children }: { children: React.ReactNode }): React.ReactElement {
-    return <table className={styles.table}>{children}</table>;
+    return (
+        <div className={styles.table__scroll}>
+            <table className={styles.table}>{children}</table>
+        </div>
+    );
 }
 
 function TableHead({ children }: { children?: React.ReactNode }): React.ReactElement {

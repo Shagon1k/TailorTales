@@ -1,6 +1,7 @@
 import AuthGuard from './_components/AuthGuard/AuthGuard';
 import Header from '@/components/shared/Header/Header';
 import Footer from '@/components/shared/Footer/Footer';
+import MobileFooterNav from '@/components/shared/MobileFooterNav/MobileFooterNav';
 import styles from './layout.module.scss';
 
 interface IPrivateLayoutProps {
@@ -14,6 +15,7 @@ export default function PrivateLayout({
         <AuthGuard>
             <Header variant="private" />
             <main className={styles.main}>{children}</main>
+            <MobileFooterNav authenticated />
             <Footer />
         </AuthGuard>
     );

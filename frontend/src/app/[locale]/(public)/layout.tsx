@@ -1,6 +1,8 @@
 import { getServerUser } from '@/api/user.server';
 import Header from '@/components/shared/Header/Header';
 import Footer from '@/components/shared/Footer/Footer';
+import MobileFooterNav from '@/components/shared/MobileFooterNav/MobileFooterNav';
+import styles from './layout.module.scss';
 
 interface IPublicLayoutProps {
     children: React.ReactNode;
@@ -14,7 +16,8 @@ export default async function PublicLayout({
     return (
         <>
             <Header variant={user ? 'private' : 'public'} />
-            <main>{children}</main>
+            <main className={styles.main}>{children}</main>
+            <MobileFooterNav authenticated={Boolean(user)} />
             <Footer />
         </>
     );

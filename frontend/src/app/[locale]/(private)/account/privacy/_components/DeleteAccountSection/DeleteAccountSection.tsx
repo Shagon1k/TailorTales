@@ -25,11 +25,11 @@ export default function DeleteAccountSection({
                 {hasPaidSubscription && (
                     <p className={styles['delete-account__blocked']}>{t('blocked')}</p>
                 )}
-                <Group>
+                <Group justify="flex-end">
                     <DeleteAccountAction>
                         {({ disabled, openModal }) => (
                             <Button
-                                variant="secondary"
+                                variant="danger"
                                 disabled={disabled}
                                 onClick={() => openModal()}
                             >
