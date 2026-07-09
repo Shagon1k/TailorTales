@@ -33,8 +33,8 @@ docker compose ps     # all three should be "healthy"
 
 | Service  | Port(s)                        | Credentials (dev)           |
 | -------- | ------------------------------ | --------------------------- |
-| Postgres | `5432`                         | `postgres` / `postgres`     |
-| Redis    | `6379`                         | —                           |
+| Postgres | `5433` host → `5432` container | `postgres` / `postgres`     |
+| Redis    | `6380` host → `6379` container | —                           |
 | MinIO    | `9000` (API), `9001` (console) | `minioadmin` / `minioadmin` |
 
 > The S3 bucket is **created automatically** on backend startup
@@ -123,6 +123,14 @@ pnpm format         # prettier --write .
 pnpm --filter ./backend db:studio    # Prisma Studio (browse the DB)
 docker compose down                  # stop services (data persists in volumes)
 ```
+
+Postgres and Redis use non-default host ports by default to avoid colliding with other local
+apps:
+
+| Service  | Override                                         | Backend env to match |
+| -------- | ------------------------------------------------ | -------------------- |
+| Postgres | `POSTGRES_HOST_PORT=<port> docker compose up -d` | `DATABASE_URL`       |
+| Redis    | `REDIS_HOST_PORT=<port> docker compose up -d`    | `REDIS_URL`          |
 
 ## First contribution checklist
 

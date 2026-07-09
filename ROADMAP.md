@@ -1070,14 +1070,14 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **Sub-tasks:**
 
-- [ ] Define the responsive foundation: supported breakpoints, page gutters, stacking rules, and when sticky / table / sidebar patterns must collapse
-- [ ] Adapt global shells and navigation: header, locale/account/notifications access, shared sidebar layouts, mobile-safe hero spacing, and replacements for desktop popovers/dropdowns where needed
-- [ ] Make the public experience mobile-ready: landing, pricing, how-it-works, contact, and privacy
-- [ ] Make the core private flows mobile-ready: workshop, library, account pages, children/characters flows, and story detail header/actions
+- [x] Define the responsive foundation: supported breakpoints, page gutters, stacking rules, and when sticky / table / sidebar patterns must collapse
+- [x] Adapt global shells and navigation: header, locale/account/notifications access, shared sidebar layouts, mobile-safe hero spacing, and replacements for desktop popovers/dropdowns where needed
+- [x] Make the public experience mobile-ready: landing, pricing, how-it-works, contact, and privacy
+- [x] Make the core private flows mobile-ready: workshop, library, account pages, children/characters flows, and story detail header/actions
 - [ ] Add dedicated mobile behavior for reading and generation flows: chapter navigation replacement, side panels, preview/progress screens, page grids, and touch-friendly controls
-- [ ] Define modal and overlay behavior on mobile: sizing, full-height/full-screen cases, sticky headers/footers, and safe interaction with long forms
-- [ ] Decide and implement the admin mobile policy: responsive support for key screens or an explicit desktop-only fallback for table-heavy screens
-- [ ] Add mobile QA coverage for critical widths and flows
+- [x] Define modal and overlay behavior on mobile: sizing, full-height/full-screen cases, sticky headers/footers, and safe interaction with long forms
+- [x] Decide and implement the admin mobile policy: responsive support for key screens or an explicit desktop-only fallback for table-heavy screens
+- [x] Add mobile QA coverage for critical widths and flows
 
 **Acceptance Check:**
 
@@ -1088,6 +1088,8 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - Admin surfaces have a clear, intentional mobile policy rather than accidental breakage
 
 **Deliverables:** responsive foundation decisions + mobile-ready public/private core flows + QA notes in ROADMAP / phase doc.
+
+**Phase note:** see `_docs/phase-18-mobile-view-support.md`. First slice uses Mobile `<768px`, Tablet `768px–1023px`, Desktop `>=1024px`; mobile/tablet navigation now uses a fixed Quiet Dock with dark `Account` and `More` sheets. Authenticated private/admin browser QA remains before closing the phase.
 
 ---
 
@@ -1356,8 +1358,8 @@ flowchart LR
 | 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                        |
 | 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain. |
 | 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                  |
-| 17 — Final Manual Check-up          | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
-| 18 — Mobile View Support            | ⬜ Not started | Placeholder phase added; scope and acceptance criteria will be defined before implementation starts.                                                                                                                                                                                                                                            |
+| 17 — Final Manual Check-up          | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                 |
+| 18 — Mobile View Support            | 🟡 In progress | First responsive slice implemented: breakpoints, mobile/tablet Quiet Dock navigation with Account/More sheets, shared sidebar/modal/popover/table behavior, public pages, login, and core private/admin layout CSS. Public/login viewport QA passes at 360/390/768/1024; authenticated private/admin browser QA remains before closing.         |
 | 19 — Production Deploy              | ⬜ Not started |                                                                                                                                                                                                                                                                                                                                                 |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval
