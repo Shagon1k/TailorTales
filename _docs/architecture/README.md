@@ -181,6 +181,38 @@ directly.
 | `/admin/ratings`         | admin  | Read-only ratings view                                                       |
 | `/admin/blueprints`      | admin  | StoryBlueprint CRUD                                                          |
 
+### Responsive shell
+
+The web app supports three breakpoints:
+
+```text
+Mobile   < 768px
+Tablet   768px-1023px
+Desktop  >= 1024px
+```
+
+Desktop keeps the classic header-led navigation. Mobile and tablet use an
+application-style fixed footer dock, while the header keeps brand presence and the
+notification bell.
+
+| User state | Footer dock items                       | Sheet behavior                                                                  |
+| ---------- | --------------------------------------- | ------------------------------------------------------------------------------- |
+| Guest      | How it works · Pricing · Sign in · More | `More` contains secondary public links, including contact/privacy.              |
+| Signed in  | Library · Workshop · Account · More     | `Account` opens account sections; `More` contains language + public/help links. |
+
+Mobile/tablet route content should be intentionally adapted, not only squeezed:
+
+- Hero/header layouts center their primary content where the page reads like an app screen.
+- Sidebars collapse below desktop; account/admin section navigation moves into explicit
+  mobile affordances rather than staying as narrow desktop sidebars.
+- Table-heavy surfaces use contained horizontal scroll when a dense table is the clearest
+  representation.
+- Modals keep the app visible behind the overlay, preserve sticky headers, and use footer
+  action bars for long or destructive flows on mobile.
+- The story reader is single-column on mobile: the page preview, navigation, regeneration,
+  rating, and download actions are ordered as touch-friendly sections instead of a desktop
+  main/aside split.
+
 ### Session & client auth
 
 **Session seeding** — the root `layout.tsx` is an RSC. It calls `getServerUser()` and passes
@@ -252,10 +284,31 @@ Mantine and overrides it with compound modifier classes (`.button.m-primary`).
 The atom library (`src/components/ui/`) includes: `Button`, `Card`, `Badge`, `Rating`,
 `Avatar`, `Modal`, `Toast`, `Input`, `Textarea`, `Select`, `TagsInput`, `Divider`,
 `Progress`, `Link`, `CapsLabel`, `BrandMark`, `StatCard`, `NotificationBell`,
-`SuggestionChip`, `Popover`, `Switch`, `Table` (compound), `Loader`, `Pagination`.
+`SuggestionChip`, `Popover`, `Switch`, `Table` (compound), `Loader`, `Pagination`, `Icon`.
 Shared structural components (`src/components/shared/`) include `Header` (with
 `LocaleSwitcher`, `NotificationCenter`, `HeaderUserChip`), `Footer`, and `SidebarLayout`
 (used by both `/account` and `/admin`).
+
+#### Action elements
+
+`Button` is the single entry point for button styling. Supported variants are:
+
+| Variant     | Use for                                                   |
+| ----------- | --------------------------------------------------------- |
+| `primary`   | The main affirmative action on a surface                  |
+| `secondary` | Important non-primary actions, including external portals |
+| `quiet`     | Low-emphasis cancel/back/neutral actions                  |
+| `danger`    | Destructive confirmation actions                          |
+
+All variants use the same weight, hover glow, focus ring, and pressed active motion so the
+button system feels related rather than mixed from unrelated styles.
+
+`Link` defaults to the gold inline link treatment. Use quieter/on-card variants only when the
+surrounding surface already supplies enough emphasis.
+
+`Icon` centralizes local SVG icon configs used by navigation and shared actions. Add new
+inline SVGs there when an icon is shared across components; keep route-local one-off artwork
+co-located with the route.
 
 ## Infrastructure & integrations
 
