@@ -1,90 +1,162 @@
 # Deployment
 
-> How TailorTales is built and deployed to production. The deployment platform is
-> **[Dokploy](https://dokploy.com)** (a self-hosted PaaS). Each app has its own Dockerfile
-> in the repo root — `backend/Dockerfile` and `frontend/Dockerfile`.
+> TailorTales deploys through **[Dokploy](https://dokploy.com)** as one Compose resource per
+> environment. UAT and production use the same
+> [`deploy/docker-compose.yml`](../../deploy/docker-compose.yml); only their Dokploy environment
+> values and Git triggers differ.
 
-## Docker images
+## Compose topology
 
-Both images use a **3-stage build** (`deps` → `build` → `run`) on `node:24-alpine`:
+The root [`docker-compose.yml`](../../docker-compose.yml) remains local-development
+infrastructure (Postgres, Redis, and MinIO). It is not the Dokploy deployment definition.
 
-### Backend (`backend/Dockerfile`)
+```mermaid
+flowchart LR
+  T["Git trigger"] --> R["release<br/>migrate + idempotent seeds"]
+  R -->|"exit 0"| B["backend"]
+  B -->|"healthy /health"| F["frontend"]
+  R -->|"non-zero exit"| X["deployment stops"]
+```
 
-| Stage   | What it does                                                                                        |
-| ------- | --------------------------------------------------------------------------------------------------- |
-| `deps`  | Installs production-only dependencies (`pnpm install --prod`).                                      |
-| `build` | Installs all deps, compiles TypeScript (`pnpm build`), generates the Prisma client.                 |
-| `run`   | Copies prod deps + compiled output; exposes port **3001**; starts with `node backend/dist/main.js`. |
-
-The Prisma client is generated **at build time** (`pnpm --filter backend db:generate`), so no
-database connection is required during the Docker build — only `DATABASE_URL` at runtime.
-
-### Frontend (`frontend/Dockerfile`)
-
-| Stage   | What it does                                                                                           |
-| ------- | ------------------------------------------------------------------------------------------------------ |
-| `deps`  | Installs production-only dependencies.                                                                 |
-| `build` | Installs all deps, runs `next build` with `NEXT_TELEMETRY_DISABLED=1`.                                 |
-| `run`   | Copies prod deps + `.next/` build output + `public/`; exposes port **3000**; starts with `next start`. |
-
-> `NEXT_TELEMETRY_DISABLED=1` is set in the Dockerfile to suppress Next.js telemetry in CI and production builds.
-
-> **Sentry source maps:** the `build` stage takes a `SENTRY_AUTH_TOKEN` build arg. When set,
-> `next build` (via `withSentryConfig`) uploads source maps to Sentry so production stack traces
-> are de-minified. Set it as a **Dokploy build-time variable** on the frontend app — it's a
-> build-only secret, scoped to the `build` stage and never copied into the runtime image. Leave
-> it unset and the build still succeeds (upload is skipped). It is **not** a GitHub Actions
-> secret — GitHub CI doesn't build images.
-
-## Environment variables
-
-All backend env vars must be injected at container start — there is no bundled `.env` file.
-Full reference: **[environment-variables.md](environment-variables.md)**.
-
-Critical production differences from dev:
-
-| Variable                   | Prod value                                     |
-| -------------------------- | ---------------------------------------------- |
-| `NODE_ENV`                 | `production`                                   |
-| `STORAGE_ENDPOINT`         | **Unset** (use AWS S3, not MinIO)              |
-| `STORAGE_FORCE_PATH_STYLE` | **Unset** (defaults false)                     |
-| `USE_AI_STUBS`             | `false`                                        |
-| `USE_EMAIL_STUBS`          | `false`                                        |
-| `JWT_SECRET`               | A long, random secret — never reuse dev values |
-| `BACKEND_URL`              | Your production backend domain                 |
-| `FRONTEND_URL`             | Your production frontend domain                |
-
-## Database migrations
-
-Migrations must be applied **before** deploying a new backend version. The command:
+`release` is a one-shot service built from `backend/Dockerfile.release`. On every deployment it
+runs, in order:
 
 ```bash
 pnpm --filter backend db:migrate:deploy
+pnpm --filter backend seed:art-styles
+pnpm --filter backend seed:pricing-tiers
 ```
 
-This runs `prisma migrate deploy` — it applies only pending migrations (idempotent; safe to
-re-run). It requires a live `DATABASE_URL`.
+The shell exits on the first failure. Compose starts `backend` only after `release` succeeds,
+then starts `frontend` only after the backend health check passes. This is automatic: nobody
+manually runs migrations or presses a second deploy button.
 
-**Recommended deployment order:**
+UAT and production keep their Dokploy-managed PostgreSQL and Redis services; UAT also has a
+persistent MinIO resource. All Compose services join the external `dokploy-network`; no
+application port is published directly on the VPS. Dokploy/Traefik routes application domains
+to ports `3000` and `3001`.
 
-1. Apply migrations against the production database.
-2. Deploy the new backend image.
-3. Deploy the new frontend image.
+> A migration and application rollout cannot be globally atomic. Every schema migration shipped
+> through this flow must therefore be backward-compatible with the currently running backend
+> (expand first, deploy code, contract in a later release).
 
-> There is no automated migration step in the Docker image itself — migrations are a pre-deploy
-> operation, not a startup side-effect.
+## Images
+
+### Backend (`backend/Dockerfile`)
+
+| Stage   | What it does                                                                                           |
+| ------- | ------------------------------------------------------------------------------------------------------ |
+| `deps`  | Installs production-only dependencies; skips Puppeteer's bundled-browser download.                     |
+| `build` | Installs all dependencies, generates the Prisma client, then compiles it with the backend.             |
+| `run`   | Copies runtime files and `newrelic.cjs`, installs Alpine Chromium for PDF rendering, and exposes 3001. |
+
+The Prisma client is generated at build time with a non-secret dummy URL because Prisma 7
+requires the variable while loading its config; no database connection is opened.
+The real `DATABASE_URL` is required only by `release` and the running backend.
+
+### Release (`backend/Dockerfile.release`)
+
+Installs the backend tooling and source needed by Prisma migrations and idempotent seed scripts.
+It is separate from the lean backend runtime image and never serves traffic.
+
+### Frontend (`frontend/Dockerfile`)
+
+Next.js `NEXT_PUBLIC_*` values are compiled into browser bundles during `next build`. The
+Dockerfile therefore declares them as build arguments, while Compose also supplies them at
+runtime for server-rendered code. Changing a public value requires a new image build.
+
+`SENTRY_AUTH_TOKEN` is a build-only secret used to upload source maps. Compose exposes it to the
+single `next build` instruction as a BuildKit secret; it is absent from image layers and the
+frontend runtime environment. Compose also fixes `SENTRY_SOURCE_MAP_UPLOAD_REQUIRED=true`, so a
+Dokploy build without the token fails instead of silently shipping minified stack traces. Direct
+local image builds leave that build arg at its `false` default and may skip the upload.
+
+## Environment contract
+
+Paste a complete copy of [`deploy/.env.example`](../../deploy/.env.example) into each Dokploy
+Compose environment and replace every `CHANGE_ME` value. Do not commit real values.
+
+The Compose file deliberately reduces duplicate inputs:
+
+| Dokploy input        | Backend use           | Frontend use                     |
+| -------------------- | --------------------- | -------------------------------- |
+| `BACKEND_URL`        | Public backend origin | `NEXT_PUBLIC_BACKEND_URL`        |
+| `FRONTEND_URL`       | CORS/frontend origin  | `NEXT_PUBLIC_SITE_URL`           |
+| `PADDLE_ENVIRONMENT` | Paddle server SDK     | `NEXT_PUBLIC_PADDLE_ENV`         |
+| `SENTRY_ENVIRONMENT` | Backend event tag     | `NEXT_PUBLIC_SENTRY_ENVIRONMENT` |
+
+Shared remote-runtime invariants (`NODE_ENV=production`, real-service stub flags off, Sentry on,
+and the New Relic loader enabled) are fixed in Compose rather than copied into every Dokploy
+environment.
+
+`NODE_ENV=production` is correct for both remote profiles: it selects optimized framework
+runtime behavior, not the business environment. These values select UAT versus production:
+
+| Input                | UAT                                   | Production                    |
+| -------------------- | ------------------------------------- | ----------------------------- |
+| `BACKEND_URL`        | `https://api-uat.tailortales.app`     | `https://api.tailortales.app` |
+| `FRONTEND_URL`       | `https://uat.tailortales.app`         | `https://tailortales.app`     |
+| `DATABASE_URL`       | dedicated UAT database                | dedicated production database |
+| `REDIS_URL`          | UAT database/index                    | production database/index     |
+| `PADDLE_ENVIRONMENT` | `sandbox`                             | `production`                  |
+| `STORAGE_ENDPOINT`   | public UAT MinIO API origin           | absent; AWS regional endpoint |
+| `STORAGE_BUCKET`     | MinIO `tailortales-uat`               | S3 `tailortales-prod`         |
+| `SENTRY_ENVIRONMENT` | `uat`                                 | `production`                  |
+| `NEW_RELIC_APP_NAME` | `TailorTales-UAT`                     | `TailorTales-Prod`            |
+| `GA`                 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` empty | production GA4 measurement ID |
+
+Credentials, OAuth clients, webhook secrets, and Paddle catalog IDs also use their
+environment-specific values from the Phase 19 matrix.
+
+For UAT, `STORAGE_ENDPOINT=https://storage-uat.tailortales.app` and
+`STORAGE_FORCE_PATH_STYLE=true`. That domain routes to the MinIO API on port `9000`; presigned
+URLs embed this endpoint, so an internal Docker hostname would not work in browsers. Keep the
+MinIO console on port `9001` private. In production, omit both variables so the AWS SDK uses the
+regional S3 endpoint. The complete variable reference and build/runtime classification is in
+[environment-variables.md](environment-variables.md).
+
+## Dokploy resources and triggers
+
+Create two Compose resources pointing to `deploy/docker-compose.yml`:
+
+| Resource   | Git ref / trigger                    | Environment values |
+| ---------- | ------------------------------------ | ------------------ |
+| UAT        | `main`; auto-deploy on every merge   | UAT/sandbox values |
+| Production | explicit SemVer tag such as `v1.0.0` | live values        |
+
+Do not configure separate backend/frontend auto-deploy webhooks. The Compose resource owns the
+ordered release and both application services as one deployment unit.
+
+## Safe UAT cutover
+
+Do not delete the existing `backend-uat` and `frontend-uat` applications before validation:
+
+1. Disable their automatic deploy triggers, but leave the running containers and domains intact.
+2. Provision persistent UAT MinIO, route `storage-uat.tailortales.app` to API port `9000`, and
+   keep its console private.
+3. Create the new UAT Compose resource from the same Git revision.
+4. Add the full UAT env set and deploy with temporary backend/frontend domains.
+5. Verify `release` exited `0`, backend is healthy, frontend loads, OAuth works, and one story
+   reaches PDF generation.
+6. Move the real UAT domains from the old applications to the Compose services.
+7. Run the smoke checklist again through the real domains.
+8. Delete the old `backend-uat` and `frontend-uat` applications only after the new route is
+   proven. Keep the Dokploy PostgreSQL, Redis, and MinIO resources.
+
+Rollback means redeploying a previously known-good Git revision. Because database migrations
+remain applied, rollback is safe only while migrations follow the expand-contract rule.
 
 ## CI pipeline
 
-`.github/workflows/ci.yml` runs on every push and PR to `main`:
+`.github/workflows/ci.yml` runs on every push and pull request to `main`:
 
-| Step                   | Command           | Notes                                                            |
-| ---------------------- | ----------------- | ---------------------------------------------------------------- |
-| Install                | `pnpm install`    | Frozen lockfile; uses `.nvmrc` for Node version.                 |
-| Generate Prisma client | `db:generate`     | Uses a dummy `DATABASE_URL` — no live DB needed.                 |
-| Lint + format check    | `pnpm check`      | ESLint + Prettier.                                               |
-| Type-check             | `pnpm type-check` | `tsc --noEmit` in both packages.                                 |
-| Test                   | `pnpm test`       | Vitest (backend + frontend). Must pass with `USE_AI_STUBS=true`. |
+| Step                   | Command           | Notes                                            |
+| ---------------------- | ----------------- | ------------------------------------------------ |
+| Install                | `pnpm install`    | Frozen lockfile; uses `.nvmrc` for Node version. |
+| Generate Prisma client | `db:generate`     | Uses a dummy `DATABASE_URL`; no live DB needed.  |
+| Lint + format check    | `pnpm check`      | ESLint + Prettier.                               |
+| Type-check             | `pnpm type-check` | Type-checks both packages.                       |
+| Test                   | `pnpm test`       | Vitest with external-service stubs.              |
 
-The CI workflow does **not** build Docker images or push to a registry — that step is handled
-by Dokploy, which is configured to build and deploy on a new commit to `main`.
+CI does not deploy individual applications. Dokploy receives the configured Git trigger and
+builds the Compose services from the repository.

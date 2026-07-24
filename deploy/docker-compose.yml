@@ -1,0 +1,138 @@
+services:
+    release:
+        build:
+            context: ..
+            dockerfile: backend/Dockerfile.release
+        environment:
+            DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+            PADDLE_PRODUCT_ID_STORY_HOUR: ${PADDLE_PRODUCT_ID_STORY_HOUR:?PADDLE_PRODUCT_ID_STORY_HOUR is required}
+            PADDLE_PRICE_ID_STORY_HOUR: ${PADDLE_PRICE_ID_STORY_HOUR:?PADDLE_PRICE_ID_STORY_HOUR is required}
+            PADDLE_PRODUCT_ID_FAMILY_WORKSHOP: ${PADDLE_PRODUCT_ID_FAMILY_WORKSHOP:?PADDLE_PRODUCT_ID_FAMILY_WORKSHOP is required}
+            PADDLE_PRICE_ID_FAMILY_WORKSHOP: ${PADDLE_PRICE_ID_FAMILY_WORKSHOP:?PADDLE_PRICE_ID_FAMILY_WORKSHOP is required}
+        command:
+            - /bin/sh
+            - -ec
+            - |
+                pnpm --filter backend db:migrate:deploy
+                pnpm --filter backend seed:art-styles
+                pnpm --filter backend seed:pricing-tiers
+        networks:
+            - dokploy-network
+        restart: 'no'
+
+    backend:
+        build:
+            context: ..
+            dockerfile: backend/Dockerfile
+        environment:
+            NODE_ENV: production
+            PORT: '3001'
+            DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+            GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID is required}
+            GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET is required}
+            JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+            JWT_EXPIRY_DAYS: '7'
+            BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+            FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
+            REDIS_URL: ${REDIS_URL:?REDIS_URL is required}
+            OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?OPENROUTER_API_KEY is required}
+            OPENROUTER_TEXT_MODEL: ${OPENROUTER_TEXT_MODEL:?OPENROUTER_TEXT_MODEL is required}
+            OPENROUTER_IMAGE_MODEL: ${OPENROUTER_IMAGE_MODEL:?OPENROUTER_IMAGE_MODEL is required}
+            USE_AI_STUBS: 'false'
+            RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY is required}
+            RESEND_FROM: ${RESEND_FROM:?RESEND_FROM is required}
+            CONTACT_INBOX_EMAIL: ${CONTACT_INBOX_EMAIL:?CONTACT_INBOX_EMAIL is required}
+            USE_EMAIL_STUBS: 'false'
+            STORAGE_REGION: ${STORAGE_REGION:?STORAGE_REGION is required}
+            STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:?STORAGE_ACCESS_KEY is required}
+            STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:?STORAGE_SECRET_KEY is required}
+            STORAGE_BUCKET: ${STORAGE_BUCKET:?STORAGE_BUCKET is required}
+            STORAGE_ENDPOINT:
+            STORAGE_FORCE_PATH_STYLE:
+            USE_PADDLE_STUBS: 'false'
+            PADDLE_API_KEY: ${PADDLE_API_KEY:?PADDLE_API_KEY is required}
+            PADDLE_WEBHOOK_SECRET: ${PADDLE_WEBHOOK_SECRET:?PADDLE_WEBHOOK_SECRET is required}
+            PADDLE_ENVIRONMENT: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}
+            SENTRY_ENABLED: 'true'
+            SENTRY_DSN: ${SENTRY_DSN:?SENTRY_DSN is required}
+            SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:?SENTRY_ENVIRONMENT is required}
+            NODE_OPTIONS: --import newrelic/esm-loader.mjs
+            NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:?NEW_RELIC_LICENSE_KEY is required}
+            NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME:?NEW_RELIC_APP_NAME is required}
+        depends_on:
+            release:
+                condition: service_completed_successfully
+                restart: true
+        expose:
+            - '3001'
+        healthcheck:
+            test:
+                - CMD
+                - env
+                - -u
+                - NODE_OPTIONS
+                - node
+                - -e
+                - fetch('http://127.0.0.1:3001/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 20s
+        networks:
+            - dokploy-network
+        restart: unless-stopped
+
+    frontend:
+        build:
+            context: ..
+            dockerfile: frontend/Dockerfile
+            args:
+                NEXT_PUBLIC_SITE_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
+                NEXT_PUBLIC_BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+                NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL:?NEXT_PUBLIC_STORAGE_URL is required}
+                NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN:?NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is required}
+                NEXT_PUBLIC_PADDLE_ENV: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}
+                NEXT_PUBLIC_SENTRY_ENABLED: 'true'
+                NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:?NEXT_PUBLIC_SENTRY_DSN is required}
+                NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:?SENTRY_ENVIRONMENT is required}
+                NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+                SENTRY_SOURCE_MAP_UPLOAD_REQUIRED: 'true'
+            secrets:
+                - sentry_auth_token
+        environment:
+            NEXT_PUBLIC_SITE_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
+            NEXT_PUBLIC_BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+            NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL:?NEXT_PUBLIC_STORAGE_URL is required}
+            NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN:?NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is required}
+            NEXT_PUBLIC_PADDLE_ENV: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}
+            NEXT_PUBLIC_SENTRY_ENABLED: 'true'
+            NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:?NEXT_PUBLIC_SENTRY_DSN is required}
+            NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:?SENTRY_ENVIRONMENT is required}
+            NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+        depends_on:
+            backend:
+                condition: service_healthy
+                restart: true
+        expose:
+            - '3000'
+        healthcheck:
+            test:
+                - CMD
+                - node
+                - -e
+                - fetch('http://127.0.0.1:3000/en').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 20s
+        networks:
+            - dokploy-network
+        restart: unless-stopped
+
+networks:
+    dokploy-network:
+        external: true
+
+secrets:
+    sentry_auth_token:
+        environment: SENTRY_AUTH_TOKEN
