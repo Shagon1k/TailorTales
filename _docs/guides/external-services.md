@@ -265,12 +265,12 @@ NEXT_PUBLIC_SENTRY_ENVIRONMENT="uat"                        # or "production"
 ```
 
 4. **Source maps (frontend):** create an auth token (Settings → Auth Tokens, scope
-   `project:releases`) and set it as a **Dokploy build-time variable** on the frontend app —
-   it's consumed by `next build`, never at runtime, and is not a GitHub Actions secret (CI
-   doesn't build images):
+   `project:releases`) and set `SENTRY_AUTH_TOKEN` in the Dokploy Compose environment.
+   Compose mounts it only as a frontend BuildKit secret; it is consumed by `next build`, absent
+   from image layers and runtime, and is not a GitHub Actions secret (CI doesn't build images):
 
 ```bash
-SENTRY_AUTH_TOKEN="sntrys_…"   # Dokploy build arg; uploads readable stack traces
+SENTRY_AUTH_TOKEN="sntrys_…"   # Compose input → frontend BuildKit secret
 ```
 
 5. **Uptime monitor:** Sentry → **Crons/Uptime → Uptime Monitors → Add** →
@@ -302,7 +302,7 @@ NEW_RELIC_APP_NAME="TailorTales-UAT"              # or "TailorTales-Prod"
 4. Deploy; the app appears in New Relic → **APM & Services** within a minute or two of the first
    request. Set alerts (error rate, p95 latency, Apdex) once data flows.
 
-The license key is a **secret** — env var only. Config (`backend/newrelic.js`) excludes `cookie`
+The license key is a **secret** — env var only. Config (`backend/newrelic.cjs`) excludes `cookie`
 and `authorization` headers from captured attributes.
 
 ---

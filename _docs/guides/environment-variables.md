@@ -4,6 +4,10 @@
 > authoritative source is
 > [`backend/src/config/env.validation.ts`](../../backend/src/config/env.validation.ts).
 
+For UAT and production, configure the deployment inputs from
+[`deploy/.env.example`](../../deploy/.env.example) in the Dokploy Compose environment panel.
+The deployment file maps those inputs to the build-time and runtime names documented below.
+
 ## Backend variables
 
 **Required** variables must be present at startup or the process exits with a validation error.
@@ -64,17 +68,19 @@
 
 ### Storage (MinIO / AWS S3)
 
-| Variable                   | Required | Default | Dev (MinIO)                    | Prod (AWS S3)              |
-| -------------------------- | -------- | ------- | ------------------------------ | -------------------------- |
-| `STORAGE_REGION`           | yes      | —       | `eu-west-1` (MinIO ignores it) | Real AWS region            |
-| `STORAGE_ACCESS_KEY`       | yes      | —       | `minioadmin`                   | IAM access key             |
-| `STORAGE_SECRET_KEY`       | yes      | —       | `minioadmin`                   | IAM secret key             |
-| `STORAGE_BUCKET`           | yes      | —       | `tailortales`                  | Your S3 bucket name        |
-| `STORAGE_ENDPOINT`         | no       | —       | `http://localhost:9000`        | **Unset** (AWS default)    |
-| `STORAGE_FORCE_PATH_STYLE` | no       | `false` | `true`                         | **Unset** (defaults false) |
+| Variable                   | Required | Default | Dev (MinIO)             | UAT (MinIO)                           | Prod (AWS S3)      |
+| -------------------------- | -------- | ------- | ----------------------- | ------------------------------------- | ------------------ |
+| `STORAGE_REGION`           | yes      | —       | `us-east-1`             | `us-east-1`                           | Real AWS region    |
+| `STORAGE_ACCESS_KEY`       | yes      | —       | `minioadmin`            | UAT MinIO access key                  | IAM access key     |
+| `STORAGE_SECRET_KEY`       | yes      | —       | `minioadmin`            | UAT MinIO secret                      | IAM secret key     |
+| `STORAGE_BUCKET`           | yes      | —       | `tailortales`           | `tailortales-uat`                     | `tailortales-prod` |
+| `STORAGE_ENDPOINT`         | no       | —       | `http://localhost:9000` | `https://storage-uat.tailortales.app` | **Unset**          |
+| `STORAGE_FORCE_PATH_STYLE` | no       | `false` | `true`                  | `true`                                | **Unset**          |
 
-> In production, leave `STORAGE_ENDPOINT` and `STORAGE_FORCE_PATH_STYLE` unset. The AWS SDK
-> resolves the correct regional endpoint automatically.
+> UAT uses a persistent MinIO resource outside the application Compose. Its endpoint must be the
+> public API origin because presigned URLs are opened by browsers. Route port `9000`; keep the
+> console on `9001` private. In production, omit the endpoint/path-style variables so the AWS SDK
+> resolves the regional S3 endpoint.
 
 ### Paddle (subscriptions)
 
@@ -90,7 +96,8 @@
 | `PADDLE_PRICE_ID_FAMILY_WORKSHOP`   | seed only      | —         | Paddle monthly price ID for Family Workshop.                                              |
 
 > "Seed only" variables are read by `seed-pricing-tiers.ts` and are not validated at server
-> startup. They only need to be set when running `pnpm seed:pricing-tiers`.
+> startup. The Dokploy `release` service requires them because it runs the idempotent pricing
+> seed on every UAT/production deployment.
 
 ### Monitoring (Sentry + New Relic)
 
@@ -104,27 +111,31 @@ each value and [monitoring.md](monitoring.md) for how they're wired.
 | `SENTRY_DSN`            | no       | —       | Backend project (`tailortales-be`) DSN. Write-only ingest key, safe to expose.                                                                        |
 | `SENTRY_ENVIRONMENT`    | no       | —       | `uat` \| `production` — tags every event for per-environment filtering.                                                                               |
 | `NODE_OPTIONS`          | no       | —       | Set to `--import newrelic/esm-loader.mjs` to load the New Relic ESM agent. Its **presence is the gate** — unset → no agent. Not validated at startup. |
-| `NEW_RELIC_LICENSE_KEY` | no       | —       | New Relic ingest license key. Read by `newrelic.js` (not validated at startup). **Secret.**                                                           |
-| `NEW_RELIC_APP_NAME`    | no       | —       | `TailorTales-UAT` \| `TailorTales-Prod`. Read by `newrelic.js` (not validated at startup).                                                            |
+| `NEW_RELIC_LICENSE_KEY` | no       | —       | New Relic ingest license key. Read by `newrelic.cjs` (not validated at startup). **Secret.**                                                          |
+| `NEW_RELIC_APP_NAME`    | no       | —       | `TailorTales-UAT` \| `TailorTales-Prod`. Read by `newrelic.cjs` (not validated at startup).                                                           |
 
 > Sentry vars are validated by `env.validation.ts` (all optional). New Relic vars and
-> `NODE_OPTIONS` are consumed by the runtime / `newrelic.js` directly and are **not** part of the
+> `NODE_OPTIONS` are consumed by the runtime / `newrelic.cjs` directly and are **not** part of the
 > startup schema.
 
 ## Frontend variables
 
-| Variable                          | Required          | Default                 | Notes                                                                                                                                                                                                              |
-| --------------------------------- | ----------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL`            | prod              | `http://localhost:3000` | Canonical public frontend origin. Used in sitemap, OG image URLs, JSON-LD, and robots. Must be non-www, no trailing slash (e.g. `https://tailortales.app`). See [seo.md](seo.md).                                  |
-| `NEXT_PUBLIC_BACKEND_URL`         | no                | `http://localhost:3001` | Backend origin. Set in `frontend/.env.example`.                                                                                                                                                                    |
-| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | for live checkout | —                       | Paddle.js client-side token. Sandbox tokens start with `test_`; live tokens start with `live_`. The pricing CTA degrades gracefully when this is absent.                                                           |
-| `NEXT_PUBLIC_PADDLE_ENV`          | no                | `sandbox`               | `sandbox` \| `production`. Must match the backend's `PADDLE_ENVIRONMENT`.                                                                                                                                          |
-| `NEXT_PUBLIC_STORAGE_URL`         | for prod          | —                       | Public S3 / CloudFront base URL. Used to construct public asset URLs (e.g. art-style thumbnails). In dev, MinIO is accessed directly.                                                                              |
-| `NEXT_PUBLIC_SENTRY_ENABLED`      | no                | `false`                 | `true` → Sentry initialises in the browser/edge/server runtimes. Dev stays silent.                                                                                                                                 |
-| `NEXT_PUBLIC_SENTRY_DSN`          | no                | —                       | Frontend project (`tailortales-fe`) DSN. Write-only ingest key, safe to expose.                                                                                                                                    |
-| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | no                | —                       | `uat` \| `production` — tags frontend events.                                                                                                                                                                      |
-| `SENTRY_AUTH_TOKEN`               | prod build only   | —                       | Source-map upload during `next build` (`withSentryConfig`). **Secret** — set as a Dokploy **build-time** variable (build arg), not a runtime var. Not a GitHub Actions secret; see [deployment.md](deployment.md). |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | prod only         | —                       | GA4 Measurement ID (`G-XXXXXXXXXX`). Set on prod only. Unset → cookie banner still renders but no analytics loads.                                                                                                 |
+All `NEXT_PUBLIC_*` values are build-time inputs because Next.js embeds them in browser bundles.
+Compose also supplies them at runtime for server-rendered code. A value change therefore requires
+a rebuild; restarting an existing frontend container is insufficient.
+
+| Variable                          | UAT/prod input             | Runtime | Notes                                                                                                                                       |
+| --------------------------------- | -------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`            | `FRONTEND_URL`             | yes     | Canonical public frontend origin. Must be non-www with no trailing slash. See [seo.md](seo.md).                                             |
+| `NEXT_PUBLIC_BACKEND_URL`         | `BACKEND_URL`              | yes     | Public backend origin.                                                                                                                      |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | same name                  | yes     | Paddle.js client token: sandbox `test_…`, production `live_…`.                                                                              |
+| `NEXT_PUBLIC_PADDLE_ENV`          | `PADDLE_ENVIRONMENT`       | yes     | `sandbox` or `production`; shared input prevents frontend/backend drift.                                                                    |
+| `NEXT_PUBLIC_STORAGE_URL`         | same name                  | yes     | Public MinIO API origin on UAT; public S3/CloudFront asset base URL on production.                                                          |
+| `NEXT_PUBLIC_SENTRY_ENABLED`      | fixed to `true` by Compose | yes     | Enables Sentry in browser, edge, and server runtimes.                                                                                       |
+| `NEXT_PUBLIC_SENTRY_DSN`          | same name                  | yes     | Frontend project (`tailortales-fe`) DSN.                                                                                                    |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | `SENTRY_ENVIRONMENT`       | yes     | `uat` or `production`; shared input prevents frontend/backend drift.                                                                        |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | same name; empty allowed   | yes     | GA4 ID. Empty on UAT; set on production.                                                                                                    |
+| `SENTRY_AUTH_TOKEN`               | same name                  | **no**  | BuildKit secret for source-map upload. Compose mounts it only for `next build`; it is absent from image layers and the runtime environment. |
 
 ## Minimal CI / offline config
 

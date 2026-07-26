@@ -1,9 +1,10 @@
-# Decision: MinIO (dev) + AWS S3 (prod) for Object Storage
+# Decision: MinIO (dev/UAT) + AWS S3 (prod) for Object Storage
 
 ## Decision
 
-Use **MinIO** locally (via docker-compose) and **AWS S3** in production. Both are accessed through
-the same `@aws-sdk/client-s3` client — the only difference is the endpoint and `forcePathStyle` env vars.
+Use **MinIO** locally (via docker-compose) and on UAT (as a persistent Dokploy resource), and use
+**AWS S3** only in production. All profiles use the same `@aws-sdk/client-s3` client — the only
+difference is the endpoint, credentials, and `forcePathStyle` env vars.
 
 ## Why not just use S3 everywhere?
 
@@ -38,17 +39,21 @@ pre-signed URLs — are fully compatible and well-tested in MinIO.
 
 The same `StorageService` reads different env vars in each environment:
 
-| Variable                   | Dev (MinIO)                    | Prod (AWS S3)            |
-| -------------------------- | ------------------------------ | ------------------------ |
-| `STORAGE_REGION`           | `us-east-1` (MinIO ignores it) | real AWS region          |
-| `STORAGE_ACCESS_KEY`       | `minioadmin`                   | IAM access key           |
-| `STORAGE_SECRET_KEY`       | `minioadmin`                   | IAM secret key           |
-| `STORAGE_BUCKET`           | `tailortales`                  | your S3 bucket name      |
-| `STORAGE_ENDPOINT`         | `http://localhost:9000`        | _unset_ (AWS default)    |
-| `STORAGE_FORCE_PATH_STYLE` | `true`                         | _unset_ (defaults false) |
+| Variable                   | Dev (MinIO)                    | UAT (MinIO)                           | Prod (AWS S3)            |
+| -------------------------- | ------------------------------ | ------------------------------------- | ------------------------ |
+| `STORAGE_REGION`           | `us-east-1` (MinIO ignores it) | `us-east-1`                           | real AWS region          |
+| `STORAGE_ACCESS_KEY`       | `minioadmin`                   | UAT MinIO access key                  | IAM access key           |
+| `STORAGE_SECRET_KEY`       | `minioadmin`                   | UAT MinIO secret                      | IAM secret key           |
+| `STORAGE_BUCKET`           | `tailortales`                  | `tailortales-uat`                     | `tailortales-prod`       |
+| `STORAGE_ENDPOINT`         | `http://localhost:9000`        | `https://storage-uat.tailortales.app` | _unset_ (AWS default)    |
+| `STORAGE_FORCE_PATH_STYLE` | `true`                         | `true`                                | _unset_ (defaults false) |
 
-In production, leave `STORAGE_ENDPOINT` and `STORAGE_FORCE_PATH_STYLE` unset. The SDK
-resolves the correct regional S3 endpoint automatically.
+The UAT endpoint must be the public MinIO API origin because presigned URLs are returned to
+browsers; an internal Docker hostname would produce unusable links. Route only MinIO port `9000`
+through Dokploy/Traefik. Keep the admin console on port `9001` private.
+
+In production, leave `STORAGE_ENDPOINT` and `STORAGE_FORCE_PATH_STYLE` unset. The SDK resolves
+the correct regional S3 endpoint automatically.
 
 ## Revisit if
 

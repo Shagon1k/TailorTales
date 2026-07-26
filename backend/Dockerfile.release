@@ -1,0 +1,15 @@
+# ---- release ----
+FROM node:24-alpine AS release
+WORKDIR /app
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+RUN corepack enable
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY backend/package.json ./backend/
+RUN pnpm install --frozen-lockfile --filter backend
+
+COPY tsconfig.base.json ./
+COPY backend/ ./backend/
+RUN DATABASE_URL=postgresql://build:build@localhost:5432/build pnpm --filter backend db:generate
+
+CMD ["pnpm", "--filter", "backend", "db:migrate:deploy"]

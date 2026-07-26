@@ -1,10 +1,13 @@
+# syntax=docker/dockerfile:1
+
 # ---- deps ----
 FROM node:24-alpine AS deps
 WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY frontend/package.json ./frontend/
-RUN pnpm install --frozen-lockfile --filter frontend --prod
+RUN pnpm install --frozen-lockfile --filter frontend --prod --ignore-scripts
+RUN pnpm --filter frontend... rebuild
 
 # ---- build ----
 FROM node:24-alpine AS build
@@ -16,13 +19,39 @@ RUN pnpm install --frozen-lockfile --filter frontend
 COPY tsconfig.base.json ./
 COPY frontend/ ./frontend/
 ENV NEXT_TELEMETRY_DISABLED=1
-# Source-map upload to Sentry runs inside `next build` (via withSentryConfig) only when this
-# token is present — pass it as a Dokploy build-time variable on prod. It is scoped to this
-# build stage and never copied into the `run` stage, so it stays out of the runtime image.
-# Absent (e.g. local builds) → upload is skipped gracefully, build still succeeds.
-ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-RUN pnpm --filter frontend build
+ARG NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ARG NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+ARG NEXT_PUBLIC_STORAGE_URL=http://localhost:9000
+ARG NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+ARG NEXT_PUBLIC_PADDLE_ENV=sandbox
+ARG NEXT_PUBLIC_SENTRY_ENABLED=false
+ARG NEXT_PUBLIC_SENTRY_DSN
+ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT
+ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
+ARG SENTRY_SOURCE_MAP_UPLOAD_REQUIRED=false
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_STORAGE_URL=$NEXT_PUBLIC_STORAGE_URL
+ENV NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=$NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+ENV NEXT_PUBLIC_PADDLE_ENV=$NEXT_PUBLIC_PADDLE_ENV
+ENV NEXT_PUBLIC_SENTRY_ENABLED=$NEXT_PUBLIC_SENTRY_ENABLED
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+ENV NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT
+ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
+RUN --mount=type=secret,id=sentry_auth_token \
+    if [ -f /run/secrets/sentry_auth_token ]; then \
+        SENTRY_AUTH_TOKEN_VALUE="$(cat /run/secrets/sentry_auth_token)"; \
+    else \
+        SENTRY_AUTH_TOKEN_VALUE=""; \
+    fi; \
+    if [ "$SENTRY_SOURCE_MAP_UPLOAD_REQUIRED" = "true" ] && [ -z "$SENTRY_AUTH_TOKEN_VALUE" ]; then \
+        echo "SENTRY_AUTH_TOKEN is required for this build" >&2; \
+        exit 1; \
+    fi; \
+    if [ -n "$SENTRY_AUTH_TOKEN_VALUE" ]; then \
+        export SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN_VALUE"; \
+    fi; \
+    pnpm --filter frontend build
 
 # ---- run ----
 FROM node:24-alpine AS run
@@ -34,5 +63,6 @@ COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
 COPY --from=build /app/frontend/.next ./frontend/.next
 COPY --from=build /app/frontend/public ./frontend/public
 COPY frontend/package.json ./frontend/
+WORKDIR /app/frontend
 EXPOSE 3000
 CMD ["node_modules/.bin/next", "start", "--port", "3000", "-H", "0.0.0.0"]

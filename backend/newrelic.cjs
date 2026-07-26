@@ -1,5 +1,6 @@
 'use strict';
 
+// CommonJS is required because the New Relic agent loads its config outside the app's ESM graph.
 exports.config = {
     app_name: [process.env.NEW_RELIC_APP_NAME ?? 'TailorTales'],
     license_key: process.env.NEW_RELIC_LICENSE_KEY ?? '',

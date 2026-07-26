@@ -28,7 +28,8 @@ so issues are filtered per environment.
 - **Frontend capture path:** the Next.js instrumentation hooks plus `global-error.tsx`
   (`Sentry.captureException`) catch render/runtime errors. No PII is sent (`sendDefaultPii` is off).
 - **Source maps:** uploaded during `next build` via `withSentryConfig` using `SENTRY_AUTH_TOKEN`
-  (a Dokploy build-time variable, never a runtime var). Without it, stack traces show minified frames.
+  (a Dokploy Compose input mounted only as a BuildKit secret, never an image layer or runtime
+  var). Without it, stack traces show minified frames.
 
 ### Sentry — uptime monitor
 
@@ -41,7 +42,7 @@ in the Sentry UI — no app env vars.
 The agent loads via the **ESM loader** (`NODE_OPTIONS="--import newrelic/esm-loader.mjs"`) because
 the backend is ESM (`"type": "module"`); the CJS `require('newrelic')` pattern does not apply.
 There is **no `NEW_RELIC_ENABLED` flag** — the presence of `NODE_OPTIONS` is the gate, so dev
-(where it is unset) never starts the agent. Config lives in `backend/newrelic.js`; the app name
+(where it is unset) never starts the agent. Config lives in `backend/newrelic.cjs`; the app name
 comes from `NEW_RELIC_APP_NAME` (`TailorTales-UAT` / `TailorTales-Prod`). `cookie` and
 `authorization` headers are excluded from captured attributes.
 

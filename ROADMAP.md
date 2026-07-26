@@ -32,7 +32,7 @@
 | State management (FE) | React Query (server state) + Zustand (UI state)                                                                                                           |
 | Database              | PostgreSQL via **Prisma** ORM                                                                                                                             |
 | Queue                 | **BullMQ** (Redis-backed)                                                                                                                                 |
-| Object storage        | **MinIO** for dev/local, **AWS S3** for production                                                                                                        |
+| Object storage        | **MinIO** for dev/local and UAT, **AWS S3** for production                                                                                                |
 | LLM (text)            | **OpenRouter** — model configurable via `OPENROUTER_TEXT_MODEL`; local/CI default to stub providers (`USE_AI_STUBS`) to avoid spend                       |
 | Image generation      | **OpenRouter** (unified with text) — `google/gemini-3.1-flash-image` or `openai/gpt-5.4-image-2`, configurable via env; base64 output uploaded to storage |
 | PDF generation        | **Puppeteer** (HTML → PDF)                                                                                                                                |
@@ -474,7 +474,7 @@ Baseline rule: every atom ships with at least — render test, one test per vari
 - [x] Prisma `Page` model: `id`, `storyId`, `order`, `chapterTitle?`, `text?` (optional — book and comic pages may be illustration-only), `illustrations (JSON — array of { key, position }; stores S3 **keys**, never URLs — API maps key → signed URL at serve time, like `pdfKey`)`, `layout?`
 - [x] Prisma `StoryBlueprint` model: `id`, `name`, `description`, `type`, `systemPrompt` (structured with XML markers e.g. `<intro_prompt>`, `<climax_prompt>` for multi-stage LLM guidance), `coverImageKey?`, `previewPageKeys (String[] default [])`, `createdById`, `createdAt`, `updatedAt`
 - [x] Prisma migrations
-- [x] Storage module: S3 abstraction (MinIO for dev, AWS S3 for prod) — upload, get signed URL, delete
+- [x] Storage module: S3 abstraction (MinIO for dev/UAT, AWS S3 for prod) — upload, get signed URL, delete
 - [x] Stories module: CRUD (draft create, list user's stories, get by id, delete)
 - [x] StoryBlueprints module: list (public to all users), CRUD (admin only)
 - [x] `SuggestionChip` atom — pill-shaped tappable chip for workshop question suggestions
@@ -927,13 +927,13 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 | `NEXT_PUBLIC_SENTRY_ENABLED`     | `false`      | `true`                             | `true`                             |
 | `NEXT_PUBLIC_SENTRY_DSN`         | —            | shared DSN                         | shared DSN                         |
 | `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | —            | `uat`                              | `production`                       |
-| `SENTRY_AUTH_TOKEN`              | —            | Dokploy build arg                  | Dokploy build arg                  |
+| `SENTRY_AUTH_TOKEN`              | —            | BuildKit secret                    | BuildKit secret                    |
 | `NODE_OPTIONS`                   | —            | `--import newrelic/esm-loader.mjs` | `--import newrelic/esm-loader.mjs` |
 | `NEW_RELIC_LICENSE_KEY`          | —            | shared key                         | shared key                         |
 | `NEW_RELIC_APP_NAME`             | —            | `TailorTales-UAT`                  | `TailorTales-Prod`                 |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | — (disabled) | — (disabled)                       | `G-XXXXXXXXXX`                     |
 
-`SENTRY_AUTH_TOKEN` is build-time only (source map upload) — set it as a Dokploy build-time variable (build arg) on the frontend app, not a runtime env var and not a GitHub Actions secret (CI doesn't build images). The Sentry uptime monitor is configured in the Sentry UI — no app env vars.
+`SENTRY_AUTH_TOKEN` is build-time only (source map upload) — set it in the Dokploy Compose environment; Compose mounts it only as a frontend BuildKit secret, not an image layer, runtime env var, or GitHub Actions secret (CI doesn't build images). The Sentry uptime monitor is configured in the Sentry UI — no app env vars.
 
 ---
 
@@ -946,8 +946,8 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [x] Install `@sentry/nextjs` in frontend (wizard) — `instrumentation-client.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, `global-error.tsx`; wrap `next.config.ts` with `withSentryConfig`; DSN moved to env, `sendDefaultPii` removed
 - [x] Gate both inits behind `SENTRY_ENABLED` / `NEXT_PUBLIC_SENTRY_ENABLED`; dev stays silent
 - [x] Add Sentry vars to env matrix + `backend/.env.example` / `frontend/.env.example`
-- [x] Wire `SENTRY_AUTH_TOKEN` into the frontend Dockerfile `build` stage (source map upload, build arg)
-- [ ] Create the Sentry auth token + set it as a Dokploy build-time variable on the frontend app
+- [x] Wire `SENTRY_AUTH_TOKEN` into the frontend Dockerfile `build` stage as a BuildKit secret
+- [ ] Create the Sentry auth token + set it in each Dokploy Compose environment
 - [ ] Trigger a test error on UAT; confirm it appears in Sentry with correct environment tag
 - [ ] Delete the wizard-generated `sentry-example-page` after UAT verification
 - [x] Document Sentry registration + setup in `_docs/guides/external-services.md`
@@ -960,7 +960,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 **New Relic APM**
 
 - [x] Create New Relic account (free tier); generate license key
-- [x] Install `newrelic` in backend; add `newrelic.js` config (reads `NEW_RELIC_LICENSE_KEY` + `NEW_RELIC_APP_NAME`); load via `NODE_OPTIONS="--import newrelic/esm-loader.mjs"` (ESM loader — backend is `"type": "module"`)
+- [x] Install `newrelic` in backend; add `newrelic.cjs` config (reads `NEW_RELIC_LICENSE_KEY` + `NEW_RELIC_APP_NAME`); load via `NODE_OPTIONS="--import newrelic/esm-loader.mjs"` (ESM loader — backend is `"type": "module"`)
 - [x] Gate agent startup by presence of `NODE_OPTIONS` (unset in dev → agent never loads)
 - [x] Add `NEW_RELIC_LICENSE_KEY`, `NEW_RELIC_APP_NAME`, `NODE_OPTIONS` to env matrix + `backend/.env.example`
 - [ ] Deploy to UAT; verify "TailorTales-UAT" application appears in New Relic with throughput data
@@ -1124,6 +1124,10 @@ UAT           →  uat.tailortales.app, prod-like on sandbox/cheap services
 prod          →  tailortales.app, live everything
 ```
 
+**Initial hosting shape — budget VPS, disposable by design:** UAT, prod, and small auxiliary apps start on one OVH VPS-4 (`shagserv`, Ubuntu 24.04, Gravelines) managed by dokploy. App containers, Postgres, Redis, and disposable UAT MinIO data live on the VPS at first. Production-generated PDFs/images and production Postgres backups must leave the VPS for S3/R2/B2-compatible storage. Scale path: upgrade the VPS first, then move Postgres/Redis to managed services, then split app servers behind a load balancer only when traffic requires it.
+
+**Control-plane domain:** reserve `dokploy.tailortales.app` for the dokploy dashboard even if future apps use unrelated domains. Protect it with Cloudflare Access (allowlist Alex's email) plus dokploy's own admin login; close direct public access to port `3000` after the dashboard works through HTTPS. Public product/API domains must not inherit this Access gate unless they are internal tools.
+
 **Env var sources — no manual `.env` retargeting:**
 
 | Profile     | Source                              | Run command                                                      |
@@ -1148,61 +1152,69 @@ prod          →  tailortales.app, live everything
 ```mermaid
 flowchart LR
   A["dev: prisma migrate dev<br/>(generates migration file)"] --> B[git commit / PR / merge]
-  B --> C["UAT deploy:<br/>prisma migrate deploy"]
-  B --> D["prod deploy:<br/>prisma migrate deploy"]
+  B --> C["UAT Compose release:<br/>migrate + idempotent seeds"]
+  B --> D["prod Compose release:<br/>migrate + idempotent seeds"]
+  C --> E["healthy backend → frontend"]
+  D --> F["healthy backend → frontend"]
 ```
 
 - `migrate dev` (generate + apply) runs **only** locally; `migrate deploy` (apply-only, non-interactive) runs as a deploy step on UAT/prod.
-- Seed scripts (`seed:art-styles`, `seed:pricing-tiers`) are idempotent upserts — run once per environment after first deploy, re-run safely after seed changes.
+- UAT and prod each use one dokploy Compose resource. Its one-shot `release` service runs migrations and the idempotent `seed:art-styles` / `seed:pricing-tiers` scripts before the new backend can start; the frontend waits for the backend health check. No manual deploy sequencing is required.
+- Migrations must use expand-contract compatibility: an already-running backend can overlap briefly with the newly migrated schema, so destructive schema contraction belongs in a later release.
 - **Data never syncs between environments** (by design): UAT holds test users + Paddle sandbox subscriptions, prod holds real ones. UAT DB is droppable/recreatable at any time.
-- UAT/prod DBs are managed Postgres (Neon / Supabase / dokploy-hosted — free tier is fine for UAT); dev stays local docker. A hosted UAT backend cannot reach a laptop DB anyway — separation is forced, not optional.
+- Initial UAT/prod DBs are separate local Postgres databases on the VPS, with external backups. Managed Postgres/Redis is a scale/reliability upgrade, not a launch blocker.
 
 ---
 
 #### Environment matrix
 
-| Variable                          | dev (stubs)             | dev (live)                                                  | UAT                                                               | prod                                                      |
-| --------------------------------- | ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
-| `NODE_ENV`                        | `development`           | `development`                                               | `production`                                                      | `production`                                              |
-| `BACKEND_URL` / `FRONTEND_URL`    | localhost               | localhost (+ `dev-api.tailortales.app` tunnel for webhooks) | `https://api-uat.tailortales.app` / `https://uat.tailortales.app` | `https://api.tailortales.app` / `https://tailortales.app` |
-| `DATABASE_URL`                    | local docker postgres   | same local postgres                                         | dedicated managed UAT DB                                          | dedicated managed prod DB                                 |
-| `REDIS_URL`                       | local docker redis      | same local redis                                            | managed redis                                                     | managed redis                                             |
-| `GOOGLE_CLIENT_ID/SECRET`         | dev OAuth app           | dev OAuth app                                               | UAT OAuth app                                                     | prod OAuth app (isolated)                                 |
-| `JWT_SECRET`                      | any local value         | any local value                                             | strong random secret                                              | strong random secret (different from UAT)                 |
-| `USE_AI_STUBS`                    | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
-| `OPENROUTER_TEXT_MODEL`           | — (stubs)               | cheap/fast model                                            | cheap/fast model (e.g. `google/gemini-flash-1.5-8b`)              | quality model (e.g. `google/gemini-2.0-flash`)            |
-| `OPENROUTER_IMAGE_MODEL`          | — (stubs)               | cheap model                                                 | cheap model                                                       | quality model                                             |
-| `USE_EMAIL_STUBS`                 | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
-| `RESEND_API_KEY`                  | — (stubs)               | real key                                                    | real key                                                          | real key (separate for tracking)                          |
-| `RESEND_FROM`                     | —                       | `TailorTales Dev <dev@tailortales.app>`                     | `TailorTales UAT <uat@tailortales.app>`                           | `TailorTales <stories@tailortales.app>`                   |
-| `USE_PADDLE_STUBS`                | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
-| `PADDLE_ENVIRONMENT`              | —                       | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
-| `PADDLE_API_KEY`                  | —                       | `_sdbx_…` (shared sandbox)                                  | `_sdbx_…` (same sandbox)                                          | `_live_…`                                                 |
-| `PADDLE_WEBHOOK_SECRET`           | —                       | secret of dev destination                                   | secret of UAT destination                                         | secret of live destination                                |
-| `PADDLE_PRICE_ID_*`               | —                       | sandbox price IDs                                           | sandbox price IDs (same)                                          | live price IDs                                            |
-| `STORAGE_ENDPOINT`                | `http://localhost:9000` | `http://localhost:9000`                                     | —                                                                 | —                                                         |
-| `STORAGE_FORCE_PATH_STYLE`        | `true`                  | `true`                                                      | `false`                                                           | `false`                                                   |
-| `STORAGE_BUCKET`                  | `tailortales`           | `tailortales`                                               | `tailortales-uat`                                                 | `tailortales-prod`                                        |
-| `STORAGE_ACCESS_KEY/SECRET`       | `minioadmin`            | `minioadmin`                                                | AWS IAM credentials                                               | AWS IAM credentials (separate user)                       |
-| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | —                       | sandbox client token                                        | sandbox client token                                              | live client token                                         |
-| `NEXT_PUBLIC_PADDLE_ENV`          | `sandbox`               | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
-| `NEXT_PUBLIC_BACKEND_URL`         | `http://localhost:3001` | `http://localhost:3001`                                     | `https://api-uat.tailortales.app`                                 | `https://api.tailortales.app`                             |
-| `NEXT_PUBLIC_STORAGE_URL`         | `http://localhost:9000` | `http://localhost:9000`                                     | CloudFront or S3 URL                                              | CloudFront or S3 URL                                      |
-| `NEXT_PUBLIC_SITE_URL`            | `http://localhost:3000` | `http://localhost:3000`                                     | `https://uat.tailortales.app`                                     | `https://tailortales.app`                                 |
-| `SENTRY_ENABLED`                  | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
-| `SENTRY_DSN`                      | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
-| `SENTRY_ENVIRONMENT`              | —                       | —                                                           | `uat`                                                             | `production`                                              |
-| `NEXT_PUBLIC_SENTRY_ENABLED`      | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
-| `NEXT_PUBLIC_SENTRY_DSN`          | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
-| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | —                       | —                                                           | `uat`                                                             | `production`                                              |
-| `NODE_OPTIONS` (New Relic loader) | —                       | —                                                           | `--import newrelic/esm-loader.mjs`                                | `--import newrelic/esm-loader.mjs`                        |
-| `NEW_RELIC_LICENSE_KEY`           | —                       | —                                                           | shared key                                                        | shared key                                                |
-| `NEW_RELIC_APP_NAME`              | —                       | —                                                           | `TailorTales-UAT`                                                 | `TailorTales-Prod`                                        |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | —                       | —                                                           | —                                                                 | `G-XXXXXXXXXX`                                            |
+| Variable                             | dev (stubs)             | dev (live)                                                  | UAT                                                               | prod                                                      |
+| ------------------------------------ | ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
+| `NODE_ENV`                           | `development`           | `development`                                               | `production`                                                      | `production`                                              |
+| `BACKEND_URL` / `FRONTEND_URL`       | localhost               | localhost (+ `dev-api.tailortales.app` tunnel for webhooks) | `https://api-uat.tailortales.app` / `https://uat.tailortales.app` | `https://api.tailortales.app` / `https://tailortales.app` |
+| `DATABASE_URL`                       | local docker postgres   | same local postgres                                         | dedicated UAT DB on VPS Postgres                                  | dedicated prod DB on VPS Postgres                         |
+| `REDIS_URL`                          | local docker redis      | same local redis                                            | VPS Redis with UAT namespace/index                                | VPS Redis with prod namespace/index                       |
+| `GOOGLE_CLIENT_ID/SECRET`            | dev OAuth app           | dev OAuth app                                               | UAT OAuth app                                                     | prod OAuth app (isolated)                                 |
+| `JWT_SECRET`                         | any local value         | any local value                                             | strong random secret                                              | strong random secret (different from UAT)                 |
+| `JWT_EXPIRY_DAYS` / `PORT`           | `7` / `3001`            | `7` / `3001`                                                | Compose-fixed `7` / `3001`                                        | Compose-fixed `7` / `3001`                                |
+| `USE_AI_STUBS`                       | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
+| `OPENROUTER_API_KEY`                 | stub/empty              | real key                                                    | real key                                                          | real key                                                  |
+| `OPENROUTER_TEXT_MODEL`              | — (stubs)               | cheap/fast model                                            | cheap/fast model (e.g. `google/gemini-flash-1.5-8b`)              | quality model (e.g. `google/gemini-2.0-flash`)            |
+| `OPENROUTER_IMAGE_MODEL`             | — (stubs)               | cheap model                                                 | cheap model                                                       | quality model                                             |
+| `USE_EMAIL_STUBS`                    | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
+| `RESEND_API_KEY`                     | — (stubs)               | real key                                                    | real key                                                          | real key (separate for tracking)                          |
+| `RESEND_FROM`                        | —                       | `TailorTales Dev <dev@tailortales.app>`                     | `TailorTales UAT <uat@tailortales.app>`                           | `TailorTales <stories@tailortales.app>`                   |
+| `CONTACT_INBOX_EMAIL`                | local/stub address      | owner inbox                                                 | owner inbox                                                       | owner inbox                                               |
+| `USE_PADDLE_STUBS`                   | `true`                  | `false`                                                     | `false`                                                           | `false`                                                   |
+| `PADDLE_ENVIRONMENT`                 | —                       | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
+| `PADDLE_API_KEY`                     | —                       | `_sdbx_…` (shared sandbox)                                  | `_sdbx_…` (same sandbox)                                          | `_live_…`                                                 |
+| `PADDLE_WEBHOOK_SECRET`              | —                       | secret of dev destination                                   | secret of UAT destination                                         | secret of live destination                                |
+| `PADDLE_PRODUCT_ID_*` / `PRICE_ID_*` | —                       | sandbox catalog IDs                                         | sandbox catalog IDs (same)                                        | live catalog IDs                                          |
+| `STORAGE_REGION`                     | `us-east-1`             | `us-east-1`                                                 | `us-east-1` (MinIO ignores it)                                    | real AWS region                                           |
+| `STORAGE_ENDPOINT`                   | `http://localhost:9000` | `http://localhost:9000`                                     | `https://storage-uat.tailortales.app`                             | —                                                         |
+| `STORAGE_FORCE_PATH_STYLE`           | `true`                  | `true`                                                      | `true`                                                            | default `false`                                           |
+| `STORAGE_BUCKET`                     | `tailortales`           | `tailortales`                                               | MinIO `tailortales-uat`                                           | S3 `tailortales-prod`                                     |
+| `STORAGE_ACCESS_KEY/SECRET`          | `minioadmin`            | `minioadmin`                                                | UAT MinIO credentials                                             | AWS IAM credentials                                       |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`    | —                       | sandbox client token                                        | sandbox client token                                              | live client token                                         |
+| `NEXT_PUBLIC_PADDLE_ENV`             | `sandbox`               | `sandbox`                                                   | `sandbox`                                                         | `production`                                              |
+| `NEXT_PUBLIC_BACKEND_URL`            | `http://localhost:3001` | `http://localhost:3001`                                     | `https://api-uat.tailortales.app`                                 | `https://api.tailortales.app`                             |
+| `NEXT_PUBLIC_STORAGE_URL`            | `http://localhost:9000` | `http://localhost:9000`                                     | `https://storage-uat.tailortales.app`                             | CloudFront or S3 URL                                      |
+| `NEXT_PUBLIC_SITE_URL`               | `http://localhost:3000` | `http://localhost:3000`                                     | `https://uat.tailortales.app`                                     | `https://tailortales.app`                                 |
+| `SENTRY_ENABLED`                     | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
+| `SENTRY_DSN`                         | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
+| `SENTRY_ENVIRONMENT`                 | —                       | —                                                           | `uat`                                                             | `production`                                              |
+| `NEXT_PUBLIC_SENTRY_ENABLED`         | `false`                 | `false`                                                     | `true`                                                            | `true`                                                    |
+| `NEXT_PUBLIC_SENTRY_DSN`             | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`     | —                       | —                                                           | `uat`                                                             | `production`                                              |
+| `SENTRY_AUTH_TOKEN` (build only)     | —                       | —                                                           | required by Compose                                               | required by Compose                                       |
+| `NODE_OPTIONS` (New Relic loader)    | —                       | —                                                           | `--import newrelic/esm-loader.mjs`                                | `--import newrelic/esm-loader.mjs`                        |
+| `NEW_RELIC_LICENSE_KEY`              | —                       | —                                                           | shared key                                                        | shared key                                                |
+| `NEW_RELIC_APP_NAME`                 | —                       | —                                                           | `TailorTales-UAT`                                                 | `TailorTales-Prod`                                        |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`      | —                       | —                                                           | —                                                                 | `G-XXXXXXXXXX`                                            |
 
 > Monitoring and analytics env vars are introduced in the analytics & monitoring phase. Registration, project creation, and obtaining the keys is covered by that phase's sub-tasks — configure them here per environment when wiring up UAT and prod in dokploy.
 >
-> **`SENTRY_AUTH_TOKEN` is not in this matrix** — it's a **build-time** secret (source-map upload during `next build`), not a runtime env var. Set it as a dokploy **build-time variable** on the frontend app, not in the runtime env panel. New Relic has no `*_ENABLED` flag: the presence of `NODE_OPTIONS` is the gate.
+> **`SENTRY_AUTH_TOKEN` is build-time only**: the Compose resource reads it from the dokploy environment and mounts it only as a frontend BuildKit secret; it is absent from image layers and the runtime container. `BACKEND_URL`, `FRONTEND_URL`, `PADDLE_ENVIRONMENT`, and `SENTRY_ENVIRONMENT` are intentionally single inputs that Compose maps to their matching `NEXT_PUBLIC_*` names. New Relic has no `*_ENABLED` flag: the Compose-fixed `NODE_OPTIONS` value is the gate.
 
 ---
 
@@ -1211,12 +1223,15 @@ flowchart LR
 **Infrastructure**
 
 - [ ] Buy domain (`tailortales.app` or similar) and put DNS on Cloudflare (free plan)
+- [ ] Configure `dokploy.tailortales.app` as the private control-plane domain behind Cloudflare Access; close public `3000/tcp` after verification
 - [ ] Cloudflare **named tunnel** `dev-api.<domain> → localhost:3001` — static dev webhook URL (replaces quick tunnels)
-- [ ] Provision UAT server (dokploy app) — separate from prod
-- [ ] Provision prod server (dokploy app)
+- [x] Provision initial OVH VPS-4 (`shagserv`, Ubuntu 24.04, 8 vCores / 24 GB RAM / 200 GB NVMe) and install dokploy
+- [ ] Provision UAT dokploy Compose resource alongside the old UAT apps, validate it, move domains, then remove only the old backend/frontend apps
+- [ ] Provision prod dokploy Compose resource — separate env and trigger from UAT on the same VPS
 - [ ] Domain + HTTPS for both (handled by dokploy / Cloudflare)
-- [ ] AWS S3 buckets: `tailortales-uat` + `tailortales-prod` (separate IAM users per bucket)
-- [ ] Managed Postgres + Redis for UAT; separate for prod
+- [ ] Provision persistent UAT MinIO resource; route `storage-uat.tailortales.app` to API port `9000`, keep console port `9001` private
+- [ ] AWS S3 bucket `tailortales-prod` with a dedicated IAM user
+- [ ] VPS Postgres + Redis configured with separate UAT/prod databases/namespaces
 - [ ] Backup strategy for prod Postgres + S3 documented and configured
 
 **Local env profiles**
@@ -1282,20 +1297,23 @@ flowchart LR
 > ```
 >
 > UAT is the continuous integration target; prod is gated behind a deliberate version tag so a merge never reaches real users by itself. Tags follow semver (`vMAJOR.MINOR.PATCH`).
+>
+> Each environment has one Compose resource using `deploy/docker-compose.yml`. Dokploy triggers that resource once; Compose enforces `release → healthy backend → frontend`. Separate backend/frontend auto-deploy triggers must remain disabled.
 
 - [ ] Configure dokploy deploy triggers: UAT on `main` push/merge; prod on tag push (`v*`)
 - [ ] CI gitleaks gate (hard-block on detected secrets) — the local pre-commit hook is best-effort (warns + continues if Homebrew/gitleaks is unavailable), so CI must be the real enforcement point before merge/deploy
+- [x] Add shared UAT/prod Compose definition plus strict, complete env template (`deploy/docker-compose.yml`, `deploy/.env.example`)
 - [ ] Dockerfiles tested end-to-end for both backend and frontend
 - [ ] Graceful shutdown verified — BullMQ worker drains in-flight jobs on SIGTERM before process exit (prevents mid-generation kills on deploy)
 - [ ] dokploy env var injection configured per environment (no secrets in repo)
-- [ ] **Set `SENTRY_AUTH_TOKEN` as a dokploy build-time variable** on the frontend app (UAT + prod) — enables Sentry source-map upload during `next build`. The Dockerfile build arg is already wired; without the token the build still succeeds but prod stack traces stay minified.
-- [ ] `prisma migrate deploy` wired as automatic pre-start/release step on UAT and prod (schema sync = git + deploy, never manual)
+- [ ] Set `SENTRY_AUTH_TOKEN` in each Compose environment — mounted only as a frontend BuildKit secret for source-map upload
+- [x] Wire `prisma migrate deploy` plus art-style/pricing seeds as the automatic Compose `release` service (schema sync = git + deploy, never manual)
 - [ ] Zero-downtime deploy strategy confirmed (dokploy rolling or blue-green)
 
 **First-deploy runbook** _(per environment, in order)_
 
-- [ ] Run DB migrations (`prisma migrate deploy`)
-- [ ] Run `pnpm seed:pricing-tiers` with env-specific Paddle IDs
+- [ ] Confirm the Compose `release` service exited `0` (migrations and both idempotent seeds ran automatically)
+- [ ] Confirm backend and frontend health checks pass before assigning the public domains
 - [ ] Verify `BACKEND_URL` is correct — used for self-hosted PDF fonts; wrong URL = broken fonts in all PDFs
 - [ ] Smoke test: login → generate 1 story → download PDF → check watermark (free tier)
 - [ ] Verify Paddle webhook round-trip: sandbox/live checkout → `subscription.activated` → tier flip in DB
@@ -1370,7 +1388,7 @@ flowchart LR
 | 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                                                           |
 | 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                                                                     |
 | 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                                                                  |
-| 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build var remain.                                           |
+| 15 — Analytics & Monitoring         | 🚧 In progress | Sentry (BE + FE, env-gated), Sentry uptime monitor (replaces UptimeRobot), New Relic APM via ESM loader, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU). Code + accounts done; UAT verification, Sentry uptime monitor, New Relic alerts, and the `SENTRY_AUTH_TOKEN` Dokploy build secret remain.                                        |
 | 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                                                            |
 | 17 — Final Manual Check-up          | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
 | 18 — Mobile View Support            | ✅ Done        | First-class mobile/tablet web support: breakpoints, app-style footer dock with guest/auth states, Account/More sheets, public pages, login, library, story reader, workshop/account/admin-safe layouts, touch-safe modals, and Button/Link/Icon cleanup. Public/login viewport QA and automated frontend checks passed; private flows were polished through authenticated browser review. |
