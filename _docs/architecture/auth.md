@@ -34,7 +34,10 @@ by `payload.sub` (the only field stored in the JWT) and attaches it to the reque
 401 if the user no longer exists.
 
 > **Cookie settings (set at login):** `httpOnly: true`, `sameSite: lax`, `secure: true` in
-> production only. Expiry is `JWT_EXPIRY_DAYS` days (default 7, configurable via env).
+> production only. Expiry is `JWT_EXPIRY_DAYS` days (default 7, configurable via env). Remote
+> browser traffic reaches the backend through the frontend's same-origin `/api` rewrite, so the
+> host-only cookie is available to both browser requests and Next.js server rendering without
+> being shared with sibling subdomains.
 
 **`AdminGuard`** — applied via `@UseGuards(AdminGuard)` on a controller or handler after
 `JwtAuthGuard`. Checks `request.user.role === ADMIN`; throws **403 Forbidden** if not.

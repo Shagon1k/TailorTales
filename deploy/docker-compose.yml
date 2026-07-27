@@ -89,7 +89,7 @@ services:
             dockerfile: frontend/Dockerfile
             args:
                 NEXT_PUBLIC_SITE_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
-                NEXT_PUBLIC_BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+                BACKEND_INTERNAL_URL: http://backend:3001
                 NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL:?NEXT_PUBLIC_STORAGE_URL is required}
                 NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN:?NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is required}
                 NEXT_PUBLIC_PADDLE_ENV: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}
@@ -102,7 +102,7 @@ services:
                 - sentry_auth_token
         environment:
             NEXT_PUBLIC_SITE_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
-            NEXT_PUBLIC_BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+            BACKEND_INTERNAL_URL: http://backend:3001
             NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL:?NEXT_PUBLIC_STORAGE_URL is required}
             NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN:?NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is required}
             NEXT_PUBLIC_PADDLE_ENV: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}

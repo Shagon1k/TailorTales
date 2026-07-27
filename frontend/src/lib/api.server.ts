@@ -2,7 +2,7 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_INTERNAL_URL = process.env.BACKEND_INTERNAL_URL ?? 'http://localhost:3001';
 
 export class ApiServerError extends Error {
     constructor(
@@ -18,7 +18,7 @@ export async function apiFetchServer<T = void>(path: string, init?: RequestInit)
     const cookieStore = await cookies();
     const token = cookieStore.get('access_token');
 
-    const res = await fetch(`${BACKEND_URL}${path}`, {
+    const res = await fetch(`${BACKEND_INTERNAL_URL}${path}`, {
         cache: 'no-store',
         ...init,
         headers: {

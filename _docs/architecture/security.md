@@ -60,10 +60,9 @@ complementary mechanisms:
 
 1. **`SameSite: lax` cookie** — the `access_token` httpOnly cookie is only sent on
    same-site requests. A cross-origin attacker cannot trigger cookie-bearing requests.
-2. **Same-site architecture** — `tailortales.app` (frontend) and `api.tailortales.app`
-   (backend) share the `tailortales.app` eTLD+1, so they are considered same-site by the
-   browser. A cross-site attacker (e.g. `evil.com`) cannot forge requests that carry the
-   cookie.
+2. **Same-origin browser API** — browsers call `tailortales.app/api`; Next.js rewrites the
+   request to the private backend service. The host-only cookie is not exposed to sibling
+   subdomains, and a cross-site attacker (e.g. `evil.com`) cannot forge requests that carry it.
 
 `csurf` is intentionally omitted — it is deprecated, incompatible with stateless JWTs, and
 unnecessary given the above.

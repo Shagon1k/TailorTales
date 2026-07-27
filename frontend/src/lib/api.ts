@@ -1,7 +1,7 @@
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_BASE_PATH = '/api';
 
 export function getApiBaseUrl(): string {
-    return BACKEND_URL ?? '';
+    return API_BASE_PATH;
 }
 
 export class ApiError extends Error {
@@ -18,7 +18,7 @@ export async function apiFetch<T = void>(path: string, init?: RequestInit): Prom
     const locale = typeof document !== 'undefined' ? document.documentElement.lang : undefined;
     const isFormData = init?.body instanceof FormData;
 
-    const res = await fetch(`${BACKEND_URL}${path}`, {
+    const res = await fetch(`${API_BASE_PATH}${path}`, {
         ...init,
         credentials: 'include',
         headers: {

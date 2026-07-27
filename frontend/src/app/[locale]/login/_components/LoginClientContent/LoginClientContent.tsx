@@ -10,9 +10,8 @@ import Button from '@/components/ui/Button/Button';
 import CapsLabel from '@/components/ui/CapsLabel/CapsLabel';
 import Divider from '@/components/ui/Divider/Divider';
 import { useCurrentUser } from '@/context/UserContext';
+import { getApiBaseUrl } from '@/lib/api';
 import styles from '../../page.module.scss';
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 function GoogleIcon(): React.ReactElement {
     return (
@@ -68,7 +67,7 @@ export default function LoginClientContent(): React.ReactElement {
 
                         <Button
                             component="a"
-                            href={`${BACKEND_URL}/auth/google`}
+                            href={`${getApiBaseUrl()}/auth/google`}
                             variant="primary"
                             fullWidth
                             leftSection={<GoogleIcon />}

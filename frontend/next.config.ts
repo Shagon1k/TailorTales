@@ -15,7 +15,7 @@ function parseUrl(envVar: string, fallback: string): URL {
     return url;
 }
 
-const backendUrl = parseUrl('NEXT_PUBLIC_BACKEND_URL', 'http://localhost:3001');
+const backendInternalUrl = parseUrl('BACKEND_INTERNAL_URL', 'http://localhost:3001');
 const storageUrl = parseUrl('NEXT_PUBLIC_STORAGE_URL', 'http://localhost:9000');
 
 function toRemotePattern(url: URL): { protocol: 'http' | 'https'; hostname: string; port: string } {
@@ -31,8 +31,14 @@ const nextConfig: NextConfig = {
         loadPaths: [path.join(configDir, 'src')],
     },
     images: {
-        remotePatterns: [toRemotePattern(backendUrl), toRemotePattern(storageUrl)],
+        remotePatterns: [toRemotePattern(storageUrl)],
     },
+    rewrites: async () => [
+        {
+            source: '/api/:path*',
+            destination: `${backendInternalUrl.origin}/:path*`,
+        },
+    ],
 };
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');

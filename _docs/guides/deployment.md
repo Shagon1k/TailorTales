@@ -15,6 +15,8 @@ flowchart LR
   T["Git trigger"] --> R["release<br/>migrate + idempotent seeds"]
   R -->|"exit 0"| B["backend"]
   B -->|"healthy /health"| F["frontend"]
+  U["Browser /api/*"] --> F
+  F -->|"rewrite"| B
   R -->|"non-zero exit"| X["deployment stops"]
 ```
 
@@ -78,12 +80,18 @@ Compose environment and replace every `CHANGE_ME` value. Do not commit real valu
 
 The Compose file deliberately reduces duplicate inputs:
 
-| Dokploy input        | Backend use           | Frontend use                     |
-| -------------------- | --------------------- | -------------------------------- |
-| `BACKEND_URL`        | Public backend origin | `NEXT_PUBLIC_BACKEND_URL`        |
-| `FRONTEND_URL`       | CORS/frontend origin  | `NEXT_PUBLIC_SITE_URL`           |
-| `PADDLE_ENVIRONMENT` | Paddle server SDK     | `NEXT_PUBLIC_PADDLE_ENV`         |
-| `SENTRY_ENVIRONMENT` | Backend event tag     | `NEXT_PUBLIC_SENTRY_ENVIRONMENT` |
+| Dokploy input        | Backend use                           | Frontend use                     |
+| -------------------- | ------------------------------------- | -------------------------------- |
+| `BACKEND_URL`        | Public same-origin API base (`…/api`) | —                                |
+| `FRONTEND_URL`       | CORS/frontend origin                  | `NEXT_PUBLIC_SITE_URL`           |
+| `PADDLE_ENVIRONMENT` | Paddle server SDK                     | `NEXT_PUBLIC_PADDLE_ENV`         |
+| `SENTRY_ENVIRONMENT` | Backend event tag                     | `NEXT_PUBLIC_SENTRY_ENVIRONMENT` |
+
+Browser requests use the fixed same-origin `/api` base. Next.js rewrites those requests to
+`http://backend:3001` on the Compose network; server-rendered code calls that internal URL
+directly and forwards the incoming session cookie. This keeps the host-only auth cookie visible
+to both browser and SSR without sharing it with sibling subdomains. `BACKEND_INTERNAL_URL` is
+fixed in Compose and is not a Dokploy input.
 
 Shared remote-runtime invariants (`NODE_ENV=production`, real-service stub flags off, Sentry on,
 and the New Relic loader enabled) are fixed in Compose rather than copied into every Dokploy
@@ -94,7 +102,7 @@ runtime behavior, not the business environment. These values select UAT versus p
 
 | Input                | UAT                                   | Production                    |
 | -------------------- | ------------------------------------- | ----------------------------- |
-| `BACKEND_URL`        | `https://api-uat.tailortales.app`     | `https://api.tailortales.app` |
+| `BACKEND_URL`        | `https://uat.tailortales.app/api`     | `https://tailortales.app/api` |
 | `FRONTEND_URL`       | `https://uat.tailortales.app`         | `https://tailortales.app`     |
 | `DATABASE_URL`       | dedicated UAT database                | dedicated production database |
 | `REDIS_URL`          | UAT database/index                    | production database/index     |
@@ -136,8 +144,8 @@ Do not delete the existing `backend-uat` and `frontend-uat` applications before 
    keep its console private.
 3. Create the new UAT Compose resource from the same Git revision.
 4. Add the full UAT env set and deploy with temporary backend/frontend domains.
-5. Verify `release` exited `0`, backend is healthy, frontend loads, OAuth works, and one story
-   reaches PDF generation.
+5. Verify `release` exited `0`, `GET /api/health` is healthy, OAuth works through the
+   same-origin callback, and one story reaches PDF generation.
 6. Move the real UAT domains from the old applications to the Compose services.
 7. Run the smoke checklist again through the real domains.
 8. Delete the old `backend-uat` and `frontend-uat` applications only after the new route is
