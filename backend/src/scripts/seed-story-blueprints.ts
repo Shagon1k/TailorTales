@@ -5,6 +5,16 @@ import { PrismaClient } from '../generated/prisma/client.js';
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+// Built-in blueprints must be available on the very first deployment, before a
+// real user has completed OAuth. This record exists only to satisfy the
+// blueprint audit relation; its .invalid address and synthetic Google id make
+// it impossible to authenticate as this user.
+const SYSTEM_BLUEPRINT_OWNER = {
+    email: 'system+story-blueprints@tailortales.invalid',
+    googleId: 'system:story-blueprints',
+    name: 'TailorTales System',
+};
+
 const STORY_BLUEPRINTS = [
     {
         name: 'Classic Book',
@@ -70,12 +80,11 @@ next adventure.
 ] as const;
 
 async function main(): Promise<void> {
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-
-    if (!admin) {
-        console.error('No ADMIN user found. Run `pnpm seed:admin <email>` first.');
-        process.exit(1);
-    }
+    const owner = await prisma.user.upsert({
+        where: { googleId: SYSTEM_BLUEPRINT_OWNER.googleId },
+        create: SYSTEM_BLUEPRINT_OWNER,
+        update: { name: SYSTEM_BLUEPRINT_OWNER.name },
+    });
 
     let seeded = 0;
 
@@ -90,7 +99,7 @@ async function main(): Promise<void> {
         }
 
         await prisma.storyBlueprint.create({
-            data: { ...blueprint, createdById: admin.id },
+            data: { ...blueprint, createdById: owner.id },
         });
 
         console.log(`  seed  "${blueprint.name}" (${blueprint.type})`);

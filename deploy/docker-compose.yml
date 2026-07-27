@@ -16,6 +16,7 @@ services:
                 pnpm --filter backend db:migrate:deploy
                 pnpm --filter backend seed:art-styles
                 pnpm --filter backend seed:pricing-tiers
+                pnpm --filter backend seed:story-blueprints
         networks:
             - dokploy-network
         restart: 'no'
