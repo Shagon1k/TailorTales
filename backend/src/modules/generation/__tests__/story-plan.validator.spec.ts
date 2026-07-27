@@ -8,18 +8,21 @@ const makePlan = (overrides: Partial<IStoryPlan> = {}): IStoryPlan => ({
         {
             template: 'book-cover',
             text: 'Cover',
+            navigationTitle: 'Cover',
             chapterTitle: null,
             illustration: { prompt: 'Cover art' },
         },
         {
             template: 'book-text-image',
             text: 'Something wonderful happened on page two.',
+            navigationTitle: 'A curious discovery',
             chapterTitle: 'Chapter 1',
             illustration: { prompt: 'An illustration' },
         },
         {
             template: 'book-final',
             text: 'The end.',
+            navigationTitle: 'A gentle ending',
             chapterTitle: null,
             illustration: { prompt: 'Final art' },
         },

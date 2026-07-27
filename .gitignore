@@ -11,6 +11,10 @@ out/
 
 # Environment variables
 .env
+.playwright
+playwright/.auth/
+playwright-report/
+test-results/
 .env.local
 .env.*.local
 

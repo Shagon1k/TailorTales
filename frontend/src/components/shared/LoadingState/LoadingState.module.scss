@@ -1,0 +1,51 @@
+@use 'styles/typography' as *;
+
+.state {
+    display: grid;
+    place-items: center;
+}
+
+.state__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.state__label {
+    @include t-subhead-xl;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.state__sr-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.state.m-page {
+    min-height: 100dvh;
+    padding: var(--space-12) var(--layout-gutter);
+}
+
+.state.m-container {
+    min-height: 100%;
+}
+
+.state.m-overlay {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    background: color-mix(
+        in srgb,
+        var(--bg-canvas) calc(var(--opacity-secondary) * 100%),
+        transparent
+    );
+}

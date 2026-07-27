@@ -29,6 +29,7 @@ export const STORY_OUTPUT_RULES_HEADER = 'OUTPUT RULES:';
 
 export const STORY_OUTPUT_RULES = [
     '  • text: the story prose for this page (null for illustration-only pages)',
+    '  • navigationTitle: a concise, child-friendly 2–5 word label for the page navigation; required on every page and never shown inside the book or PDF',
     '  • chapterTitle: short chapter label shown above the text (null by default; use only for meaningful chapter breaks)',
     '  • illustration.prompt: a complete, self-contained image generation prompt',
     '  • illustration.prompt must describe imagery only — never ask the image to render titles, chapter names, captions, labels, signs, readable symbols, or speech bubbles because page text is rendered separately by the template',

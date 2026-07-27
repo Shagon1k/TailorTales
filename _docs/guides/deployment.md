@@ -118,6 +118,7 @@ runtime behavior, not the business environment. These values select UAT versus p
 | `SENTRY_ENVIRONMENT` | `uat`                                 | `production`                  |
 | `NEW_RELIC_APP_NAME` | `TailorTales-UAT`                     | `TailorTales-Prod`            |
 | `GA`                 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` empty | production GA4 measurement ID |
+| `E2E_TEST_SECRET`    | opaque UAT-only secret                | omit                          |
 
 Credentials, OAuth clients, webhook secrets, and Paddle catalog IDs also use their
 environment-specific values from the Phase 19 matrix.
@@ -174,3 +175,47 @@ remain applied, rollback is safe only while migrations follow the expand-contrac
 
 CI does not deploy individual applications. Dokploy receives the configured Git trigger and
 builds the Compose services from the repository.
+
+## Post-deploy UAT gate (target CI flow)
+
+UAT browser smoke must run **after the deployment for the merged `main` revision has succeeded**.
+It is a release gate, not a pull-request check: a PR does not yet exist on UAT, and a health check
+alone does not prove that browser routing or the authenticated UI work.
+
+```mermaid
+sequenceDiagram
+    participant GH as GitHub Actions
+    participant D as Dokploy UAT Compose
+    participant U as uat.tailortales.app
+
+    GH->>D: deploy main SHA
+    GH->>D: poll that deployment until succeeded
+    GH->>U: Playwright public + authenticated smoke
+    alt smoke passes
+        GH-->>GH: mark main SHA deploy-verified
+        GH-->>GH: release promotion may create production tag
+    else deploy or smoke fails
+        GH-->>GH: fail deploy-verified; no production promotion
+    end
+```
+
+Use one deploy owner. The recommended setup is GitHub Actions: disable Dokploy's `On Push`
+trigger for UAT, then let a workflow triggered by `push` to `main` call the Dokploy Compose deploy
+API and poll the exact deployment it created. This avoids racing an opaque Dokploy webhook against
+the test workflow and accidentally testing a previous revision.
+
+The workflow requires these GitHub repository secrets/variables:
+
+| Name                     | Kind     | Purpose                                                                           |
+| ------------------------ | -------- | --------------------------------------------------------------------------------- |
+| `DOKPLOY_URL`            | Variable | `https://dokploy.tailortales.app`; API base for the workflow.                     |
+| `DOKPLOY_API_TOKEN`      | Secret   | Calls the Dokploy API; never expose in logs.                                      |
+| `DOKPLOY_UAT_COMPOSE_ID` | Variable | Identifies the UAT Compose resource.                                              |
+| `E2E_TEST_SECRET`        | Secret   | Authenticates the UAT-only test-session endpoint. Must equal UAT Dokploy's value. |
+| `PLAYWRIGHT_BASE_URL`    | Variable | `https://uat.tailortales.app`.                                                    |
+
+After Dokploy reports the deployment successful, the workflow runs `pnpm test:e2e`, uploads the
+Playwright report/trace/screenshot on failure, and publishes a required `uat-e2e` check for that
+main SHA. Production promotion should be a separate manual workflow: it first verifies that exact
+SHA has a successful `uat-e2e` check, then creates the SemVer tag that triggers the production
+Compose resource. Do not create production tags directly from a developer machine.

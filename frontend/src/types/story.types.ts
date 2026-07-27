@@ -16,6 +16,7 @@ export interface IPage {
     id: string;
     storyId: string;
     order: number;
+    navigationTitle: string | null;
     chapterTitle: string | null;
     text: string | null;
     illustrations: IIllustration[];

@@ -43,6 +43,11 @@ class EnvironmentVariables {
     @IsOptional()
     AUTH_ALLOWED_EMAILS?: string;
 
+    /** UAT-only secret that enables the Playwright test-session endpoint. Never set in production. */
+    @IsString()
+    @IsOptional()
+    E2E_TEST_SECRET?: string;
+
     @IsString()
     BACKEND_URL!: string;
 

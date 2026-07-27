@@ -34,6 +34,7 @@ services:
             JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
             JWT_EXPIRY_DAYS: '7'
             AUTH_ALLOWED_EMAILS: ${AUTH_ALLOWED_EMAILS:-}
+            E2E_TEST_SECRET: ${E2E_TEST_SECRET:-}
             BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
             FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
             REDIS_URL: ${REDIS_URL:?REDIS_URL is required}

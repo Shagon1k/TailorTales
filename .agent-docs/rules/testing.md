@@ -70,6 +70,21 @@
 
 ---
 
+## Browser Smoke Tests (Playwright)
+
+- Place browser smoke specs in root `e2e/` as `<flow>.spec.ts`; they are not unit-test files.
+- Keep the suite small and critical: public routing, authentication/session continuity, and one
+  representative rendered private surface. Do not perform paid purchases or real external AI work.
+- Run public smoke locally against a running frontend. Run authenticated smoke only where
+  `E2E_TEST_SECRET` is configured.
+- Authenticated tests must create the session through `page.request` so its HTTP-only cookie is
+  shared with the browser context. Never use the standalone `request` fixture for this flow.
+- A test-only auth endpoint must be gated by a non-production secret and return `404` when the
+  secret is absent. Never put the secret in a test file, committed environment file, trace, or
+  screenshot.
+
+---
+
 ## BE / Nest.js
 
 - Build the unit under test with `Test.createTestingModule({ providers: [...] })` and get it

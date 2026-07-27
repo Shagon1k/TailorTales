@@ -4,6 +4,7 @@ import type { Request, Response } from 'express';
 import type { User } from '../../../generated/prisma/client.js';
 import { AuthController } from '../auth.controller.js';
 import { AuthService } from '../auth.service.js';
+import { UserService } from '../../user/user.service.js';
 
 describe('AuthController', () => {
     let controller: AuthController;
@@ -26,6 +27,7 @@ describe('AuthController', () => {
                         }),
                     },
                 },
+                { provide: UserService, useValue: { findOrCreate: vi.fn() } },
             ],
         }).compile();
 

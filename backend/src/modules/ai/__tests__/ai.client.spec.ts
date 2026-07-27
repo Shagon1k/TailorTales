@@ -28,6 +28,7 @@ describe('AiClient', () => {
                     {
                         template: 'book-cover',
                         text: 'Title',
+                        navigationTitle: 'Cover',
                         chapterTitle: null,
                         illustration: { prompt: 'Cover art' },
                     },
