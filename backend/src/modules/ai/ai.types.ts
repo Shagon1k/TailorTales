@@ -3,6 +3,7 @@ import { z } from 'zod';
 const storyPlanPageSchema = z.object({
     template: z.string(),
     text: z.string().nullable(),
+    navigationTitle: z.string(),
     chapterTitle: z.string().nullable(),
     illustration: z.object({
         prompt: z.string(),

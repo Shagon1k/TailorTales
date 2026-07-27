@@ -1,0 +1,12 @@
+@use 'styles/typography' as *;
+
+.page {
+    position: relative;
+    min-height: 52dvh;
+}
+
+.page__status {
+    @include t-body-base;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-5);
+}

@@ -224,6 +224,7 @@ model Page {
   storyId             String
   story               Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
   order               Int
+  navigationTitle     String?
   chapterTitle        String?
   text                String?
   illustrations       Json

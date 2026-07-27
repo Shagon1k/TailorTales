@@ -18,7 +18,8 @@
         "format:check": "prettier --check .",
         "type-check": "pnpm --filter \"./backend\" --filter \"./frontend\" type-check",
         "check": "pnpm lint && pnpm format:check",
-        "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test"
+        "test": "pnpm --filter \"./backend\" --filter \"./frontend\" test",
+        "test:e2e": "playwright test"
     },
     "pnpm": {
         "onlyBuiltDependencies": [
@@ -39,6 +40,7 @@
         "@commitlint/config-conventional": "^21.0.1",
         "@eslint-react/eslint-plugin": "^5.8.3",
         "@eslint/js": "^10.0.1",
+        "@playwright/test": "^1.62.0",
         "eslint": "^10.4.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-react-hooks": "^7.1.1",

@@ -5,6 +5,7 @@
         "ogImageAlt": "TailorTales — personalisierte Bilderbücher für neugierige Kinder"
     },
     "common": {
+        "loadingPage": "Seite wird geladen…",
         "nav": {
             "howItWorks": "So funktioniert's"
         }
@@ -998,6 +999,8 @@
         },
         "subscription": {
             "loading": "Abonnement wird geladen…",
+            "checkoutSyncing": "Dein Abonnement wird aktiviert…",
+            "checkoutDelayed": "Deine Zahlung wird noch verarbeitet. Bitte aktualisiere diese Seite in einer Minute.",
             "planCard": {
                 "eyebrow": "Aktueller Plan",
                 "pastDueWarning": "Deine letzte Zahlung wurde nicht verarbeitet — wir werden es automatisch erneut versuchen. Bitte überprüfe deine Zahlungsmethode, um die Werkstatt offen zu halten.",

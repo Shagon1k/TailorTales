@@ -17,6 +17,7 @@ const MOCK_PAGE: IPage = {
     id: 'page-1',
     storyId: 'story-1',
     order: 2,
+    navigationTitle: 'A curious discovery',
     chapterTitle: null,
     text: 'Once upon a time…',
     illustrations: [],

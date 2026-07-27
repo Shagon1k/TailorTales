@@ -31,6 +31,7 @@ export class AiStubClient implements IAiClient {
 
         const interiorPages = Array.from({ length: Math.max(0, interiorCount) }, (_, i) => ({
             template: interiorTemplates[i % interiorTemplates.length],
+            navigationTitle: `A curious discovery ${i + 1}`,
             chapterTitle: `Chapter ${i + 1}`,
             text: `Once upon a time, on page ${i + 2}, something wonderful happened. The story continued with careful attention to the child's curiosity and wonder.`,
             illustration: {
@@ -46,6 +47,7 @@ export class AiStubClient implements IAiClient {
                 {
                     template: 'book-cover',
                     text: 'The Curious Little Question',
+                    navigationTitle: 'Cover',
                     chapterTitle: null,
                     illustration: {
                         prompt: 'A charming storybook cover illustration featuring a fox looking up at a starry sky with wonder.',
@@ -55,6 +57,7 @@ export class AiStubClient implements IAiClient {
                 {
                     template: 'book-final',
                     text: 'And so the question was answered, and the child went to sleep with a smile, knowing the world was full of wonderful mysteries waiting to be discovered.',
+                    navigationTitle: 'A gentle ending',
                     chapterTitle: null,
                     illustration: {
                         prompt: 'A cozy final illustration of a child sleeping peacefully, with a small fox watching over.',

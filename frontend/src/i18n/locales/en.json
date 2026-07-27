@@ -5,6 +5,7 @@
         "ogImageAlt": "TailorTales — personalized storybooks for curious kids"
     },
     "common": {
+        "loadingPage": "Loading page…",
         "nav": {
             "howItWorks": "How it works"
         }
@@ -986,6 +987,8 @@
         },
         "subscription": {
             "loading": "Loading your subscription…",
+            "checkoutSyncing": "Activating your subscription…",
+            "checkoutDelayed": "Your payment is still being processed. Please refresh this page in a minute.",
             "planCard": {
                 "eyebrow": "Current plan",
                 "pastDueWarning": "Your last payment didn't go through — we'll retry automatically. Please check your payment method to keep the workshop open.",

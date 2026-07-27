@@ -210,12 +210,14 @@ describe('GenerationPipeline', () => {
                     {
                         template: 'book-cover',
                         text: 'Cover',
+                        navigationTitle: 'Cover',
                         chapterTitle: null,
                         illustration: { prompt: 'art' },
                     },
                     {
                         template: 'book-final',
                         text: 'End',
+                        navigationTitle: 'Ending',
                         chapterTitle: null,
                         illustration: { prompt: 'art' },
                     },

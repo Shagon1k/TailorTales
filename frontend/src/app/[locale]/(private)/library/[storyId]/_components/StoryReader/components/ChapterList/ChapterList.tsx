@@ -58,7 +58,7 @@ export default function ChapterList({
                                     {String(page.order).padStart(2, '0')}
                                 </span>
                                 <span className={styles['chapter-list__title']}>
-                                    {page.chapterTitle ?? fallbackTitle}
+                                    {page.navigationTitle ?? fallbackTitle}
                                 </span>
                             </button>
                         </li>

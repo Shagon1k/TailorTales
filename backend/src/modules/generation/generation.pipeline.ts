@@ -209,6 +209,7 @@ export class GenerationPipeline {
                 storyId: story.id,
                 order: i + 1,
                 layout: p.template,
+                navigationTitle: p.navigationTitle,
                 chapterTitle: p.chapterTitle ?? null,
                 text: p.text ?? null,
                 illustrationPrompt: p.illustration.prompt,

@@ -1,5 +1,5 @@
-import Loader from '@/components/ui/Loader/Loader';
+import LoadingState from '@/components/shared/LoadingState/LoadingState';
 
 export default function AdminPageLoading(): React.ReactElement {
-    return <Loader label="Loading" />;
+    return <LoadingState label="Loading admin" />;
 }
