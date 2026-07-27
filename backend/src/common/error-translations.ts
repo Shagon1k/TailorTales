@@ -55,6 +55,11 @@ const translations: Record<string, ITranslationEntry> = {
         de: 'Konto gesperrt.',
         ru: 'Аккаунт заблокирован.',
     },
+    'errors.auth.emailNotAllowed': {
+        en: 'This email is not allowed to access this environment.',
+        de: 'Diese E-Mail-Adresse darf nicht auf diese Umgebung zugreifen.',
+        ru: 'Этому адресу электронной почты не разрешён доступ к этому окружению.',
+    },
     'errors.billing.noActiveSubscription': {
         en: 'No paid subscription to cancel.',
         de: 'Kein bezahltes Abonnement zum Kündigen vorhanden.',

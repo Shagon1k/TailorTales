@@ -4,12 +4,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { type User } from '../../../generated/prisma/client.js';
 import { UserService } from '../../user/user.service.js';
+import { AuthEmailAllowlistService } from '../auth-email-allowlist.service.js';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor(
         configService: ConfigService,
         private readonly userService: UserService,
+        private readonly emailAllowlist: AuthEmailAllowlistService,
     ) {
         super({
             clientID: configService.getOrThrow<string>('GOOGLE_CLIENT_ID'),
@@ -26,10 +28,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         done: VerifyCallback,
     ): Promise<void> {
         const { id, emails, displayName, photos } = profile;
+        const email = emails?.[0]?.value ?? '';
+
+        this.emailAllowlist.assertAllowed(email);
 
         const user: User = await this.userService.findOrCreate({
             googleId: id,
-            email: emails?.[0]?.value ?? '',
+            email,
             name: displayName,
             avatarUrl: photos?.[0]?.value,
         });

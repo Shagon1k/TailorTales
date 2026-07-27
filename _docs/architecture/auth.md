@@ -88,3 +88,14 @@ provider payload before issuing the session cookie.
 
 Custom uploaded avatars are stored separately in S3 and take precedence in the UI, so refreshing
 the Google avatar does not overwrite a user's manually chosen avatar.
+
+## Environment email allowlist
+
+`AUTH_ALLOWED_EMAILS` optionally restricts an environment to a comma-separated list of exact
+email addresses. Empty or unset means unrestricted, which is the production default. Matching is
+case-insensitive and ignores surrounding whitespace.
+
+The policy runs before Google OAuth creates or updates a user and again in `JwtStrategy` after the
+current user is loaded. The second check immediately rejects existing sessions when an email is
+removed from the allowlist; no JWT rotation or database cleanup is required. Changing the variable
+requires a backend restart.

@@ -3,19 +3,26 @@ import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import type { User } from '../../../generated/prisma/client.js';
 import { UserService } from '../../user/user.service.js';
+import { AuthEmailAllowlistService } from '../auth-email-allowlist.service.js';
 import { JwtStrategy } from '../strategies/jwt.strategy.js';
 
 describe('JwtStrategy', () => {
     let strategy: JwtStrategy;
     let findById: ReturnType<typeof vi.fn>;
+    let assertAllowed: ReturnType<typeof vi.fn>;
 
     beforeEach(async () => {
         findById = vi.fn();
+        assertAllowed = vi.fn();
 
         const module = await Test.createTestingModule({
             providers: [
                 JwtStrategy,
                 { provide: UserService, useValue: { findById } },
+                {
+                    provide: AuthEmailAllowlistService,
+                    useValue: { assertAllowed },
+                },
                 {
                     provide: ConfigService,
                     useValue: { getOrThrow: vi.fn().mockReturnValue('test-secret') },
@@ -34,6 +41,7 @@ describe('JwtStrategy', () => {
             const result = await strategy.validate({ sub: 'user-123' });
 
             expect(findById).toHaveBeenCalledWith('user-123');
+            expect(assertAllowed).toHaveBeenCalledWith('a@b.com');
             expect(result).toBe(user);
         });
 
@@ -52,6 +60,20 @@ describe('JwtStrategy', () => {
             await expect(strategy.validate({ sub: 'user-123' })).rejects.toThrow(
                 UnauthorizedException,
             );
+            expect(assertAllowed).not.toHaveBeenCalled();
+        });
+
+        it('should throw UnauthorizedException when the user email is not allowed', async () => {
+            const user = { id: 'user-123', email: 'blocked@example.com' } as User;
+            findById.mockResolvedValue(user);
+            assertAllowed.mockImplementation(() => {
+                throw new UnauthorizedException('errors.auth.emailNotAllowed');
+            });
+
+            await expect(strategy.validate({ sub: 'user-123' })).rejects.toThrow(
+                UnauthorizedException,
+            );
+            expect(assertAllowed).toHaveBeenCalledWith('blocked@example.com');
         });
     });
 });
