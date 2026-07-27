@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { type User } from '../../../generated/prisma/client.js';
 import { UserService } from '../../user/user.service.js';
+import { AuthEmailAllowlistService } from '../auth-email-allowlist.service.js';
 
 interface IJwtPayload {
     sub: string;
@@ -15,6 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor(
         configService: ConfigService,
         private readonly userService: UserService,
+        private readonly emailAllowlist: AuthEmailAllowlistService,
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
@@ -36,6 +38,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         if (user.suspendedAt) {
             throw new UnauthorizedException('errors.auth.accountSuspended');
         }
+
+        this.emailAllowlist.assertAllowed(user.email);
 
         return user;
     }

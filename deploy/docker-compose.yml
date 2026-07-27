@@ -32,6 +32,7 @@ services:
             GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET is required}
             JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
             JWT_EXPIRY_DAYS: '7'
+            AUTH_ALLOWED_EMAILS: ${AUTH_ALLOWED_EMAILS:-}
             BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
             FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
             REDIS_URL: ${REDIS_URL:?REDIS_URL is required}

@@ -40,6 +40,10 @@ class EnvironmentVariables {
     JWT_EXPIRY_DAYS: number = 7;
 
     @IsString()
+    @IsOptional()
+    AUTH_ALLOWED_EMAILS?: string;
+
+    @IsString()
     BACKEND_URL!: string;
 
     @IsString()

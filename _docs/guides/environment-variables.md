@@ -27,6 +27,7 @@ The deployment file maps those inputs to the build-time and runtime names docume
 | `GOOGLE_CLIENT_SECRET` | yes      | —       | Google OAuth 2.0 client secret.                                                                                                                       |
 | `JWT_SECRET`           | yes      | —       | Signs and verifies JWTs. **Minimum 32 characters** (enforced at startup). Generate with `openssl rand -base64 48`. Rotate to invalidate all sessions. |
 | `JWT_EXPIRY_DAYS`      | no       | `7`     | How long an issued JWT is valid. Clearing the cookie does not revoke the token — see [auth.md](../architecture/auth.md#logout-and-jwt-lifetime).      |
+| `AUTH_ALLOWED_EMAILS`  | no       | —       | Comma-separated exact email allowlist. Empty/unset allows everyone. Intended for UAT; matching ignores case and surrounding whitespace.               |
 
 ### URLs
 
