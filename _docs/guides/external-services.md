@@ -13,7 +13,9 @@ The only authentication method. Without it, the stack still boots, but no one ca
 3. Create **OAuth 2.0 credentials** → application type **Web application**.
 4. Add the callback as an **authorized redirect URI**:
    `{BACKEND_URL}/auth/google/callback` — e.g. `http://localhost:3001/auth/google/callback`
-   for local dev. It must match `BACKEND_URL` exactly.
+   for local dev, `https://uat.tailortales.app/api/auth/google/callback` for UAT, and
+   `https://tailortales.app/api/auth/google/callback` for production. It must match
+   `BACKEND_URL` exactly.
 5. Put the client ID/secret in `backend/.env`:
 
 ```bash
@@ -144,6 +146,8 @@ overlay but the user's tier never changes.
    For a permanent dev URL, use a Cloudflare named tunnel: `dev-api.<domain> → localhost:3001`.
 2. **Developer tools → Notifications → New destination:**
     - Type: **Webhook** · URL: `https://<id>.ngrok.app/webhooks/paddle`
+        - UAT: `https://uat.tailortales.app/api/webhooks/paddle`
+        - Production: `https://tailortales.app/api/webhooks/paddle`
     - Subscribe to: `subscription.created`, `subscription.activated`, `subscription.updated`,
       `subscription.canceled`, `subscription.past_due`, `transaction.payment_failed`
 3. Copy the **secret key** (`pdl_ntfset_…`) → `backend/.env`:
@@ -230,8 +234,8 @@ Same steps against <https://vendors.paddle.com> with three differences:
 2. **Domain / website approval** required for live checkout (sandbox needed none); submit as
    soon as the domain is live under **Checkout → Default payment link**.
 3. **Env flip:** `PADDLE_ENVIRONMENT=production`, `NEXT_PUBLIC_PADDLE_ENV=production`, live
-   API key (no `_sdbx`), `live_` client token, webhook destination at real backend domain
-   (no tunnel).
+   API key (no `_sdbx`), `live_` client token, and the same-origin production webhook
+   destination `https://tailortales.app/api/webhooks/paddle`.
 
 **Multiple webhook destinations:** register one per environment (dev tunnel, UAT, prod) against
 the same sandbox account. Each destination has its own `PADDLE_WEBHOOK_SECRET`. Every Paddle
@@ -274,7 +278,7 @@ SENTRY_AUTH_TOKEN="sntrys_…"   # Compose input → frontend BuildKit secret
 ```
 
 5. **Uptime monitor:** Sentry → **Crons/Uptime → Uptime Monitors → Add** →
-   `GET https://api.tailortales.app/health`, interval 5 min, alert by email. Replaces a
+   `GET https://tailortales.app/api/health`, interval 5 min, alert by email. Replaces a
    standalone uptime service.
 
 The DSN is safe to expose (it's write-only ingest); the **auth token is a secret**. One Sentry

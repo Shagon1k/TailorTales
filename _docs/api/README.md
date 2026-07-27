@@ -2,7 +2,7 @@
 
 > Every HTTP endpoint, read from the controllers (the source of truth).
 > Backend base URL: `http://localhost:3001` (no global path prefix). The frontend reaches it
-> via `NEXT_PUBLIC_BACKEND_URL`.
+> through same-origin `/api`, rewritten by Next.js to the backend.
 
 ## Conventions
 

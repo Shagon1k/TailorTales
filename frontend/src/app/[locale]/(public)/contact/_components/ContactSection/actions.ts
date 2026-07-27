@@ -1,6 +1,6 @@
 'use server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_INTERNAL_URL = process.env.BACKEND_INTERNAL_URL ?? 'http://localhost:3001';
 
 export type TContactFormState =
     | { status: 'idle' }
@@ -20,7 +20,7 @@ export async function submitContact(
     }
 
     try {
-        const res = await fetch(`${BACKEND_URL}/contact`, {
+        const res = await fetch(`${BACKEND_INTERNAL_URL}/contact`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, message }),

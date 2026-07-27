@@ -33,7 +33,7 @@ so issues are filtered per environment.
 
 ### Sentry — uptime monitor
 
-A single Sentry uptime monitor pings `GET https://api.tailortales.app/health` and alerts (email)
+A single Sentry uptime monitor pings `GET https://tailortales.app/api/health` and alerts (email)
 when the backend is down. `/health` returns `{ "status": "ok" }` and is `@Public()`. Configured
 in the Sentry UI — no app env vars.
 

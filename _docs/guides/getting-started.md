@@ -47,8 +47,9 @@ cp backend/.env.example  backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-The frontend has one variable (`NEXT_PUBLIC_BACKEND_URL`, default `http://localhost:3001`)
-already set in `.env.example` — no changes needed for local dev.
+The frontend's `BACKEND_INTERNAL_URL` defaults to `http://localhost:3001` in `.env.example`.
+Browser requests use `/api`, which Next.js rewrites to that internal URL — no changes are needed
+for local dev.
 
 **To boot, every backend var must be _present_** (env is validated at startup by
 [`env.validation.ts`](../../backend/src/config/env.validation.ts)). The example file already
