@@ -27,11 +27,17 @@ runs, in order:
 pnpm --filter backend db:migrate:deploy
 pnpm --filter backend seed:art-styles
 pnpm --filter backend seed:pricing-tiers
+pnpm --filter backend seed:story-blueprints
 ```
 
 The shell exits on the first failure. Compose starts `backend` only after `release` succeeds,
 then starts `frontend` only after the backend health check passes. This is automatic: nobody
 manually runs migrations or presses a second deploy button.
+
+The blueprint seed creates or reuses a non-login `TailorTales System` user solely as the
+required audit owner for built-in blueprints. Therefore a clean environment receives the Book
+and Comic blueprints on its first deployment; it does not need an OAuth user or an administrator
+before story generation works.
 
 UAT and production keep their Dokploy-managed PostgreSQL and Redis services; UAT also has a
 persistent MinIO resource. All Compose services join the external `dokploy-network`; no
