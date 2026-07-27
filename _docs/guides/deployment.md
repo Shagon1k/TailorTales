@@ -208,6 +208,7 @@ The workflow requires these GitHub repository secrets/variables:
 
 | Name                     | Kind     | Purpose                                                                           |
 | ------------------------ | -------- | --------------------------------------------------------------------------------- |
+| `DOKPLOY_URL`            | Variable | `https://dokploy.tailortales.app`; API base for the workflow.                     |
 | `DOKPLOY_API_TOKEN`      | Secret   | Calls the Dokploy API; never expose in logs.                                      |
 | `DOKPLOY_UAT_COMPOSE_ID` | Variable | Identifies the UAT Compose resource.                                              |
 | `E2E_TEST_SECRET`        | Secret   | Authenticates the UAT-only test-session endpoint. Must equal UAT Dokploy's value. |
