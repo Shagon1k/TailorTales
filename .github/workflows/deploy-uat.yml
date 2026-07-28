@@ -69,6 +69,20 @@ jobs:
                   test -n "${before_status}"
                   test "${before_status}" != "running"
 
+                  current_env="$(jq -r '.env // empty' <<<"${before}")"
+                  updated_env="$(jq -rn --arg env "${current_env}" --arg sha "${GITHUB_SHA}" '
+                      ($env | split("\\n") | map(select(startswith("BUILD_SHA=") | not)) | join("\\n")) as $preserved
+                      | ($preserved | if . == "" then "" else . + "\\n" end) + "BUILD_SHA=" + $sha
+                  ')"
+                  environment_payload="$(jq -n \
+                      --arg composeId "${DOKPLOY_UAT_COMPOSE_ID}" \
+                      --arg env "${updated_env}" \
+                      '{ composeId: $composeId, env: $env }')"
+                  api --request POST \
+                      --header 'Content-Type: application/json' \
+                      --data "${environment_payload}" \
+                      "${DOKPLOY_URL}/api/compose.saveEnvironment" >/dev/null
+
                   api --request POST \
                       --header 'Content-Type: application/json' \
                       --data "{\"composeId\":\"${DOKPLOY_UAT_COMPOSE_ID}\",\"title\":\"GitHub Actions ${GITHUB_SHA}\"}" \

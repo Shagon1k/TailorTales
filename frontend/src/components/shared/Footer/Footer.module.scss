@@ -64,6 +64,13 @@
     user-select: none;
 }
 
+.footer__build {
+    @include t-body-sm;
+    color: var(--text-muted);
+    font-family: var(--font-geist-mono), monospace;
+    margin: 0;
+}
+
 @media (max-width: 767px) {
     .footer__inner {
         padding: var(--space-6) var(--layout-gutter);
@@ -73,6 +80,10 @@
 
     .footer__links {
         flex-wrap: wrap;
+    }
+
+    .footer__build {
+        align-self: flex-start;
     }
 }
 

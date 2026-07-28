@@ -6,12 +6,13 @@ export default defineConfig({
     testDir: './e2e',
     fullyParallel: false,
     forbidOnly: Boolean(process.env.CI),
-    retries: process.env.CI ? 2 : 0,
+    // UAT is a release gate: a transient failure must be visible instead of retried away.
+    retries: 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
     use: {
         baseURL,
-        trace: 'on-first-retry',
+        trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
     },
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
