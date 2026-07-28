@@ -79,9 +79,6 @@
     "footer": {
         "brandName": "TailorTales",
         "tagline": "Маленькая мастерская для вопросов одного ребёнка.",
-        "build": {
-            "label": "Сборка UAT"
-        },
         "nav": {
             "ariaLabel": "Навигация в футере",
             "howItWorks": "Как это работает",
