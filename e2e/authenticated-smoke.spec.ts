@@ -16,7 +16,7 @@ test.describe('authenticated smoke', () => {
     }) => {
         await page.goto('/en/library');
         await expect(page).toHaveURL(/\/en\/library$/);
-        await expect(page.getByRole('navigation')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Account menu' })).toBeVisible();
 
         await page.goto('/en/account/subscription');
         await expect(page).toHaveURL(/\/en\/account\/subscription$/);
