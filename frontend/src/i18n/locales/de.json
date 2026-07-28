@@ -79,6 +79,9 @@
     "footer": {
         "brandName": "TailorTales",
         "tagline": "Eine kleine Werkstatt für die Fragen eines Kindes.",
+        "build": {
+            "label": "UAT-Build"
+        },
         "nav": {
             "ariaLabel": "Fußzeilennavigation",
             "howItWorks": "So funktioniert's",

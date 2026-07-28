@@ -40,10 +40,23 @@ jobs:
               run: |
                   set -euo pipefail
 
-                  [[ "${RELEASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
-                  [[ "${RELEASE_VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
-                  git cat-file -e "${RELEASE_SHA}^{commit}"
-                  git merge-base --is-ancestor "${RELEASE_SHA}" origin/main
+                  git fetch --no-tags origin main:refs/remotes/origin/main
+                  [[ "${RELEASE_SHA}" =~ ^[0-9a-f]{40}$ ]] || {
+                      echo 'Release SHA must be a full 40-character lowercase SHA.' >&2
+                      exit 1
+                  }
+                  [[ "${RELEASE_VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+                      echo 'Release version must be stable SemVer, for example v1.0.0.' >&2
+                      exit 1
+                  }
+                  git cat-file -e "${RELEASE_SHA}^{commit}" || {
+                      echo "Release SHA ${RELEASE_SHA} is not a commit in this repository." >&2
+                      exit 1
+                  }
+                  git merge-base --is-ancestor "${RELEASE_SHA}" origin/main || {
+                      echo "Release SHA ${RELEASE_SHA} is not reachable from origin/main." >&2
+                      exit 1
+                  }
 
                   if git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_VERSION}"; then
                       echo "Tag ${RELEASE_VERSION} already exists." >&2

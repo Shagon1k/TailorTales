@@ -99,6 +99,7 @@ services:
                 NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:?NEXT_PUBLIC_SENTRY_DSN is required}
                 NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:?SENTRY_ENVIRONMENT is required}
                 NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+                NEXT_PUBLIC_BUILD_SHA: ${BUILD_SHA:-unknown}
                 SENTRY_SOURCE_MAP_UPLOAD_REQUIRED: 'true'
             secrets:
                 - sentry_auth_token

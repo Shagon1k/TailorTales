@@ -4,10 +4,13 @@ test.describe('public navigation', () => {
     test('should render the landing page and open pricing', async ({ page }) => {
         await page.goto('/en');
 
-        await expect(page.getByRole('link', { name: 'Pricing' })).toBeVisible();
-        await page.getByRole('link', { name: 'Pricing' }).click();
+        const pricingLink = page.getByRole('link', { name: 'Pricing' });
+        await expect(pricingLink).toBeVisible();
+        await Promise.all([
+            page.waitForURL(/\/en\/pricing$/, { timeout: 15_000 }),
+            pricingLink.click(),
+        ]);
 
-        await expect(page).toHaveURL(/\/en\/pricing$/);
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     });
 });

@@ -13,6 +13,10 @@ import StarField from '@/components/shared/StarField/StarField';
 import Providers from '../providers';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const BUILD_SHA =
+    process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT === 'uat'
+        ? process.env.NEXT_PUBLIC_BUILD_SHA
+        : undefined;
 
 const newsreader = Newsreader({
     subsets: ['latin'],
@@ -90,6 +94,7 @@ export default async function LocaleLayout({
         <html lang={locale} {...mantineHtmlProps} className={fontClasses}>
             <head>
                 <ColorSchemeScript />
+                {BUILD_SHA ? <meta name="tailortales-build" content={BUILD_SHA} /> : null}
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
