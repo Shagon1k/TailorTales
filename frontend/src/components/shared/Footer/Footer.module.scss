@@ -7,11 +7,12 @@
 .footer__inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-8) var(--space-6) var(--space-10);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-6);
+    position: relative;
 }
 
 .footer__brand {
@@ -65,10 +66,14 @@
 }
 
 .footer__build {
-    @include t-body-sm;
+    @include t-caps-xs;
+
     color: var(--text-muted);
-    font-family: var(--font-geist-mono), monospace;
+    opacity: var(--opacity-muted);
     margin: 0;
+    position: absolute;
+    right: var(--space-6);
+    bottom: var(--space-3);
 }
 
 @media (max-width: 767px) {
@@ -80,10 +85,6 @@
 
     .footer__links {
         flex-wrap: wrap;
-    }
-
-    .footer__build {
-        align-self: flex-start;
     }
 }
 
