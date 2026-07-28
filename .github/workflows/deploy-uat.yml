@@ -1,0 +1,119 @@
+name: Deploy UAT
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: deploy-uat
+    cancel-in-progress: false
+
+jobs:
+    deploy-and-smoke:
+        name: Deploy UAT and run smoke tests
+        runs-on: ubuntu-latest
+        timeout-minutes: 40
+
+        env:
+            DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
+            DOKPLOY_API_TOKEN: ${{ secrets.DOKPLOY_API_TOKEN }}
+            DOKPLOY_UAT_COMPOSE_ID: ${{ vars.DOKPLOY_UAT_COMPOSE_ID }}
+            CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+            CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+            PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
+            E2E_TEST_SECRET: ${{ secrets.E2E_TEST_SECRET }}
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 0
+
+            - name: Confirm main has not advanced
+              run: |
+                  test "${GITHUB_REF}" = "refs/heads/main"
+                  git fetch origin main
+                  test "$(git rev-parse origin/main)" = "${GITHUB_SHA}"
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Install Playwright Chromium
+              run: pnpm exec playwright install --with-deps chromium
+
+            - name: Deploy the UAT Compose resource
+              run: |
+                  set -euo pipefail
+
+                  api() {
+                      curl --fail-with-body --silent --show-error \
+                          --header "x-api-key: ${DOKPLOY_API_TOKEN}" \
+                          --header "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+                          --header "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
+                          "$@"
+                  }
+
+                  before="$(api "${DOKPLOY_URL}/api/compose.one?composeId=${DOKPLOY_UAT_COMPOSE_ID}")"
+                  before_status="$(jq -r '.composeStatus // empty' <<<"${before}")"
+                  test -n "${before_status}"
+                  test "${before_status}" != "running"
+
+                  api --request POST \
+                      --header 'Content-Type: application/json' \
+                      --data "{\"composeId\":\"${DOKPLOY_UAT_COMPOSE_ID}\",\"title\":\"GitHub Actions ${GITHUB_SHA}\"}" \
+                      "${DOKPLOY_URL}/api/compose.deploy" >/dev/null
+
+                  observed_running=false
+                  for attempt in $(seq 1 120); do
+                      sleep 5
+                      compose="$(api "${DOKPLOY_URL}/api/compose.one?composeId=${DOKPLOY_UAT_COMPOSE_ID}")"
+                      status="$(jq -r '.composeStatus // empty' <<<"${compose}")"
+                      echo "Dokploy Compose status: ${status}"
+
+                      case "${status}" in
+                          running)
+                              observed_running=true
+                              ;;
+                          done)
+                              if [ "${observed_running}" = true ]; then
+                                  exit 0
+                              fi
+                              ;;
+                          idle)
+                              ;;
+                          error)
+                              echo 'Dokploy reported a failed deployment.' >&2
+                              exit 1
+                              ;;
+                          *)
+                              echo "Unexpected Dokploy Compose status: ${status}" >&2
+                              exit 1
+                              ;;
+                      esac
+                  done
+
+                  echo 'Timed out waiting for Dokploy to finish the deployment.' >&2
+                  exit 1
+
+            - name: Run UAT smoke tests
+              run: pnpm test:e2e
+
+            - name: Upload Playwright artifacts
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-artifacts-${{ github.run_id }}
+                  path: |
+                      playwright-report/
+                      test-results/
+                  if-no-files-found: ignore
+                  retention-days: 14

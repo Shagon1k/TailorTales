@@ -60,6 +60,10 @@ returns `404` when the variable is absent, so production does not expose it. Aut
 must use `page.request`, not Playwright's standalone `request` fixture, because the page request
 context shares the browser cookie jar.
 
+If UAT has `AUTH_ALLOWED_EMAILS`, its `app-uat` service-level value must include
+`e2e-smoke@tailortales.invalid` together with the owner emails. The JWT strategy enforces that
+allowlist on every authenticated request, including the test session.
+
 Install Chromium once after dependency installation:
 
 ```bash

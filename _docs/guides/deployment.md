@@ -123,6 +123,11 @@ runtime behavior, not the business environment. These values select UAT versus p
 Credentials, OAuth clients, webhook secrets, and Paddle catalog IDs also use their
 environment-specific values from the Phase 19 matrix.
 
+When UAT uses `AUTH_ALLOWED_EMAILS`, configure an `app-uat` service-level override containing
+the owner emails and `e2e-smoke@tailortales.invalid`. This is required because the JWT strategy
+checks the allowlist for the authenticated smoke user on every request. Do not add that technical
+email to production.
+
 For UAT, `STORAGE_ENDPOINT=https://storage-uat.tailortales.app` and
 `STORAGE_FORCE_PATH_STYLE=true`. That domain routes to the MinIO API on port `9000`; presigned
 URLs embed this endpoint, so an internal Docker hostname would not work in browsers. Keep the
@@ -206,16 +211,23 @@ the test workflow and accidentally testing a previous revision.
 
 The workflow requires these GitHub repository secrets/variables:
 
-| Name                     | Kind     | Purpose                                                                           |
-| ------------------------ | -------- | --------------------------------------------------------------------------------- |
-| `DOKPLOY_URL`            | Variable | `https://dokploy.tailortales.app`; API base for the workflow.                     |
-| `DOKPLOY_API_TOKEN`      | Secret   | Calls the Dokploy API; never expose in logs.                                      |
-| `DOKPLOY_UAT_COMPOSE_ID` | Variable | Identifies the UAT Compose resource.                                              |
-| `E2E_TEST_SECRET`        | Secret   | Authenticates the UAT-only test-session endpoint. Must equal UAT Dokploy's value. |
-| `PLAYWRIGHT_BASE_URL`    | Variable | `https://uat.tailortales.app`.                                                    |
+| Name                      | Kind     | Purpose                                                                           |
+| ------------------------- | -------- | --------------------------------------------------------------------------------- |
+| `DOKPLOY_URL`             | Variable | `https://dokploy.tailortales.app`; API base for the workflow.                     |
+| `DOKPLOY_API_TOKEN`       | Secret   | Calls the Dokploy API; never expose in logs.                                      |
+| `DOKPLOY_UAT_COMPOSE_ID`  | Variable | Identifies the UAT Compose resource.                                              |
+| `CF_ACCESS_CLIENT_ID`     | Secret   | Cloudflare Access service-token client ID for the protected Dokploy API.          |
+| `CF_ACCESS_CLIENT_SECRET` | Secret   | Cloudflare Access service-token secret for the protected Dokploy API.             |
+| `E2E_TEST_SECRET`         | Secret   | Authenticates the UAT-only test-session endpoint. Must equal UAT Dokploy's value. |
+| `PLAYWRIGHT_BASE_URL`     | Variable | `https://uat.tailortales.app`.                                                    |
 
-After Dokploy reports the deployment successful, the workflow runs `pnpm test:e2e`, uploads the
-Playwright report/trace/screenshot on failure, and publishes a required `uat-e2e` check for that
-main SHA. Production promotion should be a separate manual workflow: it first verifies that exact
-SHA has a successful `uat-e2e` check, then creates the SemVer tag that triggers the production
-Compose resource. Do not create production tags directly from a developer machine.
+`deploy-uat.yml` initially exposes only `workflow_dispatch`. It refuses to deploy if another UAT
+deployment is already running or `main` has advanced beyond the manually selected SHA. It then
+calls `compose.deploy`, waits for Dokploy's Compose status to transition through `running` to
+`done`, and runs `pnpm test:e2e`. On failure it uploads the Playwright report, trace, and
+screenshots. Run it successfully once before enabling the `push` trigger and disabling Dokploy's
+UAT `On Push` trigger.
+
+Production promotion should be a separate manual workflow: it first verifies that exact SHA has a
+successful `uat-e2e` check, then creates the SemVer tag that triggers the production Compose
+resource. Do not create production tags directly from a developer machine.
