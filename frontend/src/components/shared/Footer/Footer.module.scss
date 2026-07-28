@@ -7,12 +7,11 @@
 .footer__inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-8) var(--space-6) var(--space-10);
+    padding: var(--space-8) var(--space-6);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-6);
-    position: relative;
 }
 
 .footer__brand {
@@ -63,17 +62,6 @@
     @include t-body-sm;
     color: var(--text-muted);
     user-select: none;
-}
-
-.footer__build {
-    @include t-caps-xs;
-
-    color: var(--text-muted);
-    opacity: var(--opacity-muted);
-    margin: 0;
-    position: absolute;
-    right: var(--space-6);
-    bottom: var(--space-3);
 }
 
 @media (max-width: 767px) {

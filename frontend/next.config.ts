@@ -27,9 +27,6 @@ function toRemotePattern(url: URL): { protocol: 'http' | 'https'; hostname: stri
 }
 
 const nextConfig: NextConfig = {
-    env: {
-        NEXT_PUBLIC_BUILD_SHA: process.env.NEXT_PUBLIC_BUILD_SHA ?? 'unknown',
-    },
     sassOptions: {
         loadPaths: [path.join(configDir, 'src')],
     },

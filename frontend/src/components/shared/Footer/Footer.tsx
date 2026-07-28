@@ -2,11 +2,6 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import styles from './Footer.module.scss';
 
-const BUILD_SHA =
-    process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT === 'uat'
-        ? process.env.NEXT_PUBLIC_BUILD_SHA
-        : undefined;
-
 export default async function Footer(): Promise<React.ReactElement> {
     const t = await getTranslations('footer');
 
@@ -36,11 +31,6 @@ export default async function Footer(): Promise<React.ReactElement> {
                         {t('nav.contact')}
                     </Link>
                 </nav>
-                {BUILD_SHA ? (
-                    <small className={styles.footer__build} aria-label={t('build.label')}>
-                        {t('build.label')} · {BUILD_SHA.slice(0, 8)}
-                    </small>
-                ) : null}
             </div>
         </footer>
     );
