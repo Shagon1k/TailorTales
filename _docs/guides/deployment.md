@@ -181,7 +181,7 @@ remain applied, rollback is safe only while migrations follow the expand-contrac
 CI does not deploy individual applications. Dokploy receives the configured Git trigger and
 builds the Compose services from the repository.
 
-## Post-deploy UAT gate (target CI flow)
+## Post-deploy UAT gate
 
 UAT browser smoke must run **after the deployment for the merged `main` revision has succeeded**.
 It is a release gate, not a pull-request check: a PR does not yet exist on UAT, and a health check
@@ -197,17 +197,17 @@ sequenceDiagram
     GH->>D: poll that deployment until succeeded
     GH->>U: Playwright public + authenticated smoke
     alt smoke passes
-        GH-->>GH: mark main SHA deploy-verified
+        GH-->>GH: mark main SHA `UAT E2E` successful
         GH-->>GH: release promotion may create production tag
     else deploy or smoke fails
         GH-->>GH: fail deploy-verified; no production promotion
     end
 ```
 
-Use one deploy owner. The recommended setup is GitHub Actions: disable Dokploy's `On Push`
-trigger for UAT, then let a workflow triggered by `push` to `main` call the Dokploy Compose deploy
-API and poll the exact deployment it created. This avoids racing an opaque Dokploy webhook against
-the test workflow and accidentally testing a previous revision.
+Use one deploy owner. GitHub Actions owns UAT: `.github/workflows/deploy-uat.yml` runs on every
+push to `main`, calls the Dokploy Compose deploy API, and polls the deployment before starting
+browser smoke. Dokploy's UAT `On Push` trigger must remain disabled; otherwise its webhook races
+the workflow and may cause the smoke suite to test the wrong revision.
 
 The workflow requires these GitHub repository secrets/variables:
 
@@ -221,13 +221,14 @@ The workflow requires these GitHub repository secrets/variables:
 | `E2E_TEST_SECRET`         | Secret   | Authenticates the UAT-only test-session endpoint. Must equal UAT Dokploy's value. |
 | `PLAYWRIGHT_BASE_URL`     | Variable | `https://uat.tailortales.app`.                                                    |
 
-`deploy-uat.yml` initially exposes only `workflow_dispatch`. It refuses to deploy if another UAT
-deployment is already running or `main` has advanced beyond the manually selected SHA. It then
-calls `compose.deploy`, waits for Dokploy's Compose status to transition through `running` to
-`done`, and runs `pnpm test:e2e`. On failure it uploads the Playwright report, trace, and
-screenshots. Run it successfully once before enabling the `push` trigger and disabling Dokploy's
-UAT `On Push` trigger.
+`deploy-uat.yml` also supports `workflow_dispatch`. It refuses to deploy if another UAT deployment
+is already running or `main` has advanced beyond the selected SHA. It then calls `compose.deploy`,
+waits for Dokploy's Compose status to transition through `running` to `done`, and runs
+`pnpm test:e2e`. On failure it uploads the Playwright report, trace, and screenshots.
 
-Production promotion should be a separate manual workflow: it first verifies that exact SHA has a
-successful `uat-e2e` check, then creates the SemVer tag that triggers the production Compose
-resource. Do not create production tags directly from a developer machine.
+`deploy-prod.yml` is a manual promotion workflow named **Deploy to PROD**. It accepts an exact
+`main` SHA and a stable SemVer tag, verifies the `UAT E2E` check for that SHA, then creates the
+annotated tag. Until the production Dokploy Compose resource is configured to track SemVer tags,
+this intentionally stops at tagging and does not deploy production. Do not create production tags
+directly from a developer machine. GitHub repository settings must allow workflows to have
+**Read and write permissions**, otherwise the workflow cannot create the tag.

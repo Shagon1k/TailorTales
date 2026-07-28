@@ -2,6 +2,8 @@ name: Deploy UAT
 
 on:
     workflow_dispatch:
+    push:
+        branches: [main]
 
 permissions:
     contents: read
@@ -11,8 +13,8 @@ concurrency:
     cancel-in-progress: false
 
 jobs:
-    deploy-and-smoke:
-        name: Deploy UAT and run smoke tests
+    uat-e2e:
+        name: UAT E2E
         runs-on: ubuntu-latest
         timeout-minutes: 40
 
@@ -26,7 +28,7 @@ jobs:
             E2E_TEST_SECRET: ${{ secrets.E2E_TEST_SECRET }}
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
               with:
                   ref: ${{ github.sha }}
                   fetch-depth: 0
@@ -37,9 +39,9 @@ jobs:
                   git fetch origin main
                   test "$(git rev-parse origin/main)" = "${GITHUB_SHA}"
 
-            - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@v6
 
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6
               with:
                   node-version-file: .nvmrc
                   cache: pnpm
