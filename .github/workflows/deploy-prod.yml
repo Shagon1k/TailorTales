@@ -1,0 +1,78 @@
+name: Deploy to PROD
+
+on:
+    workflow_dispatch:
+        inputs:
+            sha:
+                description: Exact main commit SHA that passed UAT E2E
+                required: true
+                type: string
+            version:
+                description: Stable SemVer tag to create (for example, v1.0.0)
+                required: true
+                type: string
+
+permissions:
+    checks: read
+    contents: write
+
+concurrency:
+    group: deploy-prod
+    cancel-in-progress: false
+
+jobs:
+    promote:
+        name: Verify UAT and create production tag
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        env:
+            GITHUB_TOKEN: ${{ github.token }}
+            RELEASE_SHA: ${{ inputs.sha }}
+            RELEASE_VERSION: ${{ inputs.version }}
+
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  ref: main
+                  fetch-depth: 0
+
+            - name: Validate requested release
+              run: |
+                  set -euo pipefail
+
+                  [[ "${RELEASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+                  [[ "${RELEASE_VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+                  git cat-file -e "${RELEASE_SHA}^{commit}"
+                  git merge-base --is-ancestor "${RELEASE_SHA}" origin/main
+
+                  if git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_VERSION}"; then
+                      echo "Tag ${RELEASE_VERSION} already exists." >&2
+                      exit 1
+                  fi
+
+            - name: Verify UAT E2E for release SHA
+              run: |
+                  set -euo pipefail
+
+                  checks="$(curl --fail-with-body --silent --show-error \
+                      --header 'Accept: application/vnd.github+json' \
+                      --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+                      "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/commits/${RELEASE_SHA}/check-runs")"
+                  conclusion="$(jq -r '
+                      [.check_runs[] | select(.name == "UAT E2E")]
+                      | sort_by(.completed_at // "")
+                      | last
+                      | .conclusion // empty
+                  ' <<<"${checks}")"
+
+                  test "${conclusion}" = success
+
+            - name: Create production tag
+              run: |
+                  set -euo pipefail
+
+                  git config user.name 'github-actions[bot]'
+                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+                  git tag --annotate "${RELEASE_VERSION}" "${RELEASE_SHA}" \
+                      --message "Release ${RELEASE_VERSION}"
+                  git push origin "refs/tags/${RELEASE_VERSION}"
