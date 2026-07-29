@@ -29,6 +29,7 @@
 `.agent-docs/rules/*` is the source of truth for reusable project rules. Read the relevant rule before touching matching files:
 
 - Git workflow and commit messages: `.agent-docs/rules/git.md`
+- GitHub task and issue routing: `.agent-docs/rules/github-issues.md`
 - TypeScript files: `.agent-docs/rules/typescript.md`
 - Tests and test utilities: `.agent-docs/rules/testing.md`
 - i18n key naming: `.agent-docs/rules/i18n.md`
