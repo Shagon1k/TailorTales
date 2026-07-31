@@ -41,11 +41,12 @@ before story generation works.
 
 UAT and production keep their Dokploy-managed PostgreSQL and Redis services; UAT also has a
 persistent MinIO resource. Each Compose resource creates its own private application network for
-`release`, `backend`, and `frontend`. The frontend additionally joins the external
-`dokploy-network`, so Dokploy/Traefik can route application domains to port `3000`; no
-application port is published directly on the VPS. The backend deliberately does not join that
-shared network: otherwise the identical `backend` DNS name in UAT and production could resolve
-to the wrong environment.
+the `backend` and `frontend`; the backend has an environment-specific alias there
+(`backend-uat` or `backend-prod`). All services additionally join the external
+`dokploy-network` where required to reach Dokploy-managed PostgreSQL/Redis, and the frontend
+joins it so Dokploy/Traefik can route application domains to port `3000`. No application port is
+published directly on the VPS. The frontend uses the unique private alias, never the shared
+generic `backend` DNS name, so UAT and production cannot resolve each other's backend.
 
 > A migration and application rollout cannot be globally atomic. Every schema migration shipped
 > through this flow must therefore be backward-compatible with the currently running backend
@@ -96,11 +97,12 @@ The Compose file deliberately reduces duplicate inputs:
 | `PADDLE_ENVIRONMENT` | Paddle server SDK                     | `NEXT_PUBLIC_PADDLE_ENV`         |
 | `SENTRY_ENVIRONMENT` | Backend event tag                     | `NEXT_PUBLIC_SENTRY_ENVIRONMENT` |
 
-Browser requests use the fixed same-origin `/api` base. Next.js rewrites those requests to
-`http://backend:3001` on the private Compose network; server-rendered code calls that internal URL
-directly and forwards the incoming session cookie. This keeps the host-only auth cookie visible
-to both browser and SSR without sharing it with sibling subdomains. `BACKEND_INTERNAL_URL` is
-fixed in Compose and is not a Dokploy input.
+Browser requests use the fixed same-origin `/api` base. Next.js rewrites those requests to the
+private, environment-specific backend alias (`http://backend-uat:3001` or
+`http://backend-prod:3001`); server-rendered code calls that internal URL directly and forwards
+the incoming session cookie. This keeps the host-only auth cookie visible to both browser and SSR
+without sharing it with sibling subdomains. `BACKEND_INTERNAL_URL` is derived from
+`BACKEND_INTERNAL_HOST` in Compose and is not a direct Dokploy input.
 
 Shared remote-runtime invariants (`NODE_ENV=production`, real-service stub flags off, Sentry on,
 and the New Relic loader enabled) are fixed in Compose rather than copied into every Dokploy
@@ -109,19 +111,20 @@ environment.
 `NODE_ENV=production` is correct for both remote profiles: it selects optimized framework
 runtime behavior, not the business environment. These values select UAT versus production:
 
-| Input                | UAT                                   | Production                    |
-| -------------------- | ------------------------------------- | ----------------------------- |
-| `BACKEND_URL`        | `https://uat.tailortales.app/api`     | `https://tailortales.app/api` |
-| `FRONTEND_URL`       | `https://uat.tailortales.app`         | `https://tailortales.app`     |
-| `DATABASE_URL`       | dedicated UAT database                | dedicated production database |
-| `REDIS_URL`          | UAT database/index                    | production database/index     |
-| `PADDLE_ENVIRONMENT` | `sandbox`                             | `production`                  |
-| `STORAGE_ENDPOINT`   | public UAT MinIO API origin           | absent; AWS regional endpoint |
-| `STORAGE_BUCKET`     | MinIO `tailortales-uat`               | S3 `tailortales-prod`         |
-| `SENTRY_ENVIRONMENT` | `uat`                                 | `production`                  |
-| `NEW_RELIC_APP_NAME` | `TailorTales-UAT`                     | `TailorTales-Prod`            |
-| `GA`                 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` empty | production GA4 measurement ID |
-| `E2E_TEST_SECRET`    | opaque UAT-only secret                | omit                          |
+| Input                   | UAT                                   | Production                    |
+| ----------------------- | ------------------------------------- | ----------------------------- |
+| `BACKEND_URL`           | `https://uat.tailortales.app/api`     | `https://tailortales.app/api` |
+| `FRONTEND_URL`          | `https://uat.tailortales.app`         | `https://tailortales.app`     |
+| `BACKEND_INTERNAL_HOST` | `backend-uat`                         | `backend-prod`                |
+| `DATABASE_URL`          | dedicated UAT database                | dedicated production database |
+| `REDIS_URL`             | UAT database/index                    | production database/index     |
+| `PADDLE_ENVIRONMENT`    | `sandbox`                             | `production`                  |
+| `STORAGE_ENDPOINT`      | public UAT MinIO API origin           | absent; AWS regional endpoint |
+| `STORAGE_BUCKET`        | MinIO `tailortales-uat`               | S3 `tailortales-prod`         |
+| `SENTRY_ENVIRONMENT`    | `uat`                                 | `production`                  |
+| `NEW_RELIC_APP_NAME`    | `TailorTales-UAT`                     | `TailorTales-Prod`            |
+| `GA`                    | `NEXT_PUBLIC_GA_MEASUREMENT_ID` empty | production GA4 measurement ID |
+| `E2E_TEST_SECRET`       | opaque UAT-only secret                | omit                          |
 
 Credentials, OAuth clients, webhook secrets, and Paddle catalog IDs also use their
 environment-specific values from the Phase 19 matrix.

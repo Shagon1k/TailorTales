@@ -31,10 +31,11 @@ The deployment file maps those inputs to the build-time and runtime names docume
 
 ### URLs
 
-| Variable       | Required | Default | Notes                                                                                    |
-| -------------- | -------- | ------- | ---------------------------------------------------------------------------------------- |
-| `BACKEND_URL`  | yes      | —       | The backend's own public URL. Used in email links, OAuth callback, and PDF font serving. |
-| `FRONTEND_URL` | yes      | —       | The frontend's public URL. Set as the CORS origin.                                       |
+| Variable                | Required | Default | Notes                                                                                    |
+| ----------------------- | -------- | ------- | ---------------------------------------------------------------------------------------- |
+| `BACKEND_URL`           | yes      | —       | The backend's own public URL. Used in email links, OAuth callback, and PDF font serving. |
+| `FRONTEND_URL`          | yes      | —       | The frontend's public URL. Set as the CORS origin.                                       |
+| `BACKEND_INTERNAL_HOST` | remote   | —       | Unique private Docker alias: `backend-uat` on UAT, `backend-prod` on production.         |
 
 ### Runtime
 
@@ -124,12 +125,13 @@ each value and [monitoring.md](monitoring.md) for how they're wired.
 All `NEXT_PUBLIC_*` values are build-time inputs because Next.js embeds them in browser bundles.
 Compose also supplies them at runtime for server-rendered code. A value change therefore requires
 a rebuild; restarting an existing frontend container is insufficient. Browser API calls use the
-fixed same-origin `/api` path; `BACKEND_INTERNAL_URL` is a server-only value fixed by Compose.
+fixed same-origin `/api` path; `BACKEND_INTERNAL_URL` is a server-only value derived from
+`BACKEND_INTERNAL_HOST` by Compose.
 
 | Variable                          | UAT/prod input           | Runtime | Notes                                                                                                                                       |
 | --------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SITE_URL`            | `FRONTEND_URL`           | yes     | Canonical public frontend origin. Must be non-www with no trailing slash. See [seo.md](seo.md).                                             |
-| `BACKEND_INTERNAL_URL`            | fixed                    | yes     | Server-only backend origin (`http://backend:3001` remotely; `http://localhost:3001` locally).                                               |
+| `BACKEND_INTERNAL_URL`            | derived                  | yes     | Server-only backend origin (`http://backend-uat:3001` or `http://backend-prod:3001` remotely; `http://localhost:3001` locally).             |
 | `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | same name                | yes     | Paddle.js client token: sandbox `test_…`, production `live_…`.                                                                              |
 | `NEXT_PUBLIC_PADDLE_ENV`          | `PADDLE_ENVIRONMENT`     | yes     | `sandbox` or `production`; shared input prevents frontend/backend drift.                                                                    |
 | `NEXT_PUBLIC_STORAGE_URL`         | same name                | yes     | Public MinIO API origin on UAT; public S3/CloudFront asset base URL on production.                                                          |
