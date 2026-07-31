@@ -139,10 +139,10 @@ regional S3 endpoint. The complete variable reference and build/runtime classifi
 
 Create two Compose resources pointing to `deploy/docker-compose.yml`:
 
-| Resource   | Git ref / trigger                    | Environment values |
-| ---------- | ------------------------------------ | ------------------ |
-| UAT        | `main`; auto-deploy on every merge   | UAT/sandbox values |
-| Production | explicit SemVer tag such as `v1.0.0` | live values        |
+| Resource   | Git ref / trigger                                                              | Environment values |
+| ---------- | ------------------------------------------------------------------------------ | ------------------ |
+| UAT        | `main`; GitHub Actions deploys after every merge                               | UAT/sandbox values |
+| Production | SemVer tag pinned by GitHub Actions; GitHub Actions then calls the Dokploy API | live values        |
 
 Do not configure separate backend/frontend auto-deploy webhooks. The Compose resource owns the
 ordered release and both application services as one deployment unit.
@@ -227,8 +227,12 @@ waits for Dokploy's Compose status to transition through `running` to `done`, an
 `pnpm test:e2e`. On failure it uploads the Playwright report, trace, and screenshots.
 
 `deploy-prod.yml` is a manual promotion workflow named **Deploy to PROD**. It accepts an exact
-`main` SHA and a stable SemVer tag, verifies the `UAT E2E` check for that SHA, then creates the
-annotated tag. Until the production Dokploy Compose resource is configured to track SemVer tags,
-this intentionally stops at tagging and does not deploy production. Do not create production tags
-directly from a developer machine. GitHub repository settings must allow workflows to have
-**Read and write permissions**, otherwise the workflow cannot create the tag.
+`main` SHA and a stable SemVer tag, verifies the `UAT E2E` check for that SHA, then creates (or
+verifies) the annotated tag. It pins the production Compose resource to that immutable tag through
+the Dokploy API, disables its auto-deploy setting, starts the deployment, and waits for Dokploy to
+report `done`. This deliberately does **not** rely on Dokploy's UI `On Tag` trigger.
+
+The workflow needs `DOKPLOY_PROD_COMPOSE_ID` as a GitHub repository variable, alongside the
+existing `DOKPLOY_URL`, `DOKPLOY_API_TOKEN`, and Cloudflare Access service-token secrets. Do not
+create production tags directly from a developer machine. GitHub repository settings must allow
+workflows to have **Read and write permissions**, otherwise the workflow cannot create the tag.
