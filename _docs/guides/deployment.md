@@ -40,9 +40,12 @@ and Comic blueprints on its first deployment; it does not need an OAuth user or 
 before story generation works.
 
 UAT and production keep their Dokploy-managed PostgreSQL and Redis services; UAT also has a
-persistent MinIO resource. All Compose services join the external `dokploy-network`; no
-application port is published directly on the VPS. Dokploy/Traefik routes application domains
-to ports `3000` and `3001`.
+persistent MinIO resource. Each Compose resource creates its own private application network for
+`release`, `backend`, and `frontend`. The frontend additionally joins the external
+`dokploy-network`, so Dokploy/Traefik can route application domains to port `3000`; no
+application port is published directly on the VPS. The backend deliberately does not join that
+shared network: otherwise the identical `backend` DNS name in UAT and production could resolve
+to the wrong environment.
 
 > A migration and application rollout cannot be globally atomic. Every schema migration shipped
 > through this flow must therefore be backward-compatible with the currently running backend
@@ -94,7 +97,7 @@ The Compose file deliberately reduces duplicate inputs:
 | `SENTRY_ENVIRONMENT` | Backend event tag                     | `NEXT_PUBLIC_SENTRY_ENVIRONMENT` |
 
 Browser requests use the fixed same-origin `/api` base. Next.js rewrites those requests to
-`http://backend:3001` on the Compose network; server-rendered code calls that internal URL
+`http://backend:3001` on the private Compose network; server-rendered code calls that internal URL
 directly and forwards the incoming session cookie. This keeps the host-only auth cookie visible
 to both browser and SSR without sharing it with sibling subdomains. `BACKEND_INTERNAL_URL` is
 fixed in Compose and is not a Dokploy input.
