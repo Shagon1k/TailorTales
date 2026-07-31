@@ -1,16 +1,17 @@
-name: Deploy to PROD
+name: Promote to Production
 
 on:
     workflow_dispatch:
         inputs:
-            sha:
-                description: Exact main commit SHA that passed UAT E2E
+            release_type:
+                description: Version component to increment from the latest stable release tag
                 required: true
-                type: string
-            version:
-                description: Stable SemVer tag to create (for example, v1.0.0)
-                required: true
-                type: string
+                default: patch
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
 
 permissions:
     checks: read
@@ -27,8 +28,6 @@ jobs:
         timeout-minutes: 40
         env:
             GITHUB_TOKEN: ${{ github.token }}
-            RELEASE_SHA: ${{ inputs.sha }}
-            RELEASE_VERSION: ${{ inputs.version }}
             DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
             DOKPLOY_API_TOKEN: ${{ secrets.DOKPLOY_API_TOKEN }}
             DOKPLOY_PROD_COMPOSE_ID: ${{ vars.DOKPLOY_PROD_COMPOSE_ID }}
@@ -41,27 +40,30 @@ jobs:
                   ref: main
                   fetch-depth: 0
 
-            - name: Validate requested release
+            - name: Resolve release from main
               run: |
                   set -euo pipefail
 
-                  git fetch --no-tags origin main:refs/remotes/origin/main
-                  [[ "${RELEASE_SHA}" =~ ^[0-9a-f]{40}$ ]] || {
-                      echo 'Release SHA must be a full 40-character lowercase SHA.' >&2
+                  git fetch --force --tags origin main:refs/remotes/origin/main
+                  latest_tag="$(git tag --list 'v[0-9]*' --sort=-v:refname \
+                      | grep -Ex 'v[0-9]+\.[0-9]+\.[0-9]+' \
+                      | head -n 1)"
+                  test -n "${latest_tag}" || {
+                      echo 'No stable SemVer tag exists to increment.' >&2
                       exit 1
                   }
-                  [[ "${RELEASE_VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
-                      echo 'Release version must be stable SemVer, for example v1.0.0.' >&2
-                      exit 1
-                  }
-                  git cat-file -e "${RELEASE_SHA}^{commit}" || {
-                      echo "Release SHA ${RELEASE_SHA} is not a commit in this repository." >&2
-                      exit 1
-                  }
-                  git merge-base --is-ancestor "${RELEASE_SHA}" origin/main || {
-                      echo "Release SHA ${RELEASE_SHA} is not reachable from origin/main." >&2
-                      exit 1
-                  }
+
+                  IFS=. read -r major minor patch <<<"${latest_tag#v}"
+                  case '${{ inputs.release_type }}' in
+                      patch) next_version="v${major}.${minor}.$((patch + 1))" ;;
+                      minor) next_version="v${major}.$((minor + 1)).0" ;;
+                      major) next_version="v$((major + 1)).0.0" ;;
+                  esac
+
+                  release_sha="$(git rev-parse origin/main)"
+                  printf 'RELEASE_SHA=%s\n' "${release_sha}" >>"${GITHUB_ENV}"
+                  printf 'RELEASE_VERSION=%s\n' "${next_version}" >>"${GITHUB_ENV}"
+                  echo "Promoting ${release_sha} as ${next_version}."
 
             - name: Verify UAT E2E for release SHA
               run: |
