@@ -1,4 +1,9 @@
-import { initializePaddle, type CheckoutSettings, type Paddle } from '@paddle/paddle-js';
+import {
+    initializePaddle,
+    type CheckoutSettings,
+    type Paddle,
+    type PaddleSetupPwCustomer,
+} from '@paddle/paddle-js';
 
 /**
  * Product-wide overlay checkout policy. Callers spread this into
@@ -14,18 +19,28 @@ export const PADDLE_CHECKOUT_SETTINGS: CheckoutSettings = {
 let paddlePromise: Promise<Paddle | undefined> | null = null;
 
 /**
- * Lazily initializes Paddle.js (overlay checkout). Returns undefined when
- * NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is not configured — callers degrade
- * gracefully (e.g. keep the CTA pointing at /pricing docs instead of crashing).
+ * Lazily initializes Paddle.js. A known customer email is also passed to
+ * Paddle's transaction recovery flow, which is used by payment links.
  */
-export function getPaddle(): Promise<Paddle | undefined> {
+export async function getPaddle(pwCustomer?: PaddleSetupPwCustomer): Promise<Paddle | undefined> {
     const token = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
-    if (!token) return Promise.resolve(undefined);
+    if (!token) return undefined;
 
     paddlePromise ??= initializePaddle({
         token,
         environment: process.env.NEXT_PUBLIC_PADDLE_ENV === 'production' ? 'production' : 'sandbox',
+        pwCustomer,
     });
 
-    return paddlePromise;
+    try {
+        const paddle = await paddlePromise;
+        if (paddle && pwCustomer) {
+            paddle.Update({ pwCustomer });
+        }
+        return paddle;
+    } catch (error: unknown) {
+        paddlePromise = null;
+        console.error('Paddle initialization failed', error);
+        throw error;
+    }
 }

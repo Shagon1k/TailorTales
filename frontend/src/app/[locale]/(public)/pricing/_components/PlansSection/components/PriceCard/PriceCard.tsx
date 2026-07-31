@@ -27,7 +27,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
 
     const openCheckout = async (): Promise<void> => {
         if (!user || !paddlePriceId) return;
-        const paddle = await getPaddle();
+        const paddle = await getPaddle({ email: user.email });
         if (!paddle) return;
 
         paddle.Checkout.open({

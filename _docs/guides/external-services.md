@@ -231,8 +231,11 @@ billing cycles. Set `custom_data.userId` to a real user ID from your DB. Useful 
 Same steps against <https://vendors.paddle.com> with three differences:
 
 1. **Business verification required** — takes days; start early.
-2. **Domain / website approval** required for live checkout (sandbox needed none); submit as
-   soon as the domain is live under **Checkout → Default payment link**.
+2. **Domain / website approval** required for live checkout (sandbox needed none). Configure
+   `https://tailortales.app/checkout` under **Checkout → Default payment link**, then submit
+   `tailortales.app` for approval. Paddle appends `_ptxn=txn_…` to this public route; the page
+   initializes Paddle.js and opens the referenced transaction. Without `_ptxn`, it redirects
+   to the localized pricing page.
 3. **Env flip:** `PADDLE_ENVIRONMENT=production`, `NEXT_PUBLIC_PADDLE_ENV=production`, live
    API key (no `_sdbx`), `live_` client token, and the same-origin production webhook
    destination `https://tailortales.app/api/webhooks/paddle`.
