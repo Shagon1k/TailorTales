@@ -18,7 +18,7 @@ services:
                 pnpm --filter backend seed:pricing-tiers
                 pnpm --filter backend seed:story-blueprints
         networks:
-            - dokploy-network
+            - application-network
         restart: 'no'
 
     backend:
@@ -82,7 +82,7 @@ services:
             retries: 12
             start_period: 20s
         networks:
-            - dokploy-network
+            - application-network
         restart: unless-stopped
 
     frontend:
@@ -129,10 +129,13 @@ services:
             retries: 12
             start_period: 20s
         networks:
+            - application-network
             - dokploy-network
         restart: unless-stopped
 
 networks:
+    application-network:
+        driver: bridge
     dokploy-network:
         external: true
 
