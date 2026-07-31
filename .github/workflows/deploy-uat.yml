@@ -1,4 +1,4 @@
-name: Deploy UAT
+name: Deploy to UAT
 
 on:
     workflow_dispatch:

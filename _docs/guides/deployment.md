@@ -232,11 +232,12 @@ is already running or `main` has advanced beyond the selected SHA. It then calls
 waits for Dokploy's Compose status to transition through `running` to `done`, and runs
 `pnpm test:e2e`. On failure it uploads the Playwright report, trace, and screenshots.
 
-`deploy-prod.yml` is a manual promotion workflow named **Deploy to PROD**. It accepts an exact
-`main` SHA and a stable SemVer tag, verifies the `UAT E2E` check for that SHA, then creates (or
-verifies) the annotated tag. It pins the production Compose resource to that immutable tag through
-the Dokploy API, disables its auto-deploy setting, starts the deployment, and waits for Dokploy to
-report `done`. This deliberately does **not** rely on Dokploy's UI `On Tag` trigger.
+`deploy-prod.yml` is a manual promotion workflow named **Promote to Production**. Its only input is the
+release type (`patch`, `minor`, or `major`). It resolves the current `main` SHA, increments the
+latest stable `vX.Y.Z` tag, verifies the `UAT E2E` check for that SHA, then creates the annotated
+tag. It pins the production Compose resource to that immutable tag through the Dokploy API,
+disables its auto-deploy setting, starts the deployment, and waits for Dokploy to report `done`.
+This deliberately does **not** rely on Dokploy's UI `On Tag` trigger.
 
 The workflow needs `DOKPLOY_PROD_COMPOSE_ID` as a GitHub repository variable, alongside the
 existing `DOKPLOY_URL`, `DOKPLOY_API_TOKEN`, and Cloudflare Access service-token secrets. Do not
