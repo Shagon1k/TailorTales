@@ -1292,15 +1292,15 @@ flowchart LR
 > **Deploy triggers** (fits the GitHub Flow in `git.md` — `main` always deployable):
 >
 > ```
-> merge to main   →  auto-deploy UAT   (every squash-merged PR lands on uat.tailortales.app)
-> push a tag      →  deploy prod       (e.g. v1.0.0 — prod ships only from an explicit tag, never on merge)
+> merge to main       →  GitHub Actions deploys UAT   (every squash-merged PR lands on uat.tailortales.app)
+> Deploy to PROD run  →  tag + API-driven prod deploy (e.g. v1.0.0 — prod ships only by explicit promotion)
 > ```
 >
-> UAT is the continuous integration target; prod is gated behind a deliberate version tag so a merge never reaches real users by itself. Tags follow semver (`vMAJOR.MINOR.PATCH`).
+> UAT is the continuous integration target; prod is gated behind a deliberate version tag so a merge never reaches real users by itself. The manual workflow creates or verifies the SemVer tag (`vMAJOR.MINOR.PATCH`), pins Dokploy to it through its API, then starts the deploy.
 >
 > Each environment has one Compose resource using `deploy/docker-compose.yml`. Dokploy triggers that resource once; Compose enforces `release → healthy backend → frontend`. Separate backend/frontend auto-deploy triggers must remain disabled.
 
-- [ ] Configure dokploy deploy triggers: UAT on `main` push/merge; prod on tag push (`v*`)
+- [ ] Configure deploy ownership: GitHub Actions deploys UAT on `main`; **Deploy to PROD** pins Dokploy to a SemVer tag and deploys it through the API (Dokploy auto-deploy off for both)
 - [ ] CI gitleaks gate (hard-block on detected secrets) — the local pre-commit hook is best-effort (warns + continues if Homebrew/gitleaks is unavailable), so CI must be the real enforcement point before merge/deploy
 - [x] Add shared UAT/prod Compose definition plus strict, complete env template (`deploy/docker-compose.yml`, `deploy/.env.example`)
 - [ ] Dockerfiles tested end-to-end for both backend and frontend

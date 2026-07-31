@@ -22,13 +22,18 @@ concurrency:
 
 jobs:
     promote:
-        name: Verify UAT and create production tag
+        name: Verify UAT and deploy production release
         runs-on: ubuntu-latest
-        timeout-minutes: 10
+        timeout-minutes: 40
         env:
             GITHUB_TOKEN: ${{ github.token }}
             RELEASE_SHA: ${{ inputs.sha }}
             RELEASE_VERSION: ${{ inputs.version }}
+            DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
+            DOKPLOY_API_TOKEN: ${{ secrets.DOKPLOY_API_TOKEN }}
+            DOKPLOY_PROD_COMPOSE_ID: ${{ vars.DOKPLOY_PROD_COMPOSE_ID }}
+            CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+            CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
 
         steps:
             - uses: actions/checkout@v6
@@ -58,11 +63,6 @@ jobs:
                       exit 1
                   }
 
-                  if git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_VERSION}"; then
-                      echo "Tag ${RELEASE_VERSION} already exists." >&2
-                      exit 1
-                  fi
-
             - name: Verify UAT E2E for release SHA
               run: |
                   set -euo pipefail
@@ -80,12 +80,109 @@ jobs:
 
                   test "${conclusion}" = success
 
-            - name: Create production tag
+            - name: Create or verify production tag
               run: |
                   set -euo pipefail
+
+                  existing_tag_sha="$(git ls-remote origin "refs/tags/${RELEASE_VERSION}^{}" \
+                      | awk 'NR == 1 { print $1 }')"
+                  if [ -n "${existing_tag_sha}" ]; then
+                      test "${existing_tag_sha}" = "${RELEASE_SHA}" || {
+                          echo "Tag ${RELEASE_VERSION} points to ${existing_tag_sha}, not ${RELEASE_SHA}." >&2
+                          exit 1
+                      }
+                      echo "Tag ${RELEASE_VERSION} already points to the requested release SHA."
+                      exit 0
+                  fi
 
                   git config user.name 'github-actions[bot]'
                   git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
                   git tag --annotate "${RELEASE_VERSION}" "${RELEASE_SHA}" \
                       --message "Release ${RELEASE_VERSION}"
                   git push origin "refs/tags/${RELEASE_VERSION}"
+
+            - name: Pin Dokploy production resource to release tag
+              run: |
+                  set -euo pipefail
+
+                  test -n "${DOKPLOY_URL}"
+                  test -n "${DOKPLOY_API_TOKEN}"
+                  test -n "${DOKPLOY_PROD_COMPOSE_ID}"
+
+                  response="$(curl --fail-with-body --silent --show-error \
+                      --request POST "${DOKPLOY_URL}/api/compose.update" \
+                      --header 'Content-Type: application/json' \
+                      --header "x-api-key: ${DOKPLOY_API_TOKEN}" \
+                      --header "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+                      --header "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
+                      --data "$(jq -cn \
+                          --arg composeId "${DOKPLOY_PROD_COMPOSE_ID}" \
+                          --arg branch "${RELEASE_VERSION}" \
+                          '{composeId: $composeId, branch: $branch, autoDeploy: false}')")"
+
+                  configured_branch="$(jq -r '.branch // empty' <<<"${response}")"
+                  test "${configured_branch}" = "${RELEASE_VERSION}" || {
+                      echo 'Dokploy did not retain the requested production release tag.' >&2
+                      exit 1
+                  }
+
+            - name: Deploy the production release
+              run: |
+                  set -euo pipefail
+
+                  compose="$(curl --fail-with-body --silent --show-error \
+                      --get "${DOKPLOY_URL}/api/compose.one" \
+                      --data-urlencode "composeId=${DOKPLOY_PROD_COMPOSE_ID}" \
+                      --header "x-api-key: ${DOKPLOY_API_TOKEN}" \
+                      --header "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+                      --header "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}")"
+                  status="$(jq -r '.composeStatus // empty' <<<"${compose}")"
+                  test "${status}" != running || {
+                      echo 'A production deployment is already running.' >&2
+                      exit 1
+                  }
+
+                  curl --fail-with-body --silent --show-error \
+                      --request POST "${DOKPLOY_URL}/api/compose.deploy" \
+                      --header 'Content-Type: application/json' \
+                      --header "x-api-key: ${DOKPLOY_API_TOKEN}" \
+                      --header "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+                      --header "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}" \
+                      --data "$(jq -cn \
+                          --arg composeId "${DOKPLOY_PROD_COMPOSE_ID}" \
+                          --arg title "Deploy ${RELEASE_VERSION}" \
+                          '{composeId: $composeId, title: $title}')"
+
+                  deployment_started=false
+                  for attempt in {1..120}; do
+                      sleep 5
+                      compose="$(curl --fail-with-body --silent --show-error \
+                          --get "${DOKPLOY_URL}/api/compose.one" \
+                          --data-urlencode "composeId=${DOKPLOY_PROD_COMPOSE_ID}" \
+                          --header "x-api-key: ${DOKPLOY_API_TOKEN}" \
+                          --header "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID}" \
+                          --header "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET}")"
+                      status="$(jq -r '.composeStatus // empty' <<<"${compose}")"
+                      case "${status}" in
+                          done)
+                              if [ "${deployment_started}" = true ]; then
+                                  echo "Dokploy deployed ${RELEASE_VERSION}."
+                                  exit 0
+                              fi
+                              ;;
+                          error)
+                              echo "Dokploy reported a production deployment error." >&2
+                              exit 1
+                              ;;
+                          running)
+                              deployment_started=true
+                              ;;
+                          *)
+                              echo "Unexpected Dokploy Compose status: ${status:-empty}." >&2
+                              exit 1
+                              ;;
+                      esac
+                  done
+
+                  echo 'Timed out waiting for the production deployment.' >&2
+                  exit 1
