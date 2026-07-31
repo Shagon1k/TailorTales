@@ -18,7 +18,7 @@ services:
                 pnpm --filter backend seed:pricing-tiers
                 pnpm --filter backend seed:story-blueprints
         networks:
-            - application-network
+            - dokploy-network
         restart: 'no'
 
     backend:
@@ -82,7 +82,10 @@ services:
             retries: 12
             start_period: 20s
         networks:
-            - application-network
+            application-network:
+                aliases:
+                    - ${BACKEND_INTERNAL_HOST:?BACKEND_INTERNAL_HOST is required}
+            dokploy-network:
         restart: unless-stopped
 
     frontend:
@@ -91,7 +94,7 @@ services:
             dockerfile: frontend/Dockerfile
             args:
                 NEXT_PUBLIC_SITE_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
-                BACKEND_INTERNAL_URL: http://backend:3001
+                BACKEND_INTERNAL_URL: http://${BACKEND_INTERNAL_HOST:?BACKEND_INTERNAL_HOST is required}:3001
                 NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL:?NEXT_PUBLIC_STORAGE_URL is required}
                 NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN:?NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is required}
                 NEXT_PUBLIC_PADDLE_ENV: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}
@@ -104,7 +107,7 @@ services:
                 - sentry_auth_token
         environment:
             NEXT_PUBLIC_SITE_URL: ${FRONTEND_URL:?FRONTEND_URL is required}
-            BACKEND_INTERNAL_URL: http://backend:3001
+            BACKEND_INTERNAL_URL: http://${BACKEND_INTERNAL_HOST:?BACKEND_INTERNAL_HOST is required}:3001
             NEXT_PUBLIC_STORAGE_URL: ${NEXT_PUBLIC_STORAGE_URL:?NEXT_PUBLIC_STORAGE_URL is required}
             NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN:?NEXT_PUBLIC_PADDLE_CLIENT_TOKEN is required}
             NEXT_PUBLIC_PADDLE_ENV: ${PADDLE_ENVIRONMENT:?PADDLE_ENVIRONMENT is required}
