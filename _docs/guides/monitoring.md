@@ -39,8 +39,8 @@ in the Sentry UI — no app env vars.
 
 ### New Relic — APM (backend only)
 
-The agent loads via the **ESM loader** (`NODE_OPTIONS="--import newrelic/esm-loader.mjs"`) because
-the backend is ESM (`"type": "module"`); the CJS `require('newrelic')` pattern does not apply.
+The agent loads via `NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic"`: the ESM
+loader supports the backend (`"type": "module"`), while `--require` starts the agent before the app.
 There is **no `NEW_RELIC_ENABLED` flag** — the presence of `NODE_OPTIONS` is the gate, so dev
 (where it is unset) never starts the agent. Config lives in `backend/newrelic.cjs`; the app name
 comes from `NEW_RELIC_APP_NAME` (`TailorTales-UAT` / `TailorTales-Prod`). `cookie` and

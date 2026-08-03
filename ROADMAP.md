@@ -903,7 +903,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **Goal:** add observability and product analytics before production deploy — error tracking, APM, uptime monitoring, and Google Analytics with a GDPR-compliant cookie consent banner. No separate staging doc; durable setup guides land in `_docs/guides/external-services.md`, runtime observability in `_docs/guides/monitoring.md`, and env vars in `_docs/guides/environment-variables.md`.
 
-> **Implementation note (diverged from original plan):** UptimeRobot was dropped in favour of **Sentry's built-in uptime monitor** (one fewer account). New Relic loads via the **ESM loader** (`NODE_OPTIONS="--import newrelic/esm-loader.mjs"`) because the backend is ESM — there is no `NEW_RELIC_ENABLED` flag; presence of `NODE_OPTIONS` is the gate. GA4 ships via `@next/third-parties/google` with a `useSyncExternalStore` consent gate.
+> **Implementation note (diverged from original plan):** UptimeRobot was dropped in favour of **Sentry's built-in uptime monitor** (one fewer account). New Relic loads via `NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic"`: the loader supports the ESM backend and `--require` starts the agent. There is no `NEW_RELIC_ENABLED` flag; presence of `NODE_OPTIONS` is the gate. GA4 ships via `@next/third-parties/google` with a `useSyncExternalStore` consent gate.
 
 ---
 
@@ -1207,7 +1207,7 @@ flowchart LR
 | `NEXT_PUBLIC_SENTRY_DSN`             | —                       | —                                                           | shared DSN                                                        | shared DSN                                                |
 | `NEXT_PUBLIC_SENTRY_ENVIRONMENT`     | —                       | —                                                           | `uat`                                                             | `production`                                              |
 | `SENTRY_AUTH_TOKEN` (build only)     | —                       | —                                                           | required by Compose                                               | required by Compose                                       |
-| `NODE_OPTIONS` (New Relic loader)    | —                       | —                                                           | `--import newrelic/esm-loader.mjs`                                | `--import newrelic/esm-loader.mjs`                        |
+| `NODE_OPTIONS` (New Relic agent)     | —                       | —                                                           | `--import newrelic/esm-loader.mjs --require newrelic`             | `--import newrelic/esm-loader.mjs --require newrelic`     |
 | `NEW_RELIC_LICENSE_KEY`              | —                       | —                                                           | shared key                                                        | shared key                                                |
 | `NEW_RELIC_APP_NAME`                 | —                       | —                                                           | `TailorTales-UAT`                                                 | `TailorTales-Prod`                                        |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`      | —                       | —                                                           | —                                                                 | `G-XXXXXXXXXX`                                            |

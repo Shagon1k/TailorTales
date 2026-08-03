@@ -59,7 +59,7 @@ services:
             SENTRY_ENABLED: 'true'
             SENTRY_DSN: ${SENTRY_DSN:?SENTRY_DSN is required}
             SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:?SENTRY_ENVIRONMENT is required}
-            NODE_OPTIONS: --import newrelic/esm-loader.mjs
+            NODE_OPTIONS: --import newrelic/esm-loader.mjs --require newrelic
             NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:?NEW_RELIC_LICENSE_KEY is required}
             NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME:?NEW_RELIC_APP_NAME is required}
         depends_on:
