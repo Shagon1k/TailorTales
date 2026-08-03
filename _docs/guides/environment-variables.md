@@ -107,14 +107,14 @@ Enabled on UAT/prod only; leave unset in dev. See
 [external-services.md](external-services.md#sentry--error-tracking--uptime) for how to obtain
 each value and [monitoring.md](monitoring.md) for how they're wired.
 
-| Variable                | Required | Default | Notes                                                                                                                                                 |
-| ----------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SENTRY_ENABLED`        | no       | `false` | `true` → `instrument.ts` initialises Sentry. Dev stays silent.                                                                                        |
-| `SENTRY_DSN`            | no       | —       | Backend project (`tailortales-be`) DSN. Write-only ingest key, safe to expose.                                                                        |
-| `SENTRY_ENVIRONMENT`    | no       | —       | `uat` \| `production` — tags every event for per-environment filtering.                                                                               |
-| `NODE_OPTIONS`          | no       | —       | Set to `--import newrelic/esm-loader.mjs` to load the New Relic ESM agent. Its **presence is the gate** — unset → no agent. Not validated at startup. |
-| `NEW_RELIC_LICENSE_KEY` | no       | —       | New Relic ingest license key. Read by `newrelic.cjs` (not validated at startup). **Secret.**                                                          |
-| `NEW_RELIC_APP_NAME`    | no       | —       | `TailorTales-UAT` \| `TailorTales-Prod`. Read by `newrelic.cjs` (not validated at startup).                                                           |
+| Variable                | Required | Default | Notes                                                                                                                                                                                              |
+| ----------------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SENTRY_ENABLED`        | no       | `false` | `true` → `instrument.ts` initialises Sentry. Dev stays silent.                                                                                                                                     |
+| `SENTRY_DSN`            | no       | —       | Backend project (`tailortales-be`) DSN. Write-only ingest key, safe to expose.                                                                                                                     |
+| `SENTRY_ENVIRONMENT`    | no       | —       | `uat` \| `production` — tags every event for per-environment filtering.                                                                                                                            |
+| `NODE_OPTIONS`          | no       | —       | Set to `--import newrelic/esm-loader.mjs --require newrelic`: the loader supports ESM and `--require` starts the agent. Its **presence is the gate** — unset → no agent. Not validated at startup. |
+| `NEW_RELIC_LICENSE_KEY` | no       | —       | New Relic ingest license key. Read by `newrelic.cjs` (not validated at startup). **Secret.**                                                                                                       |
+| `NEW_RELIC_APP_NAME`    | no       | —       | `TailorTales-UAT` \| `TailorTales-Prod`. Read by `newrelic.cjs` (not validated at startup).                                                                                                        |
 
 > Sentry vars are validated by `env.validation.ts` (all optional). New Relic vars and
 > `NODE_OPTIONS` are consumed by the runtime / `newrelic.cjs` directly and are **not** part of the
