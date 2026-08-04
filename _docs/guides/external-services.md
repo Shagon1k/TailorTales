@@ -301,7 +301,7 @@ Request latency, throughput, and BullMQ job durations. Loads via the ESM loader 
 
 ```bash
 # backend/.env
-NODE_OPTIONS="--import newrelic/esm-loader.mjs"   # the gate — unset in dev
+NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic" # unset in dev
 NEW_RELIC_LICENSE_KEY="…NRAL"
 NEW_RELIC_APP_NAME="TailorTales-UAT"              # or "TailorTales-Prod"
 ```
