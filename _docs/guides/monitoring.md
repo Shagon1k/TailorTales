@@ -46,6 +46,10 @@ There is **no `NEW_RELIC_ENABLED` flag** — the presence of `NODE_OPTIONS` is t
 comes from `NEW_RELIC_APP_NAME` (`TailorTales-UAT` / `TailorTales-Prod`). `cookie` and
 `authorization` headers are excluded from captured attributes.
 
+HTTP `401` (anonymous session checks such as `GET /me`) and `403` (valid role or plan limits) are
+marked as expected. They remain visible for diagnosis but do not affect error rate, Apdex, or
+alerts based on those metrics.
+
 Recommended alerts (set up once UAT data flows): error rate > 5%, p95 latency > 1s, Apdex < 0.7.
 
 ## Log structure (Pino / NestJS)

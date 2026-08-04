@@ -919,19 +919,19 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 #### Env var model
 
-| Variable                         | Dev          | UAT                                | Prod                               |
-| -------------------------------- | ------------ | ---------------------------------- | ---------------------------------- |
-| `SENTRY_ENABLED`                 | `false`      | `true`                             | `true`                             |
-| `SENTRY_DSN`                     | —            | shared DSN                         | shared DSN                         |
-| `SENTRY_ENVIRONMENT`             | —            | `uat`                              | `production`                       |
-| `NEXT_PUBLIC_SENTRY_ENABLED`     | `false`      | `true`                             | `true`                             |
-| `NEXT_PUBLIC_SENTRY_DSN`         | —            | shared DSN                         | shared DSN                         |
-| `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | —            | `uat`                              | `production`                       |
-| `SENTRY_AUTH_TOKEN`              | —            | BuildKit secret                    | BuildKit secret                    |
-| `NODE_OPTIONS`                   | —            | `--import newrelic/esm-loader.mjs` | `--import newrelic/esm-loader.mjs` |
-| `NEW_RELIC_LICENSE_KEY`          | —            | shared key                         | shared key                         |
-| `NEW_RELIC_APP_NAME`             | —            | `TailorTales-UAT`                  | `TailorTales-Prod`                 |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | — (disabled) | — (disabled)                       | `G-XXXXXXXXXX`                     |
+| Variable                         | Dev          | UAT                                                   | Prod                                                  |
+| -------------------------------- | ------------ | ----------------------------------------------------- | ----------------------------------------------------- |
+| `SENTRY_ENABLED`                 | `false`      | `true`                                                | `true`                                                |
+| `SENTRY_DSN`                     | —            | shared DSN                                            | shared DSN                                            |
+| `SENTRY_ENVIRONMENT`             | —            | `uat`                                                 | `production`                                          |
+| `NEXT_PUBLIC_SENTRY_ENABLED`     | `false`      | `true`                                                | `true`                                                |
+| `NEXT_PUBLIC_SENTRY_DSN`         | —            | shared DSN                                            | shared DSN                                            |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | —            | `uat`                                                 | `production`                                          |
+| `SENTRY_AUTH_TOKEN`              | —            | BuildKit secret                                       | BuildKit secret                                       |
+| `NODE_OPTIONS`                   | —            | `--import newrelic/esm-loader.mjs --require newrelic` | `--import newrelic/esm-loader.mjs --require newrelic` |
+| `NEW_RELIC_LICENSE_KEY`          | —            | shared key                                            | shared key                                            |
+| `NEW_RELIC_APP_NAME`             | —            | `TailorTales-UAT`                                     | `TailorTales-Prod`                                    |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | — (disabled) | — (disabled)                                          | `G-XXXXXXXXXX`                                        |
 
 `SENTRY_AUTH_TOKEN` is build-time only (source map upload) — set it in the Dokploy Compose environment; Compose mounts it only as a frontend BuildKit secret, not an image layer, runtime env var, or GitHub Actions secret (CI doesn't build images). The Sentry uptime monitor is configured in the Sentry UI — no app env vars.
 
@@ -960,10 +960,10 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 **New Relic APM**
 
 - [x] Create New Relic account (free tier); generate license key
-- [x] Install `newrelic` in backend; add `newrelic.cjs` config (reads `NEW_RELIC_LICENSE_KEY` + `NEW_RELIC_APP_NAME`); load via `NODE_OPTIONS="--import newrelic/esm-loader.mjs"` (ESM loader — backend is `"type": "module"`)
+- [x] Install `newrelic` in backend; add `newrelic.cjs` config (reads `NEW_RELIC_LICENSE_KEY` + `NEW_RELIC_APP_NAME`); load via `NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic"` (ESM loader plus agent preload — backend is `"type": "module"`)
 - [x] Gate agent startup by presence of `NODE_OPTIONS` (unset in dev → agent never loads)
 - [x] Add `NEW_RELIC_LICENSE_KEY`, `NEW_RELIC_APP_NAME`, `NODE_OPTIONS` to env matrix + `backend/.env.example`
-- [ ] Deploy to UAT; verify "TailorTales-UAT" application appears in New Relic with throughput data
+- [x] Deploy to UAT; verify "TailorTales-UAT" application appears in New Relic with throughput data
 - [ ] Set up alerts (error rate >5%, p95 >1s, Apdex <0.7) + 4-widget dashboard after UAT data flows
 - [x] Document New Relic registration + setup in `_docs/guides/external-services.md`
 
