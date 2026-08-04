@@ -106,6 +106,40 @@ jobs:
                   echo 'Timed out waiting for Dokploy to finish the deployment.' >&2
                   exit 1
 
+            - name: Wait for UAT application readiness
+              run: |
+                  set -euo pipefail
+
+                  session_url="${PLAYWRIGHT_BASE_URL}/api/auth/e2e/session"
+                  for attempt in $(seq 1 18); do
+                      status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+                          --request POST \
+                          --header "x-e2e-test-secret: ${E2E_TEST_SECRET}" \
+                          "${session_url}" || true)"
+
+                      case "${status}" in
+                          204)
+                              echo 'UAT authenticated smoke endpoint is ready.'
+                              exit 0
+                              ;;
+                          401)
+                              echo 'UAT E2E_TEST_SECRET does not match the GitHub repository secret.' >&2
+                              exit 1
+                              ;;
+                          000 | 404 | 502 | 503 | 504)
+                              echo "Attempt ${attempt}/18: endpoint returned ${status}; waiting 5 seconds."
+                              sleep 5
+                              ;;
+                          *)
+                              echo "UAT authenticated smoke endpoint returned unexpected HTTP ${status}." >&2
+                              exit 1
+                              ;;
+                      esac
+                  done
+
+                  echo 'UAT authenticated smoke endpoint did not become ready after 90 seconds.' >&2
+                  exit 1
+
             - name: Run UAT smoke tests
               run: pnpm test:e2e
 
