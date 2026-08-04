@@ -43,6 +43,7 @@ function renderSummary(props: Partial<IWorkshopSummaryProps> = {}): void {
         language: 'EN',
         question: 'Why is the sky blue?',
         isValid: true,
+        missingFields: [],
         isPending: false,
         onGenerate: vi.fn(),
         onSaveDraft: vi.fn(),
@@ -91,6 +92,20 @@ describe('WorkshopSummary', () => {
         expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
         expect(screen.getByRole('button', { name: /save as draft/i })).toBeEnabled();
         expect(screen.getByText(/only 4 remain this cycle/i)).toBeInTheDocument();
+    });
+
+    it('should explain which required fields still need to be completed', () => {
+        renderSummary({
+            isValid: false,
+            missingFields: ['question', 'format', 'art style'],
+        });
+
+        expect(
+            screen.getByText(/still needed before we can save or generate/i),
+        ).toBeInTheDocument();
+        expect(screen.getByRole('status')).toHaveTextContent('question, format, art style.');
+        expect(screen.getByRole('button', { name: /light the lantern/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /save as draft/i })).toBeDisabled();
     });
 
     it('should route each action through its own handler', async () => {

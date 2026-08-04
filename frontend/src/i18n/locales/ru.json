@@ -970,6 +970,7 @@
                 "birthdateRequired": "Дата рождения обязательна",
                 "invalidDate": "Неверная дата",
                 "birthDateFuture": "Дата рождения должна быть в прошлом",
+                "birthDateTooOld": "Ребёнку должно быть не больше {maxAge} лет",
                 "genderRequired": "Пол обязателен"
             }
         },

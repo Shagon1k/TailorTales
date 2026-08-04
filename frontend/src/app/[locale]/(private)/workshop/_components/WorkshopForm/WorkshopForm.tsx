@@ -170,13 +170,15 @@ export default function WorkshopForm({
                 ? t('questionInput.errors.required')
                 : t('questionInput.errors.tooShort', { min: config.questionMinLength })
             : null;
-    const isValid =
-        selectedChildId !== null &&
-        storyType !== null &&
-        pageCount !== null &&
-        artStyleId !== null &&
-        language !== null &&
-        !isQuestionTooShort;
+    const missingFields = [
+        selectedChildId === null ? t('validation.reader') : null,
+        isQuestionTooShort ? t('validation.question') : null,
+        storyType === null ? t('validation.format') : null,
+        pageCount === null ? t('validation.length') : null,
+        artStyleId === null ? t('validation.artStyle') : null,
+        language === null ? t('validation.language') : null,
+    ].filter((field): field is string => field !== null);
+    const isValid = missingFields.length === 0;
 
     function handleReaderSelect(id: string): void {
         setSelectedChildId(id);
@@ -551,6 +553,7 @@ export default function WorkshopForm({
                 language={language}
                 question={question}
                 isValid={isValid}
+                missingFields={missingFields}
                 isPending={isPending}
                 onGenerate={handleGenerate}
                 onSaveDraft={handleSaveDraft}

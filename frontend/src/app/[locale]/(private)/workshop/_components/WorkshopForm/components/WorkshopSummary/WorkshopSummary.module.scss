@@ -113,6 +113,13 @@
         }
     }
 
+    &__validation {
+        @include t-body-sm;
+        margin: 0;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
     &__actions {
         display: flex;
         flex-direction: column;

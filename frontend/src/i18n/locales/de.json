@@ -965,6 +965,7 @@
                 "birthdateRequired": "Geburtsdatum ist erforderlich",
                 "invalidDate": "Ungültiges Datum",
                 "birthDateFuture": "Geburtsdatum muss in der Vergangenheit liegen",
+                "birthDateTooOld": "Das Kind darf höchstens {maxAge} Jahre alt sein",
                 "genderRequired": "Geschlecht ist erforderlich"
             }
         },
