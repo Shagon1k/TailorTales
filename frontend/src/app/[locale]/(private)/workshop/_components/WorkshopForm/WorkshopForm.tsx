@@ -10,6 +10,7 @@ import OptionPill from '@/components/ui/OptionPill/OptionPill';
 import SuggestionChip from '@/components/ui/SuggestionChip/SuggestionChip';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import { storiesApi } from '@/api/stories';
+import { ANALYTICS_EVENTS, useTrackAnalytics } from '@/lib/analytics';
 import { useCharacters, useCreateCharacter } from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
 import type { IChild } from '@/types/child.types';
@@ -99,6 +100,7 @@ export default function WorkshopForm({
     const tStoryOptions = useTranslations('storyOptions');
     const locale = useLocale();
     const router = useRouter();
+    const { track } = useTrackAnalytics();
     const questionSuggestions = useMemo(
         () => getRandomQuestionSuggestions(getLocalizedQuestionSuggestions((key) => t(key))),
         [t],
@@ -237,6 +239,14 @@ export default function WorkshopForm({
                           const story = await storiesApi.create(payload);
                           return storiesApi.generate(story.id);
                       })();
+            track({
+                name: ANALYTICS_EVENTS.storyGenerationStarted,
+                parameters: {
+                    story_type: payload.type,
+                    page_count: payload.pageCount,
+                    language: payload.language,
+                },
+            });
             router.push(`/workshop/${job.storyId}`);
         } catch (err: unknown) {
             console.error('Failed to start generation', err);

@@ -5,6 +5,7 @@ import type { User } from '../../../generated/prisma/client.js';
 import { AuthController } from '../auth.controller.js';
 import { AuthService } from '../auth.service.js';
 import { UserService } from '../../user/user.service.js';
+import type { IAuthenticatedGoogleUser } from '../auth.types.js';
 
 describe('AuthController', () => {
     let controller: AuthController;
@@ -46,9 +47,12 @@ describe('AuthController', () => {
     });
 
     describe('googleCallback', () => {
-        it('should issue a token, set an httpOnly cookie, and redirect to the frontend', () => {
+        it('should issue a token, set an httpOnly cookie, and redirect a returning user to the library', () => {
             const user = { id: 'user-123' } as User;
-            const req = { user } as unknown as Request;
+            const authUser: IAuthenticatedGoogleUser = { user, isNew: false };
+            const req = { user: authUser } as unknown as Request & {
+                user: IAuthenticatedGoogleUser;
+            };
             const res = { cookie: vi.fn(), redirect: vi.fn() } as unknown as Response;
 
             controller.googleCallback(req, res);
@@ -60,6 +64,21 @@ describe('AuthController', () => {
                 expect.objectContaining({ httpOnly: true }),
             );
             expect(res.redirect).toHaveBeenCalledWith('http://localhost:3000/library');
+        });
+
+        it('should append the signup marker when Google creates a new user', () => {
+            const user = { id: 'user-123' } as User;
+            const authUser: IAuthenticatedGoogleUser = { user, isNew: true };
+            const req = { user: authUser } as unknown as Request & {
+                user: IAuthenticatedGoogleUser;
+            };
+            const res = { cookie: vi.fn(), redirect: vi.fn() } as unknown as Response;
+
+            controller.googleCallback(req, res);
+
+            expect(res.redirect).toHaveBeenCalledWith(
+                'http://localhost:3000/library?signup=completed',
+            );
         });
     });
 });

@@ -102,7 +102,7 @@ describe('UserService', () => {
                 },
             });
             expect(userCreate).not.toHaveBeenCalled();
-            expect(result).toBe(MOCK_USER);
+            expect(result).toEqual({ user: MOCK_USER, isNew: false });
         });
 
         it('should create a new user with a free-tier subscription when the googleId does not exist', async () => {
@@ -126,7 +126,7 @@ describe('UserService', () => {
                     },
                 },
             });
-            expect(result).toBe(MOCK_USER);
+            expect(result).toEqual({ user: MOCK_USER, isNew: true });
         });
 
         it('should create the user without a subscription when no free tier is seeded', async () => {
@@ -145,7 +145,7 @@ describe('UserService', () => {
                     avatarUrl: undefined,
                 },
             });
-            expect(result).toBe(MOCK_USER);
+            expect(result).toEqual({ user: MOCK_USER, isNew: true });
         });
     });
 

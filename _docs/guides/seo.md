@@ -21,6 +21,12 @@ In dev the value defaults to `http://localhost:3000` when unset.
 
 Access: `GET /sitemap.xml`
 
+## Google Search Console
+
+Use a production **Domain property** for `tailortales.app`, verify it through DNS, then submit
+`https://tailortales.app/sitemap.xml` in **Sitemaps**. Do not submit the UAT host: it returns a
+`noindex` response header by design.
+
 ## Robots
 
 `frontend/src/app/robots.ts` — Next.js App Router built-in (`MetadataRoute.Robots`).

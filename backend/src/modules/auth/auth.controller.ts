@@ -13,10 +13,10 @@ import { Throttle } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { type User } from '../../generated/prisma/client.js';
 import { AuthService } from './auth.service.js';
 import { Public } from './decorators/public.decorator.js';
 import { UserService } from '../user/user.service.js';
+import type { IAuthenticatedGoogleUser } from './auth.types.js';
 
 const COOKIE_NAME = 'access_token';
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -45,8 +45,11 @@ export class AuthController {
     @Public()
     @Get('google/callback')
     @UseGuards(AuthGuard('google'))
-    googleCallback(@Req() req: Request, @Res() res: Response): void {
-        const user = req.user as User;
+    googleCallback(
+        @Req() req: Request & { user: IAuthenticatedGoogleUser },
+        @Res() res: Response,
+    ): void {
+        const { user, isNew } = req.user;
         const token = this.authService.issueToken(user);
         const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
 
@@ -59,7 +62,7 @@ export class AuthController {
             secure: process.env.NODE_ENV === 'production',
         });
 
-        res.redirect(`${frontendUrl}/library`);
+        res.redirect(`${frontendUrl}/library${isNew ? '?signup=completed' : ''}`);
     }
 
     @Public()
@@ -73,7 +76,7 @@ export class AuthController {
         if (!expectedSecret) throw new NotFoundException();
         if (providedSecret !== expectedSecret) throw new UnauthorizedException();
 
-        const user = await this.userService.findOrCreate(E2E_USER);
+        const { user } = await this.userService.findOrCreate(E2E_USER);
         const token = this.authService.issueToken(user);
         const expiryDays = this.configService.getOrThrow<number>('JWT_EXPIRY_DAYS');
 

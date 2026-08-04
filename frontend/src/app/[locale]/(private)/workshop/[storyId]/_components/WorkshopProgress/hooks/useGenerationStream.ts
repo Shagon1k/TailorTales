@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { storiesApi, type IProgressSnapshot } from '@/api/stories';
+import { ANALYTICS_EVENTS, useTrackAnalytics } from '@/lib/analytics';
 import { formatTime, stageToStepIndex, STAGE_STEPS } from '../utils/stage.utils';
 
 export interface ILogEntry {
@@ -33,6 +34,7 @@ export function useGenerationStream(storyId: string, totalPages: number): IGener
     const [log, setLog] = useState<ILogEntry[]>([]);
     const logIdRef = useRef(0);
     const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const { trackOnce } = useTrackAnalytics();
 
     useEffect(() => {
         const addLog = (message: string): void => {
@@ -67,6 +69,10 @@ export function useGenerationStream(storyId: string, totalPages: number): IGener
             }
 
             if (data.type === 'completed') {
+                trackOnce(`story_generation_completed:${storyId}`, {
+                    name: ANALYTICS_EVENTS.storyGenerationCompleted,
+                    parameters: { page_count: totalPages },
+                });
                 addLog('Your tale is ready!');
                 es.close();
                 redirectTimerRef.current = setTimeout(
@@ -88,7 +94,7 @@ export function useGenerationStream(storyId: string, totalPages: number): IGener
                 redirectTimerRef.current = null;
             }
         };
-    }, [storyId, router, totalPages]);
+    }, [storyId, router, totalPages, trackOnce]);
 
     return {
         snapshot,

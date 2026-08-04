@@ -1,4 +1,9 @@
-import type { Role } from '../../generated/prisma/client.js';
+import type { Role, User } from '../../generated/prisma/client.js';
+
+export interface IFindOrCreateUserResult {
+    user: User;
+    isNew: boolean;
+}
 
 export interface ICurrentUserResponse {
     id: string;

@@ -8,7 +8,11 @@ import {
     USER_AVATAR_MAX_BYTES,
     type TUserAvatarMimeType,
 } from './user.constants.js';
-import type { ICurrentUserResponse, IUploadedAvatarFile } from './user.types.js';
+import type {
+    ICurrentUserResponse,
+    IFindOrCreateUserResult,
+    IUploadedAvatarFile,
+} from './user.types.js';
 
 function nextMonth(): Date {
     const d = new Date();
@@ -36,16 +40,17 @@ export class UserService {
         return this.prisma.user.findUnique({ where: { id } });
     }
 
-    async findOrCreate(params: IFindOrCreateUserParams): Promise<User> {
+    async findOrCreate(params: IFindOrCreateUserParams): Promise<IFindOrCreateUserResult> {
         const { googleId, email, name, avatarUrl } = params;
 
         const existing = await this.prisma.user.findUnique({ where: { googleId } });
 
         if (existing) {
-            return this.prisma.user.update({
+            const user = await this.prisma.user.update({
                 where: { id: existing.id },
                 data: { email, name, avatarUrl },
             });
+            return { user, isNew: false };
         }
 
         // Every user owns a Subscription row from day one (free tier by default)
@@ -59,7 +64,7 @@ export class UserService {
             );
         }
 
-        return this.prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 googleId,
                 email,
@@ -72,6 +77,7 @@ export class UserService {
                 }),
             },
         });
+        return { user, isNew: true };
     }
 
     async updateName(id: string, name: string): Promise<User> {

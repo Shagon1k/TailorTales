@@ -5,6 +5,7 @@ import type { Profile, VerifyCallback } from 'passport-google-oauth20';
 import type { User } from '../../../generated/prisma/client.js';
 import { UserService } from '../../user/user.service.js';
 import { AuthEmailAllowlistService } from '../auth-email-allowlist.service.js';
+import type { IAuthenticatedGoogleUser } from '../auth.types.js';
 import { GoogleStrategy } from '../strategies/google.strategy.js';
 
 const GOOGLE_PROFILE: Profile = {
@@ -40,6 +41,8 @@ const USER: User = {
     updatedAt: new Date('2026-01-01'),
 };
 
+const AUTHENTICATED_USER: IAuthenticatedGoogleUser = { user: USER, isNew: true };
+
 describe('GoogleStrategy', () => {
     let strategy: GoogleStrategy;
     let findOrCreate: ReturnType<typeof vi.fn>;
@@ -47,7 +50,7 @@ describe('GoogleStrategy', () => {
     let done: VerifyCallback;
 
     beforeEach(async () => {
-        findOrCreate = vi.fn().mockResolvedValue(USER);
+        findOrCreate = vi.fn().mockResolvedValue(AUTHENTICATED_USER);
         assertAllowed = vi.fn();
         done = vi.fn<VerifyCallback>();
 
@@ -88,7 +91,7 @@ describe('GoogleStrategy', () => {
                 name: 'Allowed User',
                 avatarUrl: 'https://example.com/avatar.png',
             });
-            expect(done).toHaveBeenCalledWith(null, USER);
+            expect(done).toHaveBeenCalledWith(null, AUTHENTICATED_USER);
         });
 
         it('should not find or create the user when the email is rejected', async () => {
