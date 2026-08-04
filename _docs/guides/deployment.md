@@ -229,8 +229,11 @@ The workflow requires these GitHub repository secrets/variables:
 
 `deploy-uat.yml` also supports `workflow_dispatch`. It refuses to deploy if another UAT deployment
 is already running or `main` has advanced beyond the selected SHA. It then calls `compose.deploy`,
-waits for Dokploy's Compose status to transition through `running` to `done`, and runs
-`pnpm test:e2e`. On failure it uploads the Playwright report, trace, and screenshots.
+waits for Dokploy's Compose status to transition through `running` to `done`, and probes the
+authenticated smoke-session endpoint for up to 90 seconds before running `pnpm test:e2e`. The
+probe retries transient route/startup responses (`000`, `404`, `502`, `503`, `504`) but fails
+immediately on `401`, which means the UAT runtime and GitHub `E2E_TEST_SECRET` values differ. On
+failure it uploads the Playwright report, trace, and screenshots.
 
 `deploy-prod.yml` is a manual promotion workflow named **Promote to Production**. Its only input is the
 release type (`patch`, `minor`, or `major`). It resolves the current `main` SHA, increments the
