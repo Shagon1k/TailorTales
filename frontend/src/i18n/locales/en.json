@@ -953,6 +953,7 @@
                 "birthdateRequired": "Birthdate is required",
                 "invalidDate": "Invalid date",
                 "birthDateFuture": "Birthdate must be in the past",
+                "birthDateTooOld": "The child must be {maxAge} or younger",
                 "genderRequired": "Gender is required"
             }
         },

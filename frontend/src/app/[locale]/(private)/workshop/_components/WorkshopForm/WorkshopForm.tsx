@@ -10,6 +10,7 @@ import OptionPill from '@/components/ui/OptionPill/OptionPill';
 import SuggestionChip from '@/components/ui/SuggestionChip/SuggestionChip';
 import Textarea from '@/components/ui/Textarea/Textarea';
 import { storiesApi } from '@/api/stories';
+import { ANALYTICS_EVENTS, useTrackAnalytics } from '@/lib/analytics';
 import { useCharacters, useCreateCharacter } from '@/hooks/characters';
 import { useSubscription } from '@/hooks/subscription';
 import type { IChild } from '@/types/child.types';
@@ -99,6 +100,7 @@ export default function WorkshopForm({
     const tStoryOptions = useTranslations('storyOptions');
     const locale = useLocale();
     const router = useRouter();
+    const { track } = useTrackAnalytics();
     const questionSuggestions = useMemo(
         () => getRandomQuestionSuggestions(getLocalizedQuestionSuggestions((key) => t(key))),
         [t],
@@ -168,13 +170,15 @@ export default function WorkshopForm({
                 ? t('questionInput.errors.required')
                 : t('questionInput.errors.tooShort', { min: config.questionMinLength })
             : null;
-    const isValid =
-        selectedChildId !== null &&
-        storyType !== null &&
-        pageCount !== null &&
-        artStyleId !== null &&
-        language !== null &&
-        !isQuestionTooShort;
+    const missingFields = [
+        selectedChildId === null ? t('validation.reader') : null,
+        isQuestionTooShort ? t('validation.question') : null,
+        storyType === null ? t('validation.format') : null,
+        pageCount === null ? t('validation.length') : null,
+        artStyleId === null ? t('validation.artStyle') : null,
+        language === null ? t('validation.language') : null,
+    ].filter((field): field is string => field !== null);
+    const isValid = missingFields.length === 0;
 
     function handleReaderSelect(id: string): void {
         setSelectedChildId(id);
@@ -237,6 +241,14 @@ export default function WorkshopForm({
                           const story = await storiesApi.create(payload);
                           return storiesApi.generate(story.id);
                       })();
+            track({
+                name: ANALYTICS_EVENTS.storyGenerationStarted,
+                parameters: {
+                    story_type: payload.type,
+                    page_count: payload.pageCount,
+                    language: payload.language,
+                },
+            });
             router.push(`/workshop/${job.storyId}`);
         } catch (err: unknown) {
             console.error('Failed to start generation', err);
@@ -541,6 +553,7 @@ export default function WorkshopForm({
                 language={language}
                 question={question}
                 isValid={isValid}
+                missingFields={missingFields}
                 isPending={isPending}
                 onGenerate={handleGenerate}
                 onSaveDraft={handleSaveDraft}

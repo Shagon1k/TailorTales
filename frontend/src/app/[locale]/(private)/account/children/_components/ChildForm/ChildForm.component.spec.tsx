@@ -59,6 +59,21 @@ describe('ChildForm', () => {
         expect(screen.getByText(/name is required/i)).toBeInTheDocument();
     });
 
+    it('should explain when a birthdate is older than the supported age range', async () => {
+        const onSubmit = vi.fn();
+        renderForm(onSubmit, vi.fn(), {
+            name: 'Max',
+            birthdate: '2000-06-15',
+            gender: 'MALE',
+            interests: [],
+        });
+
+        await userEvent.click(screen.getByRole('button', { name: /save/i }));
+
+        expect(screen.getByText(/18 or younger/i)).toBeInTheDocument();
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
     it('should call onSubmit with correct values when form is valid', async () => {
         const onSubmit = vi.fn();
         renderForm(onSubmit, vi.fn(), {

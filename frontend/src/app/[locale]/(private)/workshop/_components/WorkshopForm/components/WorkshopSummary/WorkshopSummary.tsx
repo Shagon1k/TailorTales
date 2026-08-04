@@ -25,6 +25,7 @@ export interface IWorkshopSummaryProps {
     language: ILanguage | null;
     question: string;
     isValid: boolean;
+    missingFields: string[];
     isPending: boolean;
     onGenerate: () => void;
     onSaveDraft: () => void;
@@ -39,6 +40,7 @@ export default function WorkshopSummary({
     language,
     question,
     isValid,
+    missingFields,
     isPending,
     onGenerate,
     onSaveDraft,
@@ -113,6 +115,13 @@ export default function WorkshopSummary({
                     {overBudget
                         ? t('quotaExhausted', { creditCost, creditsRemaining })
                         : t('quotaInfo', { pageCount, creditCost, creditsRemaining })}
+                </p>
+            )}
+
+            {!isValid && missingFields.length > 0 && (
+                <p className={styles.summary__validation} role="status">
+                    <strong>{t('validation.title')}</strong>{' '}
+                    {t('validation.fields', { fields: missingFields.join(', ') })}
                 </p>
             )}
 

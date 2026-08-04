@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Stack } from '@mantine/core';
 import { billingApi } from '@/api/billing';
+import { ANALYTICS_EVENTS, useTrackAnalytics } from '@/lib/analytics';
 import LoadingState from '@/components/shared/LoadingState/LoadingState';
 import { useSubscription } from '@/hooks/subscription';
 import PlanCard from './_components/PlanCard/PlanCard';
@@ -16,10 +17,19 @@ import styles from './page.module.scss';
 const CHECKOUT_POLL_INTERVAL_MS = 2000;
 const CHECKOUT_POLL_MAX_ATTEMPTS = 10;
 
+function clearCheckoutSearchParams(): void {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('checkout');
+    url.searchParams.delete('plan');
+    window.history.replaceState(window.history.state, '', url);
+}
+
 export default function SubscriptionPage(): React.ReactElement {
     const { data: subscription, refetch } = useSubscription();
     const searchParams = useSearchParams();
     const checkoutSucceeded = searchParams.get('checkout') === 'success';
+    const checkoutPlanId = searchParams.get('plan');
+    const { consent, trackOnce } = useTrackAnalytics();
     const isPaid = subscription !== undefined && subscription.tier.priceMonthly > 0;
     const [checkoutSyncTimedOut, setCheckoutSyncTimedOut] = useState(false);
     const isCheckoutSyncing = checkoutSucceeded && !isPaid && !checkoutSyncTimedOut;
@@ -63,6 +73,26 @@ export default function SubscriptionPage(): React.ReactElement {
             if (timer) clearTimeout(timer);
         };
     }, [checkoutSucceeded, isPaid, refetch]);
+
+    useEffect(() => {
+        if (!checkoutSucceeded || !isPaid || !subscription || consent !== 'accepted') {
+            return;
+        }
+
+        if (
+            !trackOnce(`subscription_activated:${checkoutPlanId ?? subscription.tier.id}`, {
+                name: ANALYTICS_EVENTS.subscriptionActivated,
+                parameters: {
+                    plan_id: checkoutPlanId ?? subscription.tier.id,
+                    subscription_tier_id: subscription.tier.id,
+                },
+            })
+        ) {
+            return;
+        }
+
+        clearCheckoutSearchParams();
+    }, [checkoutPlanId, checkoutSucceeded, consent, isPaid, subscription, trackOnce]);
 
     const t = useTranslations('account.subscription');
 

@@ -334,6 +334,23 @@ The Measurement ID is public by design. With it unset, the consent banner still 
 analytics script ever loads. Domain ownership isn't verified at stream creation — verification
 only matters if you later enable Google Ads/Search Console linking.
 
-> **Custom events** (e.g. `story_created`, `signup_completed`) are intentionally deferred until
-> there's real traffic to justify which funnels to instrument. When added, use `sendGAEvent`
-> from `@next/third-parties/google` at the call sites — no new dependency needed.
+### Product events
+
+`frontend/src/lib/analytics-consent.ts` is the shared source of truth for the stored GDPR choice;
+`frontend/src/lib/analytics.ts` enforces that choice at the event boundary. It sends an event only
+after consent and once the GA script has been mounted by `CookieConsent`; it deliberately excludes
+email, child data, story text, and other PII. One-time redirect events clear their transient URL
+flags after a successful send instead of using browser storage for event deduplication.
+
+| Event                        | When it fires                                     | Parameters                             |
+| ---------------------------- | ------------------------------------------------- | -------------------------------------- |
+| `sign_up`                    | New Google account reaches the library            | `method=google`                        |
+| `begin_checkout`             | Signed-in user opens Paddle checkout              | `currency`, `value`, `plan_id`         |
+| `subscription_activated`     | Paddle webhook sync changes the UI to a paid plan | `plan_id`, `subscription_tier_id`      |
+| `story_generation_started`   | A generation job is accepted                      | `story_type`, `page_count`, `language` |
+| `story_generation_completed` | The generation stream completes                   | `page_count`                           |
+
+The implementation intentionally does **not** emit GA4's ecommerce `purchase` event. Paddle is
+the financial source of truth; if revenue reporting is needed later, send it server-side through
+the Measurement Protocol only after storing an explicit analytics-consent record and validating
+the transaction webhook.

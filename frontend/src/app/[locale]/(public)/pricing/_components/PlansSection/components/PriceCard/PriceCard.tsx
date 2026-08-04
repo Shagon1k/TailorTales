@@ -7,6 +7,7 @@ import ButtonLink from '@/components/ui/Button/ButtonLink';
 import { useCurrentUser } from '@/context/UserContext';
 import { useSubscription } from '@/hooks/subscription';
 import { getPaddle, PADDLE_CHECKOUT_SETTINGS } from '@/lib/paddle';
+import { ANALYTICS_EVENTS, useTrackAnalytics } from '@/lib/analytics';
 import { formatMoney } from '@/utils/money.utils';
 import type { IPricingPlan } from '../../../types';
 import styles from './PriceCard.module.scss';
@@ -24,11 +25,21 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
 
     const { user } = useCurrentUser();
     const { data: subscription } = useSubscription();
+    const { track } = useTrackAnalytics();
 
     const openCheckout = async (): Promise<void> => {
         if (!user || !paddlePriceId) return;
         const paddle = await getPaddle({ email: user.email });
         if (!paddle) return;
+
+        track({
+            name: ANALYTICS_EVENTS.beginCheckout,
+            parameters: {
+                currency: 'EUR',
+                value: priceMonthly / 100,
+                plan_id: plan.id,
+            },
+        });
 
         paddle.Checkout.open({
             items: [{ priceId: paddlePriceId, quantity: 1 }],
@@ -37,7 +48,7 @@ export default function PriceCard({ plan }: Readonly<IPriceCardProps>): React.Re
             settings: {
                 ...PADDLE_CHECKOUT_SETTINGS,
                 locale,
-                successUrl: `${window.location.origin}/account/subscription?checkout=success`,
+                successUrl: `${window.location.origin}/account/subscription?checkout=success&plan=${encodeURIComponent(plan.id)}`,
             },
         });
     };

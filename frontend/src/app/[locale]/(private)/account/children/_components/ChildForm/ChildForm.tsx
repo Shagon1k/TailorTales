@@ -27,7 +27,16 @@ interface IChildFormProps {
 }
 
 const TODAY = new Date().toISOString().split('T')[0];
+const CHILD_MAX_AGE_YEARS = 18;
 const MAX_INTERESTS = 10;
+
+function getEarliestAllowedBirthdate(): string {
+    const earliest = new Date();
+    earliest.setFullYear(earliest.getFullYear() - CHILD_MAX_AGE_YEARS);
+    return earliest.toISOString().split('T')[0];
+}
+
+const EARLIEST_ALLOWED_BIRTHDATE = getEarliestAllowedBirthdate();
 
 const DEFAULT_VALUES: IChildFormValues = {
     name: '',
@@ -60,6 +69,9 @@ export default function ChildForm({
                 const date = new Date(v);
                 if (Number.isNaN(date.getTime())) return t('errors.invalidDate');
                 if (date > new Date()) return t('errors.birthDateFuture');
+                if (v < EARLIEST_ALLOWED_BIRTHDATE) {
+                    return t('errors.birthDateTooOld', { maxAge: CHILD_MAX_AGE_YEARS });
+                }
                 return null;
             },
             gender: (v) => (v ? null : t('errors.genderRequired')),
@@ -70,7 +82,7 @@ export default function ChildForm({
 
     return (
         <>
-            <form id={formId} onSubmit={form.onSubmit(onSubmit)}>
+            <form id={formId} noValidate onSubmit={form.onSubmit(onSubmit)}>
                 <Stack gap="sm">
                     <Input
                         label={t('nameLabel')}
@@ -81,6 +93,7 @@ export default function ChildForm({
                     <Input
                         label={t('birthdateLabel')}
                         type="date"
+                        min={EARLIEST_ALLOWED_BIRTHDATE}
                         max={TODAY}
                         required
                         {...form.getInputProps('birthdate')}
