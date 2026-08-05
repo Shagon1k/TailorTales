@@ -12,11 +12,21 @@ export default function manifest(): MetadataRoute.Manifest {
         display: 'standalone',
         background_color: '#1a0a00',
         theme_color: '#1a0a00',
-        // TODO(pre-launch): add dedicated 192x192 and 512x512 (incl. maskable) icons in public/
-        // for full PWA installability — current icons are the 32px favicon and 180px apple-touch.
         icons: [
-            { src: '/icon.png', sizes: '32x32', type: 'image/png' },
-            { src: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+            { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            {
+                src: '/icons/icon-maskable-192.png',
+                sizes: '192x192',
+                type: 'image/png',
+                purpose: 'maskable',
+            },
+            {
+                src: '/icons/icon-maskable-512.png',
+                sizes: '512x512',
+                type: 'image/png',
+                purpose: 'maskable',
+            },
         ],
     };
 }

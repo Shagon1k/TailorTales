@@ -2,8 +2,8 @@
 
 > How to observe a running TailorTales instance. Three layers:
 >
-> 1. **Sentry** — error tracking (backend exceptions + frontend JS errors) and an uptime monitor.
-> 2. **New Relic** — APM: request latency, throughput, BullMQ job durations (backend only).
+> 1. **Sentry** — error tracking (backend exceptions + frontend JS errors).
+> 2. **New Relic** — APM plus the two-location synthetic uptime check and email workflow.
 > 3. **Pino structured logs** — the durable, queryable record of everything that happened.
 >
 > Sentry and New Relic are enabled on UAT/prod only; **local dev runs on logs alone** (both
@@ -31,12 +31,6 @@ so issues are filtered per environment.
   (a Dokploy Compose input mounted only as a BuildKit secret, never an image layer or runtime
   var). Without it, stack traces show minified frames.
 
-### Sentry — uptime monitor
-
-A single Sentry uptime monitor pings `GET https://tailortales.app/api/health` and alerts (email)
-when the backend is down. `/health` returns `{ "status": "ok" }` and is `@Public()`. Configured
-in the Sentry UI — no app env vars.
-
 ### New Relic — APM (backend only)
 
 The agent loads via `NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic"`: the ESM
@@ -50,7 +44,10 @@ HTTP `401` (anonymous session checks such as `GET /me`) and `403` (valid role or
 marked as expected. They remain visible for diagnosis but do not affect error rate, Apdex, or
 alerts based on those metrics.
 
-Recommended alerts (set up once UAT data flows): error rate > 5%, p95 latency > 1s, Apdex < 0.7.
+The MVP baseline includes a production dashboard, a 5xx alert that excludes expected auth/plan
+responses, a two-location synthetic check against `GET https://tailortales.app/api/health`, and
+an email workflow. Latency and Apdex threshold tuning is deliberately deferred until real traffic
+provides a meaningful baseline; do not invent thresholds from low-volume launch data.
 
 ## Log structure (Pino / NestJS)
 

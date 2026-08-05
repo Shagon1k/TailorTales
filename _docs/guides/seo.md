@@ -14,10 +14,10 @@ In dev the value defaults to `http://localhost:3000` when unset.
 
 `frontend/src/app/sitemap.ts` — Next.js App Router built-in (`MetadataRoute.Sitemap`).
 
-- 5 static public paths: `/`, `/how-it-works`, `/pricing`, `/contact`, `/privacy`
+- 6 static public paths: `/`, `/how-it-works`, `/pricing`, `/contact`, `/privacy`, `/terms`
 - 3 locales: `en`, `de`, `ru`
 - Each entry sets `url` to the `en` (default) locale path and includes an `alternates.languages`
-  map covering all three locales — consumed by crawlers as hreflang hints.
+  map covering all three locales plus `x-default` — consumed by crawlers as hreflang hints.
 
 Access: `GET /sitemap.xml`
 
@@ -52,8 +52,9 @@ Access: `GET /robots.txt`
 
 Key fields: `name: 'TailorTales'`, `display: 'standalone'`, `theme_color / background_color: '#1a0a00'`.
 
-Icons currently reuse the 32×32 favicon and 180×180 apple-touch icon. 192×192 and 512×512
-dedicated PWA icons are not yet present in `frontend/public/`.
+The manifest uses dedicated 192×192 and 512×512 icons from `frontend/public/icons/`, plus
+separately padded maskable variants. The maskable fox stays inside the central safe area so
+Android launchers can crop it to a circle, rounded square, or squircle without cutting it off.
 
 Access: `GET /manifest.webmanifest`
 
@@ -85,7 +86,7 @@ These are the only schema.org types relevant to TailorTales at MVP. No `Product`
 
 ### Page-level overrides (shared helper)
 
-`frontend/src/utils/seo.utils.ts` exports `buildMetadata()`. All 5 public pages call it:
+`frontend/src/utils/seo.utils.ts` exports `buildMetadata()`. All 6 public pages call it:
 
 ```typescript
 buildMetadata({
@@ -128,10 +129,25 @@ howItWorks.page.description
 pricing.page.description
 contact.page.description
 privacy.page.description
+terms.page.description
 ```
 
 ## OG image
 
-The sitemap and all OG tags reference `/og-default.png` (1200×630). This file **does not
-exist yet** in `frontend/public/` — social shares render without a thumbnail until it is
-added.
+All public-page OG/Twitter metadata references `/og-default.png`. The checked-in image is exactly
+1200×630 and combines the established fox mascot with the warm twilight TailorTales palette.
+
+## Production verification
+
+After deploying an SEO or asset change:
+
+1. Confirm `GET /sitemap.xml` contains all six route entries and EN/DE/RU + `x-default`
+   hreflang links.
+2. Confirm `HEAD /og-default.png` returns `200` with `Content-Type: image/png`, then refresh the
+   cached preview in the LinkedIn Post Inspector and Facebook Sharing Debugger.
+3. Open Chrome DevTools → **Application → Manifest** and confirm all four PWA icons load with no
+   installability warnings. Inspect both the standard and maskable previews.
+4. In Google Search Console → **Sitemaps**, confirm the existing sitemap remains `Success`.
+   Use **URL inspection** for `/en/terms`, `/de/terms`, and `/ru/terms`, then request indexing.
+5. Check **Page indexing** and **Performance** after Google has had several days to crawl the
+   updated sitemap; keyword refinement remains a post-launch, traffic-informed task.

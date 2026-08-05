@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         for (const locale of routing.locales) {
             languages[locale] = `${SITE_URL}/${locale}${path}`;
         }
+        languages['x-default'] = `${SITE_URL}/${routing.defaultLocale}${path}`;
 
         return {
             url: `${SITE_URL}/${routing.defaultLocale}${path}`,

@@ -142,10 +142,12 @@ NEXT_PUBLIC_PADDLE_ENV="sandbox"
 Paddle pushes subscription state to the backend. Without this, checkout "succeeds" in the
 overlay but the user's tier never changes.
 
-1. Start a tunnel: `ngrok http 3001` → note the `https://<id>.ngrok.app` URL.  
-   For a permanent dev URL, use a Cloudflare named tunnel: `dev-api.<domain> → localhost:3001`.
+1. UAT is the permanent sandbox webhook target. For an exceptional local webhook-debugging
+   session, start `ngrok http 3001` or a temporary Cloudflare tunnel and remove its Paddle
+   destination afterwards.
 2. **Developer tools → Notifications → New destination:**
-    - Type: **Webhook** · URL: `https://<id>.ngrok.app/webhooks/paddle`
+    - Type: **Webhook**
+        - Temporary local: `https://<tunnel-host>/webhooks/paddle`
         - UAT: `https://uat.tailortales.app/api/webhooks/paddle`
         - Production: `https://tailortales.app/api/webhooks/paddle`
     - Subscribe to: `subscription.created`, `subscription.activated`, `subscription.updated`,
@@ -247,10 +249,10 @@ matches by `customData.userId` and logs a warning if the user isn't found.
 
 ---
 
-## Sentry — error tracking + uptime
+## Sentry — error tracking
 
-Captures backend exceptions and frontend JS errors, and runs the uptime monitor. Disabled in
-dev (the inits are gated); only UAT/prod report. See
+Captures backend exceptions and frontend JS errors. Disabled in dev (the inits are gated); only
+UAT/prod report. See
 [monitoring.md](monitoring.md#sentry--error-tracking) for how it's wired in code.
 
 1. Sign up at [sentry.io](https://sentry.io) (free tier ≈ 5k errors/month).
@@ -280,10 +282,6 @@ NEXT_PUBLIC_SENTRY_ENVIRONMENT="uat"                        # or "production"
 SENTRY_AUTH_TOKEN="sntrys_…"   # Compose input → frontend BuildKit secret
 ```
 
-5. **Uptime monitor:** Sentry → **Crons/Uptime → Uptime Monitors → Add** →
-   `GET https://tailortales.app/api/health`, interval 5 min, alert by email. Replaces a
-   standalone uptime service.
-
 The DSN is safe to expose (it's write-only ingest); the **auth token is a secret**. One Sentry
 account covers all environments — the `environment` tag separates them.
 
@@ -307,7 +305,10 @@ NEW_RELIC_APP_NAME="TailorTales-UAT"              # or "TailorTales-Prod"
 ```
 
 4. Deploy; the app appears in New Relic → **APM & Services** within a minute or two of the first
-   request. Set alerts (error rate, p95 latency, Apdex) once data flows.
+   request.
+5. The MVP production baseline uses a 5xx alert, dashboard, two-location synthetic check against
+   `https://tailortales.app/api/health`, and an email workflow. Tune latency/Apdex thresholds only
+   after meaningful user traffic exists.
 
 The license key is a **secret** — env var only. Config (`backend/newrelic.cjs`) excludes `cookie`
 and `authorization` headers from captured attributes.

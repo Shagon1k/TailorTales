@@ -4,13 +4,14 @@
 
 ## Rate limiting
 
-Every inbound HTTP request passes through `ThrottlerGuard` before any business logic runs.
-`ThrottlerGuard` is registered as the first `APP_GUARD` in `app.module.ts`, ahead of
+Every inbound HTTP request passes through `ClientIpThrottlerGuard` before any business logic
+runs. The guard extends Nest's `ThrottlerGuard` and is registered as the first `APP_GUARD` in
+`app.module.ts`, ahead of
 `JwtAuthGuard`, so unauthenticated probing is throttled too.
 
 ```
 Request
-  → ThrottlerGuard   ← runs first; rejects with 429 if limit exceeded
+  → ClientIpThrottlerGuard  ← runs first; rejects with 429 if limit exceeded
   → JwtAuthGuard     ← auth check (public routes opt-out via @Public())
   → controller
 ```
@@ -26,10 +27,11 @@ Request
 | `POST /contact`         | `@Throttle({ default: { ttl: 60000, limit: 5 } })`  | Contact-form spam                         |
 | `POST /webhooks/paddle` | `@SkipThrottle()`                                   | Paddle servers must never be rate-limited |
 
-**Trust proxy** — `app.set('trust proxy', 1)` in `main.ts` tells Express to read the real
-client IP from `X-Forwarded-For` (set by Cloudflare/dokploy). Without this, every request
-appears to come from the proxy IP and all users share a single throttle bucket — making
-per-IP limiting useless in production.
+**Client IP** — `ClientIpThrottlerGuard` uses Cloudflare's `CF-Connecting-IP` first, then the
+first `X-Forwarded-For` address, and finally Express's request/socket IP. This keeps one stable
+bucket per visitor through the Cloudflare → Dokploy proxy chain. `app.set('trust proxy', 1)` in
+`main.ts` remains enabled for Express features that rely on the request IP. The backend must
+remain reachable only through the managed proxy path so clients cannot inject trusted headers.
 
 **Storage** — in-memory (default `ThrottlerStorageService`). Counters reset on process
 restart and are not shared across instances. Sufficient for single-instance MVP. See

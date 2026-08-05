@@ -198,7 +198,7 @@ The regular text footer is hidden on mobile/tablet because the dock owns those l
 | 2   | Magic email link auth                                              | Requires email provider (already decided: Resend in Phase 5). Added as Post-MVP auth option alongside Apple OAuth.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Post-MVP                     |
 | 3   | ~~Exact comic credit rate~~ ✅ Phase 9                             | Confirmed: 2 credits/page (`CREDITS_PER_PAGE` in `subscriptions.constants.ts`); comics still post-MVP.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Phase 9                      |
 | 4   | ~~Contact form backend (`POST /contact`)~~ ✅ Phase 5 Increment 7b | Backend `ContactModule` sends submissions to `CONTACT_INBOX_EMAIL` via Resend. Frontend Server Action wired in `actions.ts`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | _Resolved_                   |
-| 5   | Static page copy finalization                                      | All four public pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) use placeholder copy. Copy is a content/copywriting concern, not a code concern. Will be addressed in a dedicated content pass before launch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Pre-launch content phase     |
+| 5   | ~~Static page copy finalization~~ ✅ Phases 17/19                  | Public-page copy was accepted during the owner-led Phase 17 review; the full localized Privacy Notice and Terms shipped in Phase 19.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | _Resolved_                   |
 | 6   | Comic generation                                                   | **Moved to Post-MVP.** Phase 5 ships **book** generation end-to-end. Comics are genuinely heavier (multi-panel pages, speech bubbles + positioning, multiple image-gen calls per page, harder panel-to-panel consistency). The Phase 5 engine (queue, renderer, validator, contract) is built comic-ready so comics slot in additively — add `comic-*` templates + a panel contract (`panels: [{ imagePrompt, dialogue, speaker }]`). Existing comic scaffolding (`Story.type`, comic blueprint seed, "coming soon" toggle) is **kept as-is**. Keep this constraint in mind during Phase 5 architecture/code so the seams stay clean.                                                                                                                                                                                                                                                                                                                                        | Post-MVP                     |
 | 7   | BullMQ multi-worker / FlowProducer                                 | MVP uses one in-process BullMQ worker with internal capped image concurrency. Single server is fine — generation is I/O-bound (waiting on OpenRouter), so one box handles many concurrent stories; the "1 active job per user" cap is a business rule, not a capacity limit. Horizontal scale = add worker processes against the shared Redis queue (no code change). FlowProducer (cross-job per-page fan-out/fan-in) only needed if true distributed parallelism is required.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | When concurrent load grows   |
 | 8   | ~~FAILED stories visible in library~~ ✅ Phase 8                   | TaleCard now renders a dark overlay badge + "Try again →" CTA for FAILED stories; library filter includes FAILED alongside COMPLETED; workshop pre-fills all form fields from the failed story when `?storyId=` is present.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | _Resolved_                   |
@@ -213,6 +213,7 @@ The regular text footer is hidden on mobile/tablet because the dock owns those l
 | 17  | `childrenLimit` not reconciled on downgrade                        | `childrenLimit` is enforced only at create time (`children.service.ts`), so a user who adds N children on a paid tier and later cancels/downgrades keeps all N usable — the create gate only blocks adding more. Accepted because a child profile carries **no standalone cost**: AI generation (the real spend) is metered separately per period via `pagesPerMonth` / `regenerationsPerMonth` in `quota.service.ts`, so extra children don't increase spend. `childrenLimit` is a packaging/upsell perk, not a cost gate. The only non-hostile enforcement would be lock-not-delete (keep oldest N active for generation, rest read-only until upgrade) — a whole feature, disproportionate to a no-cost perk. Hard deletion is rejected (destroys parent data, orphans story child references). Revisit only if children ever gain a standalone cost.                                                                                                                     | Only if children gain cost   |
 | 18  | Character-as-protagonist — wave 2                                  | Wave 1 shipped the decoupling: Character is a distinct, user-selectable protagonist (`Story.characterId`) that **belongs to a Child** (`childId` required — a child may have several), `Character.source` ∈ `IMAGINED` (free-form: manual or AI-from-prompt) · `QUIZ` (guided appearance quiz) · `PHOTO` (reserved), and child `interests` feed the prompt as an optional hint. **Wave 2 shipped:** ~~(a) quiz-guided creation~~ ✅ (`QUIZ`, human-like); ~~(b) prompt-to-character~~ ✅ (`POST /characters/from-prompt`, free-form `IMAGINED`); ~~(e) per-child character management~~ ✅; source semantics cleaned up to `IMAGINED`/`QUIZ`/`PHOTO`; a disabled photo-upload seam + tooltip now sits in the quiz. **Still deferred:** (c) photo reference (`source = PHOTO`) — blocked on GDPR, see Deferred #10; (d) preview image as a generation reference input — see Deferred #11; (f) optionally making a Character mandatory per story (currently optional).         | Post-MVP (c/d/f)             |
 | 19  | Landing "Try a sample" demo story                                  | No preview/demo before sign-up: a visitor must commit (sign in) before seeing what a finished tale looks like. A "Try a sample" link on the landing page could open a pre-generated story page in the reader without auth, reducing perceived risk before commitment. Low code effort — reuse an existing `isPublic` story (or a curated seed) behind a lightweight unauthenticated reader route — but it's partly a content/curation concern (which sample best represents the product). Deferred to a pre-launch conversion pass.                                                                                                                                                                                                                                                                                                                                                                                                                                          | Pre-launch / conversion pass |
+| 20  | S3 Cross-Region Replication                                        | MVP keeps versioned generated assets in `eu-west-1` and external PostgreSQL dumps in a separate S3 bucket. CRR is not configured: it requires a second region/bucket, IAM role, monitoring and extra cost; it also replicates mistakes unless paired with a deliberate DR design. Revisit when regional-recovery RTO/RPO is a real product requirement.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | When regional DR is required |
 
 ### In-code TODO cross-reference
 
@@ -224,16 +225,15 @@ The regular text footer is hidden on mobile/tablet because the dock owns those l
 | ~~`pricing/page.tsx`~~                                   | ~~Replace hardcoded plan data with `GET /pricing` (real PricingTier records)~~ ✅ Phase 9 | _Resolved_  |
 | ~~`(public)/_components/TalesSection/TalesSection.tsx`~~ | ~~Replace `MOCK_TALES` with public stories from `GET /stories/public`~~ ✅ Phase 11       | _Resolved_  |
 | `(public)/_components/TalesSection/TalesSection.tsx`     | Add link to `/tales` (public story library page)                                          | Post-MVP    |
-| `privacy/_components/PrivacyContent/PrivacyContent.tsx`  | Extract privacy copy to CMS if non-dev editing is needed                                  | Post-MVP    |
 
 ---
 
 ## 10. Open Questions
 
 - Image moderation provider — OpenRouter image-model safety flags are the default; an explicit image-moderation provider is TBD if coverage proves insufficient.
-- Backup strategy specifics for Postgres + S3 — confirm in Phase 15.
+- ~~Backup strategy specifics for Postgres + S3 — confirm in Phase 15.~~ **Resolved (Phase 19):** daily external PostgreSQL dumps plus S3 versioning, a live 14-day retention policy matching the Privacy Notice, and a completed restore drill. Cross-Region Replication is explicitly deferred in #20.
 - ~~Notification preferences storage — `User` JSON field vs separate `NotificationPreference` model — decide in Phase 10.~~ **Resolved (Phase 10):** `User.notificationPreferences` JSON column; defaults merged in code.
-- Static page copy — all four static pages (`/how-it-works`, `/pricing`, `/contact`, `/privacy`) contain placeholder copy. Deferred to a dedicated content pass before launch. See Deferred Decision #5.
+- ~~Static page copy finalization.~~ **Resolved (Phases 17/19):** owner-reviewed public copy plus localized Privacy Notice and Terms are live.
 - GDPR launch readiness — confirm privacy policy copy, sub-processor list, data export/delete behavior, retention periods, and child/reference-image handling before production deploy.
 
 ---
@@ -899,23 +899,27 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 ---
 
-### Phase 15 — Analytics & Monitoring
+### Phase 15 — Analytics & Monitoring ✅
 
 **Goal:** add observability and product analytics before production deploy — error tracking, APM, uptime monitoring, and Google Analytics with a GDPR-compliant cookie consent banner. No separate staging doc; durable setup guides land in `_docs/guides/external-services.md`, runtime observability in `_docs/guides/monitoring.md`, and env vars in `_docs/guides/environment-variables.md`.
 
-> **Implementation note (diverged from original plan):** UptimeRobot was dropped in favour of **Sentry's built-in uptime monitor** (one fewer account). New Relic loads via `NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic"`: the loader supports the ESM backend and `--require` starts the agent. There is no `NEW_RELIC_ENABLED` flag; presence of `NODE_OPTIONS` is the gate. GA4 ships via `@next/third-parties/google` with a `useSyncExternalStore` consent gate.
+> **Implementation note (diverged from original plan):** New Relic Synthetics is the single
+> MVP uptime owner (two locations + email workflow), avoiding a duplicate Sentry uptime alert.
+> New Relic loads via `NODE_OPTIONS="--import newrelic/esm-loader.mjs --require newrelic"`: the
+> loader supports the ESM backend and `--require` starts the agent. There is no
+> `NEW_RELIC_ENABLED` flag; presence of `NODE_OPTIONS` is the gate. GA4 ships via
+> `@next/third-parties/google` with a `useSyncExternalStore` consent gate.
 
 ---
 
 #### Tools
 
-| Tool                   | Purpose                                                          | Free tier           |
-| ---------------------- | ---------------------------------------------------------------- | ------------------- |
-| Sentry                 | Error tracking — backend exceptions + frontend JS errors         | 5k errors/month     |
-| Sentry Uptime          | Uptime monitor — alerts when `/health` is down (Sentry built-in) | 1 monitor (free)    |
-| New Relic              | APM — request latency, throughput, BullMQ job durations          | 100 GB/month ingest |
-| Google Analytics (GA4) | Product analytics — page views, funnels, retention               | Free                |
-| Cookie consent banner  | GDPR-required gate before GA loads                               | —                   |
+| Tool                   | Purpose                                                              | Free tier           |
+| ---------------------- | -------------------------------------------------------------------- | ------------------- |
+| Sentry                 | Error tracking — backend exceptions + frontend JS errors             | 5k errors/month     |
+| New Relic              | APM + two-location synthetic uptime check + email workflow           | 100 GB/month ingest |
+| Google Analytics (GA4) | Product analytics — page views, consent-aware funnels, and retention | Free                |
+| Cookie consent banner  | GDPR-required gate before GA loads                                   | —                   |
 
 #### Env var model
 
@@ -933,7 +937,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 | `NEW_RELIC_APP_NAME`             | —            | `TailorTales-UAT`                                     | `TailorTales-Prod`                                    |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | — (disabled) | — (disabled)                                          | `G-XXXXXXXXXX`                                        |
 
-`SENTRY_AUTH_TOKEN` is build-time only (source map upload) — set it in the Dokploy Compose environment; Compose mounts it only as a frontend BuildKit secret, not an image layer, runtime env var, or GitHub Actions secret (CI doesn't build images). The Sentry uptime monitor is configured in the Sentry UI — no app env vars.
+`SENTRY_AUTH_TOKEN` is build-time only (source map upload) — set it in the Dokploy Compose environment; Compose mounts it only as a frontend BuildKit secret, not an image layer, runtime env var, or GitHub Actions secret (CI doesn't build images).
 
 ---
 
@@ -947,15 +951,15 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [x] Gate both inits behind `SENTRY_ENABLED` / `NEXT_PUBLIC_SENTRY_ENABLED`; dev stays silent
 - [x] Add Sentry vars to env matrix + `backend/.env.example` / `frontend/.env.example`
 - [x] Wire `SENTRY_AUTH_TOKEN` into the frontend Dockerfile `build` stage as a BuildKit secret
-- [ ] Create the Sentry auth token + set it in each Dokploy Compose environment
-- [ ] Trigger a test error on UAT; confirm it appears in Sentry with correct environment tag
-- [ ] Delete the wizard-generated `sentry-example-page` after UAT verification
+- [x] Create the Sentry auth token + set it in each Dokploy Compose environment
+- [x] Exercise the UAT error path with `SENTRY_ENVIRONMENT=uat`; accept the Sentry integration as the MVP baseline
+- [x] Delete the wizard-generated `sentry-example-page` and API route after UAT verification
 - [x] Document Sentry registration + setup in `_docs/guides/external-services.md`
 
-**Sentry — uptime monitor** (replaces UptimeRobot)
+**Uptime alert ownership**
 
-- [ ] In Sentry UI, verify the uptime monitor: `GET https://tailortales.app/api/health` (prod backend)
-- [ ] Configure alert contact (email) for down events
+- [x] Use the New Relic two-location synthetic check + email workflow as the MVP uptime monitor
+- [x] Keep Sentry focused on error tracking; duplicate uptime alerting is deferred until traffic justifies it
 
 **New Relic APM**
 
@@ -965,7 +969,7 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [x] Add `NEW_RELIC_LICENSE_KEY`, `NEW_RELIC_APP_NAME`, `NODE_OPTIONS` to env matrix + `backend/.env.example`
 - [x] Deploy to UAT; verify "TailorTales-UAT" application appears in New Relic with throughput data
 - [x] Set up the baseline production observability: 5xx alert excluding expected auth errors, production dashboard, two-location synthetic health-check, and email workflow
-- [ ] Add latency and Apdex alert thresholds after a week of production baseline data (do not guess a threshold before then)
+- [x] Defer latency and Apdex threshold tuning until production traffic provides a meaningful baseline
 - [x] Document New Relic registration + setup in `_docs/guides/external-services.md`
 
 **Google Analytics + cookie consent banner**
@@ -982,13 +986,13 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 - [x] Add `NEXT_PUBLIC_GA_MEASUREMENT_ID` to environment-variables.md and env matrix
 - [x] Document GA4 property setup in `_docs/guides/external-services.md`
 - [x] Add consent-aware product funnel events: Google sign-up, checkout started, subscription activated, and story generation started/completed (no PII or story content)
-- [ ] Confirm analytics-consent coverage in the GDPR launch checklist before production
+- [x] Confirm analytics-consent coverage in the GDPR launch checklist before production
 
 **Acceptance Check:**
 
-- Sentry captures a test exception on UAT with `environment=uat` tag
+- Sentry error tracking is enabled on UAT/prod with environment-specific tags and source maps
 - New Relic shows "TailorTales-UAT" application with live throughput
-- Sentry uptime monitor alerts fire on prod backend downtime
+- New Relic monitors prod `/api/health` from two locations and owns the email workflow
 - GA loads on prod only, and only after user accepts the cookie banner
 - Cookie banner passes basic GDPR check: no pre-consent tracking, reject works, preference persists
 
@@ -1003,10 +1007,10 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 **Rate limiting**
 
 - [x] Install `@nestjs/throttler`; wire `ThrottlerModule.forRoot` with global default (100 req/60 s)
-- [x] Register `ThrottlerGuard` as first `APP_GUARD` (runs before `JwtAuthGuard`)
+- [x] Register `ClientIpThrottlerGuard` as first `APP_GUARD` (runs before `JwtAuthGuard`); prefer Cloudflare's stable connecting IP, then the first forwarded IP, then the Express/socket fallback
 - [x] Per-route overrides: `GET /auth/google` → 10 req/min; `POST /contact` → 5 req/min
 - [x] `@SkipThrottle()` on `POST /webhooks/paddle` (Paddle servers must not be throttled)
-- [x] `app.set('trust proxy', 1)` in `main.ts` so `req.ip` resolves to the real client IP behind Cloudflare/dokploy; without this all users share one throttle bucket
+- [x] Keep `app.set('trust proxy', 1)` in `main.ts` for Express proxy-aware behavior; the throttle tracker resolves the client explicitly across the Cloudflare → Dokploy proxy chain
 
 **Security headers**
 
@@ -1023,19 +1027,19 @@ The bell must update instantly, not on a 30s timer. Use SSE: add a `GET /notific
 
 **SEO**
 
-- [x] `frontend/src/app/sitemap.ts` — 5 public pages × 3 locales; each entry carries `alternates.languages` hreflang map
+- [x] `frontend/src/app/sitemap.ts` — 6 public pages × 3 locales; each entry carries EN/DE/RU + `x-default` hreflang alternates
 - [x] `frontend/src/app/robots.ts` — disallow `admin`, `account`, `library`, `workshop`, `login`, and `api` routes
-- [x] `frontend/src/app/manifest.ts` — PWA manifest with `theme_color: '#1a0a00'`, `display: 'standalone'`
-- [x] `frontend/src/components/shared/JsonLd/JsonLd.tsx` — `Organization` + `WebSite` JSON-LD injected site-wide in `<head>`
+- [x] `frontend/src/app/manifest.ts` — installable PWA manifest with dedicated 192×192 / 512×512 standard and maskable icons
+- [x] `[locale]/layout.tsx` — `Organization` + `WebSite` JSON-LD injected directly in `<head>`
 - [x] `frontend/src/utils/seo.utils.ts` — `buildMetadata()` helper: canonical, hreflang + `x-default`, OG, Twitter in one call
 - [x] `[locale]/layout.tsx` — `generateMetadata` with `metadataBase`, title template, site-wide OG/Twitter defaults, `JsonLd`
-- [x] All 5 public pages (`/`, `/how-it-works`, `/pricing`, `/contact`, `/privacy`) — `generateMetadata` with per-page canonical, hreflang, and locale-aware descriptions (EN/DE/RU)
+- [x] All 6 public pages (`/`, `/how-it-works`, `/pricing`, `/contact`, `/privacy`, `/terms`) — `generateMetadata` with per-page canonical, hreflang, and locale-aware descriptions (EN/DE/RU)
 - [x] `[locale]/login/layout.tsx` — `robots: { index: false }` noindex
 - [x] `NEXT_PUBLIC_SITE_URL` env var added; per-page SEO descriptions added to all 3 locale JSON files
 
 **Acceptance Check:**
 
-- `GET /sitemap.xml` returns 15 entries (5 pages × 3 locales) with correct hreflang alternates
+- `GET /sitemap.xml` returns 6 route entries, each with correct EN/DE/RU + `x-default` hreflang alternates
 - `GET /robots.txt` disallows all auth-gated and admin paths
 - `GET /manifest.webmanifest` returns valid PWA manifest
 - Public page `<head>` includes: locale-correct canonical, hreflang ×3 + `x-default`, OG tags, Twitter card, JSON-LD `@graph`
@@ -1123,35 +1127,37 @@ mobile dock visibility/state checks at `390`, `800`, and `1200` widths.
 
 #### Environment model
 
-Three environments, but **four runtime profiles** — dev has two modes (stubs vs live-sandbox) so prod-like flows are testable locally without a deploy:
+Three environments. Local development uses the existing app-level env files; their `USE_*_STUBS`
+flags and sandbox credentials determine whether integrations are stubbed or real. There is no
+second env overlay or alternate start command:
 
 ```
-dev (stubs)   →  localhost, everything stubbed — default daily work, offline, €0
-dev (live)    →  localhost + real sandbox services (Paddle sandbox, OpenRouter, Resend)
-UAT           →  uat.tailortales.app, prod-like on sandbox/cheap services
-prod          →  tailortales.app, live everything
+dev   →  localhost; stubs by default, sandbox integrations when configured in the same env files
+UAT   →  uat.tailortales.app, prod-like on sandbox/cheap services
+prod  →  tailortales.app, live everything
 ```
 
 **Initial hosting shape — budget VPS, disposable by design:** UAT, prod, and small auxiliary apps start on one OVH VPS-4 (`shagserv`, Ubuntu 24.04, Gravelines) managed by dokploy. App containers, Postgres, Redis, and disposable UAT MinIO data live on the VPS at first. Production-generated PDFs/images and production Postgres backups must leave the VPS for S3/R2/B2-compatible storage. Scale path: upgrade the VPS first, then move Postgres/Redis to managed services, then split app servers behind a load balancer only when traffic requires it.
 
 **Control-plane domain:** reserve `dokploy.tailortales.app` for the dokploy dashboard even if future apps use unrelated domains. Protect it with Cloudflare Access (allowlist Alex's email) plus dokploy's own admin login; close direct public access to port `3000` after the dashboard works through HTTPS. Public product/API domains must not inherit this Access gate unless they are internal tools.
 
-**Env var sources — no manual `.env` retargeting:**
+**Env var sources:**
 
-| Profile     | Source                              | Run command                                                      |
-| ----------- | ----------------------------------- | ---------------------------------------------------------------- |
-| dev (stubs) | `.env` (default, stubs on)          | `pnpm dev`                                                       |
-| dev (live)  | `.env.live` (gitignored overlay)    | `pnpm dev:live` (loads `.env.live` via dotenv-cli or equivalent) |
-| UAT         | dokploy env panel — no file in repo | deploy                                                           |
-| prod        | dokploy env panel — no file in repo | deploy                                                           |
+| Environment | Source                                        | Run command |
+| ----------- | --------------------------------------------- | ----------- |
+| dev         | `backend/.env` + `frontend/.env` (gitignored) | `pnpm dev`  |
+| UAT         | dokploy env panel — no file in repo           | deploy      |
+| prod        | dokploy env panel — no file in repo           | deploy      |
 
-**Paddle — one sandbox account serves both dev (live) and UAT:**
+**Paddle — one sandbox account serves both dev and UAT:**
 
 - Paddle supports **multiple webhook destinations** per account — register one per environment, each with its own signing secret (`PADDLE_WEBHOOK_SECRET` differs per env).
 - Every event is pushed to **all** destinations; the cross-env noise is harmless — our handler matches by `customData.userId`, and a foreign userId (different DB) logs "cannot match a user" and returns 200.
 - Prod uses a separate **live** Paddle account (sandbox/live are hard-separated by Paddle anyway).
 
-**Dev webhook URL — Cloudflare named tunnel (static):** once the domain is on Cloudflare (free plan), create a named tunnel `dev-api.tailortales.app → localhost:3001` — permanent URL, configured in Paddle once. Until the domain exists, quick tunnels (`cloudflared tunnel --url …`) work but the URL must be re-pasted into Paddle after each restart.
+**Local Paddle webhooks:** UAT is the permanent sandbox webhook integration target. Do not keep a
+dedicated dev tunnel running for MVP. If a webhook must be debugged locally, start a temporary
+Cloudflare/ngrok tunnel and remove its Paddle destination afterwards.
 
 **Resend — one account, no env constraints:** outbound-only (no webhooks, no domain callback), so a single account with the domain verified once covers all envs; environments differ only by `RESEND_FROM` (`dev@` / `uat@` / `stories@`) and optionally separate API keys for usage tracking.
 
@@ -1176,10 +1182,10 @@ flowchart LR
 
 #### Environment matrix
 
-| Variable                             | dev (stubs)             | dev (live)                                                  | UAT                                                               | prod                                                      |
+| Variable                             | dev (stubs)             | dev (sandbox)                                               | UAT                                                               | prod                                                      |
 | ------------------------------------ | ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
 | `NODE_ENV`                           | `development`           | `development`                                               | `production`                                                      | `production`                                              |
-| `BACKEND_URL` / `FRONTEND_URL`       | localhost               | localhost (+ `dev-api.tailortales.app` tunnel for webhooks) | `https://uat.tailortales.app/api` / `https://uat.tailortales.app` | `https://tailortales.app/api` / `https://tailortales.app` |
+| `BACKEND_URL` / `FRONTEND_URL`       | localhost               | localhost (+ temporary tunnel only when debugging webhooks) | `https://uat.tailortales.app/api` / `https://uat.tailortales.app` | `https://tailortales.app/api` / `https://tailortales.app` |
 | `DATABASE_URL`                       | local docker postgres   | same local postgres                                         | dedicated UAT DB on VPS Postgres                                  | dedicated prod DB on VPS Postgres                         |
 | `REDIS_URL`                          | local docker redis      | same local redis                                            | VPS Redis with UAT namespace/index                                | VPS Redis with prod namespace/index                       |
 | `GOOGLE_CLIENT_ID/SECRET`            | dev OAuth app           | dev OAuth app                                               | UAT OAuth app                                                     | prod OAuth app (isolated)                                 |
@@ -1232,7 +1238,7 @@ flowchart LR
 
 - [x] Buy domain (`tailortales.app` or similar) and put DNS on Cloudflare (free plan)
 - [x] Configure `dokploy.tailortales.app` as the private control-plane domain behind Cloudflare Access; close public `3000/tcp` after verification
-- [ ] Cloudflare **named tunnel** `dev-api.<domain> → localhost:3001` — static dev webhook URL (replaces quick tunnels)
+- [x] Do not provision a permanent dev webhook tunnel at MVP; UAT owns sandbox webhook verification, and local debugging may use a temporary tunnel
 - [x] Provision initial OVH VPS-4 (`shagserv`, Ubuntu 24.04, 8 vCores / 24 GB RAM / 200 GB NVMe) and install dokploy
 - [x] Provision UAT dokploy Compose resource alongside the old UAT apps, validate it, move domains, then remove only the old backend/frontend apps
 - [x] Provision prod dokploy Compose resource — separate env and trigger from UAT on the same VPS
@@ -1240,12 +1246,12 @@ flowchart LR
 - [x] Provision persistent UAT MinIO resource; route `storage-uat.tailortales.app` to API port `9000`, keep console port `9001` private
 - [x] AWS S3 bucket `tailortales-prod` with a dedicated IAM user
 - [x] VPS Postgres + Redis configured with separate UAT/prod databases/namespaces
-- [x] Backup strategy for prod Postgres + S3 documented and configured (restore drill remains an acceptance requirement)
+- [x] Backup strategy for prod Postgres + S3 documented; Q3 2026 restore drill completed (owner-confirmed)
+- [x] Verify live 14-day retention: `tailortales-backups` expires the production DB prefix through version-aware lifecycle rules; `tailortales-prod` permanently deletes non-current versions after 14 days (owner-confirmed 5 August 2026)
 
-**Local env profiles**
+**Local environment**
 
-- [ ] Create `.env.live` overlay (gitignored) + `.env.live.example` committed
-- [ ] Add `pnpm dev:live` script loading `.env.live` (dotenv-cli or equivalent) — no manual `.env` editing to switch profiles
+- [x] Keep `backend/.env` and `frontend/.env` as the only local configuration files; use their existing stub flags and sandbox credentials with `pnpm dev`
 
 **Google OAuth**
 
@@ -1278,10 +1284,11 @@ flowchart LR
 
 - [x] Set `NEXT_PUBLIC_SITE_URL` per environment (canonical origin: non-www, no trailing slash — `https://tailortales.app` prod, `https://uat.tailortales.app` UAT)
 - [x] Enforce `www → non-www` 301 redirect at Cloudflare so the live host matches the canonical tags
-- [ ] Add the real `og-default.png` (1200×630) social-share image to `frontend/public/` (currently referenced but absent — shares render without a thumbnail until then)
-- [ ] Add dedicated 192×192 + 512×512 (incl. maskable) PWA icons to `frontend/public/` for full installability (manifest currently reuses the 32px favicon + 180px apple-touch)
+- [x] Add the real `og-default.png` (1200×630) social-share image to `frontend/public/`
+- [x] Add dedicated 192×192 + 512×512 standard and maskable PWA icons to `frontend/public/icons/`
 - [x] **Google Search Console:** prod property is verified and `https://tailortales.app/sitemap.xml` submitted; check Coverage + Performance after a few days
 - [x] Noindex the UAT environment (`X-Robots-Tag: noindex, nofollow, noarchive`); UAT must never be submitted to GSC
+- [ ] After promotion, verify the deployed OG image, four manifest icons, and six-route sitemap with EN/DE/RU + `x-default`; refresh social-preview caches
 
 **Legal & compliance (GDPR — ongoing after prod launch)**
 
@@ -1311,14 +1318,16 @@ flowchart LR
 > Each environment has one Compose resource using `deploy/docker-compose.yml`. Dokploy triggers that resource once; Compose enforces `release → healthy backend → frontend`. Separate backend/frontend auto-deploy triggers must remain disabled.
 
 - [x] Configure deploy ownership: GitHub Actions deploys UAT on `main`; **Deploy to Production** calculates a SemVer bump, creates the tag, pins Dokploy to it through the API, and deploys it (Dokploy auto-deploy off for both)
-- [ ] CI gitleaks gate (hard-block on detected secrets) — the local pre-commit hook is best-effort (warns + continues if Homebrew/gitleaks is unavailable), so CI must be the real enforcement point before merge/deploy
+- [x] CI Gitleaks gate scans full git history and hard-blocks on detected secrets; the local pre-commit hook remains a faster staged-change guard
 - [x] Add shared UAT/prod Compose definition plus strict, complete env template (`deploy/docker-compose.yml`, `deploy/.env.example`)
 - [x] Dockerfiles tested end-to-end for both backend and frontend
-- [ ] Graceful shutdown verified — BullMQ worker drains in-flight jobs on SIGTERM before process exit (prevents mid-generation kills on deploy)
+- [x] Graceful shutdown implemented (`enableShutdownHooks()` + 15-minute Compose grace period)
+- [ ] Verify an in-flight UAT generation drains on `SIGTERM` before closeout
 - [x] Dokploy env var injection configured per environment (no secrets in repo)
 - [x] Set `SENTRY_AUTH_TOKEN` in each Compose environment — mounted only as a frontend BuildKit secret for source-map upload
 - [x] Wire `prisma migrate deploy` plus art-style/pricing seeds as the automatic Compose `release` service (schema sync = git + deploy, never manual)
-- [ ] Zero-downtime deploy strategy confirmed (dokploy rolling or blue-green)
+- [x] Deployment behaviour accepted for MVP: standard Dokploy Compose may have a brief promotion window; rolling/blue-green deployment is deferred until traffic justifies Swarm/registry complexity
+- [ ] Open the hardening PR and confirm both the regular CI job and the new Gitleaks job pass before merge
 
 **First-deploy runbook** _(per environment, in order)_
 
@@ -1338,7 +1347,7 @@ flowchart LR
 - All `USE_*_STUBS` flags are `false` on prod
 - [ ] Rate limiting active — verify `POST /contact` rejects after 5 req/min, `GET /auth/google` after 10 req/min
 
-- [ ] Audit and expand `package.json` scripts for each environment — ensure `dev`, `build`, `start`, `migrate`, `seed`, and any CI scripts are correct and complete for UAT and prod contexts; add missing scripts (e.g. `migrate:prod`, `seed:prod`) if needed
+- [x] Audit package scripts: app-level `start`, migrations and seeds are complete; remote environments use the Compose release service, so duplicate `:uat` / `:prod` scripts are intentionally unnecessary
 
 **Deliverables:** ROADMAP progress. Ops runbook lives in `_docs/guides/runbook.md`; env var reference in `_docs/guides/environment-variables.md`.
 
@@ -1381,27 +1390,27 @@ flowchart LR
 
 ## 14. Progress Tracking
 
-| Phase                               | Status         | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ----------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0 — Infrastructure                  | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 1 — Auth                            | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 2 — Children                        | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                                                                                                                                                                                                                                                                                                                                |
-| 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred.                                                                                                                                                                                                                                                                                                      |
-| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                                                                                                                                                                                                                                                                                                                              |
-| 7 — Mid-point Documentation         | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 8 — Character + Regeneration        | ✅ Done        | Character entity + preview; page regeneration (text/illustration/both) with 30-day quota; iframe reader; FAILED stories in library. Resolved Deferred #8 and #9.                                                                                                                                                                                                                                                                                        |
-| 9 — Subscriptions                   | ✅ Done        | Paddle MoR, PricingTier + Subscription entities, QuotaService, watermark, GDPR export/delete, retention cron, account + pricing UI wired.                                                                                                                                                                                                                                                                                                               |
-| 10 — Notifications                  | ✅ Done        | Full notification inbox, SSE bell stream, subscription-event emails, per-user preferences, NotificationEmitterService.                                                                                                                                                                                                                                                                                                                                  |
-| 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                                                                                                                                                                                              |
-| 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                                                                                                                         |
-| 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                                                                                                                                   |
-| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                                                                                                                                |
-| 15 — Analytics & Monitoring         | 🟡 In progress | Sentry (BE + FE, env-gated), New Relic APM and production synthetic health-check, GA4 via `@next/third-parties` behind a `useSyncExternalStore` cookie consent banner (EN/DE/RU), and consent-aware sign-up, checkout, subscription-activation, and generation funnel events. UAT/prod telemetry and source-map upload are configured; remaining work is final Sentry uptime verification, consent audit, and baselined latency/Apdex alert thresholds. |
-| 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: sitemap, robots, manifest, JSON-LD, `buildMetadata()` helper, canonical + hreflang on all 5 public pages (EN/DE/RU), login noindex.                                                                                                                                                          |
-| 17 — Final Manual Check-up          | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 18 — Mobile View Support            | ✅ Done        | First-class mobile/tablet web support: breakpoints, app-style footer dock with guest/auth states, Account/More sheets, public pages, login, library, story reader, workshop/account/admin-safe layouts, touch-safe modals, and Button/Link/Icon cleanup. Public/login viewport QA and automated frontend checks passed; private flows were polished through authenticated browser review.                                                               |
-| 19 — Production Deploy              | 🟡 In progress | UAT and production are live as isolated Dokploy Compose resources. GitHub Actions owns UAT deploys and explicit production promotions; live Paddle, Resend, S3, backups, Cloudflare Access, and external monitoring are configured. Remaining launch gates: legal/GDPR paperwork, restore drill, GSC/assets, CI secret scanning, rate-limit/graceful-shutdown/zero-downtime verification, and final runbook evidence.                                   |
+| Phase                               | Status         | Notes                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — Infrastructure                  | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 1 — Auth                            | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 2 — Children                        | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 3 — Design System                   | ✅ Done        | SuggestionChip deferred to Phase 4; static page copy deferred to dedicated content phase                                                                                                                                                                                                                                                                                                  |
+| 4 — Stories & StoryBlueprints       | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 5 — Generation Pipeline             | ✅ Done        | Book end-to-end: BullMQ pipeline, OpenRouter (text + images), Puppeteer PDF, SSE progress, Resend notifications, contact endpoint. Comic deferred.                                                                                                                                                                                                                                        |
+| 6 — Human Verification & Bug Fixing | ✅ Done        | 21 issues triaged: 20 fixed (5 blockers, 7 major, 4 minor, 4 polish), 1 deferred (FAILED stories in library → Deferred #8)                                                                                                                                                                                                                                                                |
+| 7 — Mid-point Documentation         | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 8 — Character + Regeneration        | ✅ Done        | Character entity + preview; page regeneration (text/illustration/both) with 30-day quota; iframe reader; FAILED stories in library. Resolved Deferred #8 and #9.                                                                                                                                                                                                                          |
+| 9 — Subscriptions                   | ✅ Done        | Paddle MoR, PricingTier + Subscription entities, QuotaService, watermark, GDPR export/delete, retention cron, account + pricing UI wired.                                                                                                                                                                                                                                                 |
+| 10 — Notifications                  | ✅ Done        | Full notification inbox, SSE bell stream, subscription-event emails, per-user preferences, NotificationEmitterService.                                                                                                                                                                                                                                                                    |
+| 11 — Ratings & Public Sharing       | ✅ Done        | Rating upsert, isPublic opt-in, public stories on landing page, admin visibility override.                                                                                                                                                                                                                                                                                                |
+| 12 — Admin Panel                    | ✅ Done        | Stats dashboard, user management, story moderation, ArtStyle CRUD + thumbnail generation, ratings view, SidebarLayout shared component. SUPER_ADMIN role added.                                                                                                                                                                                                                           |
+| 13 — Localization                   | ✅ Done        | next-intl EN/DE/RU, [locale] routing, LocaleSwitcher, backend error i18n via Accept-Language, Paddle checkout locale.                                                                                                                                                                                                                                                                     |
+| 14 — Final Documentation            | ✅ Done        | All phase-8–13 staging docs consolidated into durable docs and deleted. New files: user-flows.md, monitoring.md, backup-strategy.md, gdpr-launch-checklist.md. backend/AGENTS.md and frontend/AGENTS.md updated with symbol-token swap, error code, S3 scope, and i18n navigation rules.                                                                                                  |
+| 15 — Analytics & Monitoring         | ✅ Done        | MVP observability baseline accepted: Sentry error tracking with environment tags and source maps; New Relic APM, production dashboard, two-location synthetic health check and email workflow; GA4 behind consent with consent-aware funnel events. Duplicate uptime alerts and latency/Apdex tuning are deferred until traffic justifies them.                                           |
+| 16 — Security Hardening & SEO       | ✅ Done        | Rate limiting (`@nestjs/throttler`, global + per-route + webhook skip), Helmet headers, trust proxy, JWT 32-char minimum, CI `next build` type-check. SEO: six-route sitemap, robots, installable manifest, OG/PWA assets, JSON-LD, canonical + hreflang on all public pages (EN/DE/RU), login noindex.                                                                                   |
+| 17 — Final Manual Check-up          | ✅ Done        |                                                                                                                                                                                                                                                                                                                                                                                           |
+| 18 — Mobile View Support            | ✅ Done        | First-class mobile/tablet web support: breakpoints, app-style footer dock with guest/auth states, Account/More sheets, public pages, login, library, story reader, workshop/account/admin-safe layouts, touch-safe modals, and Button/Link/Icon cleanup. Public/login viewport QA and automated frontend checks passed; private flows were polished through authenticated browser review. |
+| 19 — Production Deploy              | 🟡 In progress | UAT and production are live; legal pages, restore drill, GSC, OG/PWA assets, CI secret scanning, and the MVP monitoring baseline are complete. Remaining closeout: verify live 14-day backup retention, graceful shutdown, and rate limits; finish external GDPR paperwork/review; and perform the final documentation sweep.                                                             |
 
 Status legend: ⬜ Not started · 🟡 In progress · ✅ Done · 🔵 Needs rules-revision approval

@@ -16,30 +16,27 @@
 
 ### Approach
 
-Use your managed database provider's **automated daily backups** as the baseline. Both
-Neon and Supabase (recommended providers) include point-in-time recovery (PITR) on paid plans.
+Production PostgreSQL is self-hosted on the Dokploy VPS. Dokploy's database backup job creates a
+compressed SQL dump every day and uploads it to separate S3 storage so a VPS failure does not
+take the database and its backup together:
 
-If using a self-hosted database on the Dokploy server, set up `pg_dump` via cron:
+| Setting     | Production value                                                        |
+| ----------- | ----------------------------------------------------------------------- |
+| Schedule    | `30 2 * * *` (Dokploy/server timezone)                                  |
+| Format      | Timestamped `.sql.gz`                                                   |
+| Destination | `s3://tailortales-backups/tailortales-db-postgres-prod-wjoq7z/db/prod/` |
+| Retention   | Versioned S3 lifecycle with a conservative 14-day maximum               |
 
-```bash
-# Run as a cron job on the DB server (daily at 2 AM):
-0 2 * * * pg_dump "$DATABASE_URL" | gzip > /backups/tailortales-$(date +\%Y\%m\%d).sql.gz
-
-# Retain last 30 days, delete older:
-find /backups -name "tailortales-*.sql.gz" -mtime +30 -delete
-```
-
-Upload the dump to a separate S3 bucket (or cloud storage) so it survives a server failure:
-
-```bash
-aws s3 cp /backups/tailortales-$(date +\%Y\%m\%d).sql.gz s3://tailortales-backups/db/
-```
+The observed S3 objects confirm daily uploads. Retention is enforced in S3 rather than by a
+VPS-local cleanup command; this keeps cleanup working even if the database server is unavailable.
 
 ### Restore procedure
 
 ```bash
 # 1. Obtain the backup file
-aws s3 cp s3://tailortales-backups/db/tailortales-<YYYYMMDD>.sql.gz ./restore.sql.gz
+aws s3 cp \
+  s3://tailortales-backups/tailortales-db-postgres-prod-wjoq7z/db/prod/<TIMESTAMP>.sql.gz \
+  ./restore.sql.gz
 
 # 2. Decompress
 gunzip restore.sql.gz
@@ -72,24 +69,38 @@ Enable **S3 versioning** on the production bucket (`tailortales-prod`). Versioni
 against accidental overwrites and deletions — deleted objects become "delete markers" and can
 be restored.
 
-Additionally, use **S3 Cross-Region Replication (CRR)** or **S3 Replication** to a second
-bucket in a different region for disaster recovery:
-
-```
-tailortales-prod  (eu-west-1, primary)
-      │ replication
-      ▼
-tailortales-prod-backup  (us-east-1, replica)
-```
+Cross-Region Replication is intentionally **not configured** at MVP. The current design protects
+against accidental object changes through versioning, but does not provide automated recovery
+from a full regional or AWS-account loss. See [Deferred Decision #20](../../ROADMAP.md) before
+adding CRR: it needs a second bucket/region, IAM role, monitoring, cost ownership, and a deliberate
+disaster-recovery design.
 
 ### Lifecycle rules (cost control)
 
-Configure the following lifecycle rules on `tailortales-prod`:
+Configure the following rules on `tailortales-backups`, scoped to the production database prefix:
 
-| Rule                       | Target                            | Action                                    |
-| -------------------------- | --------------------------------- | ----------------------------------------- |
-| `expire-old-versions`      | All objects, non-current versions | Expire after 30 days                      |
-| `abort-incomplete-uploads` | All objects                       | Abort multipart uploads older than 7 days |
+| Rule                               | Target                                         | Action                                                                                                                    |
+| ---------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `expire-prod-db-backups`           | `tailortales-db-postgres-prod-wjoq7z/db/prod/` | Expire current after 12 days; permanently delete non-current after 1 day; abort incomplete multipart uploads after 7 days |
+| `remove-expired-db-delete-markers` | Same prefix                                    | Remove expired object delete markers                                                                                      |
+
+The backup bucket has versioning enabled. S3 rounds lifecycle eligibility to the next midnight
+UTC, so the 12-day current-version expiry plus 1 non-current day leaves a conservative buffer
+under the published 14-day maximum. Leave “number of newer non-current versions to retain” blank.
+AWS does not allow a days-based current expiration and expired-delete-marker cleanup in the same
+rule, so marker cleanup is a second prefix-scoped rule. Do not add storage-class transitions for
+this short retention window.
+
+> **Verified 5 August 2026:** the two production-database prefix rules and the
+> `tailortales-prod` non-current-version rule are enabled in AWS. The public 14-day retention
+> statement now matches the live configuration.
+
+On `tailortales-prod`, configure:
+
+| Rule                        | Target                            | Action                                    |
+| --------------------------- | --------------------------------- | ----------------------------------------- |
+| `prune-noncurrent-versions` | All objects, non-current versions | Permanently delete after 14 days          |
+| `abort-incomplete-uploads`  | All objects                       | Abort multipart uploads older than 7 days |
 
 The application's retention cleanup cron (`RetentionCleanupCron`) handles application-level
 retention (deleting PDFs past `PricingTier.retentionDays`). S3 lifecycle rules are a safety net
@@ -103,25 +114,17 @@ for orphaned versions and incomplete uploads, not a replacement.
 2. Toggle "Show versions" → locate the version just before the delete marker.
 3. Select that version and restore it by copying or removing the delete marker.
 
-**Recover from a corrupted bucket (full restore):**
-
-```bash
-# Sync from the replica to the primary bucket
-aws s3 sync s3://tailortales-prod-backup/ s3://tailortales-prod/ --source-region us-east-1
-```
-
-> After a full S3 restore, generated signed URLs in the DB (`pdfKey`, `coverImageKey`,
-> `Page.illustrations`) remain valid — they reference by key, and the keys are the same
-> after a sync.
+**Full bucket loss:** there is no automated replica restore at MVP. Treat this as an incident:
+preserve the database backup, assess which generated assets can be recreated, and do not invent an
+S3 sync source. Add a tested replica restore procedure only when CRR is deliberately adopted.
 
 ## Backup schedule summary
 
-| What                     | Frequency               | Retention                      | Where                        |
-| ------------------------ | ----------------------- | ------------------------------ | ---------------------------- |
-| Postgres (managed PITR)  | Continuous              | 7 days (PITR window)           | Provider-managed             |
-| Postgres (daily pg_dump) | Daily 2 AM              | 30 days                        | S3 `tailortales-backups/db/` |
-| S3 generated assets      | Continuous (versioning) | 30 days (non-current versions) | S3 versioning                |
-| S3 replication           | Continuous              | Same as primary                | Replica bucket               |
+| What                        | Frequency               | Retention                      | Where                               |
+| --------------------------- | ----------------------- | ------------------------------ | ----------------------------------- |
+| Postgres (Dokploy SQL dump) | Daily (`30 2 * * *`)    | 14 days                        | S3 `tailortales-backups/…/db/prod/` |
+| S3 generated assets         | Continuous (versioning) | 14 days (non-current versions) | S3 versioning                       |
+| S3 Cross-Region Replication | —                       | Not configured                 | Deferred Decision #20               |
 
 ## Restore drill (quarterly)
 
@@ -135,3 +138,13 @@ Run a restore drill each quarter to confirm backups are usable:
 6. Tear down the temporary database.
 
 Record the outcome (success / issues found) and update this document if the procedure changed.
+
+### Drill history
+
+| Period  | Result | Evidence                                                                                    |
+| ------- | ------ | ------------------------------------------------------------------------------------------- |
+| 2026 Q3 | Passed | Owner-confirmed during Phase 19 closeout; the original detailed drill log was not retained. |
+
+> Production policy is now **14 days** for database dumps and non-current S3 versions, matching
+> the public Privacy Notice. Verify the live cron/lifecycle configuration whenever this policy
+> changes; editing this guide alone does not change provider-side retention.
