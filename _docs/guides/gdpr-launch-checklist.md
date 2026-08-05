@@ -1,7 +1,7 @@
 # GDPR Launch Checklist
 
-> Pre-production checklist for GDPR compliance. All technical items (export, delete, retention)
-> are implemented. What remains is legal paperwork and copy review.
+> Launch checklist for GDPR compliance. Technical controls and public-facing Privacy Notice and
+> Terms of Service are implemented. Contractual review and provider paperwork remain open.
 >
 > Target: EU-only audience at MVP. US state privacy laws (CCPA/CPRA etc.) are below threshold
 > at MVP scale — revisit at scale.
@@ -19,19 +19,17 @@
 | Session cookie (`access_token`)                                | Strictly necessary                         | Authentication                       |
 | Analytics (page views, device/region) via Google Analytics     | Consent (cookie banner)                    | Product analytics — prod only        |
 
-> **Children's data:** the child's name and interests are sent in generation prompts to
-> OpenRouter (an AI provider). This is a cross-border transfer covered under sub-processor
-> SCCs/DPF. Parents enter and consent to this data; children are not users and do not
-> create accounts (keeps US COPPA out of scope under the "service for adults" clause in the
-> Terms of Service).
+> **Children's data:** the child's name and interests may be sent in generation prompts to
+> OpenRouter (an AI provider). Parents enter the data; children do not create accounts. The
+> transfer safeguards and provider terms must be confirmed as part of the open processor review.
 
 ## Technical checklist (implemented)
 
 - [x] **Data export** (`GET /me/export`) — returns all user data as structured JSON, with
       signed download links to retained files. Covers: profile, children, characters, stories + pages, ratings, notifications, subscription state.
-- [x] **Account deletion** (`DELETE /me`) — cancels active Paddle subscription, deletes all
-      S3 objects by prefix listing (with audit log), cascade-deletes all DB rows. Blocked while
-      a paid subscription is active (user must cancel and wait for period end first).
+- [x] **Account deletion** (`DELETE /me`) — blocked while a paid subscription is active; the
+      user must cancel and wait for the paid period to end. It then deletes all S3 objects by
+      prefix listing (with audit log) and cascade-deletes all DB rows.
 - [x] **Retention enforcement** — `RetentionCleanupCron` runs daily and deletes PDFs/images
       past `PricingTier.retentionDays`; free-tier assets have a shorter retention window.
 - [x] **Session cookie** — httpOnly, SameSite: Lax, Secure in production.
@@ -43,31 +41,40 @@
       cookie, so no consent record is itself a tracking cookie. GA only loads on prod
       (`NEXT_PUBLIC_GA_MEASUREMENT_ID` set) **and** after consent.
 
-## Legal paperwork (required before production launch)
+## Public legal documents
+
+- [x] Privacy Notice published at `/privacy` — effective 5 August 2026, version 1.0.
+- [x] Terms of Service published at `/terms` — effective 5 August 2026, version 1.0.
+- [x] Login, desktop footer and mobile footer link to both documents.
+
+The documents are product copy, not legal advice. Review them with a qualified Lithuanian/EU
+privacy professional as the service and legal structure develop.
 
 ### Privacy Policy
 
-Replace the placeholder `PrivacyContent` component with a real policy covering:
+The live Privacy Notice covers:
 
-- [ ] What personal data is collected (see table above)
-- [ ] Legal basis for each processing activity
-- [ ] **Sub-processors** (see list below) — names, purposes, and data transfer mechanism
-- [ ] **Children's data section** — parent enters and consents; child name/interests sent to AI
+- [x] What personal data is collected (see table above)
+- [x] Legal basis for each processing activity
+- [x] **Sub-processors** (see list below) — names, purposes, and transfer safeguards
+- [x] **Children's data section** — parent enters and consents; child name/interests sent to AI
       providers; no biometric or photo data at MVP
-- [ ] Retention periods per tier (with a table matching `PricingTier.retentionDays` values)
-- [ ] User rights: access, rectification, erasure, portability, restriction, objection
-- [ ] How to exercise rights (link to export/delete in `/account/privacy`, or email)
-- [ ] Supervisory authority (DPA) complaint right and the relevant authority for the EU country
-      of establishment
-- [ ] Policy effective date and version
+- [x] Retention periods per tier, including 14-day backup retention
+- [x] User rights: access, rectification, erasure, portability, restriction, objection
+- [x] How to exercise rights (link to export/delete in `/account/privacy`, or email)
+- [x] Supervisory authority (VDAI) complaint right
+- [x] Policy effective date and version
 
 ### Terms of Service
 
-- [ ] **"Service for adults 18+ / accounts operated by parents"** clause — ensures COPPA
-      does not apply (children are not users; parents operate the account on their behalf)
-- [ ] Acceptable use policy
-- [ ] Limitation of liability for AI-generated content
-- [ ] Governing law and jurisdiction
+- [x] **"Service for adults 18+ / accounts operated by parents"** clause — keeps children out
+      of account creation and makes the adult responsible for the profile information
+- [x] Acceptable use policy
+- [x] AI-assisted output limitations and liability wording
+- [x] Lithuanian governing law and legal-notice contact details
+
+The Terms are not a substitute for legal advice and do not themselves determine COPPA or other
+non-EU law applicability. Reassess this when the audience, features or legal structure changes.
 
 ### Sub-processor list
 
@@ -82,18 +89,15 @@ Replace the placeholder `PrivacyContent` component with a real policy covering:
 | **Sentry**             | Error tracking — exception data, may include IP           | SCC or EU-US DPF (Sentry EU region ingest in use)                   |
 | **New Relic**          | APM — request metadata (cookie/auth headers excluded)     | SCC or EU-US DPF                                                    |
 
-- [ ] Sign DPAs with OpenRouter, Resend, and AWS (or confirm they are covered under existing
-      framework agreements). Paddle is an independent controller for payments.
-- [ ] Confirm DPAs / framework coverage for Google Analytics, Sentry, and New Relic.
-- [ ] Document transfer mechanism for each sub-processor in the Privacy Policy.
+- [ ] Confirm and retain DPAs / contractual terms with OpenRouter, Resend, and AWS (or confirm
+      they are covered under existing framework agreements).
+- [ ] Confirm and retain DPAs / framework coverage for Google Analytics, Sentry, and New Relic.
+- [ ] Verify the documented transfer safeguard for each provider with a legal professional.
 
-### Breach notification procedure
+### Internal breach-notification procedure
 
-- [ ] Define an internal procedure: who is notified, within what timeframe?
-- [ ] GDPR requires notifying the supervisory authority within **72 hours** of becoming aware
-      of a breach likely to cause risk to individuals.
-- [ ] Affected users must be notified without undue delay if the breach is high-risk to them.
-- [ ] Keep a breach register even for incidents not requiring notification.
+- [x] Internal 72-hour procedure documented in [breach-response.md](breach-response.md).
+- [ ] Nominate a backup incident owner and complete a tabletop exercise.
 
 ## Cookie audit
 
@@ -114,10 +118,12 @@ prominent, nothing is pre-ticked, and no analytics runs before a positive choice
 
 ## Pre-launch sign-off
 
-- [ ] Privacy Policy copy reviewed by a lawyer or qualified DPO
-- [ ] Terms of Service copy reviewed
+- [x] Privacy Notice published at `/privacy` with effective date and version
+- [x] Terms of Service published at `/terms` with effective date and version
+- [ ] Privacy Notice copy reviewed by a lawyer or qualified DPO
+- [ ] Terms of Service copy reviewed by a lawyer or qualified DPO
 - [ ] Sub-processor DPAs signed
-- [ ] Breach notification procedure documented
+- [x] Breach notification procedure documented
 - [ ] `GET /me/export` tested with a real account (verify all data present + links work)
 - [ ] `DELETE /me` tested (verify DB rows gone, S3 objects deleted, audit log shows expected vs actual counts)
 - [ ] Public-story opt-in flow tested end-to-end (rate → toggle Share → verify on landing page)

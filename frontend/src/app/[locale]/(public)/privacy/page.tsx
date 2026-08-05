@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import PageHero, { HeroHighlight } from '@/components/shared/PageHero/PageHero';
 import { buildMetadata } from '@/utils/seo.utils';
-import PrivacyContent from './_components/PrivacyContent/PrivacyContent';
+import LegalDocument from '../_components/LegalDocument/LegalDocument';
 
 export async function generateMetadata({
     params,
@@ -37,7 +37,7 @@ export default async function PrivacyPage(): Promise<React.ReactElement> {
                 })}
                 sub={t('subheading')}
             />
-            <PrivacyContent />
+            <LegalDocument document="privacy" />
         </>
     );
 }

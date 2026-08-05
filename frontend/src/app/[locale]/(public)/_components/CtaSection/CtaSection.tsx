@@ -11,9 +11,6 @@ export default async function CtaSection(): Promise<React.ReactElement | null> {
     return (
         <section className={styles.cta}>
             <div className={styles.cta__card}>
-                <span className={styles.cta__dot} aria-hidden="true">
-                    ♥
-                </span>
                 <h2 className={styles.cta__heading}>{t('heading')}</h2>
                 <p className={styles.cta__sub}>{t('subheading')}</p>
                 <ButtonLink href="/login">{t('button')}</ButtonLink>

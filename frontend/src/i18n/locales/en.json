@@ -57,7 +57,8 @@
             "pricing": "Pricing",
             "howItWorks": "How it works",
             "contact": "Contact us",
-            "privacy": "Privacy"
+            "privacy": "Privacy",
+            "terms": "Terms"
         },
         "more": {
             "ariaLabel": "More navigation",
@@ -83,6 +84,7 @@
             "ariaLabel": "Footer navigation",
             "howItWorks": "How it works",
             "privacy": "Privacy",
+            "terms": "Terms of Service",
             "contact": "Contact"
         }
     },
@@ -99,7 +101,7 @@
         "hero": {
             "eyebrow": "A small light at bedtime",
             "heading": "Where their <highlight>questions</highlight> become their <highlight>stories</highlight>.",
-            "subheading": "A small workshop that takes your child's name, age and curiosity, and stitches them into a tiny book or comic — five to twenty pages, theirs to keep forever.",
+            "subheading": "A small workshop that takes your child's name, age and curiosity, and stitches them into a tiny book or comic — five to twenty pages, ready to revisit in their library.",
             "cta": {
                 "loggedIn": "Open workshop →",
                 "signUp": "Begin your first tale →",
@@ -115,17 +117,17 @@
             "label": "· How the workshop works ·",
             "heading": "Three steps, then their book.",
             "lightAName": {
-                "numeral": "i.",
+                "numeral": "I.",
                 "title": "Light a name",
                 "body": "Tell us who it is for. A name, an age, and a few things they love."
             },
             "whisperAWhy": {
-                "numeral": "ii.",
+                "numeral": "II.",
                 "title": "Whisper a why",
                 "body": "Pick their question, then choose the feel: length, language, look, and style."
             },
             "carryItHome": {
-                "numeral": "iii.",
+                "numeral": "III.",
                 "title": "Carry it home",
                 "body": "We turn it into a personalized illustrated PDF in minutes — ready to print or keep."
             }
@@ -185,7 +187,7 @@
         },
         "steps": {
             "lightAName": {
-                "numeral": "i.",
+                "numeral": "I.",
                 "title": "Light a name",
                 "body": "Start with the child behind the tale: a name, an age, and a few things they love right now. If you already made a recurring character, you can bring them in too.",
                 "detail1": "Takes about a minute",
@@ -193,7 +195,7 @@
                 "detail3": "Optional recurring character"
             },
             "whisperAWhy": {
-                "numeral": "ii.",
+                "numeral": "II.",
                 "title": "Whisper a why",
                 "body": "Choose the question they keep asking, then shape the mood around it: length, language, writing style, and art style. We keep the setup simple, but the result feels personal.",
                 "detail1": "Question prompts or your own words",
@@ -201,10 +203,10 @@
                 "detail3": "Pick the visual style for the pages"
             },
             "carryItHome": {
-                "numeral": "iii.",
+                "numeral": "III.",
                 "title": "Carry it home",
                 "body": "The workshop writes and illustrates the tale, then places a print-ready PDF in your library. Come back to re-read it, share it, rate it, or keep refining the next one.",
-                "detail1": "PDF ready in under 5 minutes",
+                "detail1": "Saved in your library when it is ready",
                 "detail2": "Saved in your library when it's done",
                 "detail3": "Print at home or keep it digital"
             }
@@ -300,7 +302,7 @@
             "heading": "A few things worth knowing.",
             "cancelAnyTime": {
                 "question": "Can I cancel any time?",
-                "answer": "Yes — at the click of a button. You keep your plan until the end of the period you paid for, and your finished stories stay in your library."
+                "answer": "Yes — at the click of a button. You keep your plan until the end of the period you paid for. Generated files are retained according to your plan; see our Privacy Notice for details."
             },
             "unusedCredits": {
                 "question": "What if I don't use my credits?",
@@ -308,15 +310,15 @@
             },
             "contentSafety": {
                 "question": "Is the content safe for my child?",
-                "answer": "Every tale is filtered through layered text and image moderation before delivery. We are strict — child-friendly only."
+                "answer": "We use automated text and image safety checks, but AI-generated output can still be imperfect. Please review every tale before sharing it with a child."
             },
             "childData": {
                 "question": "Do you keep my child's data?",
-                "answer": "Only what's needed to make the tales. Names and photos never leave your account. Full export and deletion any time."
+                "answer": "We process the name, age, interests and story preferences needed to create a tale. Photo uploads are not supported in this version. You can export your data or request deletion from your account."
             },
             "giftingTale": {
                 "question": "Can I gift a tale?",
-                "answer": "Yes. Both paid plans let you share finished tales — perfect for nieces, nephews, and small friends."
+                "answer": "Stories are private by default. You can explicitly choose to share a finished tale when you have the required permissions."
             },
             "languages": {
                 "question": "What languages?",
@@ -353,35 +355,95 @@
     },
     "privacy": {
         "page": {
-            "title": "Privacy",
-            "description": "How TailorTales collects, uses and protects your and your child's data. Read our privacy commitments and your rights."
+            "title": "Privacy Notice",
+            "description": "How TailorTales collects, uses and protects personal data."
         },
         "hero": {
             "eyebrow": "Quiet matters",
             "heading": "Your family's <highlight>data</highlight> is <highlight>yours</highlight>.",
-            "subheading": "Short version: we collect only what we need to make the tales, we never sell it, and you can delete everything at any time."
+            "subheading": "We collect only what we need to run the workshop, never sell personal data, and explain the choices you have."
         },
-        "whatWeCollect": {
-            "title": "What we collect",
-            "body": "We collect your email address, the first name and age of each child profile you create, and the tale preferences you choose (themes, art style, format). We also collect standard server logs (IP address, browser type) for security and debugging. Nothing else."
+        "document": {
+            "intro": "This Privacy Notice explains how TailorTales handles personal data.",
+            "controller": {
+                "title": "1. Who we are and how to contact us",
+                "body": "TailorTales is operated by Hurynovich Aliaksei, trading as TailorTales (\"we\", \"us\"). We are the controller of the personal data described in this notice. Contact us about privacy at privacy@tailortales.app or by post at Konstitucijos pr. 9-11, LT-09308, Vilnius, Lithuania."
+            },
+            "data": {
+                "title": "2. Data we collect and why",
+                "collection": "We collect the Google account details used to sign in (name, email address and avatar); child-profile details you choose to provide (name, birthdate, gender and interests); story prompts, preferences, generated text, illustrations and PDFs; character descriptions; subscription status and Paddle identifiers; support messages; and security diagnostics such as IP address, browser and server logs.",
+                "use": "We use this data to provide and secure TailorTales, personalise and generate stories, operate subscriptions, answer support requests, prevent abuse, and improve the service. Our legal bases are performance of our contract with the adult account holder, our legitimate interests in security and service reliability, legal obligations where applicable, and consent for optional analytics."
+            },
+            "children": {
+                "title": "3. Children and AI generation",
+                "details": "TailorTales is for adults aged 18 or over. Parents or guardians create and manage child profiles; children do not create accounts. Do not provide special category data, precise location, photographs or other biometric data. We send the minimum relevant prompt details, which may include a child's name, age and interests, to our AI generation providers to create the story you request.",
+                "safety": "AI-generated output can be imperfect. Please review every story before sharing it with a child. Automated safety checks reduce risk but cannot guarantee that every output is suitable in every context."
+            },
+            "processors": {
+                "title": "4. Processors and international transfers",
+                "providers": "We use carefully selected providers to operate TailorTales: Google for OAuth; OpenRouter for AI generation; AWS S3 for generated-file storage; Paddle as merchant of record for payments and tax handling; Resend for transactional email; Google Analytics for consent-based product analytics; Sentry for error monitoring; and New Relic for application performance monitoring. Providers process data only for their services and may process it outside the EEA. Where required, we rely on appropriate safeguards such as contractual commitments, Standard Contractual Clauses or an applicable adequacy mechanism.",
+                "noSale": "We do not sell or rent personal data, and we do not use child data for advertising."
+            },
+            "retention": {
+                "title": "5. Retention, sharing and deletion",
+                "period": "Account, profile and story records are retained while your account is active. Generated PDFs and illustrations are retained according to your plan: free-tier generated files are deleted after 30 days; paid-tier generated files are kept while the paid plan remains active, subject to our operational backups and legal obligations. Backups are retained for up to 14 days. We delete or anonymise data when it is no longer needed, unless law requires longer retention.",
+                "accountAction": "You can export your data or request account deletion in <accountPrivacy>Account → Privacy & data</accountPrivacy>. If you have an active paid subscription, cancel it first; deletion becomes available once that subscription has ended."
+            },
+            "cookies": {
+                "title": "6. Cookies and analytics",
+                "body": "The access_token cookie is strictly necessary to keep you signed in. We load Google Analytics only in production and only after you accept analytics in the cookie banner. If you reject it, analytics does not load. The banner preference is stored locally on your device."
+            },
+            "rights": {
+                "title": "7. Your rights and complaints",
+                "body": "Subject to applicable law, you may request access, correction, deletion, restriction, objection or portability of your personal data, and withdraw consent at any time. Contact privacy@tailortales.app. You may also complain to the State Data Protection Inspectorate of Lithuania (VDAI) or your local EEA supervisory authority."
+            },
+            "lastUpdated": "Effective date: 5 August 2026 · Version 1.0",
+            "legalReviewNotice": "This document describes the current product terms and privacy practices. It is not legal advice and should be reviewed by a qualified legal professional as the service develops."
+        }
+    },
+    "terms": {
+        "page": {
+            "title": "Terms of Service",
+            "description": "Terms governing use of TailorTales."
         },
-        "howWeUseIt": {
-            "title": "How we use it",
-            "body": "Your child's name and age are used only to personalise the tale you requested — they are never used for advertising, profiling, or shared with third parties. Your email is used to deliver tales and, if you opt in, to send occasional updates about new features. You can unsubscribe at any time."
+        "hero": {
+            "eyebrow": "The small print",
+            "heading": "Terms of <highlight>Service</highlight>.",
+            "subheading": "The agreement for adults using TailorTales on behalf of their families."
         },
-        "whoWeShareWith": {
-            "title": "Who we share it with",
-            "body": "We use a small number of trusted sub-processors to operate the service: a cloud hosting provider, a payment processor (for paid plans), and an AI image generation service. Each receives only the minimum data needed. We do not sell, rent, or trade your data. Ever."
-        },
-        "yourRights": {
-            "title": "Your rights",
-            "body": "You can export all your data or delete your account at any time from Account → Privacy. Deletion is permanent and processed within 30 days. If you have a question or concern, email us at hello@tailortales.app and we will respond within 5 business days."
-        },
-        "cookies": {
-            "title": "Cookies",
-            "body": "We use one first-party session cookie to keep you signed in. Your cookie-consent choice is stored in local storage, not a cookie. Analytics cookies are set only after you accept them in production; we do not use third-party advertising cookies."
-        },
-        "lastUpdated": "Last updated: May 2026."
+        "document": {
+            "intro": "Please read these Terms of Service carefully before using TailorTales.",
+            "agreement": {
+                "title": "1. Agreement and eligibility",
+                "body": "These Terms govern your use of TailorTales. By creating an account or using the service, you confirm that you are at least 18 years old and, where you add a child profile, that you are the child's parent or guardian or otherwise have authority to provide the information."
+            },
+            "service": {
+                "title": "2. The service",
+                "body": "TailorTales creates personalised AI-assisted stories, illustrations and PDFs from the details you provide. The service is provided as-is and may change as we improve it. Generation can take time, fail, or produce output that needs correction. You remain responsible for reviewing generated content before using or sharing it."
+            },
+            "billing": {
+                "title": "3. Accounts, subscriptions and payments",
+                "body": "You are responsible for keeping your sign-in account secure. Paid plans, checkout, invoices, taxes, renewals and cancellation are handled by Paddle, which acts as merchant of record. Prices, plan allowances and renewal terms are shown before checkout. You can cancel a subscription through your account; it remains active until the end of the paid period."
+            },
+            "content": {
+                "title": "4. Your content and our licence",
+                "body": "You keep the rights you have in the details you submit. You grant us a limited licence to process those details solely to operate, secure and improve TailorTales. Subject to these Terms and your plan's retention period, you may use generated stories for personal, non-commercial purposes. Do not present generated content as human-authored professional advice or as a guarantee of factual accuracy."
+            },
+            "use": {
+                "title": "5. Public sharing and acceptable use",
+                "body": "Stories are private by default. You may explicitly choose to share a finished story as an example; do so only if you have the rights and permissions needed. Do not use TailorTales to submit unlawful, harmful, discriminatory, sexually explicit, infringing or personal data you are not authorised to provide; probe or disrupt the service; or circumvent usage limits or safety controls."
+            },
+            "liability": {
+                "title": "6. Suspension, termination and liability",
+                "body": "We may suspend or terminate access where reasonably necessary for security, abuse prevention, legal compliance or material breach of these Terms. To the fullest extent permitted by law, TailorTales is not liable for indirect, incidental or consequential loss arising from use of the service. Nothing in these Terms limits liability that cannot legally be limited."
+            },
+            "law": {
+                "title": "7. Governing law and contact",
+                "body": "These Terms are governed by the laws of Lithuania, without prejudice to mandatory consumer protections in your country of residence. Questions or legal notices can be sent to support@tailortales.app or Hurynovich Aliaksei, Konstitucijos pr. 9-11, LT-09308, Vilnius, Lithuania."
+            },
+            "lastUpdated": "Effective date: 5 August 2026 · Version 1.0",
+            "legalReviewNotice": "This document describes the current product terms and privacy practices. It is not legal advice and should be reviewed by a qualified legal professional as the service develops."
+        }
     },
     "auth": {
         "login": {
@@ -389,7 +451,7 @@
             "heading": "Step back into the workshop.",
             "subheading": "Sign in to find your library, your children's profiles, and any tales you began but didn't finish.",
             "googleButton": "Continue with Google",
-            "legal": "By continuing you agree to our terms and privacy policy. We will never sell your child's data. We promise."
+            "legal": "By continuing, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Notice</privacy>. We do not sell or rent personal data."
         }
     },
     "workshop": {

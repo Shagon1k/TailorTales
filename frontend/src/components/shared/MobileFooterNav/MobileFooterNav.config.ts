@@ -14,8 +14,8 @@ export interface IPrimaryLink extends INavLink {
     route: Exclude<TNavRoute, 'account' | 'more'>;
 }
 
-export const SECONDARY_ROUTES = ['/pricing', '/how-it-works', '/contact', '/privacy'];
-export const PUBLIC_SECONDARY_ROUTES = ['/contact', '/privacy'];
+export const SECONDARY_ROUTES = ['/pricing', '/how-it-works', '/contact', '/privacy', '/terms'];
+export const PUBLIC_SECONDARY_ROUTES = ['/contact', '/privacy', '/terms'];
 
 export function getPrimaryLinks(t: TTranslate): IPrimaryLink[] {
     return [
@@ -37,6 +37,7 @@ export function getMoreLinks(t: TTranslate): INavLink[] {
         { href: '/how-it-works', label: t('items.howItWorks'), icon: 'help' },
         { href: '/contact', label: t('items.contact'), icon: 'contact' },
         { href: '/privacy', label: t('items.privacy'), icon: 'shield' },
+        { href: '/terms', label: t('items.terms'), icon: 'book' },
     ];
 }
 
@@ -44,6 +45,7 @@ export function getPublicMoreLinks(t: TTranslate): INavLink[] {
     return [
         { href: '/contact', label: t('items.contact'), icon: 'contact' },
         { href: '/privacy', label: t('items.privacy'), icon: 'shield' },
+        { href: '/terms', label: t('items.terms'), icon: 'book' },
     ];
 }
 

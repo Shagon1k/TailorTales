@@ -95,6 +95,10 @@ describe('MobileFooterNav', () => {
                 'href',
                 '/privacy',
             );
+            expect(within(more).getByRole('link', { name: 'Terms' })).toHaveAttribute(
+                'href',
+                '/terms',
+            );
         });
 
         it('should close more navigation from the backdrop', async () => {

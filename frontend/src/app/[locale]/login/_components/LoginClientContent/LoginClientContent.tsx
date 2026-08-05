@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import MascotImage from '@/components/shared/MascotImage/MascotImage';
 import Card from '@/components/ui/Card/Card';
 import BrandMark from '@/components/ui/BrandMark/BrandMark';
@@ -77,7 +77,12 @@ export default function LoginClientContent(): React.ReactElement {
 
                         <Divider variant="needle" />
 
-                        <p className={styles.legal}>{t('legal')}</p>
+                        <p className={styles.legal}>
+                            {t.rich('legal', {
+                                terms: (chunks) => <Link href="/terms">{chunks}</Link>,
+                                privacy: (chunks) => <Link href="/privacy">{chunks}</Link>,
+                            })}
+                        </p>
                     </div>
                 </Card>
             </main>

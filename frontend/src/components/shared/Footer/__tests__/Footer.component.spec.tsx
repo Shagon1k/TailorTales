@@ -36,6 +36,12 @@ describe('Footer', () => {
             expect(link).toHaveAttribute('href', '/privacy');
         });
 
+        it('should render the Terms link pointing to /terms', async () => {
+            render(await Footer());
+            const link = screen.getByRole('link', { name: /terms/i });
+            expect(link).toHaveAttribute('href', '/terms');
+        });
+
         it('should render the Contact link pointing to /contact', async () => {
             render(await Footer());
             const link = screen.getByRole('link', { name: /contact/i });
