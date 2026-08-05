@@ -39,7 +39,7 @@
 
 .updated,
 .notice {
-    @include t-body-sm !important;
+    @include t-body-sm;
 
     color: var(--text-muted) !important;
 }
