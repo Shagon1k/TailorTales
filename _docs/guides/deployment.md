@@ -34,6 +34,11 @@ The shell exits on the first failure. Compose starts `backend` only after `relea
 then starts `frontend` only after the backend health check passes. This is automatic: nobody
 manually runs migrations or presses a second deploy button.
 
+The backend enables Nest shutdown hooks. On Docker `SIGTERM`, `@nestjs/bullmq` stops accepting
+new generation jobs and waits for the active job before the application closes. Compose gives
+that drain up to `stop_grace_period: 15m`; after the grace period Docker may force the process
+down with `SIGKILL`.
+
 The blueprint seed creates or reuses a non-login `TailorTales System` user solely as the
 required audit owner for built-in blueprints. Therefore a clean environment receives the Book
 and Comic blueprints on its first deployment; it does not need an OAuth user or an administrator
@@ -153,6 +158,44 @@ Create two Compose resources pointing to `deploy/docker-compose.yml`:
 Do not configure separate backend/frontend auto-deploy webhooks. The Compose resource owns the
 ordered release and both application services as one deployment unit.
 
+### Deployment availability at MVP
+
+Standard Dokploy Compose replaces the current containers during deployment and can produce a
+brief availability window. TailorTales accepts that trade-off at MVP scale: health checks prevent
+an unready backend/frontend from being treated as ready, while graceful shutdown protects an
+in-flight generation job. True rolling or blue-green deployment would require moving the app
+services to a Swarm/registry topology and is deferred until real traffic justifies the added
+operational complexity.
+
+### Post-change UAT reliability verification
+
+Run these checks after the hardening branch reaches UAT:
+
+1. **Stable per-client rate limit:** wait 60 seconds for old counters to expire, then send six
+   invalid contact requests from one machine. Validation runs after the throttle guard, so this
+   does not send email. Expect five `400` responses followed by one `429`:
+
+    ```bash
+    for attempt in 1 2 3 4 5 6; do
+      curl -sS -o /dev/null -w "%{http_code}\n" \
+        -H 'content-type: application/json' \
+        -d '{}' https://uat.tailortales.app/api/contact
+    done
+    ```
+
+    After another clean 60-second window, request
+    `https://uat.tailortales.app/api/auth/google` 11 times without following redirects. Expect ten
+    `302` responses followed by one `429`. Confirm `X-RateLimit-Limit` remains `10` and
+    `X-RateLimit-Remaining` decreases monotonically; a jump upward means requests are still
+    reaching different in-memory buckets.
+
+2. **Graceful generation drain:** start one UAT story generation, wait until it is actively
+   generating pages, then trigger the normal UAT Compose deployment. In the old backend logs,
+   confirm `SIGTERM` begins shutdown but the active BullMQ job reaches its terminal state before
+   the container exits. Confirm the story is `COMPLETED` and downloadable after the new backend
+   becomes healthy. If generation exceeds 15 minutes, Docker may use `SIGKILL`; capture that as a
+   failed drill and increase the grace period only with measured evidence.
+
 ## Safe UAT cutover
 
 Do not delete the existing `backend-uat` and `frontend-uat` applications before validation:
@@ -176,13 +219,14 @@ remain applied, rollback is safe only while migrations follow the expand-contrac
 
 `.github/workflows/ci.yml` runs on every push and pull request to `main`:
 
-| Step                   | Command           | Notes                                            |
-| ---------------------- | ----------------- | ------------------------------------------------ |
-| Install                | `pnpm install`    | Frozen lockfile; uses `.nvmrc` for Node version. |
-| Generate Prisma client | `db:generate`     | Uses a dummy `DATABASE_URL`; no live DB needed.  |
-| Lint + format check    | `pnpm check`      | ESLint + Prettier.                               |
-| Type-check             | `pnpm type-check` | Type-checks both packages.                       |
-| Test                   | `pnpm test`       | Vitest with external-service stubs.              |
+| Step                   | Command / action               | Notes                                                    |
+| ---------------------- | ------------------------------ | -------------------------------------------------------- |
+| Secret scan            | `gitleaks/gitleaks-action@v2`  | Full git history; any detected credential fails the job. |
+| Install                | `pnpm install`                 | Frozen lockfile; uses `.nvmrc` for Node version.         |
+| Generate Prisma client | `db:generate`                  | Uses a dummy `DATABASE_URL`; no live DB needed.          |
+| Lint + format check    | `pnpm check`                   | ESLint + Prettier.                                       |
+| Framework type-check   | `pnpm --filter frontend build` | Includes generated Next.js route types.                  |
+| Test                   | `pnpm test`                    | Vitest with external-service stubs.                      |
 
 CI does not deploy individual applications. Dokploy receives the configured Git trigger and
 builds the Compose services from the repository.

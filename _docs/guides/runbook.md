@@ -79,14 +79,17 @@ The most common omissions in production:
 
 ## Database migrations
 
-**Before deploying a new backend version**, apply pending migrations:
+UAT and production migrations run automatically in the Compose `release` service before the new
+backend starts:
 
 ```bash
 pnpm --filter backend db:migrate:deploy
 ```
 
-This is idempotent — safe to re-run. A new backend that expects a schema column that doesn't
-exist yet will fail at runtime, not at startup.
+Do not run this manually before a normal deployment. If the release service fails, inspect its
+Dokploy logs and fix the underlying migration or environment error; a failed release prevents the
+new backend from starting. The command is idempotent and may be re-run manually only as an
+explicit recovery step after the failure is understood.
 
 ---
 

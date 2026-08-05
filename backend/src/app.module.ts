@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -27,6 +27,7 @@ import { RatingsModule } from './modules/ratings/ratings.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { ClientIpThrottlerGuard } from './common/client-ip-throttler.guard.js';
 
 @Module({
     imports: [
@@ -67,7 +68,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
     providers: [
         {
             provide: APP_GUARD,
-            useClass: ThrottlerGuard,
+            useClass: ClientIpThrottlerGuard,
         },
         {
             provide: APP_GUARD,

@@ -43,8 +43,8 @@
 
 ## Public legal documents
 
-- [x] Privacy Notice published at `/privacy` — effective 5 August 2026, version 1.0.
-- [x] Terms of Service published at `/terms` — effective 5 August 2026, version 1.0.
+- [x] Privacy Notice published in production at `/privacy` in EN/DE/RU — effective 5 August 2026, version 1.0.
+- [x] Terms of Service published in production at `/terms` in EN/DE/RU — effective 5 August 2026, version 1.0.
 - [x] Login, desktop footer and mobile footer link to both documents.
 
 The documents are product copy, not legal advice. Review them with a qualified Lithuanian/EU
@@ -127,4 +127,4 @@ prominent, nothing is pre-ticked, and no analytics runs before a positive choice
 - [ ] `GET /me/export` tested with a real account (verify all data present + links work)
 - [ ] `DELETE /me` tested (verify DB rows gone, S3 objects deleted, audit log shows expected vs actual counts)
 - [ ] Public-story opt-in flow tested end-to-end (rate → toggle Share → verify on landing page)
-- [ ] Cookie audit confirmed (no new cookies introduced since this doc was written)
+- [x] Cookie audit confirmed for the MVP monitoring baseline on 5 August 2026; revisit when a new client-side integration is added
