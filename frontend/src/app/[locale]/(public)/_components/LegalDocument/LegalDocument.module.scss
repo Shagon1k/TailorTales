@@ -1,0 +1,63 @@
+@use 'styles/typography' as *;
+
+.content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 var(--space-6) var(--space-24);
+
+    section {
+        display: grid;
+        gap: var(--space-3);
+        padding: 0 0 var(--space-8);
+        margin: 0 0 var(--space-8);
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    h2 {
+        @include t-heading-2xl;
+
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    p {
+        @include t-body-md;
+
+        margin: 0;
+        color: var(--text-secondary);
+    }
+
+    a {
+        color: var(--accent-primary);
+        text-underline-offset: var(--space-1);
+    }
+}
+
+.intro {
+    margin-bottom: var(--space-10) !important;
+}
+
+.updated,
+.notice {
+    @include t-body-sm;
+
+    color: var(--text-muted) !important;
+}
+
+.notice {
+    margin-top: var(--space-4) !important;
+}
+
+@media (max-width: 767px) {
+    .content {
+        padding: 0 var(--layout-gutter) var(--space-12);
+
+        h2 {
+            font-size: var(--fs-xl);
+        }
+
+        p {
+            font-size: var(--fs-base);
+        }
+    }
+}

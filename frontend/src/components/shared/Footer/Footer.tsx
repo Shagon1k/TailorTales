@@ -27,6 +27,12 @@ export default async function Footer(): Promise<React.ReactElement> {
                     <span className={styles.footer__separator} aria-hidden="true">
                         ·
                     </span>
+                    <Link href="/terms" className={styles.footer__link}>
+                        {t('nav.terms')}
+                    </Link>
+                    <span className={styles.footer__separator} aria-hidden="true">
+                        ·
+                    </span>
                     <Link href="/contact" className={styles.footer__link}>
                         {t('nav.contact')}
                     </Link>

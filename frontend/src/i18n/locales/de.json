@@ -57,7 +57,8 @@
             "pricing": "Preise",
             "howItWorks": "So funktioniert's",
             "contact": "Kontakt",
-            "privacy": "Datenschutz"
+            "privacy": "Datenschutz",
+            "terms": "Nutzungsbedingungen"
         },
         "more": {
             "ariaLabel": "Weitere Navigation",
@@ -83,6 +84,7 @@
             "ariaLabel": "Fußzeilennavigation",
             "howItWorks": "So funktioniert's",
             "privacy": "Datenschutz",
+            "terms": "Nutzungsbedingungen",
             "contact": "Kontakt"
         }
     },
@@ -99,7 +101,7 @@
         "hero": {
             "eyebrow": "Ein kleines Licht zur Schlafenszeit",
             "heading": "Wo ihre <highlight>Fragen</highlight> ihre <highlight>Geschichten</highlight> werden.",
-            "subheading": "Eine kleine Werkstatt, die den Namen, das Alter und die Neugier deines Kindes nimmt und zu einem kleinen Buch oder Comic zusammennäht — fünf bis zwanzig Seiten, für immer ihr Eigen.",
+            "subheading": "Eine kleine Werkstatt, die den Namen, das Alter und die Neugier deines Kindes nimmt und zu einem kleinen Buch oder Comic zusammennäht — fünf bis zwanzig Seiten, die du in deiner Bibliothek wieder aufrufen kannst.",
             "cta": {
                 "loggedIn": "Werkstatt öffnen →",
                 "signUp": "Erste Geschichte beginnen →",
@@ -115,17 +117,17 @@
             "label": "· So funktioniert die Werkstatt ·",
             "heading": "Drei Schritte, dann ihr Buch.",
             "lightAName": {
-                "numeral": "i.",
+                "numeral": "I.",
                 "title": "Einen Namen erhellen",
                 "body": "Sag uns, für wen sie ist. Ein Name, ein Alter und ein paar Dinge, die sie lieben."
             },
             "whisperAWhy": {
-                "numeral": "ii.",
+                "numeral": "II.",
                 "title": "Ein Warum flüstern",
                 "body": "Wähle ihre Frage und dann das Gefühl: Länge, Sprache, Bildwelt und Stil."
             },
             "carryItHome": {
-                "numeral": "iii.",
+                "numeral": "III.",
                 "title": "Nach Hause tragen",
                 "body": "Wir verwandeln alles in Minuten in ein persönliches illustriertes PDF — zum Drucken und Behalten."
             }
@@ -185,7 +187,7 @@
         },
         "steps": {
             "lightAName": {
-                "numeral": "i.",
+                "numeral": "I.",
                 "title": "Einen Namen erhellen",
                 "body": "Beginne mit dem Kind hinter der Geschichte: ein Name, ein Alter und ein paar Dinge, die gerade geliebt werden. Wenn du schon einen wiederkehrenden Helden angelegt hast, kannst du ihn gleich mitnehmen.",
                 "detail1": "Dauert etwa eine Minute",
@@ -193,7 +195,7 @@
                 "detail3": "Wiederkehrender Charakter optional"
             },
             "whisperAWhy": {
-                "numeral": "ii.",
+                "numeral": "II.",
                 "title": "Ein Warum flüstern",
                 "body": "Wähle die Frage, die immer wieder gestellt wird, und forme dann das Gefühl der Geschichte: Länge, Sprache, Schreibstil und Bildwelt. Wenige Entscheidungen, aber ein viel persönlicheres Ergebnis.",
                 "detail1": "Frage aus Ideenpool oder in eigenen Worten",
@@ -201,10 +203,10 @@
                 "detail3": "Auch der Illustrationsstil ist wählbar"
             },
             "carryItHome": {
-                "numeral": "iii.",
+                "numeral": "III.",
                 "title": "Nach Hause tragen",
                 "body": "Die Werkstatt schreibt und illustriert die Geschichte und legt das fertige PDF in deine Bibliothek. Du kannst sie wieder lesen, teilen, bewerten und die nächste Geschichte noch feiner abstimmen.",
-                "detail1": "PDF in weniger als 5 Minuten fertig",
+                "detail1": "Das PDF erscheint in deiner Bibliothek, sobald es bereit ist",
                 "detail2": "Fertig gespeichert in deiner Bibliothek",
                 "detail3": "Digital lesen oder zu Hause drucken"
             }
@@ -300,7 +302,7 @@
             "heading": "Ein paar wissenswerte Dinge.",
             "cancelAnyTime": {
                 "question": "Kann ich jederzeit kündigen?",
-                "answer": "Ja — per Knopfdruck. Du behältst deinen Plan bis zum Ende des bezahlten Zeitraums, und deine fertigen Geschichten bleiben in deiner Bibliothek."
+                "answer": "Ja — per Knopfdruck. Dein Plan bleibt bis zum Ende des bezahlten Zeitraums aktiv. Wie lange fertige Dateien gespeichert werden, hängt von deinem Plan ab; Details findest du im Datenschutzhinweis."
             },
             "unusedCredits": {
                 "question": "Was, wenn ich meine Credits nicht nutze?",
@@ -308,15 +310,15 @@
             },
             "contentSafety": {
                 "question": "Sind die Inhalte für mein Kind sicher?",
-                "answer": "Jede Geschichte wird vor der Auslieferung durch mehrschichtige Text- und Bildmoderation gefiltert. Wir sind streng — nur kinderfreundliche Inhalte."
+                "answer": "Wir verwenden automatisierte Sicherheitsprüfungen für Text und Bilder, aber KI-Ausgaben können dennoch unvollkommen sein. Bitte prüfe jede Geschichte, bevor du sie mit einem Kind teilst."
             },
             "childData": {
                 "question": "Speichert ihr Daten meines Kindes?",
-                "answer": "Nur das, was für die Geschichten notwendig ist. Namen und Fotos verlassen dein Konto nie. Vollständiger Export und Löschung jederzeit möglich."
+                "answer": "Wir verarbeiten Name, Alter, Interessen und Präferenzen, die zum Erstellen einer Geschichte nötig sind. Foto-Uploads werden in dieser Version nicht unterstützt. Du kannst deine Daten exportieren oder die Löschung über dein Konto anfordern."
             },
             "giftingTale": {
                 "question": "Kann ich eine Geschichte verschenken?",
-                "answer": "Ja. Beide bezahlten Pläne erlauben das Teilen fertiger Geschichten — perfekt für Nichten, Neffen und kleine Freunde."
+                "answer": "Geschichten sind standardmäßig privat. Du kannst dich ausdrücklich dafür entscheiden, eine fertige Geschichte zu teilen, wenn du die notwendigen Berechtigungen hast."
             },
             "languages": {
                 "question": "Welche Sprachen?",
@@ -353,35 +355,95 @@
     },
     "privacy": {
         "page": {
-            "title": "Datenschutz",
-            "description": "Wie TailorTales deine Daten und die deines Kindes erhebt, nutzt und schützt. Lies unsere Datenschutzversprechen und deine Rechte."
+            "title": "Datenschutzhinweis",
+            "description": "Wie TailorTales personenbezogene Daten erhebt, nutzt und schützt."
         },
         "hero": {
             "eyebrow": "Stille ist wichtig",
             "heading": "Die Daten deiner Familie <highlight>gehören</highlight> dir.",
-            "subheading": "Kurzfassung: Wir sammeln nur, was wir für die Geschichten brauchen, verkaufen es nie und du kannst alles jederzeit löschen."
+            "subheading": "Wir sammeln nur, was für die Werkstatt nötig ist, verkaufen nie personenbezogene Daten und erklären dir deine Wahlmöglichkeiten."
         },
-        "whatWeCollect": {
-            "title": "Was wir sammeln",
-            "body": "Wir sammeln deine E-Mail-Adresse, den Vornamen und das Alter jedes Kindprofils, das du erstellst, und die gewählten Geschichtspräferenzen (Themen, Kunststil, Format). Außerdem erfassen wir Standard-Serverlogs (IP-Adresse, Browsertyp) für Sicherheit und Fehlersuche. Nichts anderes."
+        "document": {
+            "intro": "Dieser Datenschutzhinweis erläutert, wie TailorTales personenbezogene Daten verarbeitet.",
+            "controller": {
+                "title": "1. Wer wir sind und wie du uns kontaktierst",
+                "body": "TailorTales wird von Hurynovich Aliaksei unter dem Namen TailorTales betrieben (\"wir\", \"uns\"). Wir sind Verantwortlicher für die in diesem Hinweis beschriebenen personenbezogenen Daten. Bei Datenschutzfragen erreichst du uns unter privacy@tailortales.app oder per Post: Konstitucijos pr. 9-11, LT-09308, Vilnius, Lithuania."
+            },
+            "data": {
+                "title": "2. Welche Daten wir erheben und warum",
+                "collection": "Wir erheben die für die Anmeldung genutzten Google-Kontodaten (Name, E-Mail-Adresse und Avatar); Angaben zu Kinderprofilen, die du bereitstellst (Name, Geburtsdatum, Geschlecht und Interessen); Story-Prompts, Einstellungen, generierte Texte, Illustrationen und PDFs; Charakterbeschreibungen; Abonnementstatus und Paddle-Identifikatoren; Support-Nachrichten; sowie Sicherheitsdiagnosen wie IP-Adresse, Browser- und Serverprotokolle.",
+                "use": "Wir verwenden diese Daten, um TailorTales bereitzustellen und zu schützen, Geschichten zu personalisieren und zu erzeugen, Abonnements abzuwickeln, Support-Anfragen zu beantworten, Missbrauch zu verhindern und den Dienst zu verbessern. Unsere Rechtsgrundlagen sind die Vertragserfüllung mit dem erwachsenen Kontoinhaber, unsere berechtigten Interessen an Sicherheit und Zuverlässigkeit, gegebenenfalls gesetzliche Pflichten und die Einwilligung für optionale Analysen."
+            },
+            "children": {
+                "title": "3. Kinder und KI-Generierung",
+                "details": "TailorTales richtet sich an Erwachsene ab 18 Jahren. Eltern oder Erziehungsberechtigte erstellen und verwalten Kinderprofile; Kinder erstellen keine Konten. Bitte gib keine besonderen Kategorien personenbezogener Daten, keine präzisen Standortdaten, Fotos oder sonstige biometrische Daten an. Wir senden unseren KI-Generierungsanbietern nur die minimal relevanten Prompt-Angaben, die Name, Alter und Interessen eines Kindes enthalten können, um die von dir angeforderte Geschichte zu erstellen.",
+                "safety": "KI-generierte Ergebnisse können unvollkommen sein. Bitte prüfe jede Geschichte, bevor du sie mit einem Kind teilst. Automatische Sicherheitsprüfungen verringern Risiken, können aber nicht garantieren, dass jede Ausgabe in jedem Kontext geeignet ist."
+            },
+            "processors": {
+                "title": "4. Auftragsverarbeiter und internationale Datenübermittlungen",
+                "providers": "Für den Betrieb von TailorTales nutzen wir sorgfältig ausgewählte Anbieter: Google für OAuth; OpenRouter für KI-Generierung; AWS S3 für die Speicherung generierter Dateien; Paddle als Merchant of Record für Zahlungen und Steuerabwicklung; Resend für Transaktions-E-Mails; Google Analytics für einwilligungsbasierte Produktanalysen; Sentry für die Fehlerüberwachung und New Relic für das Application-Performance-Monitoring. Anbieter verarbeiten Daten nur für ihre Dienstleistungen und können sie außerhalb des EWR verarbeiten. Soweit erforderlich, stützen wir uns auf angemessene Garantien wie vertragliche Verpflichtungen, Standardvertragsklauseln oder einen anwendbaren Angemessenheitsmechanismus.",
+                "noSale": "Wir verkaufen oder vermieten keine personenbezogenen Daten und verwenden keine Kinderdaten für Werbung."
+            },
+            "retention": {
+                "title": "5. Aufbewahrung, Weitergabe und Löschung",
+                "period": "Konto-, Profil- und Story-Daten werden aufbewahrt, solange dein Konto aktiv ist. Generierte PDFs und Illustrationen werden entsprechend deinem Tarif aufbewahrt: Im kostenlosen Tarif werden generierte Dateien nach 30 Tagen gelöscht; im kostenpflichtigen Tarif bleiben sie erhalten, solange der bezahlte Tarif aktiv ist, vorbehaltlich unserer betrieblichen Backups und gesetzlicher Pflichten. Backups werden bis zu 14 Tage aufbewahrt. Wir löschen oder anonymisieren Daten, wenn sie nicht mehr benötigt werden, sofern nicht eine längere Aufbewahrung gesetzlich vorgeschrieben ist.",
+                "accountAction": "Du kannst deine Daten exportieren oder die Löschung deines Kontos unter <accountPrivacy>Konto → Datenschutz und Daten</accountPrivacy> beantragen. Wenn du ein aktives kostenpflichtiges Abonnement hast, kündige es zuerst; die Löschung wird verfügbar, sobald das Abonnement beendet ist."
+            },
+            "cookies": {
+                "title": "6. Cookies und Analysen",
+                "body": "Das Cookie access_token ist unbedingt erforderlich, damit du angemeldet bleibst. Google Analytics laden wir nur in Produktion und erst, nachdem du im Cookie-Banner Analysen akzeptiert hast. Bei Ablehnung wird die Analyse nicht geladen. Die Banner-Einstellung wird lokal auf deinem Gerät gespeichert."
+            },
+            "rights": {
+                "title": "7. Deine Rechte und Beschwerden",
+                "body": "Vorbehaltlich des anwendbaren Rechts kannst du Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch oder Übertragbarkeit deiner personenbezogenen Daten verlangen und deine Einwilligung jederzeit widerrufen. Kontaktiere privacy@tailortales.app. Du kannst dich auch bei der litauischen Datenschutzaufsichtsbehörde (VDAI) oder deiner örtlichen EWR-Aufsichtsbehörde beschweren."
+            },
+            "lastUpdated": "Gültig ab: 5. August 2026 · Version 1.0",
+            "legalReviewNotice": "Dieses Dokument beschreibt die aktuellen Produktbedingungen und Datenschutzpraktiken. Es ist keine Rechtsberatung und sollte bei Weiterentwicklung des Dienstes von einer qualifizierten Rechtsfachkraft geprüft werden."
+        }
+    },
+    "terms": {
+        "page": {
+            "title": "Nutzungsbedingungen",
+            "description": "Bedingungen für die Nutzung von TailorTales."
         },
-        "howWeUseIt": {
-            "title": "Wie wir es verwenden",
-            "body": "Der Name und das Alter deines Kindes werden nur zur Personalisierung der angeforderten Geschichte verwendet — sie werden nie für Werbung, Profilerstellung oder Weitergabe an Dritte genutzt. Deine E-Mail wird verwendet, um Geschichten zuzustellen und gelegentliche Updates über neue Funktionen zu senden, wenn du zustimmst. Du kannst dich jederzeit abmelden."
+        "hero": {
+            "eyebrow": "Das Kleingedruckte",
+            "heading": "<highlight>Nutzungsbedingungen</highlight>.",
+            "subheading": "Die Vereinbarung für Erwachsene, die TailorTales für ihre Familie nutzen."
         },
-        "whoWeShareWith": {
-            "title": "Mit wem wir teilen",
-            "body": "Wir nutzen eine kleine Anzahl vertrauenswürdiger Unterauftragsverarbeiter: einen Cloud-Hosting-Anbieter, einen Zahlungsanbieter (für kostenpflichtige Pläne) und einen KI-Bildgenerierungsdienst. Jeder erhält nur die minimal notwendigen Daten. Wir verkaufen, vermieten oder handeln deine Daten nicht. Nie."
-        },
-        "yourRights": {
-            "title": "Deine Rechte",
-            "body": "Du kannst alle deine Daten jederzeit unter Konto → Datenschutz exportieren oder dein Konto löschen. Löschung ist dauerhaft und wird innerhalb von 30 Tagen verarbeitet. Bei Fragen schreib uns an hello@tailortales.app und wir antworten innerhalb von 5 Werktagen."
-        },
-        "cookies": {
-            "title": "Cookies",
-            "body": "Wir verwenden ein eigenes Sitzungs-Cookie, um dich angemeldet zu halten. Deine Cookie-Einwilligung wird im lokalen Speicher gespeichert, nicht in einem Cookie. Analyse-Cookies werden nur in Produktion gesetzt, nachdem du zugestimmt hast; Werbe-Cookies von Drittanbietern verwenden wir nicht."
-        },
-        "lastUpdated": "Zuletzt aktualisiert: Mai 2026."
+        "document": {
+            "intro": "Bitte lies diese Nutzungsbedingungen sorgfältig, bevor du TailorTales nutzt.",
+            "agreement": {
+                "title": "1. Vereinbarung und Berechtigung",
+                "body": "Diese Bedingungen regeln deine Nutzung von TailorTales. Durch die Erstellung eines Kontos oder die Nutzung des Dienstes bestätigst du, dass du mindestens 18 Jahre alt bist und dass du beim Hinzufügen eines Kinderprofils dessen Elternteil oder Erziehungsberechtigter bist oder anderweitig berechtigt bist, die Informationen bereitzustellen."
+            },
+            "service": {
+                "title": "2. Der Dienst",
+                "body": "TailorTales erstellt anhand der von dir bereitgestellten Angaben personalisierte KI-gestützte Geschichten, Illustrationen und PDFs. Der Dienst wird wie besehen bereitgestellt und kann sich bei seiner Weiterentwicklung ändern. Die Generierung kann Zeit in Anspruch nehmen, fehlschlagen oder Ergebnisse liefern, die korrigiert werden müssen. Du bleibst dafür verantwortlich, generierte Inhalte vor der Nutzung oder Weitergabe zu prüfen."
+            },
+            "billing": {
+                "title": "3. Konten, Abonnements und Zahlungen",
+                "body": "Du bist für die Sicherheit deines Anmeldekontos verantwortlich. Bezahlte Tarife, Checkout, Rechnungen, Steuern, Verlängerungen und Kündigungen werden von Paddle abgewickelt, das als Merchant of Record handelt. Preise, Tarifkontingente und Verlängerungsbedingungen werden vor dem Checkout angezeigt. Du kannst ein Abonnement über dein Konto kündigen; es bleibt bis zum Ende des bezahlten Zeitraums aktiv."
+            },
+            "content": {
+                "title": "4. Deine Inhalte und unsere Lizenz",
+                "body": "Du behältst die Rechte, die du an den von dir übermittelten Angaben hast. Du erteilst uns eine beschränkte Lizenz, diese Angaben ausschließlich zu verarbeiten, um TailorTales zu betreiben, zu schützen und zu verbessern. Vorbehaltlich dieser Bedingungen und der Aufbewahrungsfrist deines Tarifs darfst du generierte Geschichten für persönliche, nicht-kommerzielle Zwecke nutzen. Stelle generierte Inhalte nicht als von Menschen verfasste professionelle Beratung oder als Garantie für sachliche Richtigkeit dar."
+            },
+            "use": {
+                "title": "5. Öffentliches Teilen und zulässige Nutzung",
+                "body": "Geschichten sind standardmäßig privat. Du kannst ausdrücklich wählen, eine fertige Geschichte als Beispiel zu teilen; tue dies nur, wenn du die erforderlichen Rechte und Einwilligungen hast. Nutze TailorTales nicht, um rechtswidrige, schädliche, diskriminierende, sexuell explizite oder rechtsverletzende Inhalte oder personenbezogene Daten einzureichen, zu deren Weitergabe du nicht berechtigt bist; den Dienst zu untersuchen oder zu stören; oder Nutzungsgrenzen und Sicherheitsmaßnahmen zu umgehen."
+            },
+            "liability": {
+                "title": "6. Sperrung, Beendigung und Haftung",
+                "body": "Wir können den Zugang sperren oder beenden, wenn dies vernünftigerweise für die Sicherheit, die Missbrauchsprävention, die Einhaltung gesetzlicher Vorschriften oder bei einem wesentlichen Verstoß gegen diese Bedingungen erforderlich ist. Soweit gesetzlich zulässig, haftet TailorTales nicht für mittelbare, zufällige oder Folgeschäden, die aus der Nutzung des Dienstes entstehen. Diese Bedingungen beschränken keine Haftung, die rechtlich nicht beschränkt werden kann."
+            },
+            "law": {
+                "title": "7. Anwendbares Recht und Kontakt",
+                "body": "Diese Bedingungen unterliegen dem Recht Litauens, unbeschadet zwingender Verbraucherschutzvorschriften in deinem Wohnsitzland. Fragen oder rechtliche Mitteilungen kannst du an support@tailortales.app oder an Hurynovich Aliaksei, Konstitucijos pr. 9-11, LT-09308, Vilnius, Lithuania senden."
+            },
+            "lastUpdated": "Gültig ab: 5. August 2026 · Version 1.0",
+            "legalReviewNotice": "Dieses Dokument beschreibt die aktuellen Produktbedingungen und Datenschutzpraktiken. Es ist keine Rechtsberatung und sollte bei Weiterentwicklung des Dienstes von einer qualifizierten Rechtsfachkraft geprüft werden."
+        }
     },
     "auth": {
         "login": {
@@ -389,7 +451,7 @@
             "heading": "Zurück in die Werkstatt.",
             "subheading": "Melde dich an, um deine Bibliothek, die Profile deiner Kinder und begonnene Geschichten zu finden.",
             "googleButton": "Mit Google fortfahren",
-            "legal": "Durch das Fortfahren stimmst du unseren Nutzungsbedingungen und Datenschutzrichtlinien zu. Wir verkaufen die Daten deines Kindes nie. Versprochen."
+            "legal": "Durch das Fortfahren stimmst du unseren <terms>Nutzungsbedingungen</terms> und <privacy>Datenschutzhinweisen</privacy> zu. Wir verkaufen oder vermieten keine personenbezogenen Daten."
         }
     },
     "workshop": {

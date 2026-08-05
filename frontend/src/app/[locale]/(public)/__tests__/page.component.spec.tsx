@@ -22,7 +22,8 @@ vi.mock('@/app/[locale]/(public)/_components/HeroSection/HeroSection', () => ({
             <h1>Where their questions become their stories.</h1>
             <p>
                 A small workshop that takes your child&apos;s name, age and curiosity, and stitches
-                them into a tiny book or comic — five to twenty pages, theirs to keep forever.
+                them into a tiny book or comic — five to twenty pages, ready to revisit in their
+                library.
             </p>
             <a href="/login">Begin your first tale →</a>
         </>

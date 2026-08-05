@@ -16,6 +16,7 @@ them accurate as the code changes.
 | Monitor logs and diagnose failures                                        | [guides/monitoring.md](guides/monitoring.md)                               |
 | Understand the backup and restore strategy                                | [guides/backup-strategy.md](guides/backup-strategy.md)                     |
 | Review GDPR compliance before launch                                      | [guides/gdpr-launch-checklist.md](guides/gdpr-launch-checklist.md)         |
+| Respond to a suspected personal-data breach                               | [guides/breach-response.md](guides/breach-response.md)                     |
 | Understand the system at a high level                                     | [architecture/README.md](architecture/README.md)                           |
 | See key user flows as sequence diagrams                                   | [architecture/user-flows.md](architecture/user-flows.md)                   |
 | Understand how auth works                                                 | [architecture/auth.md](architecture/auth.md)                               |
