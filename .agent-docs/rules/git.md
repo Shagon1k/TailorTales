@@ -74,7 +74,7 @@ Cite the config when a limit comes up — never restate the number elsewhere, so
 feat(auth): add Google OAuth callback handler
 fix(frontend): correct session cookie expiry
 chore: bump prisma to 5.10
-docs(roadmap): clarify Phase 4 acceptance criteria
+docs(guides): clarify deployment acceptance criteria
 refactor(backend): extract DTO validation into pipe
 ```
 
@@ -83,10 +83,9 @@ refactor(backend): extract DTO validation into pipe
 - **Squash merge** to `main` — one commit per logical PR, clean linear history.
 - PR title MUST follow Conventional Commits — it becomes the squash-commit message.
 - PR description MUST include (the `.github/PULL_REQUEST_TEMPLATE.md` template prompts for these):
-    - **ROADMAP phase reference** (e.g. "Phase 1 — Auth").
+    - **Linked GitHub issue(s)** from Project 2.
     - **Acceptance check confirmation** — which checks pass.
     - **New env vars / migrations** — call out anything operational.
-- Link the GitHub Milestone for the phase the PR belongs to.
 
 ## Enforcement
 

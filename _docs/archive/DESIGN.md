@@ -1,8 +1,9 @@
-# TailorTales — Design Reference
+# TailorTales — Design Reference (Archived)
 
-> Captures all UI/UX decisions from design screen reviews (session: 2026-05-26).
-> Single source of truth for page structure, navigation, and design scope decisions.
-> Update whenever new screens are reviewed or decisions change.
+> Historical record of design decisions made during the original phased delivery plan,
+> archived on 7 August 2026. Current UI behavior is documented in durable docs and code;
+> ongoing work is tracked in
+> [GitHub Project 2](https://github.com/users/Shagon1k/projects/2).
 
 ---
 
@@ -267,7 +268,7 @@ Post-MVP: credits_low, marketing, story_expiry_warning (free tier retention)
 
 ## Styling Architecture
 
-Four layers, strictly ordered (SCSS — see [`frontend-css.md`](.agent-docs/rules/frontend-css.md) for the full spec):
+Four layers, strictly ordered (SCSS — see [`frontend-css.md`](../../.agent-docs/rules/frontend-css.md) for the full spec):
 
 | Layer            | File                          | Role                                                                                                                                                                                |
 | ---------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -369,7 +370,7 @@ Composed from atoms. Location determined by the promotion rule in `css.md` — s
 
 ## Ideas & Future Directions (References)
 
-See `ROADMAP.md § Ideas & Future Directions` for the full list.
+See the archived `ROADMAP.md § 9 Post-MVP` for the historical list.
 Quick references from design review:
 
 - Workshop step-by-step wizard pagination (currently single form)

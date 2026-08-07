@@ -58,5 +58,5 @@ the correct regional S3 endpoint automatically.
 ## Revisit if
 
 - The team moves to multiple AWS services and LocalStack becomes a better fit.
-- MinIO compatibility causes a real prod divergence (track in Deferred Decisions).
+- MinIO compatibility causes a real prod divergence
 - The decision is made to require an AWS account as a dev prerequisite.

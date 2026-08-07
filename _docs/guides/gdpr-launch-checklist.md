@@ -1,7 +1,12 @@
 # GDPR Launch Checklist
 
-> Launch checklist for GDPR compliance. Technical controls and public-facing Privacy Notice and
-> Terms of Service are implemented. Contractual review and provider paperwork remain open.
+> Compliance checklist for GDPR. Technical controls and public-facing Privacy Notice and Terms of
+> Service are implemented. Contractual review and provider paperwork remain open.
+
+> **Phase 19 close decision (6 August 2026):** the remaining contractual, legal-review, and
+> real-account validation items are intentional post-launch compliance follow-up. They are not
+> complete and must be revisited before scaling paid acquisition, adding child-photo processing,
+> or materially expanding providers/data flows.
 >
 > Target: EU-only audience at MVP. US state privacy laws (CCPA/CPRA etc.) are below threshold
 > at MVP scale — revisit at scale.
@@ -116,7 +121,7 @@ and UAT, and before/after a Reject, no analytics cookies exist. The consent choi
 Consent is freely given, specific, informed, and unambiguous: Accept and Reject are equally
 prominent, nothing is pre-ticked, and no analytics runs before a positive choice.
 
-## Pre-launch sign-off
+## Post-launch compliance follow-up
 
 - [x] Privacy Notice published at `/privacy` with effective date and version
 - [x] Terms of Service published at `/terms` with effective date and version

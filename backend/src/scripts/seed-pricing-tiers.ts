@@ -69,8 +69,8 @@ async function main(): Promise<void> {
     console.log(`Seeded ${PRICING_TIERS.length} pricing tier(s).`);
 
     // Backfill: every user without a Subscription gets a free-tier row.
-    // (Phase 8 regeneration usage was carried over by the
-    // drop_user_regeneration_quota_columns migration, not here.)
+    // Existing regeneration usage was preserved by the
+    // drop_user_regeneration_quota_columns migration, not here.
     const freeTier = await prisma.pricingTier.findUniqueOrThrow({
         where: { name: 'Free Chapter' },
     });

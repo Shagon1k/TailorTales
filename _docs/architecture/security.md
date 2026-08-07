@@ -34,9 +34,7 @@ bucket per visitor through the Cloudflare → Dokploy proxy chain. `app.set('tru
 remain reachable only through the managed proxy path so clients cannot inject trusted headers.
 
 **Storage** — in-memory (default `ThrottlerStorageService`). Counters reset on process
-restart and are not shared across instances. Sufficient for single-instance MVP. See
-[ROADMAP Deferred Decision #15](../../ROADMAP.md) for the Redis upgrade path when
-horizontal scaling is introduced.
+restart and are not shared across instances.
 
 ## Security headers (Helmet)
 
@@ -80,7 +78,7 @@ See [auth.md](auth.md) for the full auth architecture. Security-relevant constra
 - **`secure: true` in production** — the cookie is only transmitted over HTTPS.
 - **Short-lived tokens** — default 7 days, configurable via `JWT_EXPIRY_DAYS`. Logout is
   client-side (cookie deletion); the token remains valid until expiry. See
-  [Deferred Decision #1](../../ROADMAP.md) for server-side revocation.
+  [GitHub issue #57](https://github.com/Shagon1k/TailorTales/issues/57) for server-side revocation.
 
 ## CORS
 

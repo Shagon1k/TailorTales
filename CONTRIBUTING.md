@@ -8,8 +8,8 @@
     - `TT-chore-bump-prisma`
 2. **Make focused commits** following [Conventional Commits](#commit-message-format) (below).
 3. **Open a PR** with title in Conventional Commits format.
-4. **Link the GitHub Milestone** for the ROADMAP phase (e.g. `Phase 1 — Auth`).
-5. **PR description** must include: ROADMAP phase, which acceptance checks pass, any new env vars / migrations.
+4. **Link the GitHub issue** from [Project 2](https://github.com/users/Shagon1k/projects/2).
+5. **PR description** must include: acceptance evidence and any new env vars / migrations.
 6. **Squash merge** to `main` once approved.
 
 ## Commit Message Format
@@ -30,7 +30,7 @@ fix(frontend): correct session cookie expiry
 chore: bump prisma to 5.10
 ```
 
-## Enforcement (set up in Phase 0)
+## Enforcement
 
 - **`commitlint` + `husky`** validate commit messages on every commit.
 - Failed commit? Fix the message and recommit. **Do not bypass with `--no-verify`.**
@@ -48,11 +48,13 @@ pnpm install   # installs all workspaces + Husky commit hooks (via the prepare s
 
 After install, every `git commit` runs commitlint on the message. If it fails, the commit is rejected.
 
-## Phase Workflow
+## Issue Workflow
 
-TailorTales is built in numbered phases (see [ROADMAP.md](ROADMAP.md)). Per phase:
-
-- Track work via a GitHub Milestone named `Phase N — <name>`.
-- All PRs related to a phase carry that milestone.
-- Phase is complete when: all milestone PRs merged, acceptance checks pass, and the phase's working `_docs/phase-N-<name>.md` is written (per `_docs/TEMPLATE.md`). At documentation phases these get consolidated into the durable docs (`_docs/architecture/`, `api/`, `guides/`) and removed.
-- After each phase, propose updates to `AGENTS.md` and `.agent-docs/rules/*` — apply only after developer approval.
+- [Project 2](https://github.com/users/Shagon1k/projects/2) is the only source of truth for
+  active and deferred delivery scope.
+- `Deferred` issues are excluded from autonomous work until their documented activation
+  trigger is met and they are moved to `Backlog`.
+- Autonomous work may select only `Backlog` issues without the `human-control` label.
+- A PR moves to `[AI] Human Review` when autonomous implementation is ready for owner review.
+- Keep durable docs accurate when behavior changes. Archived planning files under
+  `_docs/archive/` are historical and are not updated as part of delivery work.

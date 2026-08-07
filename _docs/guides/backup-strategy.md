@@ -71,8 +71,7 @@ be restored.
 
 Cross-Region Replication is intentionally **not configured** at MVP. The current design protects
 against accidental object changes through versioning, but does not provide automated recovery
-from a full regional or AWS-account loss. See [Deferred Decision #20](../../ROADMAP.md) before
-adding CRR: it needs a second bucket/region, IAM role, monitoring, cost ownership, and a deliberate
+from a full regional or AWS-account loss. CRR needs a second bucket/region, IAM role, monitoring, cost ownership, and a deliberate
 disaster-recovery design.
 
 ### Lifecycle rules (cost control)

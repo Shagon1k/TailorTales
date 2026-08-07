@@ -196,6 +196,10 @@ Run these checks after the hardening branch reaches UAT:
    becomes healthy. If generation exceeds 15 minutes, Docker may use `SIGKILL`; capture that as a
    failed drill and increase the grace period only with measured evidence.
 
+> **Phase 19 evidence (6 August 2026):** the owner completed both UAT drills. The contact and
+> Google OAuth limits returned `429` at their configured thresholds; an in-flight generation
+> drained successfully during a normal UAT deployment.
+
 ## Safe UAT cutover
 
 Do not delete the existing `backend-uat` and `frontend-uat` applications before validation:

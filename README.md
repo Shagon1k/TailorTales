@@ -4,8 +4,8 @@ Personalized, AI-generated PDF storybooks for curious kids. A parent answers the
 question in the **Workshop**; TailorTales writes and illustrates a book or comic and returns
 a downloadable PDF.
 
-> **Status:** MVP in active development (book generation works end-to-end). See
-> [ROADMAP.md](ROADMAP.md) for scope and phase progress.
+> **Status:** production MVP in post-launch development. Active and deferred scope lives in
+> [GitHub Project 2](https://github.com/users/Shagon1k/projects/2).
 
 ## Quick start
 
@@ -26,14 +26,15 @@ Full setup (env vars, seeds, Google OAuth, troubleshooting):
 
 ## Documentation
 
-| If you want to…             | Go to                                                                                   |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| Run it locally / contribute | [\_docs/guides/getting-started.md](_docs/guides/getting-started.md)                     |
-| Understand the architecture | [\_docs/architecture/](_docs/architecture/README.md)                                    |
-| See how generation works    | [\_docs/architecture/generation-pipeline.md](_docs/architecture/generation-pipeline.md) |
-| Use the HTTP API            | [\_docs/api/](_docs/api/README.md)                                                      |
-| Read the full doc index     | [\_docs/README.md](_docs/README.md)                                                     |
-| See the plan & decisions    | [ROADMAP.md](ROADMAP.md) · [DESIGN.md](DESIGN.md)                                       |
+| If you want to…              | Go to                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| Run it locally / contribute  | [\_docs/guides/getting-started.md](_docs/guides/getting-started.md)                       |
+| Understand the architecture  | [\_docs/architecture/](_docs/architecture/README.md)                                      |
+| See how generation works     | [\_docs/architecture/generation-pipeline.md](_docs/architecture/generation-pipeline.md)   |
+| Use the HTTP API             | [\_docs/api/](_docs/api/README.md)                                                        |
+| Read the full doc index      | [\_docs/README.md](_docs/README.md)                                                       |
+| See current delivery scope   | [GitHub Project 2](https://github.com/users/Shagon1k/projects/2)                          |
+| Read planning/design history | [Archived ROADMAP](_docs/archive/ROADMAP.md) · [Archived DESIGN](_docs/archive/DESIGN.md) |
 
 ## Repository
 

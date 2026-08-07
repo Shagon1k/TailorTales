@@ -3,7 +3,7 @@ import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { RatingsService } from './ratings.service.js';
 import type { IAdminRating } from './ratings.types.js';
 
-/** Admin-only feedback view. The full admin UI is built in Phase 12. */
+/** Admin-only feedback view consumed by the ratings administration UI. */
 @Controller('admin/ratings')
 @UseGuards(AdminGuard)
 export class RatingsController {

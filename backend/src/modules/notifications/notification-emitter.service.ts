@@ -134,7 +134,7 @@ export class NotificationEmitterService {
         }
     }
 
-    /** New billing cycle on the same tier — email only, no bell record (per ROADMAP). */
+    /** New billing cycle on the same tier — email only to avoid a routine bell notification. */
     async subscriptionRenewed(userId: string, tierName: string): Promise<void> {
         const user = await this.findUserOrWarn(userId);
         if (!user) return;
