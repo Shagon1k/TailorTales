@@ -2,7 +2,7 @@
  * Per-event notification channel toggles. Channels a user cannot turn off are
  * simply absent from the shape:
  * - paymentFailed email is billing-critical — always sent, no toggle.
- * - subscriptionRenewed is email-only (no bell record per ROADMAP).
+ * - subscriptionRenewed is email-only to avoid duplicating routine billing-cycle notices.
  */
 export interface INotificationPreferences {
     storyCompleted: { email: boolean; inApp: boolean };

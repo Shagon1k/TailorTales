@@ -3,6 +3,10 @@
 These are the **durable docs** — the current source of truth for how the system works. Keep
 them accurate as the code changes.
 
+Active and deferred delivery scope is tracked only in
+[GitHub Project 2](https://github.com/users/Shagon1k/projects/2). The original phase plan
+and design-review record are preserved in [`archive/`](archive/) for history, not planning.
+
 ## I want to…
 
 | Goal                                                                      | Read                                                                       |
@@ -24,6 +28,7 @@ them accurate as the code changes.
 | Know the DB entities and relationships                                    | [architecture/data-model.md](architecture/data-model.md)                   |
 | Call or extend the HTTP API                                               | [api/README.md](api/README.md)                                             |
 | Know _why_ a design choice was made                                       | [decisions/](decisions/)                                                   |
+| Read historical planning and design artifacts                             | [archive/](archive/)                                                       |
 
 ## Conventions
 

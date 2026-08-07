@@ -22,7 +22,7 @@ type StoryWithoutKeys = Omit<Story, 'coverImageKey' | 'pdfKey'>;
 export interface IStorySummary extends StoryWithoutKeys {
     child: Pick<Child, 'id' | 'name' | 'birthdate'>;
     artStyle: IStoryArtStyle;
-    /** Pre-signed S3 URL valid for 1 hour. Null until generation completes (Phase 5). */
+    /** Pre-signed S3 URL valid for 1 hour. Null until generation completes. */
     coverImageUrl: string | null;
     /** The owner's rating score (1-5), or null if unrated. Only the owner can rate a story. */
     rating: number | null;
@@ -48,7 +48,7 @@ export interface IPublicStorySummary {
 
 export interface IStoryDetail extends IStorySummary {
     pages: Page[];
-    /** Pre-signed S3 URL valid for 1 hour. Null until generation completes (Phase 5). */
+    /** Pre-signed S3 URL valid for 1 hour. Null until generation completes. */
     pdfUrl: string | null;
     /** The current user's full rating, so the rating panel pre-fills. Null if unrated. */
     myRating: IMyRating | null;

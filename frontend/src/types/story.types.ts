@@ -6,7 +6,7 @@ export type ILanguage = 'EN' | 'RU' | 'DE';
 export type IStoryGenre = 'FAIRY_TALE' | 'BEDTIME' | 'EDUCATIONAL' | 'ADVENTURE';
 export type IWritingStyle = 'POETIC' | 'SIMPLE' | 'IMAGINATIVE';
 
-/** Illustration entry on a Page. Structure is extended in Phase 5 (generation pipeline). */
+/** Illustration entry on a generated page. */
 export interface IIllustration {
     url: string;
     position?: string;

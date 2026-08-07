@@ -8,8 +8,7 @@ export interface ISpread {
 
 /**
  * Group pages into two-page spreads (left + right).
- * Face-value reading of design: "spread 4 of 6" with 12 pages = 2 pages/spread.
- * Revisit layout if Phase 5 generation introduces single-page or cover-only spreads.
+ * The reader contract renders two generated pages per spread; an odd final page stands alone.
  */
 export function getSpreads(pages: IPage[]): ISpread[] {
     const spreads: ISpread[] = [];

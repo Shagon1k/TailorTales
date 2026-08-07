@@ -98,8 +98,8 @@ export class StoriesService {
     async create(userId: string, dto: CreateStoryDto): Promise<Story> {
         await this.assertCharacterBelongsToChild(userId, dto);
 
-        // blueprintId is intentionally absent — the generation pipeline auto-selects
-        // the appropriate StoryBlueprint by StoryType in Phase 5.
+        // blueprintId is intentionally absent: the generation pipeline selects the
+        // appropriate StoryBlueprint from the story type.
         return this.prisma.story.create({
             data: {
                 userId,

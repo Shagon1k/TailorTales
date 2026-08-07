@@ -1,7 +1,9 @@
 # Architecture Overview
 
 > The current-state description of how TailorTales is built — the source of truth for how the
-> system works today. Scope, planning, and history live in [ROADMAP.md](../../ROADMAP.md).
+> system works today. Delivery scope lives in
+> [GitHub Project 2](https://github.com/users/Shagon1k/projects/2); historical planning lives
+> in [`_docs/archive/`](../archive/).
 
 ## In this document
 

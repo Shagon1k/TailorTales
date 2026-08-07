@@ -85,13 +85,13 @@ Session context hygiene: apply the same rule within every session. Plans, summar
 
 ## Documentation
 
-Three kinds of docs, different lifecycles:
+Three kinds of project knowledge, different lifecycles:
 
 - **Durable docs**: `_docs/architecture/`, `_docs/api/`, `_docs/guides/`, `_docs/decisions/`, and the READMEs. Human-facing, phase-agnostic, the lasting source of truth.
-- **Per-phase docs (staging)**: while a phase is in progress, capture what it built in `_docs/phase-N-<name>.md` following `TEMPLATE.md`. Temporary working notes.
-- **Implementation guides**: `ROADMAP.md`, `DESIGN.md`, `TEMPLATE.md`. Phase planning, scope, and design-review history live here, and only here.
+- **Delivery scope**: GitHub Issues in [Project 2](https://github.com/users/Shagon1k/projects/2) are the only source of truth for active and deferred work.
+- **Historical artifacts**: `_docs/archive/ROADMAP.md` and `_docs/archive/DESIGN.md` preserve the original phase plan and design-review history. Never use or update them for ongoing scope.
 
 Rules:
 
-- After each phase: propose updates to `AGENTS.md` and `.agent-docs/rules/*` based on what was learned. Apply only after developer approval.
-- When deferring a decision or tech debt item, propose adding it to `ROADMAP.md` section "Deferred Decisions & Tech Debt"; ALWAYS ask the developer before adding.
+- After completing an issue or PR, propose updates to `AGENTS.md` and `.agent-docs/rules/*` when the work produced a reusable pattern. Apply only after developer approval.
+- Track a deferred decision or tech-debt item as a GitHub issue in Project 2 with status `Deferred` and an explicit activation trigger.

@@ -15,8 +15,7 @@ export default async function StoryPage({
     const { storyId } = await params;
     const story = await storiesServerApi.getOne(storyId);
 
-    // Only COMPLETED stories are readable — others live in the workshop.
-    // Phase 5 will redirect to /workshop/[jobId] for in-progress stories.
+    // Only completed stories are readable; unfinished stories remain in the workshop flow.
     if (story.status !== 'COMPLETED') {
         redirect('/library');
     }
