@@ -48,26 +48,49 @@ ambiguous "add a task to the project"
 
 ```text
 Deferred
-  -> excluded from autonomous selection
-  -> must state an observable activation trigger
-  -> move to Backlog only after the trigger is evidenced
+  -> inactive; an observable activation condition has not been met
+  -> orchestrator must never start a run
 
 Backlog
-  -> ready to be selected
-  -> autonomous AI may select only issues without human-control
+  -> ready for owner selection
+  -> no run has started
 
 In progress
-  -> human-led or human-supervised implementation
+  -> owner explicitly requested a run
+  -> autonomous and human-controlled runs both remain here until a reviewable result exists
 
-[AI] In Progress
-  -> autonomous AI implementation is active
-
-[AI] Human Review
-  -> autonomous implementation produced a PR and awaits owner review
+Human Review
+  -> a PR, preview, artifact, or decision is ready for owner review
 
 Done
-  -> acceptance criteria are satisfied and delivery is complete
+  -> owner accepted the result
 ```
+
+The orchestrator never selects work from Backlog automatically. Moving an issue to
+In progress is the explicit start signal. Move a Deferred issue to Backlog only after
+its activation condition is evidenced.
+
+## Interaction Policy
+
+```text
+human-control absent  -> autonomous
+human-control present -> human_control
+```
+
+The label changes only the interaction and approval policy. It does not create a
+different execution model.
+
+## Run Authorization
+
+For an issue without `human-control`, moving it to In progress authorizes an
+issue-scoped run to create a worktree and branch, make commits, push the branch, and
+open a Draft PR.
+
+For an issue with `human-control`, the same transition authorizes run preparation
+and analysis. Mutating implementation waits for the required owner checkpoint.
+
+Neither policy authorizes merging, production deployment, destructive operations,
+secret disclosure, or bypassing risk guards.
 
 ## Issue Creation
 
