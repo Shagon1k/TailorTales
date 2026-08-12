@@ -81,7 +81,9 @@ Session context hygiene: apply the same rule within every session. Plans, summar
 
 - GitHub Flow, `TT-<type>-<descriptor>` branches, Conventional Commits, squash merge. Full spec: `.agent-docs/rules/git.md`.
 - One logical change per commit. Refactors require approval and go in a separate commit with no behavior change.
-- NEVER commit without explicit developer approval; describe the change and wait for a clear "yes" before running `git commit`.
+- Commit, push, and PR authorization for owner-started Project 2 runs follows
+  `.agent-docs/rules/github-issues.md`. Outside that narrow issue-scoped exception,
+  NEVER commit, push, or open a PR without explicit developer approval.
 
 ## Documentation
 
