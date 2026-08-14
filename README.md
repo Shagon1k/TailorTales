@@ -10,18 +10,13 @@ a downloadable PDF.
 ## Quick start
 
 ```bash
-pnpm install
-docker compose up -d                          # Postgres + Redis + MinIO
-cp backend/.env.example backend/.env          # set USE_AI_STUBS=true for offline dev
-cp frontend/.env.example frontend/.env
-pnpm --filter ./backend db:migrate:deploy
-pnpm --filter ./backend db:generate
-pnpm --filter ./backend seed:art-styles       # required — Workshop grid
-pnpm --filter ./backend seed:story-blueprints # required — pipeline needs these
-pnpm dev                                       # backend :3001, frontend :3000
+docker compose up --build -d # complete credential-free local stack
+docker compose ps -a         # release exits 0; long-running services become healthy
+curl http://localhost:3001/health
 ```
 
-Full setup (env vars, seeds, Google OAuth, troubleshooting):
+For the infrastructure-only + host hot-reload workflow, port overrides, credentials, and
+troubleshooting, see:
 **[\_docs/guides/getting-started.md](_docs/guides/getting-started.md)**.
 
 ## Documentation

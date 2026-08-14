@@ -1,3 +1,14 @@
+x-frontend-environment: &frontend-environment
+    NEXT_PUBLIC_SITE_URL: http://localhost:${FRONTEND_HOST_PORT:-3000}
+    BACKEND_INTERNAL_URL: http://backend:3001
+    NEXT_PUBLIC_STORAGE_URL: http://localhost:${MINIO_API_HOST_PORT:-9000}
+    NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: ''
+    NEXT_PUBLIC_PADDLE_ENV: sandbox
+    NEXT_PUBLIC_SENTRY_ENABLED: 'false'
+    NEXT_PUBLIC_SENTRY_DSN: ''
+    NEXT_PUBLIC_SENTRY_ENVIRONMENT: ''
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: ''
+
 services:
     postgres:
         image: postgres:17-alpine
@@ -7,7 +18,7 @@ services:
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: tailortales
         ports:
-            - '${POSTGRES_HOST_PORT:-5433}:5432'
+            - '127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432'
         volumes:
             - postgres_data:/var/lib/postgresql/data
         healthcheck:
@@ -20,7 +31,7 @@ services:
         image: redis:7-alpine
         restart: unless-stopped
         ports:
-            - '${REDIS_HOST_PORT:-6380}:6379'
+            - '127.0.0.1:${REDIS_HOST_PORT:-6380}:6379'
         volumes:
             - redis_data:/data
         healthcheck:
@@ -37,8 +48,8 @@ services:
             MINIO_ROOT_USER: minioadmin
             MINIO_ROOT_PASSWORD: minioadmin
         ports:
-            - '9000:9000'
-            - '9001:9001'
+            - '127.0.0.1:${MINIO_API_HOST_PORT:-9000}:9000'
+            - '127.0.0.1:${MINIO_CONSOLE_HOST_PORT:-9001}:9001'
         volumes:
             - minio_data:/data
         healthcheck:
@@ -46,6 +57,105 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+
+    release:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile.release
+        environment:
+            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tailortales?schema=public
+        command:
+            - /bin/sh
+            - -ec
+            - |
+                pnpm --filter backend db:migrate:deploy
+                pnpm --filter backend seed:art-styles
+                pnpm --filter backend seed:pricing-tiers
+                pnpm --filter backend seed:story-blueprints
+        depends_on:
+            postgres:
+                condition: service_healthy
+        restart: 'no'
+
+    backend:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+        environment:
+            NODE_ENV: development
+            PORT: '3001'
+            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tailortales?schema=public
+            GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-local-disabled}
+            GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-local-disabled}
+            JWT_SECRET: ${JWT_SECRET:-tailortales-local-development-only-jwt-secret}
+            JWT_EXPIRY_DAYS: '7'
+            AUTH_ALLOWED_EMAILS: ''
+            BACKEND_URL: http://localhost:${BACKEND_HOST_PORT:-3001}
+            FRONTEND_URL: http://localhost:${FRONTEND_HOST_PORT:-3000}
+            REDIS_URL: redis://redis:6379
+            OPENROUTER_API_KEY: local-disabled
+            OPENROUTER_TEXT_MODEL: local-stub
+            OPENROUTER_IMAGE_MODEL: local-stub
+            USE_AI_STUBS: 'true'
+            RESEND_API_KEY: local-disabled
+            RESEND_FROM: TailorTales Local <noreply@tailortales.invalid>
+            CONTACT_INBOX_EMAIL: local@tailortales.invalid
+            USE_EMAIL_STUBS: 'true'
+            STORAGE_REGION: us-east-1
+            STORAGE_ACCESS_KEY: minioadmin
+            STORAGE_SECRET_KEY: minioadmin
+            STORAGE_BUCKET: tailortales
+            STORAGE_ENDPOINT: http://minio:9000
+            STORAGE_PUBLIC_ENDPOINT: http://localhost:${MINIO_API_HOST_PORT:-9000}
+            STORAGE_FORCE_PATH_STYLE: 'true'
+            USE_PADDLE_STUBS: 'true'
+            PADDLE_ENVIRONMENT: sandbox
+            SENTRY_ENABLED: 'false'
+        depends_on:
+            release:
+                condition: service_completed_successfully
+            redis:
+                condition: service_healthy
+            minio:
+                condition: service_healthy
+        ports:
+            - '127.0.0.1:${BACKEND_HOST_PORT:-3001}:3001'
+        healthcheck:
+            test:
+                - CMD
+                - node
+                - -e
+                - fetch('http://127.0.0.1:3001/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 20s
+        restart: unless-stopped
+
+    frontend:
+        build:
+            context: .
+            dockerfile: frontend/Dockerfile
+            args:
+                <<: *frontend-environment
+                SENTRY_SOURCE_MAP_UPLOAD_REQUIRED: 'false'
+        environment: *frontend-environment
+        depends_on:
+            backend:
+                condition: service_healthy
+        ports:
+            - '127.0.0.1:${FRONTEND_HOST_PORT:-3000}:3000'
+        healthcheck:
+            test:
+                - CMD
+                - node
+                - -e
+                - fetch('http://127.0.0.1:3000/en').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 20s
+        restart: unless-stopped
 
 volumes:
     postgres_data:

@@ -16,40 +16,54 @@ const SIGNED_URL_DEFAULT_EXPIRY_SECONDS = 3600;
 
 @Injectable()
 export class StorageService implements OnModuleInit {
-    private readonly client: S3Client;
+    private readonly operationsClient: S3Client;
+    private readonly signingClient: S3Client;
     private readonly bucket: string;
     private readonly logger = new Logger(StorageService.name);
 
     constructor(private readonly config: ConfigService) {
-        // Dev (MinIO): STORAGE_ENDPOINT is set (e.g. http://localhost:9000) and
+        // Dev (MinIO): STORAGE_ENDPOINT is set for backend operations. The optional
+        // STORAGE_PUBLIC_ENDPOINT is used only to generate browser-reachable signed URLs.
         // forcePathStyle must be true so the SDK uses path-style URLs (bucket/key)
         // instead of virtual-hosted ones (bucket.host/key) that MinIO doesn't support.
         //
-        // Prod (AWS S3): STORAGE_ENDPOINT is not set — the SDK resolves the correct
-        // regional endpoint automatically. forcePathStyle defaults to false.
-        const endpoint = this.config.get<string>('STORAGE_ENDPOINT');
+        // Prod (AWS S3): neither endpoint is set — the SDK resolves the correct regional
+        // endpoint automatically. forcePathStyle defaults to false.
+        const operationsEndpoint = this.config.get<string>('STORAGE_ENDPOINT');
+        const publicEndpoint =
+            this.config.get<string>('STORAGE_PUBLIC_ENDPOINT') || operationsEndpoint;
         const forcePathStyle = this.config.get<boolean>('STORAGE_FORCE_PATH_STYLE') ?? false;
-
-        this.client = new S3Client({
+        const clientConfig = {
             region: this.config.getOrThrow<string>('STORAGE_REGION'),
             credentials: {
                 accessKeyId: this.config.getOrThrow<string>('STORAGE_ACCESS_KEY'),
                 secretAccessKey: this.config.getOrThrow<string>('STORAGE_SECRET_KEY'),
             },
-            // Spread only in dev — keeps prod config clean with no custom endpoint.
-            ...(endpoint ? { endpoint, forcePathStyle } : {}),
-        });
+            forcePathStyle,
+        };
+        const createClient = (clientEndpoint?: string): S3Client =>
+            new S3Client({
+                ...clientConfig,
+                // Omit custom endpoints in production so the SDK resolves AWS S3 normally.
+                ...(clientEndpoint ? { endpoint: clientEndpoint } : {}),
+            });
+
+        this.operationsClient = createClient(operationsEndpoint);
+        this.signingClient =
+            publicEndpoint === operationsEndpoint
+                ? this.operationsClient
+                : createClient(publicEndpoint);
 
         this.bucket = this.config.getOrThrow<string>('STORAGE_BUCKET');
     }
 
     async onModuleInit(): Promise<void> {
         try {
-            await this.client.send(new HeadBucketCommand({ Bucket: this.bucket }));
+            await this.operationsClient.send(new HeadBucketCommand({ Bucket: this.bucket }));
             this.logger.log(`Storage bucket "${this.bucket}" is ready`);
         } catch {
             this.logger.log(`Bucket "${this.bucket}" not found — creating`);
-            await this.client.send(new CreateBucketCommand({ Bucket: this.bucket }));
+            await this.operationsClient.send(new CreateBucketCommand({ Bucket: this.bucket }));
             this.logger.log(`Bucket "${this.bucket}" created`);
         }
     }
@@ -58,7 +72,7 @@ export class StorageService implements OnModuleInit {
         this.logger.log(`Uploading object: ${key}`);
 
         try {
-            await this.client.send(
+            await this.operationsClient.send(
                 new PutObjectCommand({
                     Bucket: this.bucket,
                     Key: key,
@@ -80,7 +94,7 @@ export class StorageService implements OnModuleInit {
     ): Promise<string> {
         try {
             return await getSignedUrl(
-                this.client,
+                this.signingClient,
                 new GetObjectCommand({ Bucket: this.bucket, Key: key }),
                 { expiresIn: expiresInSeconds },
             );
@@ -92,7 +106,7 @@ export class StorageService implements OnModuleInit {
 
     async downloadBuffer(key: string): Promise<Buffer> {
         try {
-            const response = await this.client.send(
+            const response = await this.operationsClient.send(
                 new GetObjectCommand({ Bucket: this.bucket, Key: key }),
             );
             if (!response.Body) {
@@ -111,7 +125,9 @@ export class StorageService implements OnModuleInit {
         this.logger.log(`Deleting object: ${key}`);
 
         try {
-            await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }));
+            await this.operationsClient.send(
+                new DeleteObjectCommand({ Bucket: this.bucket, Key: key }),
+            );
         } catch (err: unknown) {
             this.logger.error(`Failed to delete object: ${key}`, err);
             throw err;
@@ -124,7 +140,7 @@ export class StorageService implements OnModuleInit {
         let continuationToken: string | undefined;
 
         do {
-            const response = await this.client.send(
+            const response = await this.operationsClient.send(
                 new ListObjectsV2Command({
                     Bucket: this.bucket,
                     Prefix: prefix,
@@ -150,7 +166,7 @@ export class StorageService implements OnModuleInit {
 
         for (let i = 0; i < keys.length; i += BATCH_SIZE) {
             const batch = keys.slice(i, i + BATCH_SIZE);
-            const response = await this.client.send(
+            const response = await this.operationsClient.send(
                 new DeleteObjectsCommand({
                     Bucket: this.bucket,
                     Delete: { Objects: batch.map((key) => ({ Key: key })) },
