@@ -1343,7 +1343,7 @@ flowchart LR
 **Infrastructure**
 
 - [x] Buy domain (`tailortales.app` or similar) and put DNS on Cloudflare (free plan)
-- [x] Configure `dokploy.tailortales.app` as the private control-plane domain behind Cloudflare Access; close public `3000/tcp` after verification
+- [x] Configure `dokploy.shagon1k.win` as the private control-plane domain behind Cloudflare Access; close public `3000/tcp` after verification
 - [x] Do not provision a permanent dev webhook tunnel at MVP; UAT owns sandbox webhook verification, and local debugging may use a temporary tunnel
 - [x] Provision initial OVH VPS-4 (`shagserv`, Ubuntu 24.04, 8 vCores / 24 GB RAM / 200 GB NVMe) and install dokploy
 - [x] Provision UAT dokploy Compose resource alongside the old UAT apps, validate it, move domains, then remove only the old backend/frontend apps

@@ -267,7 +267,7 @@ The workflow requires these GitHub repository secrets/variables:
 
 | Name                      | Kind     | Purpose                                                                           |
 | ------------------------- | -------- | --------------------------------------------------------------------------------- |
-| `DOKPLOY_URL`             | Variable | `https://dokploy.tailortales.app`; API base for the workflow.                     |
+| `DOKPLOY_URL`             | Variable | `https://dokploy.shagon1k.win`; API base for the workflow.                        |
 | `DOKPLOY_API_TOKEN`       | Secret   | Calls the Dokploy API; never expose in logs.                                      |
 | `DOKPLOY_UAT_COMPOSE_ID`  | Variable | Identifies the UAT Compose resource.                                              |
 | `CF_ACCESS_CLIENT_ID`     | Secret   | Cloudflare Access service-token client ID for the protected Dokploy API.          |
