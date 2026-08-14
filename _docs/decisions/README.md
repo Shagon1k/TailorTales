@@ -10,3 +10,4 @@ Design choices that were non-obvious or had meaningful alternatives considered.
 | Why OpenRouter for text and image generation            | [ai-openrouter.md](ai-openrouter.md)                       |
 | Why pnpm workspaces monorepo (no Turborepo)             | [monorepo-pnpm-workspaces.md](monorepo-pnpm-workspaces.md) |
 | Why Resend for transactional email                      | [email-resend.md](email-resend.md)                         |
+| How to add Spanish language support                     | [spanish-language-support.md](spanish-language-support.md) |
