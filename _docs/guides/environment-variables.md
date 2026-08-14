@@ -70,19 +70,27 @@ The deployment file maps those inputs to the build-time and runtime names docume
 
 ### Storage (MinIO / AWS S3)
 
-| Variable                   | Required | Default | Dev (MinIO)             | UAT (MinIO)                           | Prod (AWS S3)      |
-| -------------------------- | -------- | ------- | ----------------------- | ------------------------------------- | ------------------ |
-| `STORAGE_REGION`           | yes      | —       | `us-east-1`             | `us-east-1`                           | Real AWS region    |
-| `STORAGE_ACCESS_KEY`       | yes      | —       | `minioadmin`            | UAT MinIO access key                  | IAM access key     |
-| `STORAGE_SECRET_KEY`       | yes      | —       | `minioadmin`            | UAT MinIO secret                      | IAM secret key     |
-| `STORAGE_BUCKET`           | yes      | —       | `tailortales`           | `tailortales-uat`                     | `tailortales-prod` |
-| `STORAGE_ENDPOINT`         | no       | —       | `http://localhost:9000` | `https://storage-uat.tailortales.app` | **Unset**          |
-| `STORAGE_FORCE_PATH_STYLE` | no       | `false` | `true`                  | `true`                                | **Unset**          |
+| Variable                   | Required | Default            | Dev (MinIO)                                                           | UAT (MinIO)                           | Prod (AWS S3)      |
+| -------------------------- | -------- | ------------------ | --------------------------------------------------------------------- | ------------------------------------- | ------------------ |
+| `STORAGE_REGION`           | yes      | —                  | `us-east-1`                                                           | `us-east-1`                           | Real AWS region    |
+| `STORAGE_ACCESS_KEY`       | yes      | —                  | `minioadmin`                                                          | UAT MinIO access key                  | IAM access key     |
+| `STORAGE_SECRET_KEY`       | yes      | —                  | `minioadmin`                                                          | UAT MinIO secret                      | IAM secret key     |
+| `STORAGE_BUCKET`           | yes      | —                  | `tailortales`                                                         | `tailortales-uat`                     | `tailortales-prod` |
+| `STORAGE_ENDPOINT`         | no       | AWS SDK resolution | Host backend: `http://localhost:9000`; container: `http://minio:9000` | `https://storage-uat.tailortales.app` | **Unset**          |
+| `STORAGE_PUBLIC_ENDPOINT`  | no       | `STORAGE_ENDPOINT` | Host backend: **unset**; container: `http://localhost:9000`           | **Unset**                             | **Unset**          |
+| `STORAGE_FORCE_PATH_STYLE` | no       | `false`            | `true`                                                                | `true`                                | **Unset**          |
 
-> UAT uses a persistent MinIO resource outside the application Compose. Its endpoint must be the
-> public API origin because presigned URLs are opened by browsers. Route port `9000`; keep the
-> console on `9001` private. In production, omit the endpoint/path-style variables so the AWS SDK
-> resolves the regional S3 endpoint.
+`STORAGE_ENDPOINT` is used for backend bucket and object operations. Presigned browser URLs use
+`STORAGE_PUBLIC_ENDPOINT` when it is set and otherwise fall back to `STORAGE_ENDPOINT`. This
+fallback preserves the host-run local setup and UAT, where one endpoint is reachable by both the
+backend and browsers. In a fully containerized local stack, use the Docker service address
+(`http://minio:9000`) for `STORAGE_ENDPOINT` and the host-mapped address
+(`http://localhost:9000`) for `STORAGE_PUBLIC_ENDPOINT`. Both clients share the same region,
+credentials, and path-style setting.
+
+UAT uses a persistent MinIO resource outside the application Compose. Route its public API port
+`9000`; keep the console on `9001` private. In production, omit both endpoint variables and the
+path-style variable so the AWS SDK resolves the regional S3 endpoint.
 
 ### Paddle (subscriptions)
 
@@ -126,20 +134,21 @@ All `NEXT_PUBLIC_*` values are build-time inputs because Next.js embeds them in 
 Compose also supplies them at runtime for server-rendered code. A value change therefore requires
 a rebuild; restarting an existing frontend container is insufficient. Browser API calls use the
 fixed same-origin `/api` path; `BACKEND_INTERNAL_URL` is a server-only value derived from
-`BACKEND_INTERNAL_HOST` by Compose.
+`BACKEND_INTERNAL_HOST` by the deployment Compose and set directly to the `backend` service by
+the root local Compose.
 
-| Variable                          | UAT/prod input           | Runtime | Notes                                                                                                                                       |
-| --------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`            | `FRONTEND_URL`           | yes     | Canonical public frontend origin. Must be non-www with no trailing slash. See [seo.md](seo.md).                                             |
-| `BACKEND_INTERNAL_URL`            | derived                  | yes     | Server-only backend origin (`http://backend-uat:3001` or `http://backend-prod:3001` remotely; `http://localhost:3001` locally).             |
-| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | same name                | yes     | Paddle.js client token: sandbox `test_…`, production `live_…`.                                                                              |
-| `NEXT_PUBLIC_PADDLE_ENV`          | `PADDLE_ENVIRONMENT`     | yes     | `sandbox` or `production`; shared input prevents frontend/backend drift.                                                                    |
-| `NEXT_PUBLIC_STORAGE_URL`         | same name                | yes     | Public MinIO API origin on UAT; public S3/CloudFront asset base URL on production.                                                          |
-| `NEXT_PUBLIC_SENTRY_ENABLED`      | fixed to `true` by       | yes     | Enables Sentry in browser, edge, and server runtimes.                                                                                       |
-| `NEXT_PUBLIC_SENTRY_DSN`          | same name                | yes     | Frontend project (`tailortales-fe`) DSN.                                                                                                    |
-| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | `SENTRY_ENVIRONMENT`     | yes     | `uat` or `production`; shared input prevents frontend/backend drift.                                                                        |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | same name; empty allowed | yes     | GA4 ID. Empty on UAT; set on production.                                                                                                    |
-| `SENTRY_AUTH_TOKEN`               | same name                | **no**  | BuildKit secret for source-map upload. Compose mounts it only for `next build`; it is absent from image layers and the runtime environment. |
+| Variable                          | UAT/prod input           | Runtime | Notes                                                                                                                                                                                     |
+| --------------------------------- | ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`            | `FRONTEND_URL`           | yes     | Canonical public frontend origin. Must be non-www with no trailing slash. See [seo.md](seo.md).                                                                                           |
+| `BACKEND_INTERNAL_URL`            | derived                  | yes     | Server-only backend origin (`http://backend-uat:3001` or `http://backend-prod:3001` remotely; `http://backend:3001` in full local Compose; `http://localhost:3001` with host hot reload). |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | same name                | yes     | Paddle.js client token: sandbox `test_…`, production `live_…`.                                                                                                                            |
+| `NEXT_PUBLIC_PADDLE_ENV`          | `PADDLE_ENVIRONMENT`     | yes     | `sandbox` or `production`; shared input prevents frontend/backend drift.                                                                                                                  |
+| `NEXT_PUBLIC_STORAGE_URL`         | same name                | yes     | Public MinIO API origin on UAT; public S3/CloudFront asset base URL on production.                                                                                                        |
+| `NEXT_PUBLIC_SENTRY_ENABLED`      | fixed to `true` by       | yes     | Enables Sentry in browser, edge, and server runtimes.                                                                                                                                     |
+| `NEXT_PUBLIC_SENTRY_DSN`          | same name                | yes     | Frontend project (`tailortales-fe`) DSN.                                                                                                                                                  |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`  | `SENTRY_ENVIRONMENT`     | yes     | `uat` or `production`; shared input prevents frontend/backend drift.                                                                                                                      |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`   | same name; empty allowed | yes     | GA4 ID. Empty on UAT; set on production.                                                                                                                                                  |
+| `SENTRY_AUTH_TOKEN`               | same name                | **no**  | BuildKit secret for source-map upload. Compose mounts it only for `next build`; it is absent from image layers and the runtime environment.                                               |
 
 ## Minimal CI / offline config
 
@@ -176,6 +185,7 @@ USE_PADDLE_STUBS=true
 | -------------------------- | ----------------------------------------------------- |
 | `NODE_ENV`                 | `production`                                          |
 | `STORAGE_ENDPOINT`         | **Unset** (use AWS S3, not MinIO)                     |
+| `STORAGE_PUBLIC_ENDPOINT`  | **Unset** (presign against AWS S3)                    |
 | `STORAGE_FORCE_PATH_STYLE` | **Unset** (defaults false)                            |
 | `USE_AI_STUBS`             | `false`                                               |
 | `USE_EMAIL_STUBS`          | `false`                                               |

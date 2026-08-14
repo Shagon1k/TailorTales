@@ -78,6 +78,10 @@ class EnvironmentVariables {
     @IsOptional()
     STORAGE_ENDPOINT?: string;
 
+    @IsString()
+    @IsOptional()
+    STORAGE_PUBLIC_ENDPOINT?: string;
+
     @IsBoolean()
     @IsOptional()
     STORAGE_FORCE_PATH_STYLE: boolean = false;
