@@ -2,7 +2,7 @@ import PillLabel from '@/components/ui/PillLabel/PillLabel';
 import styles from './PageHero.module.scss';
 
 interface IPageHeroProps {
-    /** Eyebrow text, rendered with the default PillLabel star mark. */
+    /** Eyebrow text, rendered with the default PillLabel diamond mark. */
     eyebrow?: string;
     /** Heading content. Wrap emphasized words in <HeroHighlight> for the orange italic accent. */
     heading: React.ReactNode;
