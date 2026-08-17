@@ -3,10 +3,10 @@ import PillLabel from '../PillLabel';
 
 describe('PillLabel', () => {
     describe('given no mark', () => {
-        it('should render the default circle mark', () => {
+        it('should render the default triangle mark', () => {
             render(<PillLabel>Featured</PillLabel>);
 
-            expect(screen.getByText('●')).toBeInTheDocument();
+            expect(screen.getByText('▲')).toBeInTheDocument();
         });
     });
 
@@ -15,7 +15,7 @@ describe('PillLabel', () => {
             render(<PillLabel mark="◆">Featured</PillLabel>);
 
             expect(screen.getByText('◆')).toBeInTheDocument();
-            expect(screen.queryByText('●')).not.toBeInTheDocument();
+            expect(screen.queryByText('▲')).not.toBeInTheDocument();
         });
     });
 });
