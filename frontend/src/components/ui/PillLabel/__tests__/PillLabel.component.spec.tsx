@@ -3,7 +3,7 @@ import PillLabel from '../PillLabel';
 
 describe('PillLabel', () => {
     describe('given no mark', () => {
-        it('should render the default diamond mark', () => {
+        it('should render the default diamond symbol', () => {
             render(<PillLabel>Featured</PillLabel>);
 
             expect(screen.getByText('◆')).toBeInTheDocument();
