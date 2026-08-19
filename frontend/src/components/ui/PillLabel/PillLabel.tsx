@@ -10,7 +10,7 @@ export default function PillLabel({
     mark = '◆',
 }: Readonly<IPillLabelProps>): React.ReactElement {
     return (
-        <span className={styles.pill}>
+        <span className={styles.pill} aria-hidden="true">
             <span className={styles.pill__mark} aria-hidden="true">
                 {mark}
             </span>
