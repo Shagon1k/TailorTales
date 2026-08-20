@@ -7,6 +7,7 @@ import HeroSection from './_components/HeroSection/HeroSection';
 import LanternsSection from './_components/LanternsSection/LanternsSection';
 import TalesSection from './_components/TalesSection/TalesSection';
 import CtaSection from './_components/CtaSection/CtaSection';
+import styles from './page.module.scss';
 
 export async function generateMetadata({
     params,
@@ -41,6 +42,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
 
     return (
         <>
+            <p className={styles.previewMarker}>P5 preview smoke</p>
             <HeroSection isLoggedIn={!!user} />
             <LanternsSection />
             <TalesSection tales={publicStories} />
