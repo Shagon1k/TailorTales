@@ -53,7 +53,7 @@ describe('HomePage', () => {
 
         it('should display the P5 preview marker', async () => {
             renderWithMantine(await HomePage());
-            expect(screen.getByText('P5 preview smoke')).toBeInTheDocument();
+            expect(screen.getByText('P5 preview smoke · refresh confirmed')).toBeInTheDocument();
         });
 
         it('should display the hero subtext', async () => {
