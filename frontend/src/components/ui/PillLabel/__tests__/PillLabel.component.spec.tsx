@@ -3,19 +3,19 @@ import PillLabel from '../PillLabel';
 
 describe('PillLabel', () => {
     describe('given no mark', () => {
-        it('should render the default diamond symbol', () => {
+        it('should render the default circle mark', () => {
             render(<PillLabel>Featured</PillLabel>);
 
-            expect(screen.getByText('◆')).toBeInTheDocument();
+            expect(screen.getByText('●')).toBeInTheDocument();
         });
     });
 
     describe('given an explicit mark', () => {
         it('should render the supplied mark unchanged', () => {
-            render(<PillLabel mark="●">Featured</PillLabel>);
+            render(<PillLabel mark="▲">Featured</PillLabel>);
 
-            expect(screen.getByText('●')).toBeInTheDocument();
-            expect(screen.queryByText('◆')).not.toBeInTheDocument();
+            expect(screen.getByText('▲')).toBeInTheDocument();
+            expect(screen.queryByText('●')).not.toBeInTheDocument();
         });
     });
 });
