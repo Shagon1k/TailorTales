@@ -6,7 +6,7 @@ describe('PillLabel', () => {
         it('should render the default four-pointed star symbol', () => {
             render(<PillLabel>Featured</PillLabel>);
 
-            expect(screen.getByText('✦')).toBeInTheDocument();
+            expect(screen.getByText('◇')).toBeInTheDocument();
         });
     });
 
