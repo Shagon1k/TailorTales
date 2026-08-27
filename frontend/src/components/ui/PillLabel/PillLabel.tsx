@@ -7,7 +7,7 @@ export interface IPillLabelProps {
 
 export default function PillLabel({
     children,
-    mark = '●',
+    mark = '✦',
 }: Readonly<IPillLabelProps>): React.ReactElement {
     return (
         <span className={styles.pill}>
