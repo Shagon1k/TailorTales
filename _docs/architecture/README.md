@@ -49,7 +49,8 @@ TailorTales/
   .agent-docs/   Source-of-truth agent rule docs
   .agents/       Generic repo skills
   .claude/       Claude compatibility adapters
-  docker-compose.yml   Postgres + Redis + MinIO for local dev
+  compose.local.yaml   Complete local stack, including Postgres, Redis, and MinIO
+  compose.deploy.yaml  Shared Dokploy UAT/production application topology
 ```
 
 Root scripts orchestrate both apps: `pnpm dev`, `pnpm build`, `pnpm lint`,

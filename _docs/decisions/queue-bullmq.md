@@ -23,8 +23,9 @@ the request/response cycle.
 
 ## Why not a managed queue (SQS, Cloud Tasks)?
 
-Would add an external AWS/GCP dependency to the dev loop and complicate the "docker compose up
-is enough" local setup. BullMQ + Redis achieves the same decoupling with a single container.
+Would add an external AWS/GCP dependency to the dev loop and complicate the one-command local
+setup (`docker compose --file compose.local.yaml up`). BullMQ + Redis achieves the same decoupling
+with a single container.
 
 ## Trade-offs / known gaps
 

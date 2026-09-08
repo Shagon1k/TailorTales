@@ -10,8 +10,8 @@ a downloadable PDF.
 ## Quick start
 
 ```bash
-docker compose up --build -d # complete credential-free local stack
-docker compose ps -a         # release exits 0; long-running services become healthy
+docker compose --file compose.local.yaml up --build -d # complete credential-free local stack
+docker compose --file compose.local.yaml ps -a         # release exits 0; services become healthy
 curl http://localhost:3001/health
 ```
 

@@ -6,7 +6,8 @@
 
 For UAT and production, configure the deployment inputs from
 [`deploy/.env.example`](../../deploy/.env.example) in the Dokploy Compose environment panel.
-The deployment file maps those inputs to the build-time and runtime names documented below.
+[`compose.deploy.yaml`](../../compose.deploy.yaml) maps those inputs to the build-time and runtime
+names documented below.
 
 ## Backend variables
 
@@ -134,8 +135,8 @@ All `NEXT_PUBLIC_*` values are build-time inputs because Next.js embeds them in 
 Compose also supplies them at runtime for server-rendered code. A value change therefore requires
 a rebuild; restarting an existing frontend container is insufficient. Browser API calls use the
 fixed same-origin `/api` path; `BACKEND_INTERNAL_URL` is a server-only value derived from
-`BACKEND_INTERNAL_HOST` by the deployment Compose and set directly to the `backend` service by
-the root local Compose.
+`BACKEND_INTERNAL_HOST` by `compose.deploy.yaml` and set directly to the `backend` service by
+`compose.local.yaml`.
 
 | Variable                          | UAT/prod input           | Runtime | Notes                                                                                                                                                                                     |
 | --------------------------------- | ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
