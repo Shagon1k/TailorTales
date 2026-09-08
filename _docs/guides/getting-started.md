@@ -29,8 +29,8 @@ pnpm install          # installs all workspaces + Husky commit hooks (via `prepa
 Build and start PostgreSQL, Redis, MinIO, the release job, backend, and frontend:
 
 ```bash
-docker compose up --build -d
-docker compose ps -a
+docker compose --file compose.local.yaml up --build -d
+docker compose --file compose.local.yaml ps -a
 ```
 
 The one-shot `release` service waits for PostgreSQL, applies migrations, and seeds art styles,
@@ -47,7 +47,7 @@ To enable real Google OAuth in the complete containerized stack, keep the real c
 local JWT secret in the uncommitted `backend/.env`, then use it only for Compose interpolation:
 
 ```bash
-docker compose --env-file backend/.env up --build -d
+docker compose --env-file backend/.env --file compose.local.yaml up --build -d
 ```
 
 Never commit `backend/.env`. The Google OAuth authorized redirect URI must match the published
@@ -69,8 +69,8 @@ Default URLs:
 Start only the infrastructure services in Compose:
 
 ```bash
-docker compose up -d postgres redis minio
-docker compose ps postgres redis minio
+docker compose --file compose.local.yaml up -d postgres redis minio
+docker compose --file compose.local.yaml ps postgres redis minio
 ```
 
 Then configure and run the backend and frontend on the host as described below. This workflow
@@ -163,7 +163,7 @@ For the complete stack, verify dependency state and both HTTP applications witho
 extra processes:
 
 ```bash
-docker compose ps -a
+docker compose --file compose.local.yaml ps -a
 curl -fsS "http://localhost:${BACKEND_HOST_PORT:-3001}/health"
 curl -fsS -o /dev/null "http://localhost:${FRONTEND_HOST_PORT:-3000}/en"
 ```
@@ -188,7 +188,7 @@ For example:
 
 ```bash
 BACKEND_HOST_PORT=3101 FRONTEND_HOST_PORT=3100 MINIO_API_HOST_PORT=9100 \
-    docker compose up --build -d
+    docker compose --file compose.local.yaml up --build -d
 ```
 
 Compose derives `BACKEND_URL`, `FRONTEND_URL`, `STORAGE_PUBLIC_ENDPOINT`,
@@ -199,17 +199,17 @@ Compose does not set fixed container, network, or volume names. Use a project na
 preview stacks are useful:
 
 ```bash
-docker compose -p tailortales-preview-1 up --build -d
+docker compose --project-name tailortales-preview-1 --file compose.local.yaml up --build -d
 ```
 
 Each project name gets its own default network and named-volume instances.
-Use the same `-p` value for later `ps`, `logs`, and `down` commands.
+Use the same `--project-name` value for later `ps`, `logs`, and `down` commands.
 
 ## Stop or reset
 
 ```bash
-docker compose down       # stop and remove containers/network; preserve database and object data
-docker compose down -v    # DESTRUCTIVE: also delete PostgreSQL, Redis, and MinIO named volumes
+docker compose --file compose.local.yaml down    # stop containers/network; preserve data
+docker compose --file compose.local.yaml down -v # DESTRUCTIVE: also delete named volumes
 ```
 
 Use `down -v` only when an intentional clean reset is worth losing all local data.
@@ -228,7 +228,7 @@ pnpm check          # lint + prettier format check
 pnpm format         # prettier --write .
 
 pnpm --filter ./backend db:studio    # Prisma Studio (browse the DB)
-docker compose down                  # stop services (data persists in volumes)
+docker compose --file compose.local.yaml down # stop services (data persists in volumes)
 ```
 
 ## First contribution checklist
@@ -247,11 +247,11 @@ docker compose down                  # stop services (data persists in volumes)
 
 ## Troubleshooting
 
-| Symptom                                           | Fix                                                                                                             |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Backend exits at boot with a validation error     | A required env var is missing entirely — copy `.env.example` again.                                             |
-| `Browser was not found` during generation/PDF     | Puppeteer's Chromium didn't install — re-run `pnpm install` (the build is allow-listed in root `package.json`). |
-| `Cannot connect` to Postgres/Redis/MinIO          | Start the chosen workflow and check `docker compose ps -a` for dependency health.                               |
-| Services stuck in a bad state after schema churn  | If data loss is acceptable, use the destructive `docker compose down -v`, then start the chosen workflow again. |
-| Prisma client types missing after a schema change | `pnpm --filter ./backend db:generate`.                                                                          |
-| Login redirect fails                              | Real `GOOGLE_CLIENT_*` + `JWT_SECRET` required (step 3).                                                        |
+| Symptom                                           | Fix                                                                                                                                       |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend exits at boot with a validation error     | A required env var is missing entirely — copy `.env.example` again.                                                                       |
+| `Browser was not found` during generation/PDF     | Puppeteer's Chromium didn't install — re-run `pnpm install` (the build is allow-listed in root `package.json`).                           |
+| `Cannot connect` to Postgres/Redis/MinIO          | Start the chosen workflow and check `docker compose --file compose.local.yaml ps -a` for dependency health.                               |
+| Services stuck in a bad state after schema churn  | If data loss is acceptable, use the destructive `docker compose --file compose.local.yaml down -v`, then start the chosen workflow again. |
+| Prisma client types missing after a schema change | `pnpm --filter ./backend db:generate`.                                                                                                    |
+| Login redirect fails                              | Real `GOOGLE_CLIENT_*` + `JWT_SECRET` required (step 3).                                                                                  |

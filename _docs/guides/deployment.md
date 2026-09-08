@@ -2,13 +2,13 @@
 
 > TailorTales deploys through **[Dokploy](https://dokploy.com)** as one Compose resource per
 > environment. UAT and production use the same
-> [`deploy/docker-compose.yml`](../../deploy/docker-compose.yml); only their Dokploy environment
+> [`compose.deploy.yaml`](../../compose.deploy.yaml); only their Dokploy environment
 > values and Git triggers differ.
 
 ## Compose topology
 
-The root [`docker-compose.yml`](../../docker-compose.yml) remains local-development
-infrastructure (Postgres, Redis, and MinIO). It is not the Dokploy deployment definition.
+The root [`compose.local.yaml`](../../compose.local.yaml) defines the complete local stack,
+including Postgres, Redis, and MinIO. Dokploy uses only `compose.deploy.yaml`.
 
 ```mermaid
 flowchart LR
@@ -148,7 +148,7 @@ regional S3 endpoint. The complete variable reference and build/runtime classifi
 
 ## Dokploy resources and triggers
 
-Create two Compose resources pointing to `deploy/docker-compose.yml`:
+Create two Compose resources pointing to the root `compose.deploy.yaml`:
 
 | Resource   | Git ref / trigger                                                              | Environment values |
 | ---------- | ------------------------------------------------------------------------------ | ------------------ |
@@ -227,6 +227,7 @@ remain applied, rollback is safe only while migrations follow the expand-contrac
 | ---------------------- | ------------------------------ | -------------------------------------------------------- |
 | Secret scan            | `gitleaks/gitleaks-action@v2`  | Full git history; any detected credential fails the job. |
 | Install                | `pnpm install`                 | Frozen lockfile; uses `.nvmrc` for Node version.         |
+| Deployment contract    | `pnpm compose:deploy:check`    | Renders synthetic UAT and production configurations.     |
 | Generate Prisma client | `db:generate`                  | Uses a dummy `DATABASE_URL`; no live DB needed.          |
 | Lint + format check    | `pnpm check`                   | ESLint + Prettier.                                       |
 | Framework type-check   | `pnpm --filter frontend build` | Includes generated Next.js route types.                  |

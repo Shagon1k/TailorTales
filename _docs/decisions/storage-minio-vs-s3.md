@@ -2,7 +2,7 @@
 
 ## Decision
 
-Use **MinIO** locally (via docker-compose) and on UAT (as a persistent Dokploy resource), and use
+Use **MinIO** locally (via `compose.local.yaml`) and on UAT (as a persistent Dokploy resource), and use
 **AWS S3** only in production. All profiles use the same `@aws-sdk/client-s3` client — the only
 difference is the endpoint, credentials, and `forcePathStyle` env vars.
 
@@ -15,7 +15,7 @@ Real S3 in dev is a valid option (and eliminates any parity risk), but it requir
 - A dedicated dev bucket that accumulates test files (PDFs, images)
 - Small but real AWS costs
 
-For a project where `docker-compose up` should be the only requirement to run the full stack,
+For a project where one `docker compose --file compose.local.yaml up` command should run the stack,
 adding an external cloud dependency to the dev loop is friction we'd rather avoid.
 
 ## Why not filesystem for dev?

@@ -43,6 +43,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
+            - name: Check deployment Compose contract
+              run: pnpm compose:deploy:check
+
             - name: Generate Prisma client
               run: pnpm --filter backend db:generate
               env:

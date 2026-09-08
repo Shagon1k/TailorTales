@@ -13,6 +13,7 @@
         "prepare": "husky",
         "dev": "pnpm --parallel --filter \"./backend\" --filter \"./frontend\" dev",
         "build": "pnpm --filter \"./backend\" build && pnpm --filter \"./frontend\" build",
+        "compose:deploy:check": "node scripts/check-compose-deploy.mjs",
         "lint": "pnpm --filter \"./backend\" --filter \"./frontend\" lint",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
