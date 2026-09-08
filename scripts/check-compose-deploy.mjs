@@ -9,7 +9,7 @@ const applicationServices = ['backend', 'frontend', 'release'];
 const sharedInputs = {
     GOOGLE_CLIENT_ID: 'synthetic-client-id',
     GOOGLE_CLIENT_SECRET: 'synthetic-client-secret',
-    JWT_SECRET: 'synthetic-jwt-secret-at-least-32-characters',
+    JWT_SECRET: 'x'.repeat(32),
     AUTH_ALLOWED_EMAILS: '',
     E2E_TEST_SECRET: '',
     OPENROUTER_API_KEY: 'synthetic-openrouter-key',
