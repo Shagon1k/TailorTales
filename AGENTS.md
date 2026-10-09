@@ -18,7 +18,6 @@ Before finishing, remove unnecessary indirection, redundant checks, and speculat
 
 These guidelines do not override repository-specific approval requirements, architecture constraints, or verification gates.
 
-
 ## Core
 
 - **Role Contract**: The human provides intent, constraints, and acceptance criteria. The agent chooses the route, executes, and proves the result. Acceptance criteria must exist before substantial work begins; evidence must exist before claiming completion.
