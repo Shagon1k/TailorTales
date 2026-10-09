@@ -1,6 +1,23 @@
 # TailorTales
 
-**Important!** Don't be lazy.
+## Simplicity and scope
+
+Implement the requested behavior with the simplest clear solution that fits the existing codebase. Optimize for maintainers reading and changing the code, not for hypothetical future requirements.
+
+- Prefer straightforward control flow, concrete functions, and existing conventions. Add abstractions only when they simplify a current requirement or remove meaningful existing duplication.
+- Do not introduce generic frameworks, extension points, configuration, dependencies, or extra layers for a single bounded use case unless current requirements justify them.
+- Handle expected failures and validate untrusted input at system boundaries. Inside trusted code, rely on established contracts instead of repeating defensive checks.
+- Add retries, fallbacks, recovery paths, and compatibility behavior only for an identified requirement or a demonstrated failure mode. Prefer a clear, actionable error over speculative recovery.
+- Match edge-case handling to both likelihood and impact. Do not add substantial complexity for low-impact hypothetical cases. Preserve security, authorization, data integrity, and explicit acceptance requirements.
+- Keep changes focused. Do not combine the task with unrelated cleanup, restructuring, or future-proofing.
+- Test required behavior, meaningful failure paths, and observed regressions. Do not invent new product requirements merely to cover more cases.
+
+For non-trivial changes, briefly state the simplest approach, what existing code it reuses, and what is intentionally out of scope. Do not create a separate design document or wait for additional approval unless a material trade-off or repository-specific rule requires it.
+
+Before finishing, remove unnecessary indirection, redundant checks, and speculative branches introduced by your change. If a rare case would require disproportionate complexity, disclose the limitation rather than silently expanding the implementation. Simplicity means fewer unnecessary mechanisms, not compressed or cryptic code.
+
+These guidelines do not override repository-specific approval requirements, architecture constraints, or verification gates.
+
 
 ## Core
 
@@ -11,10 +28,10 @@
 
 ## Process
 
-- **Check docs first**: before searching the codebase for patterns or implementation details, identify the task type, find the relevant doc via the docs map (`_docs/README.md`), and read it. Search the codebase only after confirming the docs don't already answer the question. Docs encode curated patterns, conventions, and architectural decisions; skipping them duplicates investigation and risks reinventing anti-patterns.
+- **Check docs first**: before searching the codebase for patterns or implementation details, identify the task type, find the relevant doc via the docs map (`_docs/README.md`), and read it. Search the codebase only after confirming the docs don't already answer the question.
 - Analyze impact before writing code.
 - **Execution Loop**: for substantial tasks, work in a loop: explore enough to avoid guessing, execute the smallest useful move, then reflect with evidence before continuing.
-- Fight for the "obvious" solution. Avoid being clever because something seems smart. We want everything we create to be so obvious it feels kind of stupid. Never hesitate to push back and suggest ways we could make things more obvious. Note that "obvious" and "simple" are not always aligned; sometimes the obvious solution is more complex.
+- Prefer obvious solutions over clever ones; push back and suggest clearer alternatives. Obvious and simple are not always aligned: the obvious solution may be more complex.
 - Ask when unclear; group all questions in one message, don't ask one-by-one. Ask especially when requirements are ambiguous, multiple approaches are equally valid, architectural tradeoffs are material, or policy applicability is unclear.
 - For changes touching >5 files or ~100+ LOC: outline the plan -> get approval -> then deliver incrementally.
 - **Stronger Second Check**: do not treat weak evidence as final truth. If the first result is inconclusive, fetch missing context or perform one stronger confirming check before escalating or concluding.
@@ -58,7 +75,6 @@ Session context hygiene: apply the same rule within every session. Plans, summar
 
 ## Code
 
-- Write minimal but readable code. The codebase should remain easy to follow for any developer picking it up.
 - YAGNI: write only what the current task needs. Exceptions require explicit approval.
 - Match surrounding code conventions when no explicit styleguide exists.
 - NEVER swallow errors or hide failures behind silent fallbacks. Let them surface or log them explicitly.
@@ -80,7 +96,7 @@ Session context hygiene: apply the same rule within every session. Plans, summar
 ## Git
 
 - GitHub Flow, `TT-<type>-<descriptor>` branches, Conventional Commits, squash merge. Full spec: `.agent-docs/rules/git.md`.
-- One logical change per commit. Refactors require approval and go in a separate commit with no behavior change.
+- One logical change per commit.
 - Commit, push, and PR authorization for owner-started Project 2 runs follows
   `.agent-docs/rules/github-issues.md`. Outside that narrow issue-scoped exception,
   NEVER commit, push, or open a PR without explicit developer approval.
